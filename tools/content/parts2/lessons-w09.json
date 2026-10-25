@@ -1,0 +1,576 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w9-s1",
+   "summary": "You work through all eight People tasks of the July 2026 PMP exam with the Release 2 team, then resolve the conflict between Tomás Rivera and Ahmed Haddad over the gateway firewall change window and record it in the team charter and conflict record.",
+   "read": [
+    {
+     "heading": "The People domain and the Release 2 team",
+     "body": "People is 33% of the PMP exam and has eight tasks:\n\n1. Develop a common vision\n2. Manage conflicts\n3. Lead the project team\n4. Engage stakeholders\n5. Align stakeholder expectations\n6. Manage stakeholder expectations\n7. Help ensure knowledge transfer\n8. Plan and manage communication\n\nIn People questions the best answer usually has you acting yourself, early, with the people involved, before you escalate.\n\nYour Release 2 core team has ten people: you; Grace Liu (E-005, access service owner); Tomás Rivera (E-006, access-governance dashboard and its refresh); Kevin Park (E-009) and Lucas Girard (E-033), directory and provisioning setup; Ahmed Haddad (E-017, network and firewall changes); Nora Lindqvist (E-018, human resources events and data); Sam Okafor (E-020, security monitoring and tests); Janelle Cardinal (E-008), clinical workflow and owner of risk R-03, multi-factor authentication (MFA) prompts slow clinicians at shared workstations; and Aisha Mahmoud (E-010), clinical workflow and acceptance testing. Daniel Osei (E-004, security) and Priya Raman (E-003, privacy) advise.\n\nOne gap: WP-108, MFA and single sign-on rollout, has no owner. Ask the sponsor, Dr. Helen Marchetti (E-001), to name one before work starts on 2026-10-26."
+    },
+    {
+     "heading": "Task 1: develop a common vision",
+     "body": "A common vision is a short, shared picture of success that each team member can test their work against. Build it with the team and tie it to measures.\n\nRelease 2's vision: the right access on the first shift, and no access after the last one. It ties to the charter measures:\n\n| Measure | Baseline (data) | Target (agreed) |\n|---|---|---|\n| Access requests resolved within 72 hours | 27.3% | 80% |\n| Median days to fulfil an access request | 4.26 | 1 |\n| Missed leavers | 2 | 0 |\n| Privileged accounts with MFA | 66.7% | 100% |\n| Q3 access reviews completed on time | 66.7% | 100% |\n\nIf Kevin Park wants to keep his approval rights \"to keep things moving\", the vision answers him: speed matters, and so does proof of who can see what. On the exam, when people pull in different directions, bring them back to the shared goal."
+    },
+    {
+     "heading": "Task 2: manage conflicts with the five modes",
+     "body": "Conflict usually comes from schedules, priorities, resources, technical opinions or procedures, rarely from personalities. Deal with it early and privately, and aim at the problem, not the person.\n\n| Mode | What it looks like | When it fits | Beacon example |\n|---|---|---|---|\n| Collaborate or problem solve | Work the real problem until both concerns are met | Time allows; both concerns matter | The gateway change window |\n| Compromise or reconcile | Each side gives up something | Equal power, a deadline, a temporary fix will do | Splitting pilot training between two units |\n| Smooth or accommodate | Stress agreement; one side gives way | The point matters far more to the other side | Grace Liu picks the article template |\n| Force or direct | One view wins by authority | Emergency, safety or a legal duty | Isolating desktops in a ransomware precursor (SEC-004) |\n| Withdraw or avoid | Postpone or step back | Tempers high, issue trivial, facts missing | Pausing a heated stand-up |\n\nCollaborate is the default best answer when there is time: it fixes the cause and keeps the relationship. Force only when safety, the law or an emergency leaves no room to talk. Avoiding is never a final answer.\n\nA facilitated resolution has fixed steps: meet each person privately; bring them together; separate positions (what each demands) from interests (why); agree the facts; generate options together; choose against agreed criteria; record and follow up."
+    },
+    {
+     "heading": "The Beacon conflict: the gateway firewall change window",
+     "body": "Tomás Rivera needs a firewall change so the on-premises data gateway can refresh the access-governance dashboard. At stand-up on 2026-11-09 he asks for it during the day on 2026-11-10, so he can test the refresh before acceptance testing (task 19, on the critical path from 2026-11-23). Ahmed Haddad refuses a daytime change. The same firewall carries the Virtual Desktop Service (A-008) traffic that clinicians at every site use to reach the Clinical Information System (CIS, A-001), and Ahmed is that service's custodian: one wrong rule could cut a ward off from patient records. Kestrel's standard core-firewall window is Sunday 01:00 to 05:00, and the next one with capacity is 2026-11-22, one day before testing. That afternoon an email about the dispute is copied to Marcus Bell (E-002).\n\nPositions: a daytime change on 2026-11-10 against the standard window on 2026-11-22. Interests: Tomás needs time to build and test the refresh before testing, while Lumen Analytics Partners (V-05) can still help (R-07) and because he alone knows the model (R-06); Ahmed needs clinical access to stay up, and every network change to have change approval and a rollback plan.\n\nWhat you did:\n\n1. On 2026-11-09, met each privately to hear the facts and the need behind each position, and told Marcus Bell you were handling it.\n2. On 2026-11-10 at 10:00, ran a facilitated session. The shared goal came first: a safe change and a tested refresh before testing.\n3. Compared four options on clinical risk, test time and approval: a daytime change (clinical risk), the 2026-11-22 window (no test time), a lunchtime change (still clinical hours) and an extra overnight window that week.\n4. Both chose the extra overnight window, Thursday 2026-11-12 23:00 to Friday 2026-11-13 01:00. Ahmed tests the rule in the test environment on 2026-11-12 and writes a rollback, Tomás is on call to run a test refresh, and the service desk is told in advance. Marcus Bell approved the change through change control on 2026-11-10.\n5. On 2026-11-13 the change went in inside the window and the test refresh passed.\n\nThe mode was collaborate. Forcing either date would have overridden a legitimate need: there was no emergency, both had a point, and the team has weeks of work left together. Because the window went through change control, the decision sits inside governance."
+    },
+    {
+     "heading": "Tasks 3 to 6: lead the team and work with stakeholders",
+     "body": "Lead the project team (task 3): set direction, agree roles, delegate real decisions, develop people and recognize good work. The gateway argument is the storming stage (forming, storming, norming, performing, adjourning); a team charter helps a team reach norming.\n\nServant leadership is the style the exam rewards: remove impediments, shield the team from distraction, coach rather than command, and let the team decide how to do its work. In Release 2 that means getting WP-108 an owner, pushing the fix for Kevin Park's segregation-of-duties conflict (issue I-01), and routing new requests through change control.\n\nEngage stakeholders (task 4): track each one's current and desired engagement (unaware, resistant, neutral, supportive, leading). Janelle Cardinal supports Beacon but resists MFA at shared workstations. Start with her concern: watch a shift change on Medicine 4A at Kestrel General Hospital and involve her in designing the pilot.\n\nAlign stakeholder expectations (task 5) early: agree what success means and what each group will experience, such as how often an MFA prompt appears. Manage stakeholder expectations (task 6) throughout: if Kestrel adds Remembrance Day (2026-11-11) to the calendar, the Release 2 gate moves a day, to 2026-11-27. Add Thanksgiving (2026-10-12), which falls in critical task 8, as well and the Release 1 gate moves to 2026-10-26, the Release 2 gate to 2026-11-30 and programme acceptance to 2026-12-21. Tell the sponsor early, with options."
+    },
+    {
+     "heading": "Tasks 7 and 8: knowledge transfer and communication",
+     "body": "Help ensure knowledge transfer (task 7). Explicit knowledge is written down; tacit knowledge lives in people's heads and leaves with them. Two Beacon cases:\n\n- R-06, key-person dependency on Tomás Rivera for the semantic model: pair Mei Tanaka (E-013) with him on every model change and have her run a refresh and a release on her own.\n- R-07, the Lumen Analytics Partners (V-05) contract ends 2026-11-30: hold handover sessions before then and make their files and notes a contract deliverable.\n\nPlan and manage communication (task 8): the sponsor needs exceptions and decisions, the board impact assessments, the team a daily stand-up, and clinicians short notices before MFA reaches them. Use interactive communication for decisions and conflict, push for must-know notices, and pull for large audiences.\n\nChannels = n(n - 1) / 2. The ten-person core team has 10 x 9 / 2 = 45. Add the two advisers and it becomes 12 x 11 / 2 = 66, so every message needs a named owner."
+    },
+    {
+     "heading": "What goes in a team charter and a conflict record",
+     "body": "A team charter is the team's own agreement on how it works. The team writes it and you facilitate. A Beacon charter holds:\n\n- Purpose and vision, with the five Release 2 measures.\n- Members, roles, work packages and decision rights.\n- Working agreements: stand-up time, reply times, where work is tracked, how requests arrive.\n- Disagreement and escalation: raise it with the person first, then at stand-up; with no agreement in 2 working days the Programme Manager facilitates; baseline changes go to the change-control board chaired by Marcus Bell, and priority clashes between releases to Dr. Helen Marchetti (sponsor).\n\nA conflict record captures one conflict: date, parties, issue, positions, interests, agreed facts, options, decision, mode and why, follow-up owners, and the working agreement added afterwards. After the gateway conflict the team added working agreement 7: any network or firewall change touching clinical traffic goes on the release plan as soon as the need is known, runs in an overnight window approved through change control, and has a tested rollback.\n\nWhen someone breaks a ground rule, the exam answer is a private conversation that points back to the charter."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Team charter",
+     "definition": "The team's own written agreement on its purpose, vision, working agreements, decision rules and how it handles disagreement. The team creates it together and the project manager facilitates."
+    },
+    {
+     "term": "Conflict-resolution modes",
+     "definition": "Five ways to handle conflict: collaborate or problem solve, compromise or reconcile, smooth or accommodate, force or direct, and withdraw or avoid. Collaborate is preferred when time allows; force fits only emergencies, safety or legal duties."
+    },
+    {
+     "term": "Positions and interests",
+     "definition": "A position is what someone demands; an interest is why they want it. Solving for interests, such as Ahmed's need for clinical uptime and Tomás's need for a tested refresh, opens options the positions hide."
+    },
+    {
+     "term": "Servant leadership",
+     "definition": "A leadership style where the leader serves the team first: removing impediments, shielding it from distraction, coaching, and letting the team decide how to do its work."
+    },
+    {
+     "term": "Stakeholder engagement level",
+     "definition": "Where a stakeholder stands on the project: unaware, resistant, neutral, supportive or leading. You record current and desired levels and plan actions to close the gap."
+    },
+    {
+     "term": "Tacit and explicit knowledge",
+     "definition": "Explicit knowledge is written down and easy to share. Tacit knowledge lives in people's experience. Knowledge transfer moves tacit knowledge into other people and documents before someone leaves."
+    },
+    {
+     "term": "Communication channels",
+     "definition": "The number of possible two-way paths between people on a team, n(n - 1) / 2. Ten people have 45 channels; twelve have 66."
+    }
+   ],
+   "build": {
+    "goal": "Write the Release 2 team charter with the team, and record how the gateway firewall conflict between Tomás Rivera and Ahmed Haddad was resolved, so the team has agreed ways of working and a tested route for the next disagreement.",
+    "steps": [
+     "Open Project, choose Release 2, then Team charter and conflict record. Read How to write it and See the finished example before you write.",
+     "Write the purpose and vision: the one-sentence vision and the five Release 2 measures with their baselines (data) and targets (agreed).",
+     "List the ten core members and the two advisers with E-IDs and Release 2 roles. Record that WP-108 has no owner and the action to ask Dr. Helen Marchetti to name one.",
+     "Write the working agreements and decision rules: stand-up, reply times, where work is tracked, which decisions the team makes and which go to the change-control board.",
+     "Write the conflict record for the gateway firewall change: parties, issue, positions, interests, agreed facts, the four options, the decision, the mode used and why forcing was rejected, and follow-up owners.",
+     "Add the escalation path and the new working agreement on network and firewall changes, then tick every item in Done when.",
+     "Write Explain it in your own words (why collaborating fitted this conflict) and answer the five Check yourself questions."
+    ],
+    "modelAnswer": "Conflict record extract (example). CF-01, raised 2026-11-09. Issue: timing of the firewall change the on-premises data gateway needs. Parties: Tomás Rivera (E-006), Ahmed Haddad (E-017). Positions: a daytime change on 2026-11-10; the standard Sunday window on 2026-11-22. Interests: a tested refresh before task 19; no risk to clinician access through A-008, with an approved change and a rollback plan. Decision (2026-11-10): an extra overnight window, 2026-11-12 23:00 to 2026-11-13 01:00, approved through change control; Ahmed makes the change, Tomás tests refresh on the call. Mode: collaborate. Outcome: change made and test refresh passed on 2026-11-13; working agreement 7 added to the charter."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "When two team members clash, the first move is to talk with them, privately and then together. Escalating to the sponsor or a functional manager first is almost always wrong unless you have already tried, or a rule or law has been broken."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Collaborate or problem solve is the best answer when time allows. Choose force or direct only when safety, a legal duty or an emergency leaves no time, and treat withdraw or avoid as a pause, never a resolution."
+    },
+    {
+     "cert": "PMP",
+     "tip": "The team creates the team charter and the project manager facilitates. If someone breaks a ground rule, point back to the charter in a private conversation before involving anyone else."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Servant leadership answers remove impediments, coach and let the team self-organize. Distrust options where the project manager assigns tasks inside an agile team or makes its technical decisions."
+    }
+   ],
+   "pitfalls": [
+    "Arguing about positions. Ask each person why they want what they want; the interests usually allow an option neither side proposed.",
+    "Going to the sponsor before you have talked with the people in the conflict.",
+    "Writing the team charter yourself and sending it out. The team must write it, or the team will not follow it.",
+    "Recording a conflict as resolved when you only postponed it. Avoiding buys time; it fixes nothing."
+   ],
+   "check": [
+    {
+     "q": "Tomás messages Marcus Bell asking him to order Ahmed to make the firewall change today. What should the Programme Manager do first, and why?",
+     "a": "Meet Tomás and Ahmed, privately first and then together, to understand each person's interest and agree the facts, and tell Marcus Bell you are handling it. Escalating or forcing before the team has tried to solve it damages trust and skips the cheapest, most durable fix: a collaborative decision taken inside change control."
+    },
+    {
+     "q": "Give one Beacon situation where forcing is the right conflict mode, and explain why collaborating would be wrong there.",
+     "a": "Containing a ransomware precursor like SEC-004 on the Virtual Desktop Service: the security lead isolates the affected desktops at once, by authority. Patient care and data are at stake and minutes matter, so there is no time to find an option that pleases everyone. The discussion and learning happen afterwards, in the review."
+    },
+    {
+     "q": "The Release 2 core team has ten people. How many communication channels is that, and how many do the two advisers add?",
+     "a": "Ten people have 10 x 9 / 2 = 45 channels. Twelve have 12 x 11 / 2 = 66, so the two advisers add 21 channels. That growth is why every message in the communication plan needs a named owner and a set channel."
+    }
+   ]
+  },
+  {
+   "key": "w9-s2",
+   "summary": "You learn all ten Process tasks and earned value in full with Beacon's 2026-10-01 figures: the base values, variances and indices, every common EAC, ETC, VAC and TCPI, and how to read them against the critical path. Then you write the earned value status report.",
+   "read": [
+    {
+     "heading": "The Process domain: ten tasks",
+     "body": "Process is the largest PMP domain at 41%. Its ten tasks, with a Beacon example each:\n\n1. Develop an integrated project management plan and plan delivery: one charter, schedule and budget for three releases.\n2. Develop and manage project scope: the scope statement, work breakdown structure (WBS) and CR-01.\n3. Help ensure value-based delivery: patient-flow dashboards first, so leaders get value early.\n4. Plan and manage resources: an owner for every work package (WP-108 still lacks one).\n5. Plan and manage procurement: the fixed-price Lumen Analytics Partners (V-05) contract.\n6. Plan and manage finance: the CAD 1,200,000 budget and CAD 120,000 management reserve.\n7. Plan and optimize quality of products/deliverables: the quality plan and user-acceptance test (UAT) scripts.\n8. Plan and manage schedule: critical path and float.\n9. Evaluate project status: earned value, today's topic.\n10. Manage project closure: Release 2 closes next week.\n\nBeacon is hybrid: predictive governance (charter, board, fixed gates) with iterative work inside releases. Tailoring means choosing that mix on purpose and recording why."
+    },
+    {
+     "heading": "Earned value: the base numbers",
+     "body": "Earned value compares planned work, done work and cost at a status date. The register's latest data is 2026-10-01, so that is the status date.\n\n- Budget at completion (BAC): the total approved budget, CAD 1,200,000.\n- Planned value (PV): budget for the work that should be done by now (budget x planned percent).\n- Earned value (EV): budget for the work actually done (budget x percent complete).\n- Actual cost (AC): what that work really cost.\n\nClean the register first: drop the duplicate WP-104 row, use 60,000 for WP-113 (a confirmed sign error) and cap WP-101 at 100%. Uncleaned totals of 1,220,000 or 1,080,000 are wrong.\n\nFive work packages carry value (your own calculation; CPI and SPI, the cost and schedule performance indices, are explained next):\n\n| Work package | PV | EV | AC | CPI | SPI |\n|---|---|---|---|---|---|\n| WP-101 Mobilization and charter | 40,000 | 40,000 | 41,200 | 0.97 | 1.00 |\n| WP-102 Privacy impact assessment, threat model | 70,000 | 63,000 | 68,500 | 0.92 | 0.90 |\n| WP-103 Profiling and warehouse staging | 101,400 | 78,000 | 92,300 | 0.85 | 0.77 |\n| WP-104 Semantic model and dashboards | 0 | 7,000 | 9,000 | 0.78 | not defined |\n| WP-106 Role catalogue and access design | 67,500 | 36,000 | 39,600 | 0.91 | 0.53 |\n| Programme | 278,900 | 224,000 | 250,600 | 0.89 | 0.80 |\n\nPercent complete is the weak point, because people guess it. Make it objective: 0/100 for short tasks, 50/50, or weighted milestones, such as 25% when the role catalogue draft is reviewed."
+    },
+    {
+     "heading": "Variances and indices",
+     "body": "Variances subtract, indices divide, and both start with EV.\n\n- Cost variance: CV = EV - AC = 224,000 - 250,600 = -26,600.\n- Schedule variance: SV = EV - PV = 224,000 - 278,900 = -54,900.\n- Cost performance index: CPI = EV / AC = 0.89. Each dollar spent earned about 89 cents of planned work.\n- Schedule performance index: SPI = EV / PV = 0.80. Beacon has done 80% of the work planned by now.\n\nBelow zero and below 1.0 are unfavourable. Cross-check: Beacon has spent 20.9% of its budget but completed 18.7% of the work.\n\nSo Beacon is over cost and behind. When the exam shows numbers like these and asks what to do first, find the cause before acting. The cost overrun sits mostly in WP-103, CAD -14,300 of the -26,600 (54%): profiling and staging took more effort than estimated, which matches what the emergency extract showed (duplicates, an invalid date, out-of-range triage levels). That needs a different fix from people working slowly."
+    },
+    {
+     "heading": "Forecasts: EAC, ETC, VAC and TCPI",
+     "body": "The estimate at completion (EAC) is what you now expect the whole programme to cost. The formula follows what you believe about the remaining work:\n\n| What you believe | Formula | Beacon (CAD) |\n|---|---|---|\n| Current cost performance continues | BAC / CPI | 1,342,500 |\n| The overrun was a one-off | AC + (BAC - EV) | 1,226,600 |\n| Cost and schedule pressure both continue | AC + (BAC - EV) / (CPI x SPI) | 1,610,113 |\n| The original estimates were wrong | AC + new bottom-up ETC | needs a new estimate |\n\nKestrel reports 1,342,500 because the data-quality overrun carries into later packages. Use the unrounded CPI (224,000 / 250,600); dividing by the rounded 0.89 gives 1,348,315 instead.\n\n- Estimate to complete: ETC = EAC - AC = 1,091,900.\n- Variance at completion: VAC = BAC - EAC = -142,500.\n- To-complete performance index: TCPI = (BAC - EV) / (BAC - AC) = 976,000 / 949,400 = 1.03. To finish on budget, each remaining dollar must earn 1.03 dollars of work, against 0.89 so far. That is unrealistic without a change.\n- TCPI against the EAC: 976,000 / 1,091,900 = 0.89, the current CPI.\n\nTotal authorized funding is CAD 1,320,000: the BAC plus the sponsor's CAD 120,000 management reserve. The EAC is 22,500 above it. That is the trigger for R-08, owned by Marcus Bell. Even spending the whole reserve needs a TCPI of (BAC - EV) / (1,320,000 - AC) = 976,000 / 1,069,400 = 0.91, better than today's 0.89."
+    },
+    {
+     "heading": "Earned value and the critical path together",
+     "body": "SPI is measured in dollars and treats all late work alike. The critical path tells you which late work moves a date.\n\n- WP-102 (owner Priya Raman, E-003), SPI 0.90, holds task 4, Complete privacy impact assessment: critical, due 2026-09-24 and still at 90% on the status date. Task 6 cannot start until it finishes.\n- WP-103 (owner Mei Tanaka, E-013), SPI 0.77, maps to schedule tasks 5 (2 days of float) and 6 (zero float, critical). At the status date it threatened the Release 1 gate on 2026-10-23.\n- WP-106 (owner Daniel Osei, E-004), SPI 0.53, the worst in the register, maps to task 13, which has 14 working days of float. It is behind its own plan but not yet a threat to the Release 2 gate.\n\nSo the worst SPI is not the most urgent problem. Recover the critical-path work first: close task 4 in WP-102, then recover task 6 in WP-103. Watch WP-106's float before task 14 (joiner-mover-leaver events from human resources, HR) starts on 2026-10-26.\n\nSplit by release so one release cannot hide in the average. Release 1: PV 211,400, EV 188,000, AC 211,000, CPI 0.89, SPI 0.89. Release 2 so far (WP-106 only): CPI 0.91, SPI 0.53. Near the end of any project SPI drifts back to 1.0, because all work is eventually earned, so trust the dates more than SPI then."
+    },
+    {
+     "heading": "Schedule and quality",
+     "body": "Release 2's critical path: task 14 (2026-10-26 to 2026-11-10), task 17 Redesign the access-request value stream (2026-11-11 to 2026-11-20), task 19 Pilot and acceptance testing, and the gate on 2026-11-26. Tasks 15 and 18 have 4 days of float; task 16 has 6.\n\nThe calendar has no holidays. Remembrance Day, 2026-11-11, is task 17's first day. Add it and the Release 2 gate moves to 2026-11-27. Thanksgiving, 2026-10-12, falls in critical task 8; add both holidays and the Release 1 gate moves to 2026-10-26, the Release 2 gate to 2026-11-30 and programme acceptance to 2026-12-21 (your own forward pass). To hold the date, crash (add people to a critical task: more cost), fast track (overlap tasks planned in sequence: more rework risk), or move the date or scope through the board. Compression only helps on the critical path; crashing task 16 buys nothing.\n\nQuality means meeting requirements and being fit for use, and prevention beats inspection. Quality assurance checks the process: is there a UAT script for every role, including what must be refused? Quality control checks the output: did Olivia Grant's excess order-entry grant actually go? Cost of quality is conformance (prevention and appraisal) plus non-conformance (failures found before or after release). Control tests CT-006 (multi-factor authentication for privileged accounts), CT-007 (access review completion) and CT-008 (leaver accounts) all failed at 2026-10-01; acceptance needs evidence that each now passes."
+    },
+    {
+     "heading": "How to report status",
+     "body": "A status report supports a decision. Write it for the sponsor, Dr. Helen Marchetti, and the change-control board.\n\n1. Headline: overall health, a colour and the rule behind it. A proposed Beacon rule: red when CPI or SPI is below 0.90.\n2. Numbers: BAC, PV, EV, AC, CV, SV, CPI and SPI, with the status date.\n3. Forecast: the EAC you chose and why, the range from the other formulas (1,226,600 to 1,610,113), plus ETC, VAC and TCPI.\n4. Causes, by work package, tied to the critical path.\n5. Actions, with owners and dates.\n6. Decisions needed: for example a bottom-up re-estimate of Releases 2 and 3, release of reserve, or a scope cut through change control.\n7. Risks and issues, starting with R-08.\n\nGive bad news early and plainly. Hiding a red status until a gate is the classic mistake the exam punishes."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Planned value (PV)",
+     "definition": "The budget for the work scheduled to be done by the status date. Beacon's PV at 2026-10-01 is CAD 278,900."
+    },
+    {
+     "term": "Earned value (EV)",
+     "definition": "The budget for the work actually completed by the status date: budget x percent complete. Beacon's EV is CAD 224,000."
+    },
+    {
+     "term": "Actual cost (AC)",
+     "definition": "The cost actually incurred for the work done by the status date. Compare it with EV, never with PV. Beacon's AC is CAD 250,600."
+    },
+    {
+     "term": "Cost performance index (CPI)",
+     "definition": "EV / AC. Below 1.0 means over budget. Beacon's CPI of 0.89 means each dollar spent earned about 89 cents of planned work."
+    },
+    {
+     "term": "Schedule performance index (SPI)",
+     "definition": "EV / PV. Below 1.0 means behind. It is measured in dollars, so read it alongside the critical path; it drifts back to 1.0 as a project ends."
+    },
+    {
+     "term": "Estimate at completion (EAC)",
+     "definition": "The expected total cost. BAC / CPI when performance continues (CAD 1,342,500 for Beacon), AC + (BAC - EV) for a one-off variance, or AC plus a new estimate when the plan was wrong."
+    },
+    {
+     "term": "To-complete performance index (TCPI)",
+     "definition": "(BAC - EV) / (BAC - AC): the efficiency the remaining work needs to finish on budget. Beacon's 1.03 against a CPI of 0.89 shows the budget is out of reach without a change."
+    },
+    {
+     "term": "Cost of quality",
+     "definition": "The cost of conformance (prevention and appraisal, such as training and testing) plus the cost of non-conformance (internal and external failures). Spending on prevention usually lowers the total."
+    }
+   ],
+   "build": {
+    "goal": "Write the Beacon earned value status report as at 2026-10-01: rebuild the figures from the cleaned register, choose and justify a forecast, tie the variances to the critical path, and ask the sponsor for the decisions you need.",
+    "steps": [
+     "Open Project, choose Release 2, then Earned value status report. Read How to write it and See the finished example.",
+     "Rebuild the totals from khn_programme_register.csv in Practice, Labs or a spreadsheet: remove the WP-104 duplicate, use 60,000 for WP-113 and cap WP-101 at 100. Confirm PV 278,900, EV 224,000 and AC 250,600.",
+     "Calculate CV, SV, CPI and SPI, then the four EAC forms, ETC, VAC and the TCPI values to the BAC, to total authorized funding and to the EAC. Show each calculation so a reviewer can repeat it.",
+     "Break the figures down by release and work package. Mark WP-102 (task 4) and WP-103 (task 6) as critical path with zero float, and WP-106 as behind but with 14 days of float (task 13).",
+     "Choose the EAC you report, explain why, compare it with total authorized funding of CAD 1,320,000 and record the R-08 trigger.",
+     "Write the headline, causes, actions with owners, decisions needed and the holiday schedule note (Remembrance Day and Thanksgiving).",
+     "Tick Done when, write Explain it in your own words (why the worst SPI is not the first priority) and answer Check yourself."
+    ],
+    "modelAnswer": "Headline (example): Red. At 2026-10-01 Beacon has earned CAD 224,000 of work against CAD 278,900 planned, and spent CAD 250,600 (CPI 0.89, SPI 0.80). If cost performance continues, the programme will cost CAD 1,342,500: CAD 142,500 over budget and CAD 22,500 above total authorized funding. The main causes sit on the critical path: extra data-quality effort in WP-103 (54% of the cost variance) and the privacy impact assessment in WP-102, due 2026-09-24 and still at 90%. Decisions needed: name an owner for WP-108, and approve a bottom-up re-estimate of Releases 2 and 3 before any management reserve is released."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Process task 9, Evaluate project status: know CV = EV - AC, SV = EV - PV, CPI = EV / AC, SPI = EV / PV, EAC = BAC / CPI, ETC = EAC - AC, VAC = BAC - EAC and TCPI = (BAC - EV) / (BAC - AC). Below zero and below 1.0 are unfavourable."
+    },
+    {
+     "cert": "PMP",
+     "tip": "When a question shows poor CPI or SPI and asks what to do first, choose the option that analyzes the cause. Crashing, cutting scope or asking for money come after you know why."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Pick the EAC formula from the story: 'expected to continue' means BAC / CPI; 'one-time event' means AC + (BAC - EV); 'the estimates were wrong' means AC plus a new bottom-up ETC."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Graphic-based items may show an S-curve. EV below PV means behind schedule; AC above EV means over budget. Read the legend before you read the lines."
+    }
+   ],
+   "pitfalls": [
+    "Comparing AC with PV. Cost performance compares AC with EV; schedule performance compares EV with PV.",
+    "Dividing by the rounded CPI. 1,200,000 / 0.89 = 1,348,315, not the approved 1,342,500.",
+    "Treating the worst SPI as the most urgent problem without checking float on the critical path.",
+    "Totalling the raw register. The duplicate WP-104 and the negative WP-113 give wrong totals of 1,220,000 or 1,080,000."
+   ],
+   "check": [
+    {
+     "q": "Why is Beacon's EAC CAD 1,342,500, and what does it mean for the management reserve?",
+     "a": "EAC = BAC / CPI with the unrounded CPI (224,000 / 250,600), so 1,200,000 x 250,600 / 224,000 = 1,342,500. It assumes current cost performance continues. It is 22,500 above total authorized funding of CAD 1,320,000, so on current trends the overrun would use the whole CAD 120,000 reserve and more: the R-08 trigger."
+    },
+    {
+     "q": "WP-106 has SPI 0.53. Is the Release 2 gate at risk today?",
+     "a": "Not yet. Its schedule task 13 has 14 working days of total float, so it can slip without moving the gate. It still needs watching: if its float runs out before task 14 starts on 2026-10-26 it becomes critical. WP-102 (task 4) and WP-103 (task 6), on zero-float tasks, are the more urgent problems."
+    },
+    {
+     "q": "TCPI to finish on budget is 1.03. What does that tell the sponsor?",
+     "a": "The remaining work would have to earn 1.03 dollars of value for every dollar spent, better than the 0.89 achieved so far. A jump that large is rarely achieved, so finishing within CAD 1,200,000 is unrealistic without a change agreed through change control: more funding, less scope or a better plan."
+    }
+   ]
+  },
+  {
+   "key": "w9-s3",
+   "summary": "You learn all eight Business Environment tasks through Release 2: governance, compliance with the Health Information Act and the Protection of Privacy Act, change, issues, risk, improvement, organizational change and external changes. Then you design the service desk knowledge and escalation model for access issues.",
+   "read": [
+    {
+     "heading": "The Business Environment domain and Beacon's governance",
+     "body": "Business Environment is 26% of the PMP exam. Its eight tasks:\n\n1. Define and establish project governance\n2. Plan and manage project compliance\n3. Manage and control changes\n4. Remove impediments and manage issues\n5. Plan and manage risk\n6. Continuous improvement\n7. Support organizational change\n8. Evaluate external business environment changes\n\nThe strong answer works within governance: assess, involve the accountable person, record, and act through the agreed route.\n\nBeacon's decision rights: the sponsor, Dr. Helen Marchetti (E-001), authorized the programme (D-01) and passes gates on evidence (D-02); the change-control board, chaired by Marcus Bell (E-002), decides baseline changes; risk owners accept risk.\n\nManage and control changes (task 3) follows one route: log, assess impact, decide at the right level, record, update baselines, communicate. CR-01 is the model. Janelle Cardinal (E-008) asked for a patient-level list of alternate level of care (ALC) patients on the bed dashboard. The board refused it as asked, because the Health Information Act requires the least information and the highest anonymity, and approved unit-level ALC counts instead (3 days of model work, gate unchanged). In adaptive work the product owner reorders the backlog; anything that moves a baseline, gate or budget still goes to the board."
+    },
+    {
+     "heading": "Compliance: the Health Information Act and POPA",
+     "body": "Kestrel is a public body and a custodian under the Health Information Act (HIA). Two laws apply:\n\n- Patient health information, such as in the Clinical Information System (CIS), falls under the HIA.\n- Non-health personal information, such as staff records from human resources (HR) in the HR and Payroll System (A-015), falls under the Protection of Privacy Act (POPA), in force since June 11, 2025.\n\nHIA duties Release 2 serves:\n\n- Section 60: keep administrative, technical and physical safeguards against unauthorized access, use and disclosure. Role-based access, multi-factor authentication (MFA) and access reviews are such safeguards.\n- Sections 57 and 58: the highest degree of anonymity possible and only the amount of information essential for the purpose. A least-privilege role matrix applies this.\n- Section 64: a privacy impact assessment for a new or changed system handling identifying health information, submitted to the Information and Privacy Commissioner for review and comment (not approval) before implementation.\n- Section 60.1: where there is a risk of harm to an individual from loss or unauthorized access or disclosure, notify the Commissioner as soon as practicable, the Minister responsible under the Act, and the affected individuals.\n\nAffiliates, such as employees, contractors and agency nurses, must follow the Act, and Kestrel stays responsible for them. So Olivia Grant's account (E-014), enabled after her contract ended, is a safeguard failure; whether it is a breach depends on whether it was used, which Priya Raman (E-003), the Chief Privacy Officer, decides with the HIA risk-of-harm test. POPA uses a different test, real risk of significant harm, and has required a privacy management program since June 11, 2026."
+    },
+    {
+     "heading": "External changes: the 2026 Health Information Act amendments",
+     "body": "Evaluate external business environment changes (task 8): watch laws, suppliers, technology and markets, and judge the effect on scope, risk and value.\n\nAmendments to the HIA came into force on June 22, 2026, with further amendments on July 2, 2026. As the Commissioner described them, they add a sharing custodian model for shared health information and rules for putting identifying health information into automated systems, including artificial intelligence. A privacy impact assessment is now also needed before becoming a sharing custodian, joining a common or integrated program or service, or performing data matching.\n\nHow you handle it:\n\n1. Do not interpret the law yourself. Ask Priya Raman to assess the effect on Beacon.\n2. Give her specific questions: does any Beacon practice now need a privacy impact assessment? Do the security logs that Sentinel SOC Services (V-04), a security operations centre (SOC), processes in the United States contain health information? The HIA does not ban storage outside Canada, but section 60 requires safeguards for information stored or used outside Alberta.\n3. Record the answer in the risk, assumption, issue and decision (RAID) log, raise a change request if scope changes, and tell the people affected.\n\nAnother external change: vendor support for Clinical Paging and Secure Messaging (A-014) ended 2026-06-30."
+    },
+    {
+     "heading": "Issues, risk, improvement and organizational change",
+     "body": "Remove impediments and manage issues (task 4). An issue has happened; a risk might. Each issue needs an owner and a route to closure:\n\n- I-01: Kevin Park (E-009) can provision, approve and administer audit logs on the Identity Directory. Fix: approval moves to business owners, audit logs to security.\n- I-02: missed leavers E-014 and E-027 are still enabled. Disable them now, then find out why HR and ClearPath Staffing (V-03) end dates did not reach IT.\n\nPlan and manage risk (task 5). Threats: avoid, mitigate, transfer, accept, or escalate when outside your authority. Opportunities: exploit, enhance, share, accept, or escalate. R-03 (MFA prompts slow clinicians) is mitigated by a one-unit pilot that measures sign-in time; R-05 (Sentinel SOC Services) by privacy review and contract safeguards.\n\nContinuous improvement (task 6): capture lessons as they happen and hold a retrospective each cycle.\n\nSupport organizational change (task 7): people need to know why, want to take part, know how, be able to, and have the change reinforced. Training covers only the knowing. Security awareness for agency and vendor workers is 48% against a 90% target, so plan for them first."
+    },
+    {
+     "heading": "The service desk side: incidents, requests and knowledge",
+     "body": "The access service runs through the service desk, so these ITIL practices matter:\n\n- Service desk: the single point of contact for users.\n- Incident management: an incident is an unplanned interruption to a service or a reduction in its quality. Restore service fast.\n- Service request management: a service request asks for something that is a normal part of the service, such as new access or a password reset. Fulfil it reliably.\n- Knowledge management, problem management (removing causes) and service level management.\n\nFulfilling an access request is the Deliver lifecycle stage; helping when access fails is Support.\n\nYour own counts from khn_service_desk.csv (SD-10210 duplicate removed): all 49 access requests went to the Identity and Access group, 36 for CIS access, 7 for the Virtual Desktop Service and 6 for Power BI; 17 were P3 (24-hour target) and 32 were P4 (72-hour target). Only 15.2% met target, the median took 102.3 hours, and 27.3% were resolved within 72 hours against the agreed 80%. The Service Desk group handled 27 password resets itself.\n\nClassify by need, not wording. \"I need CIS access for my new job\" is a service request. \"My access stopped working after MFA enrolment\" is an incident. \"Someone used my account\" is a security incident for security, at once."
+    },
+    {
+     "heading": "Designing knowledge and escalation for access issues",
+     "body": "Write each knowledge article for someone using it at 07:00 on a busy shift: a title in the user's words, symptoms, cause, steps, any workaround, who may act, an owner and a review date.\n\nEscalation moves work to whoever can resolve it:\n\n- Functional escalation goes to more expertise: service desk analyst, then the Identity and Access group, then Clinical Applications or Meridian Clinical Systems (V-01) for CIS faults.\n- Hierarchical escalation goes up the management line when a target is about to be missed or impact is serious: Grace Liu (E-005), then Marcus Bell.\n- Specialist routes: suspected misuse to Sam Okafor (E-020), the SOC liaison; a possible privacy breach to Priya Raman.\n\nPriority comes from impact and urgency. Kestrel's targets are in the data: P1 4 hours, P2 8, P3 24, P4 72. A proposed rule: a clinician who cannot reach the CIS at shift start is at least P2, a whole unit locked out is P1, and a routine new-access request for next week is P4.\n\nReport access requests resolved within 72 hours (target 80%, agreed) and median days to fulfil (target 1, agreed)."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Project governance",
+     "definition": "The framework of decision rights, gates, roles and oversight around a project. In Beacon the sponsor authorizes and passes gates, the change-control board decides baseline changes, and risk owners accept risk."
+    },
+    {
+     "term": "Compliance requirement",
+     "definition": "An obligation from law, regulation, contract or policy that the project must meet and prove, such as the HIA duty to keep safeguards (section 60). Each one needs an owner, a control and evidence."
+    },
+    {
+     "term": "External business environment change",
+     "definition": "A change outside the project, such as a new law, a supplier change or end of vendor support, that can affect scope, risk or value. You assess it with the right expert and act through change control."
+    },
+    {
+     "term": "Incident",
+     "definition": "An unplanned interruption to a service or a reduction in its quality, such as CIS access that stops working after MFA enrolment. Incident management restores service as fast as possible."
+    },
+    {
+     "term": "Service request",
+     "definition": "A user request for something that is a normal part of the service, such as new CIS access or a password reset. Service request management fulfils it through a standard, measured workflow."
+    },
+    {
+     "term": "Knowledge article",
+     "definition": "A reusable record of how to resolve a request or fault: title in the user's words, symptoms, cause, steps, workaround, who may act, owner and review date. It lets the service desk resolve more at first contact."
+    },
+    {
+     "term": "Functional and hierarchical escalation",
+     "definition": "Functional escalation passes work to a team with more expertise. Hierarchical escalation passes it up the management line when targets or impact need a management decision."
+    },
+    {
+     "term": "Service level",
+     "definition": "A measured level of service quality, such as the share of access requests resolved within 72 hours. Kestrel's ticket targets are P1 4, P2 8, P3 24 and P4 72 hours."
+    }
+   ],
+   "build": {
+    "goal": "Design the service desk knowledge and escalation model for Release 2 access issues: classify contacts, outline the core knowledge articles, set escalation routes and service levels, and link each part to the compliance duty it supports.",
+    "steps": [
+     "Open Project, choose Release 2, then Service desk knowledge and escalation model. Read How to write it and See the finished example.",
+     "Classify the access contact types into service requests and incidents, using the counts from khn_service_desk.csv: 49 access requests (36 CIS, 7 virtual desktop, 6 Power BI) and 27 password resets.",
+     "Outline five knowledge articles: new CIS access, mover role change, MFA enrolment failure, locked account at shift start, and agency or vendor end dates. Give each an owner and a review date.",
+     "Draw the escalation model: the functional tiers, the hierarchical triggers, and the security and privacy routes to Sam Okafor and Priya Raman.",
+     "Set the priority rules and service levels: the P1 to P4 targets from the data, the agreed 72-hour target, and the measures you will report.",
+     "Add a compliance column: which HIA duty each part supports (section 60 safeguards, sections 57 and 58 least information, section 60.1 breach route) and where POPA applies to staff records.",
+     "Tick Done when, write Explain it in your own words and answer Check yourself."
+    ],
+    "modelAnswer": "Knowledge article (example; KB-ACC-05 in the finished model covers MFA enrolment). Title: I cannot sign in to the CIS after enrolling in MFA. Symptoms: the sign-in prompt loops on a shared workstation. Cause: MFA registered on an old phone, or enrolment not finished. Resolution: the analyst verifies identity against the human resources (HR) record and, for a phone request, calls back the number held there, then resets the MFA registration and stays on the line while the clinician enrols again. Workaround: none; never use another person's session. Escalate: Identity and Access group if the reset fails. Owner: Grace Liu (E-005). Review: every six months and after any process or system change (proposed)."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Business Environment questions reward working within governance. If a powerful stakeholder wants a change now, log it and take it through change control; seniority never justifies changing a baseline directly."
+    },
+    {
+     "cert": "PMP",
+     "tip": "When a new regulation or compliance requirement appears mid-project, assess its impact with the accountable expert, update the risk register and plans, and raise a change request if scope changes. Never ignore it, and never interpret the law yourself."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "An incident means something is broken or degraded; a service request is a normal, pre-defined request such as new access or a password reset. Exam options often swap the two."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Functional escalation goes to more expertise; hierarchical escalation goes up the management line. Knowledge management puts the right knowledge at the point of need so more contacts are resolved first time."
+    }
+   ],
+   "pitfalls": [
+    "Treating every access contact as an incident. A new access request is a service request with its own fulfilment workflow and target.",
+    "Saying the Commissioner approved a privacy impact assessment. Under the HIA the Commissioner reviews and comments; Kestrel stays accountable.",
+    "Applying the HIA to staff records. Patient health information falls under the HIA; staff personal information from HR falls under POPA.",
+    "Writing knowledge articles in IT language. Write titles in the words a nurse would type or say."
+   ],
+   "check": [
+    {
+     "q": "A clinician calls: 'My CIS access stopped working this morning after I enrolled in MFA.' Is this an incident or a service request, and how is it handled?",
+     "a": "An incident: an existing service is interrupted. The service desk logs it, sets priority from impact and urgency (at least P2 under the proposed rule, because it blocks care at shift start), uses the MFA knowledge article to restore access, and escalates functionally to the Identity and Access group if the reset fails."
+    },
+    {
+     "q": "Which law covers the HR data that drives joiner-mover-leaver events, and why does it matter?",
+     "a": "POPA, because it is non-health personal information about staff held by a public body; patient health information in the CIS falls under the HIA. It matters because the breach tests differ: POPA uses real risk of significant harm, while the HIA uses risk of harm."
+    },
+    {
+     "q": "The 2026 Health Information Act amendments arrive mid-programme. What do you do as Programme Manager?",
+     "a": "Ask the Chief Privacy Officer, Priya Raman, to assess the effect on Beacon, with specific questions such as whether any practice now needs a privacy impact assessment. Record the outcome in the RAID log, raise a change request if scope changes, and tell the stakeholders affected. You neither interpret the law yourself nor ignore it."
+    }
+   ]
+  },
+  {
+   "key": "w9-s4",
+   "summary": "You learn exactly how the July 2026 PMP exam works, how to read situational questions and how to pace 180 questions in 240 minutes. Then you sit timed PMP mock 1 in Practice and start the error journal that drives your repair work.",
+   "read": [
+    {
+     "heading": "The PMP exam you will sit",
+     "body": "The Project Management Professional (PMP) exam from the Project Management Institute (PMI) changed on July 9, 2026. The facts that matter:\n\n- 180 questions: 170 scored and 10 unscored pretest questions. You cannot tell which are which, so treat every question as scored.\n- 240 minutes, with two 10-minute breaks.\n- At a test centre (on computer or paper) or online with a remote proctor.\n- Three domains: People 33% (8 tasks), Process 41% (10 tasks), Business Environment 26% (8 tasks). Of 170 scored questions that is roughly 56 People, 70 Process and 44 Business Environment.\n\nQuestion types:\n\n- Case or scenario: a short story, then a question about it.\n- Graphic-based: a chart to read, such as an S-curve, a burndown chart or a network diagram.\n- Multiple choice, single response: pick one answer.\n- Multiple response: pick the number of answers the question asks for.\n- Computer-based only: enhanced matching, matching, point and click, and pull-down list.\n\nMost questions are situational: a project moment, then \"what should you do?\". Formulas help, but judgment wins this exam."
+    },
+    {
+     "heading": "How to read a situational question",
+     "body": "Use the same five steps every time.\n\n1. Read the last sentence first. Does it ask what to do first, next, best, most likely, or what not to do? \"First\" wants analysis or a conversation. \"Next\" usually means the analysis is done.\n2. Find the delivery approach. Backlog, iteration, product owner and retrospective mean adaptive. Baseline, change-control board, work breakdown structure and contract mean predictive. A mix means hybrid.\n3. Find your role and authority. You are the project manager unless told otherwise. You cannot approve your own change or accept a risk the sponsor owns.\n4. Remove weak options: escalating before trying yourself, ignoring the problem, acting without analysis, bypassing the agreed process, blaming someone.\n5. Choose the option that deals with the cause, involves the right people, stays within governance and protects value.\n\nTry it: \"Grace Liu says the access-request queue has doubled since multi-factor authentication (MFA) enrolment began. What should you do first?\" Asking the sponsor for staff escalates before analysis; adding an MFA knowledge article assumes the cause. Analyzing the new tickets with Grace comes first."
+    },
+    {
+     "heading": "Agile, predictive and hybrid cues, servant leadership and tailoring",
+     "body": "The approach in the question changes the right answer.\n\n| If the question shows | The right answer usually |\n|---|---|\n| A change to an approved baseline, predictive project | Goes through integrated change control and the board |\n| A new request to an agile team | Goes to the product owner for the backlog |\n| A team member blocked by an impediment | Gets the servant leader's help to remove it |\n| A team deciding how to do its work | Is left to the team; the leader facilitates |\n| Stable, regulated, well-understood work | Suits predictive planning with formal gates |\n| Uncertain needs and cheap feedback | Suits adaptive delivery in short cycles |\n\nServant leadership answers coach, facilitate, remove impediments and protect the team's focus. Distrust any option where the project manager assigns tasks inside an agile team, overrules its estimates or tells it how to build something.\n\nTailoring is choosing the approach, processes and documents that fit, on purpose. Beacon gives privileged access a predictive path with formal security sign-off, because errors are costly and policy fixes the requirements, and builds dashboards iteratively, because leaders know what they need once they see it. An answer that tailors with a reason beats one method everywhere."
+    },
+    {
+     "heading": "Pacing and breaks",
+     "body": "240 minutes over 180 questions gives you at most 80 seconds a question. Practise at about 70 seconds. At that pace you reach question 60 at about 70 minutes, question 120 at about 140, and question 180 at about 210, leaving a buffer for flagged questions.\n\nRules that protect your time:\n\n- After two minutes on a question, choose your best answer, flag it and move on. An answered flagged question still scores if you never return.\n- Answer every question. A blank can never be right.\n- Long scenarios are not harder, only longer. Read the last sentence first and skim the story for the cue.\n- Review flagged questions before each break, in case you cannot go back to them afterwards.\n- Take both breaks. Stand, drink water, reset. Tired candidates lose marks in the last third.\n- Change an answer only for a specific reason, such as a word you misread. A vague doubt is not a reason.\n\nA strange question may be one of the ten pretest items: answer it and move on."
+    },
+    {
+     "heading": "How to run mock 1 in the app",
+     "body": "Practice, Timed set gives you 15 minutes of questions for the exam you choose and records the result as evidence. Mock 1 strings timed sets together to build stamina.\n\n| Block | What you do | Minutes |\n|---|---|---|\n| 1 | Three PMP timed sets back to back | 45 |\n| Break | Stand up, water, no notes | 10 |\n| 2 | Three more PMP timed sets | 45 |\n| Break | Same as the first | 10 |\n| 3 | Three more PMP timed sets | 45 |\n| Review | Practice, Review, and the error journal | 85 |\n\nConditions: phone away, no notes, no lesson open, one sitting, 70-second pace, flag and move after two minutes.\n\nThen review by domain: compare each domain's share of your misses with its exam weight. If 40% of misses are Business Environment (26% of the exam), it needs work first. Practice, Review holds every wrong or guessed answer: read the explanation, write an error journal line, then answer it again. An item leaves Review when your latest answer is correct and not marked as a guess.\n\nThis mock feeds your PMP gate. Timed sets at 80% or better count toward gate check 3 (two are needed). Your answers are the decisions gate check 4 counts (at least 24, under 30% wrong). Clearing Review works toward check 5."
+    },
+    {
+     "heading": "The error journal",
+     "body": "An error journal turns wrong answers into rules. Keep it on paper or in a simple file, one line per wrong or guessed answer:\n\n| Field | What to write |\n|---|---|\n| Question | A short description, such as \"queue doubles after MFA\" |\n| Domain and task | For example, Process, task 9 Evaluate project status |\n| My answer and why | What you chose and the reasoning you used |\n| Right answer and why | The reasoning that makes it right |\n| Error type | Knowledge gap, misread, trap, second-guess or time |\n| Rule | One sentence you will apply next time |\n\nThe error type matters most, because each has a different cure:\n\n- Knowledge gap: you did not know the concept. Re-teach it.\n- Misread: you missed first, next or not, or misread a number. Slow down on the last sentence.\n- Trap: you chose an answer that sounds strong but escalates early, skips analysis or bypasses governance. Add it to your trap list.\n- Second-guess: you had it right and changed it. Change only with a specific reason.\n- Time: you rushed. Fix the pacing, not the knowledge.\n\nAfter the mock, total the journal by domain and by error type. Those two totals decide what you repair in week 10."
+    },
+    {
+     "heading": "High-yield review: People",
+     "body": "Read these rules once before the mock. Each decides a common question.\n\n- Conflict: talk directly and privately first; collaborate when time allows; force only for safety, law or emergency; avoiding is a pause.\n- Underperformance: a private talk, find the cause (skills, clarity, personal issue), then coach or train. Removal is a last resort.\n- Broken ground rule: point back to the team charter the team agreed.\n- New team member: onboard with the charter, roles and a buddy.\n- Resistant stakeholder: understand the concern first, then involve them. Escalation comes later.\n- Engagement: compare current and desired levels (unaware, resistant, neutral, supportive, leading) and plan for the gap.\n- Communication: interactive for decisions and sensitive news, push for must-know notices, pull for large audiences. Channels = n(n - 1) / 2.\n- Motivation: autonomy, mastery and purpose move people more than pressure. Recognize work the way the person values.\n- Emotional intelligence: manage yourself first, then read and influence others.\n- Knowledge transfer: plan it before people leave, especially contractors such as Lumen Analytics Partners (V-05)."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Pretest questions",
+     "definition": "The 10 unscored questions among the PMP's 180. They look like the rest and cannot be identified, so you treat every question as scored."
+    },
+    {
+     "term": "Situational question",
+     "definition": "A question that describes a project moment and asks what you would do first, next or best. You answer it by reading the last sentence first, finding the approach and your authority, and removing trap options."
+    },
+    {
+     "term": "Multiple response item",
+     "definition": "A PMP question type that asks you to choose a stated number of answers. Each chosen option must be right on its own."
+    },
+    {
+     "term": "Tailoring",
+     "definition": "Choosing the delivery approach, processes and documents that fit a project on purpose, and recording why. Beacon uses predictive gates for privileged access and iterative builds for dashboards."
+    },
+    {
+     "term": "Error journal",
+     "definition": "A log of every wrong or guessed practice answer with domain, task, both lines of reasoning, the error type and a rule for next time. Its totals decide what you repair."
+    },
+    {
+     "term": "Timed set",
+     "definition": "A 15-minute set of questions for the exam you choose in Practice, recorded as evidence. Two PMP timed sets at 80% or better meet gate check 3."
+    }
+   ],
+   "build": {
+    "goal": "Sit PMP mock 1 under exam conditions using Practice, Timed set, then review every wrong or guessed answer by domain and record each one in your error journal.",
+    "steps": [
+     "Read the high-yield People list once, put your phone away and close every lesson and note.",
+     "Open Practice, choose Timed set and select PMP. Run three sets back to back (45 minutes) at about 70 seconds a question, flagging and moving on after two minutes.",
+     "Take a 10-minute break, run three more timed sets, take a second break, then run the final three.",
+     "Write down the score of each timed set and mark the ones at 80% or better for gate check 3.",
+     "Open Practice, Review. For every wrong or guessed answer write an error journal line (domain, task, both lines of reasoning, error type, rule), then answer it again.",
+     "Total your misses by domain and by error type, and compare the domain shares with the exam weights of 33%, 41% and 26%.",
+     "Write your top two repair targets at the bottom of the journal, then open Today and Mark done."
+    ],
+    "modelAnswer": "Error journal: PMP mock 1. Every entry below is an example of how a line should look.\n\n| Question | Domain and task | My answer and why | Right answer and why | Error type | Rule |\n|---|---|---|---|---|---|\n| Example: queue doubles after MFA enrolment | Process, task 9 Evaluate project status | Asked the sponsor for two more analysts, because the queue was growing | Analyze the new tickets with Grace Liu first; the cause was unknown | Trap | First means find the cause before acting |\n| Example: director asks an agile developer for a report mid-iteration | People, task 6 Manage stakeholder expectations | Added it to the iteration to keep the director happy | Refer it to the product owner for the backlog; the iteration goal is protected | Knowledge gap | New work in agile goes to the product owner |\n| Example: cost performance index (CPI) 0.89 and schedule performance index (SPI) 0.80, which statement is true | Process, task 9 Evaluate project status | Ahead of schedule, over budget | Behind schedule and over budget: both indices are below 1.0 | Misread | An index below 1.0 is unfavourable for both |\n| Example: a privacy law changes mid-project | Business Environment, task 8 Evaluate external business environment changes | Carried on, because the law changed after the charter | Assess the impact with the privacy officer, update the risk register, raise a change if needed | Knowledge gap | External changes are assessed, never ignored |\n| Example: two engineers argue about a change window | People, task 2 Manage conflicts | Chose collaborate, then changed to compromise | Collaborate: time allowed and both concerns were valid | Second-guess | Change an answer only for a specific reason |\n| Example: one-off overrun, which EAC | Process, task 6 Plan and manage finance | BAC / CPI | AC + (BAC - EV), because the variance will not continue | Knowledge gap | One-off variance means the atypical EAC |\n\nTotals (example values)\n\n| Domain | Misses | Share of misses | Exam weight |\n|---|---|---|---|\n| People | 4 | 27% | 33% |\n| Process | 5 | 33% | 41% |\n| Business Environment | 6 | 40% | 26% |\n| Total | 15 | 100% | 100% |\n\nBy error type (example values): knowledge gap 6, trap 4, misread 3, second-guess 1, time 1.\n\nTimed sets (example values): 73%, 67%, 80%, 70%, 73%, 67%, 75%, 70%, 67%. One at 80% or better so far.\n\nRepair targets (example): 1. Business Environment, because it holds 40% of the misses against 26% of the exam. 2. Trap answers, because four misses came from escalating or acting before analysis; apply step 4 of the reading method on every question in mock 2."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Read the last sentence first. 'First' asks for analysis or a conversation; 'next' assumes the analysis is done; 'not' or 'except' flips the question. Many wrong answers come from misreading this one line."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Ten of the 180 questions are unscored pretest items you cannot identify. Treat every question as scored and do not let one odd question break your pace."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Multiple response items tell you how many answers to choose. Choose exactly that number, and make sure each chosen option is right on its own."
+    },
+    {
+     "cert": "PMP",
+     "tip": "If the scenario mentions a backlog, iterations or a product owner, apply adaptive answers: the product owner orders the work and the team decides how. If it mentions a baseline and a change-control board, apply predictive change control."
+    }
+   ],
+   "pitfalls": [
+    "Reviewing only wrong answers. Guessed answers that happened to be right hide the same gaps, which is why Review keeps them.",
+    "Writing 'careless' as the error type. Name the real type (misread, trap, second-guess, time) so you know the cure.",
+    "Taking the mock with notes or a lesson open. A mock with help tells you nothing about exam day.",
+    "Spending five minutes on one question. Answer, flag and move on after two."
+   ],
+   "check": [
+    {
+     "q": "How many questions does the PMP have, how long is it, and how many questions are scored?",
+     "a": "180 questions in 240 minutes with two 10-minute breaks. 170 are scored and 10 are unscored pretest questions that you cannot identify, so you treat every question as scored."
+    },
+    {
+     "q": "A question says the team works from a product backlog, and a director asks a developer to add a report this iteration. What does the cue tell you?",
+     "a": "It is adaptive. New work goes to the product owner, who decides where it sits in the backlog, and the current iteration's goal is protected. As servant leader you coach the director on that route rather than adding the work yourself."
+    },
+    {
+     "q": "Your mock shows 40% of your misses in Business Environment. Why is that a priority?",
+     "a": "Business Environment is 26% of the exam, so 40% of misses means you lose marks there faster than its weight. Repairing an over-represented domain gains more than polishing one where your misses already match or sit below its weight."
+    }
+   ]
+  },
+  {
+   "key": "w9-s5",
+   "summary": "You sit timed PMP mock 2 as one long sitting, explain every correction in writing, and review the high-yield rules for Process, Business Environment and agile delivery so the errors from mock 1 do not come back.",
+   "read": [
+    {
+     "heading": "What changes in mock 2",
+     "body": "Mock 1 showed where you lose marks. Mock 2 tests whether the fixes hold under pressure, and it adds one rule: every correction gets a written explanation.\n\nRun the same shape as mock 1, but keep a pace chart: after each block, write the clock time and questions answered. Most people slow down after the second break; knowing your curve lets you plan for it.\n\nRead your mock 1 rules once beforehand, but do not reread lessons: apply the rules from memory.\n\nAfterwards compare the two mocks on four numbers: average timed-set score, number of timed sets at 80% or better, misses by domain and misses by error type. Traps and misreads usually improve first, because they are habits. Knowledge gaps take longer, which is what week 10, day 2 is for."
+    },
+    {
+     "heading": "How to explain a correction",
+     "body": "Writing the explanation forces you to find the exact step of reasoning that failed. Use five parts:\n\n1. The situation, in one line.\n2. The cue: the word or fact that should have decided the answer.\n3. Why the right answer is right.\n4. Why your answer was wrong: name the trap.\n5. The rule you will use next time.\n\nA Beacon-style example. The change-control board has approved CR-01, so the semantic model needs 3 days of extra work. What should the project manager do next?\n\n\"The board had already decided, so the cue was 'next'. The right answer is to update the schedule and cost baselines and tell the people affected, because an approved change must show in the plans. I chose to assess the impact again, but that assessment came before the decision, so repeating it wastes time. Rule: after approval, update baselines and communicate.\"\n\nGate check 5 needs at least six written explanations of 80 characters or more. Write them in the Explain it in your own words box of the matching documents in Project, such as the change-control process for a change question, and keep each in your error journal too."
+    },
+    {
+     "heading": "High-yield review: Process",
+     "body": "- Change: log, assess impact, decide at the right authority, update baselines, communicate. You never approve your own change.\n- Scope: validate scope is the customer formally accepting deliverables; control scope manages changes to the scope baseline. Gold plating (unrequested extras) adds cost and risk without approved value, so avoid it.\n- Work breakdown structure (WBS): the 100% rule means nothing in scope is missing and nothing outside it appears.\n- Schedule: critical tasks have zero float. Crash (more cost) or fast track (more risk) only critical tasks. Resource levelling can move the end date; resource smoothing stays within float.\n- Reserves: contingency reserve sits inside the cost baseline for identified risks; management reserve sits outside it for unknown risks and needs sponsor approval. Beacon's CAD 120,000 is management reserve.\n- Earned value: from planned value (PV), earned value (EV), actual cost (AC) and budget at completion (BAC), cost variance CV = EV - AC; schedule variance SV = EV - PV; cost performance index CPI = EV / AC; schedule performance index SPI = EV / PV; estimate at completion EAC = BAC / CPI when performance continues; estimate to complete ETC = EAC - AC; variance at completion VAC = BAC - EAC; to-complete performance index TCPI = (BAC - EV) / (BAC - AC).\n- Quality: assurance checks the process, control checks the output before the customer validates it, and prevention is cheaper than inspection. Seven points in a row on one side of a control chart's mean is a signal.\n- Resources: a responsible, accountable, consulted, informed (RACI) chart has exactly one Accountable per item.\n- Procurement: firm fixed price puts cost risk on the seller and needs clear scope; cost-reimbursable puts it on the buyer; time and materials needs a not-to-exceed limit.\n- Value: deliver usable increments early; a minimum viable product tests value with the least work.\n- Closure: acceptance, handover, contracts closed, people released, lessons, archive. Cancelled projects are closed too."
+    },
+    {
+     "heading": "High-yield review: Business Environment",
+     "body": "- Governance: know who decides what. The sponsor authorizes and funds; the board decides baseline changes; you manage within delegated authority.\n- Compliance: identify requirements early, give each an owner and keep evidence. A gap found late is an issue to resolve, never to hide.\n- Change: every baseline change is assessed and decided, even the sponsor's.\n- Issues and risks: an issue has happened and needs an owner and a resolution date; a risk is uncertain and needs an owner, a trigger and a response.\n- Responses: threats are avoided, mitigated, transferred, accepted or escalated; opportunities are exploited, enhanced, shared, accepted or escalated. Escalate when the risk is outside the project's authority.\n- Risk owner: the person best placed to manage it, not always you. Beacon's R-04 belongs to Daniel Osei.\n- Impediments: remove them, or escalate those outside the team's control. Capture lessons throughout, not only at the end.\n- Organizational change: people need awareness, desire, knowledge, ability and reinforcement. Training alone does not create desire.\n- External environment: when a law, supplier or technology changes, assess the effect on value and scope with the right expert, then act through change control.\n- Benefits: a benefit owner tracks benefits after delivery. Outputs are not benefits."
+    },
+    {
+     "heading": "Agile and hybrid in depth",
+     "body": "- Roles: the product owner owns the backlog and orders it by value; the team decides how to do the work and estimates it; the servant leader facilitates and removes impediments.\n- Artifacts: the product backlog holds everything that might be built; the iteration backlog holds this cycle's commitment; the increment is the usable result.\n- Events: planning; a daily stand-up of about 15 minutes on progress, plan and impediments, with problem solving afterwards; a review that shows the increment to stakeholders; a retrospective that improves how the team works.\n- Definition of done applies to every item; acceptance criteria belong to one item. An item is finished only when it meets both.\n- Metrics: velocity is the team's own planning tool, never a way to compare teams. A burndown shows work left; a burnup shows work done against total scope, so scope growth is visible.\n- Kanban: limit work in progress and measure cycle time.\n- Change goes through the product owner and backlog, not into the current iteration. Spikes (short, time-boxed experiments) reduce uncertainty.\n- Hybrid: Beacon iterates inside releases under predictive governance, so baseline changes still go to the board."
+    },
+    {
+     "heading": "Trap answers and how to beat them",
+     "body": "These options look strong and are usually wrong.\n\n| Trap | Why it is usually wrong | Beacon version |\n|---|---|---|\n| Escalate to the sponsor | You have not tried to solve it yourself | Taking the gateway conflict to Dr. Marchetti |\n| Replace the team member | Skips coaching and finding the cause | Moving Tomás off the dashboard |\n| Do the work yourself | Takes ownership from the team | Writing the firewall rule yourself |\n| Change the baseline now | Bypasses change control | Adding the patient-level list without the board |\n| Ignore it, it is small | Small issues grow, and honesty still applies | Not reporting a CPI of 0.89 |\n| Update lessons learned | Right activity, wrong moment when action is needed | Logging a lesson instead of disabling E-014 |\n\nAlso distrust absolute words such as always and never, and any answer that blames. The best answer fixes the cause, involves the right people and stays within the rules."
+    },
+    {
+     "heading": "Running mock 2 and comparing results",
+     "body": "Session plan for 240 minutes:\n\n1. Read your mock 1 rules once (5 minutes).\n2. Block 1: three PMP timed sets (45 minutes); note time and count on your pace chart.\n3. Break (10 minutes).\n4. Block 2: three timed sets (45 minutes); pace chart.\n5. Break (10 minutes).\n6. Block 3: three timed sets (45 minutes); pace chart.\n7. Review and explain (80 minutes): Practice, Review, an error journal line for every item, and a written explanation in Project for at least six of them.\n\nThen fill the comparison table and pick no more than three repair targets for week 10, day 2. Two timed sets at 80% or better meet gate check 3, but keep practising: one good day can be luck."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Written explanation",
+     "definition": "Your own account of a correction: situation, cue, why the right answer is right, why yours was wrong and the rule. At 80 characters or more in Project it counts toward gate check 5, which needs six."
+    },
+    {
+     "term": "Pace chart",
+     "definition": "A note of the clock time and questions answered after each block of a mock. It shows where your speed drops so you can plan checkpoints for exam day."
+    },
+    {
+     "term": "Gold plating",
+     "definition": "Adding features or extras the customer did not ask for. It adds cost and risk without approved value, so the exam treats it as something to avoid, not good service."
+    },
+    {
+     "term": "Management reserve",
+     "definition": "Budget held outside the cost baseline for unknown risks, released with sponsor or management approval. Beacon's management reserve is CAD 120,000; contingency reserve, by contrast, sits inside the baseline."
+    },
+    {
+     "term": "Definition of done",
+     "definition": "The team's shared quality standard that every backlog item must meet, such as tested and documented. Acceptance criteria are specific to one item; an item is finished only when it meets both."
+    },
+    {
+     "term": "Velocity",
+     "definition": "The amount of work an agile team completes per iteration, in its own relative units. It helps the team forecast its own capacity and must never be used to compare teams."
+    }
+   ],
+   "build": {
+    "goal": "Sit PMP mock 2 as one long timed sitting, explain every correction in writing, and compare the result with mock 1 to choose your top three repair targets.",
+    "steps": [
+     "Read your mock 1 rules once, then close your notes. Open Practice, choose Timed set and select PMP.",
+     "Run three blocks of three timed sets with a 10-minute break between blocks. After each block, write the clock time and question count on your pace chart.",
+     "Open Practice, Review. For each wrong or guessed answer, write an error journal line using the five parts: situation, cue, why right, why yours was wrong, rule.",
+     "Write at least six of those explanations, each 80 characters or more, in the Explain it in your own words box of the matching documents in Project.",
+     "Answer each Review item again until it clears: correct and not marked as a guess.",
+     "Build the mock 1 versus mock 2 comparison table and name your top three repair targets for week 10, day 2.",
+     "Open Progress to see where gate checks 3, 4 and 5 stand, then Mark done."
+    ],
+    "modelAnswer": "Error journal and comparison: PMP mock 2. Every entry and value below is an example.\n\n| Question | Domain and task | Error type | Written explanation (saved in Project) | Saved in |\n|---|---|---|---|---|\n| Example: approved change, what next | Business Environment, task 3 Manage and control changes | Trap | The board had already approved CR-01, so the cue was 'next'. Update the baselines and tell the people affected; assessing the impact again repeats work already done. | Change-control process |\n| Example: agency nurse account still enabled after contract end | Business Environment, task 4 Remove impediments and manage issues | Knowledge gap | This has already happened, so it is an issue, not a risk. Resolve it now: disable the account, remove permissions, then find why the end date never reached IT. | RAID log |\n| Example: S-curve with AC above EV and EV below PV | Process, task 9 Evaluate project status | Misread | AC above EV means over budget and EV below PV means behind schedule. I read the PV line as EV; check the legend before reading the lines. | Earned value status report |\n| Example: vendor contract ends before handover | People, task 7 Help ensure knowledge transfer | Knowledge gap | Knowledge transfer must be planned before the contract ends and made a contract output. Lumen's contract ends 2026-11-30, so handover sessions belong before it. | Procurement and vendor-risk plan |\n| Example: stakeholder resists multi-factor authentication (MFA) | People, task 4 Engage stakeholders | Trap | First understand the concern, slow sign-in at shared workstations, and involve the stakeholder in the pilot. Escalating to the sponsor first damages engagement. | Change, communication and training plan |\n| Example: who estimates in iteration planning | People, task 3 Lead the project team | Knowledge gap | In adaptive delivery the team estimates its own work and the servant leader facilitates. Imposed estimates remove the team's commitment. | Team charter and conflict record |\n\nComparison (example values)\n\n| Measure | Mock 1 | Mock 2 |\n|---|---|---|\n| Average timed-set score | 71% | 79% |\n| Timed sets at 80% or better | 1 | 4 |\n| Misses: People, Process, Business Environment | 4, 5, 6 | 3, 5, 3 |\n| Misses: knowledge gap, trap, misread, second-guess, time | 6, 4, 3, 1, 1 | 5, 2, 2, 1, 1 |\n\nPace chart (example): block 1 ended at 45 minutes, block 2 at 100, block 3 at 157: 2 minutes over the plan of 155, with fewer questions answered in block 3 than in block 1.\n\nTop three repair targets for week 10, day 2 (example): choosing the EAC formula; issue versus risk responses; agile roles and estimating."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "'Next' questions assume earlier steps are done. After a change is approved, the next step is to update the baselines and communicate, not to assess the impact again."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Control quality (the team checks deliverables against requirements) comes before validate scope (the customer formally accepts them). Options that send untested work to the customer are wrong."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Management reserve sits outside the cost baseline and needs sponsor or management approval; contingency reserve sits inside it for identified risks and the project manager can use it as the risk plan says."
+    },
+    {
+     "cert": "PMP",
+     "tip": "The daily stand-up is for coordination, not problem solving. When an issue comes up, the people involved solve it straight after the stand-up."
+    }
+   ],
+   "pitfalls": [
+    "Writing explanations that only restate the answer. Name the cue you missed and the trap you fell for.",
+    "Comparing mocks on score alone. The error-type totals show whether your habits changed.",
+    "Rereading lessons right before the mock. Apply the rules from memory, as you will on exam day.",
+    "Clearing Review by recognizing the answer. Say why each wrong option is wrong before you answer again."
+   ],
+   "check": [
+    {
+     "q": "What five parts make a useful written explanation of a correction?",
+     "a": "The situation in one line, the cue that should have decided it, why the right answer is right, why your answer was wrong (naming the trap), and the rule for next time. Written at 80 characters or more in Project, each one counts toward gate check 5."
+    },
+    {
+     "q": "Beacon's CAD 120,000: contingency reserve or management reserve, and who can release it?",
+     "a": "Management reserve. It sits outside the cost baseline, is held by the sponsor for unknown risks, and needs the sponsor's approval to use. Contingency reserve sits inside the baseline for identified risks, and the project manager uses it as the risk response plan says."
+    },
+    {
+     "q": "Why is velocity a poor measure for comparing two agile teams?",
+     "a": "Each team sizes work in its own relative units, so one team's 30 points is not another team's 30. Velocity helps a team forecast its own capacity; comparing teams with it rewards inflated estimates rather than better delivery."
+    }
+   ]
+  }
+ ]
+}

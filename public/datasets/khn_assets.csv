@@ -1,0 +1,17 @@
+asset_id,system_name,tier,business_owner_id,custodian_id,classification,hosting,vendor_id,depends_on,rto_target_hours,rpo_target_hours,end_of_support_date
+A-001,Clinical Information System (CIS),1,E-001,E-009,Restricted,On premises,V-01,A-007,4,1,2029-03-31
+A-002,Emergency Department Tracking Board,1,E-007,E-009,Restricted,On premises,V-01,A-001;A-007,4,1,2029-03-31
+A-003,Laboratory Information System,1,E-001,E-009,Restricted,On premises,,A-007,4,1,2028-09-30
+A-004,Picture Archiving and Communication System (PACS),2,E-001,E-017,Restricted,On premises,,A-007,24,4,2027-12-31
+A-005,Pharmacy System,1,,E-009,Restricted,On premises,,A-001;A-007,4,1,2028-06-30
+A-006,Bed Management System,2,E-008,E-009,Restricted,On premises,,A-001;A-007,8,4,2028-03-31
+A-007,Identity Directory,1,E-002,E-009,Confidential,On premises,,,2,1,2030-01-31
+A-008,Virtual Desktop Service,1,E-002,E-017,Internal,On premises,,A-007,4,24,2027-10-31
+A-008,Virtual Desktop Service,1,E-002,E-017,Internal,On premises,,A-007,4,24,2027-10-31
+A-009,Power BI service and Beacon semantic model,3,E-008,E-006,Confidential,Vendor hosted,,A-007;A-010,72,24,
+A-010,Clinical Data Warehouse,2,E-006,E-009,Restricted,On premises,,A-001;A-002;A-006,24,24,2029-06-30
+A-011,IT Service Management Platform,2,E-005,E-009,Internal,NorthArc Cloud,V-02,A-007,24,4,2028-12-31
+A-012,Backup Platform,1,E-002,E-009,Restricted,NorthArc Cloud,V-02,A-007,8,24,2030-06-30
+A-013,Email and Collaboration,2,E-002,E-017,Confidential,NorthArc Cloud,V-02,A-007,24,4,2029-12-31
+A-014,Clinical Paging and Secure Messaging,1,E-001,E-017,Restricted,On premises,,A-007,2,1,2026-06-30
+A-015,HR and Payroll System,3,E-018,E-009,Confidential,NorthArc Cloud,V-02,,72,24,2028-12-31

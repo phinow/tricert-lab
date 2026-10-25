@@ -1,0 +1,29 @@
+ID,Name,Duration,Start,Predecessors,Resource Names,Milestone,Release
+1,Project Beacon programme,78d,2026-09-01,,Programme Manager,No,Programme
+2,Charter approved,0d,,,Executive Sponsor;Programme Manager,Yes,Programme
+3,Confirm requirements and KPI definitions,6d,,2,Programme Manager;Director of Patient Flow;Emergency Medical Director,No,Release 1
+4,Complete privacy impact assessment,12d,,3,Chief Privacy Officer;Clinical Analytics Lead,No,Release 1
+5,Profile and clean ED and bed census sources,10d,,3,Clinical Analyst;Clinical Analytics Lead,No,Release 1
+6,Build warehouse staging and de-identified views,8d,,"4,5",Clinical Analytics Lead;Systems Administrator,No,Release 1
+7,Threat model the analytics architecture,7d,,3,Chief Information Security Officer;Security Analyst,No,Release 1
+8,Build semantic model and DAX measures,7d,,6,Clinical Analytics Lead;Power BI Consultant,No,Release 1
+9,Configure RLS and sensitivity labels,3d,,"7,8",Clinical Analytics Lead;Security Analyst,No,Release 1
+10,Prepare service desk support and knowledge articles,4d,,8,Service Desk Manager;Clinical Analyst,No,Release 1
+11,User acceptance testing with ED and patient-flow leaders,3d,,9,Director of Patient Flow;Emergency Medical Director;Clinical Analyst,No,Release 1
+12,Release 1 go-live gate,0d,,"10,11",Executive Sponsor;Chief Information Officer,Yes,Release 1
+13,Design role catalogue and RBAC model,12d,,7,Chief Information Security Officer;HR Business Partner,No,Release 2
+14,Integrate joiner-mover-leaver events from HR,12d,,"12,13",HR Business Partner;Systems Administrator,No,Release 2
+15,Roll out MFA and single sign-on,10d,,12,Network Engineer;Systems Administrator,No,Release 2
+16,Implement privileged access and SoD controls,8d,,"12,13",Chief Information Security Officer;Systems Administrator,No,Release 2
+17,Redesign the access-request value stream,8d,,14,Service Desk Manager;Programme Manager,No,Release 2
+18,Run Q3 access review and recertification,6d,,"15,16",Chief Information Security Officer;Service Desk Manager,No,Release 2
+19,Release 2 pilot and acceptance testing,4d,,"17,18",Emergency Charge Nurse;Unit Clerk;Service Desk Manager,No,Release 2
+20,Release 2 acceptance gate,0d,,19,Executive Sponsor;Chief Information Security Officer,Yes,Release 2
+21,Complete business impact analysis and recovery targets,5d,,20,Business Continuity Lead;Executive Sponsor,No,Release 3
+22,Test CIS restore and downtime procedures,6d,,21,Business Continuity Lead;Systems Administrator;CIS Vendor Support,No,Release 3
+23,Update incident response plan and run tabletop exercise,5d,,21,Chief Information Security Officer;Security Analyst,No,Release 3
+24,Remediate priority vulnerabilities,7d,,20,Security Analyst;Systems Administrator,No,Release 3
+25,Build security operations dashboard,4d,,24,Clinical Analytics Lead;Security Analyst,No,Release 3
+26,Hold major-incident review,2d,,"22,23",Chief Information Security Officer;Service Desk Manager,No,Release 3
+27,Close programme and record lessons learned,2d,,"25,26",Programme Manager,No,Release 3
+28,Programme acceptance,0d,,27,Executive Sponsor;Programme Manager,Yes,Programme

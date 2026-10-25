@@ -1,0 +1,405 @@
+{
+ "type": "flashcards",
+ "items": [
+  {
+   "cert": "PMP",
+   "front": "Charter versus business case?",
+   "back": "The business case justifies why the project is worth doing; the charter, issued by the sponsor, formally authorizes it and gives the project manager authority over resources."
+  },
+  {
+   "cert": "PMP",
+   "front": "CPI versus SPI?",
+   "back": "CPI = EV / AC measures cost efficiency and SPI = EV / PV measures schedule efficiency. For both, a value below 1.0 is unfavourable."
+  },
+  {
+   "cert": "PMP",
+   "front": "Which EAC formula applies when the cost variance is expected to continue?",
+   "back": "EAC = BAC / CPI, the typical case. If the variance was a one-off, use EAC = AC + (BAC - EV) instead."
+  },
+  {
+   "cert": "PMP",
+   "front": "CV and SV are both negative. What does that tell you?",
+   "back": "CV = EV - AC below zero means over budget, and SV = EV - PV below zero means behind schedule."
+  },
+  {
+   "cert": "PMP",
+   "front": "Total float versus free float?",
+   "back": "Total float is how long an activity can slip without delaying the project finish; free float is how long it can slip without delaying the early start of any successor."
+  },
+  {
+   "cert": "PMP",
+   "front": "Crashing versus fast tracking?",
+   "back": "Crashing adds resources to critical path activities and usually adds cost. Fast tracking overlaps activities planned in sequence and usually adds risk and rework."
+  },
+  {
+   "cert": "PMP",
+   "front": "Contingency reserve versus management reserve?",
+   "back": "Contingency reserve sits inside the baseline for identified risks (known-unknowns). Management reserve sits outside the cost baseline for unidentified risks and needs management approval to use."
+  },
+  {
+   "cert": "PMP",
+   "front": "Mitigate versus transfer a threat?",
+   "back": "Mitigate reduces the threat's probability or impact; transfer shifts ownership of the impact to a third party, such as an insurer or a fixed-price seller, usually for a premium."
+  },
+  {
+   "cert": "PMP",
+   "front": "Exploit versus enhance an opportunity?",
+   "back": "Exploit acts to make sure the opportunity happens; enhance raises its probability or impact without guaranteeing it."
+  },
+  {
+   "cert": "PMP",
+   "front": "When should a risk be escalated instead of handled by the project?",
+   "back": "When it falls outside the project scope or beyond the project manager's authority. The right owner at program, portfolio or organization level must accept it."
+  },
+  {
+   "cert": "PMP",
+   "front": "Which contract type puts the most cost risk on the seller?",
+   "back": "Firm fixed price (FFP). Under cost plus fixed fee (CPFF), the buyer carries most of the cost risk because it reimburses allowable costs."
+  },
+  {
+   "cert": "PMP",
+   "front": "When does a time and materials (T&M) contract fit, and what control should you add?",
+   "back": "It fits staff augmentation or small work with unclear scope. Add a not-to-exceed limit so cost cannot grow without control."
+  },
+  {
+   "cert": "PMP",
+   "front": "Definition of done versus acceptance criteria?",
+   "back": "The definition of done applies to every increment, such as tested, reviewed and documented. Acceptance criteria are specific conditions for one item or requirement."
+  },
+  {
+   "cert": "PMP",
+   "front": "In a RACI chart, how many people should be Accountable for each item?",
+   "back": "Exactly one. Several people can be Responsible, Consulted or Informed, but one person owns the outcome and signs off."
+  },
+  {
+   "cert": "PMP",
+   "front": "When should lessons learned be captured?",
+   "back": "Throughout the project, in a lessons learned register, not only at closure. At closure they are transferred to the organization so future projects can reuse them."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Import versus DirectQuery?",
+   "back": "Import stores a compressed copy for fast queries and full features, but data is only as fresh as the last refresh. DirectQuery queries the source live, so data is current but speed depends on the source and some features are limited."
+  },
+  {
+   "cert": "PL-300",
+   "front": "What makes DirectLake different from Import and DirectQuery?",
+   "back": "It reads Delta tables in Microsoft Fabric OneLake straight into memory when queried, giving near-Import speed without a scheduled copy of the data."
+  },
+  {
+   "cert": "PL-300",
+   "front": "How do you check whether a Power Query step folds?",
+   "back": "Right-click the step and see whether View Native Query is available. Steps that cannot be translated for the source stop folding, so put them as late as possible."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Reference versus duplicate query?",
+   "back": "Duplicate copies all steps into an independent query. Reference starts a new query from the original's output, so changes to the original flow through."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Merge versus append?",
+   "back": "Merge joins queries side by side on a key and adds columns. Append stacks queries with matching columns and adds rows."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Filter context versus row context?",
+   "back": "Filter context is the set of filters active when a measure evaluates, from visuals, slicers and CALCULATE. Row context is the current row in a calculated column or iterator, and it does not filter by itself."
+  },
+  {
+   "cert": "PL-300",
+   "front": "What does CALCULATE do?",
+   "back": "It evaluates an expression in a modified filter context, adding or replacing filters. Inside a row context it also performs context transition, turning the current row into filters."
+  },
+  {
+   "cert": "PL-300",
+   "front": "How do you handle a Date table that relates to both opened date and resolved date?",
+   "back": "Treat Date as a role-playing dimension: keep one active relationship, make the other inactive and switch it on with USERELATIONSHIP inside CALCULATE, or use a separate date table per role."
+  },
+  {
+   "cert": "PL-300",
+   "front": "What must be true before you mark a table as a date table?",
+   "back": "It needs a column of the date (or date/time) data type with unique values, no blanks and no missing dates. A date/time column must have the same time on every value. Microsoft's modelling guidance also says the date table should span full years."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Why does SUM give the wrong total for staffed beds across a month?",
+   "back": "Staffed beds are semi-additive: they add across units on the same day but not across days, because 30 days of 32 staffed beds is not 960 beds. Average the daily values or take the last snapshot instead."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Single versus both cross-filter direction?",
+   "back": "Single lets the dimension filter the fact and is the safe default. Both can create ambiguous filter paths and slower queries, so use it only for a specific, tested need."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Promoted versus certified?",
+   "back": "Any content owner with write permission can promote an item. Only reviewers authorized by the administrator can certify it, which signals it meets organizational standards."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Which workspace role is subject to RLS?",
+   "back": "Viewer. Admins, Members and Contributors can edit the semantic model, so RLS does not restrict them in that workspace."
+  },
+  {
+   "cert": "PL-300",
+   "front": "When do you need an on-premises data gateway?",
+   "back": "When the Power BI service must refresh or query a source it cannot reach directly, such as an on-premises SQL Server or a file share inside the network."
+  },
+  {
+   "cert": "PL-300",
+   "front": "When should you choose a paginated report over a Power BI report?",
+   "back": "When users need a fixed, print-ready layout across many pages, such as an invoice or a full list of every record to export or print."
+  },
+  {
+   "cert": "CISSP",
+   "front": "How do you calculate ALE?",
+   "back": "ALE = SLE x ARO, where SLE = asset value x exposure factor. For example, an SLE of 50,000 dollars with an ARO of 0.2 gives an ALE of 10,000 dollars."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Due care versus due diligence?",
+   "back": "Due care is acting as a prudent person would by putting controls in place. Due diligence is the investigation and checking that shows those controls are understood and working."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Vulnerability versus threat versus risk?",
+   "back": "A vulnerability is a weakness, a threat is something that could exploit it, and risk is the likelihood of that happening combined with the business impact."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Qualitative versus quantitative risk analysis?",
+   "back": "Qualitative ranks risks with scales such as high, medium and low using judgment. Quantitative assigns money values and frequencies, such as SLE, ARO and ALE."
+  },
+  {
+   "cert": "CISSP",
+   "front": "MAC versus DAC?",
+   "back": "In MAC the system enforces access by matching labels to clearances and users cannot change it. In DAC the resource owner decides who gets access."
+  },
+  {
+   "cert": "CISSP",
+   "front": "RBAC versus ABAC?",
+   "back": "RBAC grants permissions through job roles. ABAC evaluates policies over attributes of the user, resource, action and environment, allowing finer, context-aware decisions."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Need to know versus least privilege?",
+   "back": "Least privilege limits the permissions a person or system has. Need to know limits access to specific information to what current duties require, even within a clearance level."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Is a password plus a PIN multifactor authentication?",
+   "back": "No. Both are something you know. MFA needs factors from different types: something you know, something you have and something you are."
+  },
+  {
+   "cert": "CISSP",
+   "front": "SAML versus OpenID Connect?",
+   "back": "SAML exchanges XML assertions between an identity provider and a service provider, common for enterprise web SSO. OpenID Connect adds authentication on top of OAuth 2.0 and returns an ID token as a JSON Web Token."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Which encryption type solves the key distribution problem?",
+   "back": "Asymmetric encryption, because the public key can be shared openly. Symmetric encryption is faster, so systems often use asymmetric to exchange a symmetric session key."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Hashing versus encryption?",
+   "back": "Hashing is one-way and produces a fixed-length digest to check integrity. Encryption is reversible with the right key and protects confidentiality."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Which key creates a digital signature, and what does it provide?",
+   "back": "The sender's private key signs the message hash, and anyone verifies it with the public key. It provides integrity, authentication and nonrepudiation, not confidentiality."
+  },
+  {
+   "cert": "CISSP",
+   "front": "IDS versus IPS?",
+   "back": "An IDS monitors and alerts but does not block. An IPS sits inline and can block traffic, so a false positive can stop legitimate activity."
+  },
+  {
+   "cert": "CISSP",
+   "front": "How do MTD, RTO and WRT relate?",
+   "back": "RTO plus WRT must not exceed the MTD. You must restore systems within the RTO and leave enough work recovery time to verify data and resume work before the MTD is reached."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Parallel test versus full interruption test?",
+   "back": "A parallel test brings up the recovery site while production keeps running. A full interruption test shuts production down, so it is the most realistic and the most risky."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Output versus outcome?",
+   "back": "An output is a deliverable of an activity, such as the Beacon bed dashboard. An outcome is the result a stakeholder achieves with it, such as patient-flow leaders making bed decisions from one trusted set of numbers."
+  },
+  {
+   "cert": "ITIL",
+   "front": "What makes something a service rather than just a product?",
+   "back": "A service enables value co-creation by facilitating outcomes customers want without them managing specific costs and risks. Services are based on one or more products."
+  },
+  {
+   "cert": "ITIL",
+   "front": "What are the eight stages of the Version 5 product and service lifecycle, in order?",
+   "back": "Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support."
+  },
+  {
+   "cert": "ITIL",
+   "front": "What are the five components of the ITIL value system?",
+   "back": "Guiding principles, governance, value chain activities, management practices and continual improvement."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Name the seven guiding principles.",
+   "back": "Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Problem versus known error?",
+   "back": "A problem is a cause, or potential cause, of one or more incidents. A known error is a problem that has been analyzed but not yet resolved."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Does a workaround close a problem?",
+   "back": "No. A workaround reduces or removes the impact while a full resolution is not available; the problem stays open for root-cause work."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Optimize and automate: which comes first?",
+   "back": "Optimize first by simplifying and improving the work, then automate where it adds value. Automating a poor process makes waste faster."
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does Progress iteratively with feedback warn against?",
+   "back": "Trying to do everything at once. Break the work into small pieces and use feedback before, during and after each one to adjust."
+  },
+  {
+   "cert": "ITIL",
+   "front": "How does Keep it simple and practical decide whether a step stays?",
+   "back": "If a step, rule or report does not contribute to value or an outcome, remove it, and use the fewest steps needed."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Customer versus user versus sponsor?",
+   "back": "The customer defines requirements and owns outcomes, the user uses the service, and the sponsor authorizes the budget. One person can hold several roles."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which dimension covers a contract with a cloud hosting company?",
+   "back": "Partners and Suppliers, which covers relationships with other organizations involved in designing, delivering and supporting services."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Value stream versus practice?",
+   "back": "A value stream is the series of steps that creates and delivers a specific product or service to consumers. A practice is a set of organizational resources for performing a type of work, used across many value streams."
+  },
+  {
+   "cert": "ITIL",
+   "front": "What counts as a change in ITIL?",
+   "back": "The addition, modification or removal of anything that could have a direct or indirect effect on services. Types include standard, normal and emergency changes."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Service level versus service level agreement?",
+   "back": "A service level is one or more metrics defining expected or achieved service quality. An SLA is the documented agreement between provider and customer that sets those levels."
+  },
+  {
+   "cert": "PMP",
+   "front": "Beacon's CPI is 0.89 and SPI is 0.80 at 2026-10-01. What do they tell you?",
+   "back": "Both are below 1.0. Beacon gets about 89 cents of planned work for each dollar spent and has done about 80% of the work planned by this date, so it is over budget and behind schedule."
+  },
+  {
+   "cert": "PMP",
+   "front": "Who approves use of Beacon's CAD 120,000 management reserve?",
+   "back": "Management, not the programme manager. It sits outside the cost baseline and is held by the sponsor, Dr. Helen Marchetti; using it needs approval and a baseline change. Contingency reserve covers identified risks inside the baseline."
+  },
+  {
+   "cert": "PMP",
+   "front": "A director asks for a patient-level alternate level of care (ALC) list on the bed dashboard. What is the right path?",
+   "back": "Log a change request and take it through change control: assess the impact on scope, schedule, cost, risk and compliance, then let the change-control board decide (Business Environment task Manage and control changes). In CR-01 the board declined the list as asked and approved unit-level ALC counts."
+  },
+  {
+   "cert": "PMP",
+   "front": "What is a release in a hybrid programme like Beacon?",
+   "back": "A planned delivery of usable capability to users with its own scope, acceptance and handover. Beacon has three: patient-flow analytics, clinician identity and access, and cyber resilience, each ending at a gate."
+  },
+  {
+   "cert": "PMP",
+   "front": "Two team members disagree about when a firewall change should happen. Which People task applies, and what works best?",
+   "back": "Manage conflicts. On Beacon, the programme manager ran a facilitated session so Tomás Rivera and Ahmed Haddad could agree a change window, a collaborative approach that solves the underlying problem instead of picking a winner."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Why does Beacon report the median minutes to physician initial assessment instead of the average?",
+   "back": "A few very long waits pull an average up, so the median shows a typical patient's wait better. The measure uses MEDIANX over visits where MinutesToPIA is not blank: 64.0 minutes across Kestrel in the baseline."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Occupancy % (Average Daily) versus Occupancy % (Last Snapshot)?",
+   "back": "Average Daily works out each day's occupied divided by staffed beds and averages those ratios, for trends and comparisons (87.0% in the baseline). Last Snapshot uses only the latest census date in the filter, for as-at cards (84.0% on 30 September 2026)."
+  },
+  {
+   "cert": "PL-300",
+   "front": "How do you count Kestrel tickets by the day they were resolved when DimDate is related to OpenedDate?",
+   "back": "Add a ResolvedDate column from ResolvedAt, create an inactive relationship from DimDate[Date] to it, and use USERELATIONSHIP inside CALCULATE in that measure. The active OpenedDate relationship is ignored only for that calculation."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Classic versus calendar-based time intelligence?",
+   "back": "Classic needs a date table marked as a date table, with contiguous dates. Calendar-based time intelligence is still in preview: it uses a calendar defined in the model, needs the Enhanced DAX Time Intelligence preview feature, and is the only way week functions such as DATESWTD work."
+  },
+  {
+   "cert": "PL-300",
+   "front": "Which visits does % PIA Within CTAS Target leave out of its denominator, and why?",
+   "back": "Visits without a valid MinutesToPIA, including every left without being seen (LWBS) visit, because they have no physician initial assessment. Under Kestrel's rule an LWBS visit is not counted as a miss; the LWBS Rate measure tracks it instead."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Health Information Act risk of harm versus POPA real risk of significant harm?",
+   "back": "Risk of harm is the Health Information Act test for health information and the lower bar: the custodian notifies the Commissioner, the Minister and the affected individuals. Real risk of significant harm is the Protection of Privacy Act test for other personal information held by public bodies, such as Kestrel's staff records."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Does the Information and Privacy Commissioner approve Kestrel's privacy impact assessment?",
+   "back": "No. Under the Health Information Act, Kestrel submits it before the practice or system is implemented, and the Commissioner reviews and comments. Internal approval comes from Kestrel's Chief Privacy Officer, Priya Raman."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Break-glass access versus just-in-time privileged access?",
+   "back": "Break-glass lets a user override normal restrictions in an emergency, with every use justified, logged and reviewed afterward. Just-in-time access grants privileged rights for an approved task and a limited time, then removes them, so no one holds standing privilege."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Custodian under the Health Information Act versus the CISSP data custodian role?",
+   "back": "An HIA custodian is the organization the Act holds accountable for health information, such as Kestrel. A CISSP data custodian is the technical role, often IT, that carries out the data owner's decisions on access, encryption and backup."
+  },
+  {
+   "cert": "CISSP",
+   "front": "Does Alberta law ban storing Kestrel's health information outside Canada?",
+   "back": "No statute bans it. The Health Information Act requires safeguards for health information stored or used outside Alberta. Keeping Kestrel's backups in Canada at NorthArc Cloud is a Kestrel contract and policy requirement."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Service request versus incident?",
+   "back": "An incident is an unplanned interruption or reduction in quality, such as the Clinical Information System failing to load. A service request asks for something normal and agreed, such as new access or a password reset; nothing is broken."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which lifecycle stage moves Beacon's Release 1 dashboards into live use in a controlled way?",
+   "back": "Transition, where new or changed products and services move into live use with change, release and deployment. After go-live, Support helps users and restores service when it fails."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Kestrel takes a median of 4.26 days to fulfil an access request. What should you do before automating the access-request value stream?",
+   "back": "Map it: draw every step, handoff, wait and decision from the clinician's request to working access, find where the time goes, and simplify first. Optimize and automate says automating a poor process only makes waste happen faster."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Who are the customer, user and sponsor of Beacon's patient-flow analytics service?",
+   "back": "Customers are the business owners who define requirements and own outcomes: Janelle Cardinal (bed data) and Dr. Sarah Whitford (emergency data). Users include frontline staff such as charge nurse Aisha Mahmoud, and Janelle Cardinal is also the main user. The sponsor is Dr. Helen Marchetti, who authorizes the budget."
+  },
+  {
+   "cert": "ITIL",
+   "front": "Access requests resolved within 72 hours: baseline 27.3%, target 80%. Which continual improvement questions do these numbers answer?",
+   "back": "Where are we now? (27.3%, the baseline) and Where do we want to be? (80%, the agreed target). The ITIL 4 model, which Version 5 refines, then asks How do we get there?, Take action, Did we get there? and How do we keep the momentum going?"
+  }
+ ]
+}

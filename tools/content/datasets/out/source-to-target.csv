@@ -1,0 +1,54 @@
+source_file,source_column,target_table,target_column,rule,reconciliation_check
+khn_sites.csv,site_code,DimSite,SiteCode,Trim and upper case; primary key,4 rows; 4 distinct SiteCode values
+khn_sites.csv,site_name,DimSite,SiteName,Trim,No blanks
+khn_sites.csv,zone,DimSite,Zone,Trim,"Central, North, South only"
+khn_sites.csv,site_type,DimSite,SiteType,Trim,No blanks
+khn_units.csv,unit_id,DimUnit,UnitID,Trim and upper case; primary key,7 rows
+khn_units.csv,site_code,DimUnit,SiteCode,Relate DimSite[SiteCode] 1 to many DimUnit[SiteCode],0 unmatched site codes
+khn_units.csv,unit_name,DimUnit,UnitName,Trim,No blanks
+khn_units.csv,unit_type,DimUnit,UnitType,Trim,"Medicine, Surgery, Intensive care only"
+(generated in Power Query),(none),DimDate,Date,"Continuous calendar for the full year 2026-01-01 to 2026-12-31 (full years, as Microsoft recommends); mark as date table","365 rows; every ArrivalDate, CensusDate and OpenedDate found"
+(generated in Power Query),(none),DimDate,Year,Date.Year([Date]),All rows 2026
+(generated in Power Query),(none),DimDate,MonthNumber,Date.Month([Date]),1 to 12; sort key for MonthName
+(generated in Power Query),(none),DimDate,MonthName,Date.MonthName([Date]),Sort by MonthNumber
+(generated in Power Query),(none),DimDate,DayOfWeek,Date.DayOfWeekName([Date]),Seven distinct values
+(Kestrel CTAS reference),CTAS level,DimCTAS,CTASLevel,Whole number 1 to 5; primary key,5 rows
+(Kestrel CTAS reference),level name,DimCTAS,CTASDescription,1 Resuscitation; 2 Emergent; 3 Urgent; 4 Less urgent; 5 Non-urgent,Five distinct values
+(Kestrel CTAS reference),target,DimCTAS,TargetMinutes,Minutes from arrival to PIA: 1 = 0 (immediate); 2 = 15; 3 = 30; 4 = 60; 5 = 120,"Five rows, no blanks"
+khn_ed_visits.csv,(whole row),FactEDVisit,(all),Remove exact duplicate rows (DQ-01),480 source rows; 2 exact duplicates removed; 478 unique
+khn_ed_visits.csv,visit_id,FactEDVisit,VisitID,"Text; unique after DQ-01; quarantine rows failing DQ-04, DQ-05 or DQ-07",474 rows loaded; 4 quarantined
+khn_ed_visits.csv,site_code,FactEDVisit,SiteCode,Trim and upper case (DQ-03); relate to DimSite,KGH 213; ARH 105; CVH 101; PGH 55; 0 unmatched
+khn_ed_visits.csv,arrival_datetime,FactEDVisit,ArrivalDateTime,Parse as date/time; a value that does not parse quarantines the row (DQ-04),Quarantined for an invalid date: V0476
+khn_ed_visits.csv,arrival_datetime,FactEDVisit,ArrivalDate,DateTime.Date([ArrivalDateTime]); relate to DimDate[Date],"474 rows match DimDate; first 2026-07-01, last 2026-09-30"
+khn_ed_visits.csv,ctas_level,FactEDVisit,CTASLevel,Whole number; outside 1 to 5 quarantines the row (DQ-05); relate to DimCTAS,"CTAS 1 7; CTAS 2 46; CTAS 3 192; CTAS 4 158; CTAS 5 71; quarantined V0070, V0222"
+khn_ed_visits.csv,triage_datetime,FactEDVisit,TriageDateTime,Parse as date/time,No blanks
+khn_ed_visits.csv,pia_datetime,FactEDVisit,PIADateTime,Parse as date/time; blank allowed only for LWBS; LWBS with a PIA quarantines the row (DQ-07),Quarantined: V0075
+khn_ed_visits.csv,pia_datetime,FactEDVisit,MinutesToPIA,Whole minutes from ArrivalDateTime to PIADateTime; null when PIA is blank or the timestamps are out of order (DQ-06),"445 non-null; median 64.0 minutes; nulled for order problems: V0385, V0421"
+khn_ed_visits.csv,disposition,FactEDVisit,Disposition,"Trim; Admitted, Discharged, LWBS, Transferred",LWBS 27 (5.7%)
+khn_ed_visits.csv,departure_datetime,FactEDVisit,DepartureDateTime,"Parse as date/time; blank for a non-LWBS visit is flagged, not quarantined",Blank departure: V0268
+khn_ed_visits.csv,departure_datetime,FactEDVisit,EDLOSMinutes,Whole minutes from ArrivalDateTime to DepartureDateTime; null when departure is blank or the timestamps are out of order,471 non-null; median admitted 11.96 h; median discharged 3.61 h
+khn_ed_visits.csv,age_band,FactEDVisit,AgeBand,"Text; 0-17, 18-64, 65+",No other values
+khn_ed_visits.csv,arrival_mode,FactEDVisit,ArrivalMode,"Text; Ambulance, Walk-in",Ambulance 110
+khn_bed_census.csv,(whole row),FactBedCensus,(all),Remove exact duplicates (DQ-01); check one row per unit per day (DQ-09),644 source rows; 1 duplicate removed; 643 loaded; expected 644; missing ARH-SUR 2026-08-16
+khn_bed_census.csv,census_date,FactBedCensus,CensusDate,Parse as date; relate to DimDate[Date],Last snapshot 2026-09-30
+khn_bed_census.csv,unit_id,FactBedCensus,UnitID,Relate DimUnit[UnitID] 1 to many FactBedCensus[UnitID],0 unmatched
+khn_bed_census.csv,staffed_beds,FactBedCensus,StaffedBeds,"Whole number 0 or more; semi-additive: add across units, never across dates",Average daily occupancy 87.0%; staffed beds on the last date 144
+khn_bed_census.csv,occupied_beds,FactBedCensus,OccupiedBeds,Whole number 0 or more; above StaffedBeds is kept and flagged for review (DQ-11),Occupancy on 2026-09-30: 84.0%
+khn_bed_census.csv,occupied_beds,FactBedCensus,OverCapacityFlag,[OccupiedBeds] > [StaffedBeds],"TRUE for KGH-MED4A 2026-09-08 (34 occupied, 32 staffed)"
+khn_bed_census.csv,alc_patients,FactBedCensus,ALCPatients,Whole number 0 or more; a negative value is set to null (DQ-05),"ALC patient-days 2,075; nulled CVH-MED 2026-07-22 (-1)"
+khn_service_desk.csv,(whole row),FactServiceTicket,(all),Remove exact duplicates (DQ-01),220 source rows; 1 duplicate removed; 219 loaded
+khn_service_desk.csv,ticket_id,FactServiceTicket,TicketID,Text; unique after DQ-01,0 duplicate keys
+khn_service_desk.csv,ticket_type,FactServiceTicket,TicketType,Trim,Incident 113; Service request 57; Access request 49
+khn_service_desk.csv,opened_at,FactServiceTicket,OpenedAt,Parse as date/time,No blanks
+khn_service_desk.csv,opened_at,FactServiceTicket,OpenedDate,DateTime.Date([OpenedAt]); relate to DimDate[Date],All rows match DimDate
+khn_service_desk.csv,resolved_at,FactServiceTicket,ResolvedAt,Parse as date/time; blank means open at the extract,Open at extract 9
+khn_service_desk.csv,resolved_at,FactServiceTicket,ResolutionHours,Decimal hours from OpenedAt to ResolvedAt; null when open or when resolved before opened (DQ-06),Median access request 4.26 days (n = 44); nulled SD-10089
+khn_service_desk.csv,priority,FactServiceTicket,Priority,P1 to P4; blank kept and flagged,Blank priority SD-10057
+khn_service_desk.csv,category,FactServiceTicket,Category,Trim,Eight governed values
+khn_service_desk.csv,site_code,FactServiceTicket,SiteCode,Trim and upper case; relate to DimSite,KGH 110; ARH 43; CVH 42; PGH 24
+khn_service_desk.csv,assignment_group,FactServiceTicket,AssignmentGroup,Trim,Six governed values
+khn_service_desk.csv,channel,FactServiceTicket,Channel,Trim,"Phone, Portal, Walk-up only"
+khn_service_desk.csv,sla_target_hours,FactServiceTicket,SLATargetHours,P1 4; P2 8; P3 24; P4 72,0 mismatches with priority
+khn_service_desk.csv,sla_met,FactServiceTicket,SLAMet,"Recompute from timestamps (DQ-08): Y or N; blank when the clock is still running, the priority is blank or the times are out of order",SLA Met % 64.6% (137 of 212); corrected SD-10011 file 'Y' recomputed 'N'
+khn_service_desk.csv,reopened,FactServiceTicket,Reopened,Y or N,Reopened 5.9%
+khn_service_desk.csv,csat,FactServiceTicket,CSAT,Whole number 1 to 5; blank means no response,Average 3.50 from 88 responses

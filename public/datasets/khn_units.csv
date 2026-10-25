@@ -1,0 +1,8 @@
+unit_id,site_code,unit_name,unit_type
+KGH-MED4A,KGH,KGH Medicine 4A,Medicine
+KGH-SUR5B,KGH,KGH Surgery 5B,Surgery
+KGH-ICU,KGH,KGH ICU,Intensive care
+ARH-MED,ARH,ARH Medicine,Medicine
+ARH-SUR,ARH,ARH Surgery,Surgery
+CVH-MED,CVH,CVH Medicine,Medicine
+PGH-MED,PGH,PGH Medicine,Medicine

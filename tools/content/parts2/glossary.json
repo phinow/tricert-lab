@@ -1,0 +1,1215 @@
+{
+ "type": "glossary",
+ "items": [
+  {
+   "term": "Project charter",
+   "cert": "PMP",
+   "definition": "The document, issued by the sponsor, that formally authorizes a project and gives the project manager authority to use organizational resources. It records the purpose, high-level requirements, success criteria, key risks, summary milestones and the sponsor's name."
+  },
+  {
+   "term": "Business case",
+   "cert": "PMP",
+   "definition": "The documented justification for a project, comparing options with their costs, benefits and risks. It comes before the charter, and you revisit it during the project to confirm the work still delivers value."
+  },
+  {
+   "term": "Scope statement",
+   "cert": "PMP",
+   "definition": "A description of the project scope, major deliverables, acceptance criteria, exclusions, assumptions and constraints. Together with the WBS and WBS dictionary it forms the scope baseline, which changes only through change control."
+  },
+  {
+   "term": "Work breakdown structure (WBS)",
+   "cert": "PMP",
+   "definition": "A hierarchical breakdown of all project work into deliverables and smaller components, down to work packages you can estimate and assign. It follows the 100% rule: the children of each element add up to all of its work, and nothing outside scope appears."
+  },
+  {
+   "term": "Critical path",
+   "cert": "PMP",
+   "definition": "The longest chain of dependent activities through the schedule network, which sets the shortest possible project duration. Activities on it usually have zero total float, so delaying any of them delays the finish date."
+  },
+  {
+   "term": "Total float",
+   "cert": "PMP",
+   "definition": "How long an activity can slip from its early start without delaying the project finish date. Calculate it as late start minus early start, or late finish minus early finish."
+  },
+  {
+   "term": "Free float",
+   "cert": "PMP",
+   "definition": "How long an activity can slip without delaying the early start of any immediate successor. Free float can never be larger than total float."
+  },
+  {
+   "term": "Crashing",
+   "cert": "PMP",
+   "definition": "A schedule compression technique that shortens critical path activities by adding resources, such as overtime or extra staff. It usually raises cost, so you crash the activities with the lowest added cost per day saved."
+  },
+  {
+   "term": "Fast tracking",
+   "cert": "PMP",
+   "definition": "A schedule compression technique that runs activities in parallel or overlapping when they were planned in sequence. It adds little cost but raises risk and the chance of rework."
+  },
+  {
+   "term": "Earned value management (EVM)",
+   "cert": "PMP",
+   "definition": "A method that compares planned work, completed work and actual cost to measure schedule and cost performance at a point in time. Its three base values are planned value (PV), earned value (EV) and actual cost (AC)."
+  },
+  {
+   "term": "Planned value (PV)",
+   "cert": "PMP",
+   "definition": "The authorized budget for the work scheduled to be done by a given date. Cumulative PV at the end of the project equals the budget at completion (BAC)."
+  },
+  {
+   "term": "Earned value (EV)",
+   "cert": "PMP",
+   "definition": "The budgeted value of the work actually completed by a given date. If 40% of a 100,000 dollar work package is done, EV is 40,000 dollars no matter how much was spent."
+  },
+  {
+   "term": "Actual cost (AC)",
+   "cert": "PMP",
+   "definition": "The cost actually incurred for the work performed by a given date. Compare it with EV, never with PV, to judge cost performance."
+  },
+  {
+   "term": "Budget at completion (BAC)",
+   "cert": "PMP",
+   "definition": "The total approved budget for the work being measured. It is the sum of all planned value across the project."
+  },
+  {
+   "term": "Cost variance (CV)",
+   "cert": "PMP",
+   "definition": "CV = EV - AC. A negative CV means the work completed so far cost more than planned; a positive CV means it cost less."
+  },
+  {
+   "term": "Schedule variance (SV)",
+   "cert": "PMP",
+   "definition": "SV = EV - PV. A negative SV means less work is done than planned for this date; a positive SV means you are ahead."
+  },
+  {
+   "term": "Cost performance index (CPI)",
+   "cert": "PMP",
+   "definition": "CPI = EV / AC. A CPI below 1.0 means you are over budget, getting less than one dollar of planned work for each dollar spent. Beacon's CPI at 2026-10-01 is 0.89 (EV CAD 224,000 divided by AC CAD 250,600)."
+  },
+  {
+   "term": "Schedule performance index (SPI)",
+   "cert": "PMP",
+   "definition": "SPI = EV / PV. An SPI below 1.0 means you are behind schedule, completing work more slowly than planned. Beacon's SPI at 2026-10-01 is 0.80 (EV CAD 224,000 divided by PV CAD 278,900)."
+  },
+  {
+   "term": "Estimate at completion (EAC)",
+   "cert": "PMP",
+   "definition": "The expected total cost of the work when finished. When current cost performance is typical and expected to continue, EAC = BAC / CPI. When the variance was a one-off (atypical), EAC = AC + (BAC - EV). Beacon at 2026-10-01: BAC CAD 1,200,000 divided by the unrounded CPI (224,000 / 250,600) gives an EAC of CAD 1,342,500."
+  },
+  {
+   "term": "Estimate to complete (ETC)",
+   "cert": "PMP",
+   "definition": "The expected cost to finish the remaining work. ETC = EAC - AC."
+  },
+  {
+   "term": "Variance at completion (VAC)",
+   "cert": "PMP",
+   "definition": "VAC = BAC - EAC. A negative VAC forecasts that the project will finish over budget."
+  },
+  {
+   "term": "To-complete performance index (TCPI)",
+   "cert": "PMP",
+   "definition": "The cost efficiency you must achieve on the remaining work to finish on budget: TCPI = (BAC - EV) / (BAC - AC). A TCPI above 1.0 means you have to perform better than you have so far."
+  },
+  {
+   "term": "RACI chart",
+   "cert": "PMP",
+   "definition": "A responsibility assignment matrix that shows who is Responsible, Accountable, Consulted and Informed for each activity or deliverable. Each item should have exactly one Accountable person, who owns the outcome and signs off."
+  },
+  {
+   "term": "Stakeholder register",
+   "cert": "PMP",
+   "definition": "A record of the people and groups affected by or able to affect the project, with their interests, influence, expectations and engagement level. You keep it current because stakeholders and their attitudes change."
+  },
+  {
+   "term": "Risk register",
+   "cert": "PMP",
+   "definition": "The record of identified risks with their causes, probability, impact, owner, triggers and planned responses. Every risk needs a named owner who watches the triggers and carries out the response."
+  },
+  {
+   "term": "Avoid (threat response)",
+   "cert": "PMP",
+   "definition": "Change the plan to remove a threat completely or protect the project from its impact, for example by dropping risky scope or choosing a proven technology."
+  },
+  {
+   "term": "Mitigate (threat response)",
+   "cert": "PMP",
+   "definition": "Take action to reduce the probability or the impact of a threat, for example extra testing before a data migration. The threat remains, but smaller."
+  },
+  {
+   "term": "Transfer (threat response)",
+   "cert": "PMP",
+   "definition": "Shift ownership of a threat and its impact to a third party, for example through insurance, a warranty or a fixed-price contract. The risk does not disappear, and you usually pay a premium for the transfer."
+  },
+  {
+   "term": "Exploit (opportunity response)",
+   "cert": "PMP",
+   "definition": "Act to make sure an opportunity definitely happens, for example assigning your most skilled people so a task finishes early. It is the opportunity mirror of avoid."
+  },
+  {
+   "term": "Enhance (opportunity response)",
+   "cert": "PMP",
+   "definition": "Increase the probability or impact of an opportunity, for example adding resources so an early finish becomes more likely. It is the opportunity mirror of mitigate."
+  },
+  {
+   "term": "Share (opportunity response)",
+   "cert": "PMP",
+   "definition": "Give some or all ownership of an opportunity to a third party better able to capture it, such as a partnership or joint venture. It is the opportunity mirror of transfer."
+  },
+  {
+   "term": "Accept (risk response)",
+   "cert": "PMP",
+   "definition": "Acknowledge a threat or opportunity without acting unless it occurs. Active acceptance sets aside a contingency reserve; passive acceptance only reviews the risk periodically."
+  },
+  {
+   "term": "Escalate (risk response)",
+   "cert": "PMP",
+   "definition": "Used when a threat or opportunity falls outside the project scope or the project manager's authority. Ownership moves to the program, portfolio or other suitable part of the organization, which must accept it."
+  },
+  {
+   "term": "Contingency reserve",
+   "cert": "PMP",
+   "definition": "Time or money inside the schedule or cost baseline set aside for identified risks, the known-unknowns. The project manager can usually use it when the planned risk occurs."
+  },
+  {
+   "term": "Management reserve",
+   "cert": "PMP",
+   "definition": "Budget held outside the cost baseline for unidentified risks, the unknown-unknowns. It is part of the total project budget, and using it normally requires management approval and a baseline change. Beacon's management reserve is CAD 120,000, held by the sponsor outside the register, for a total authorized budget of CAD 1,320,000."
+  },
+  {
+   "term": "Change control board (CCB)",
+   "cert": "PMP",
+   "definition": "A formally chartered group that reviews, evaluates, approves, defers or rejects change requests and records each decision. It supports the Business Environment task Manage and control changes. Beacon's board is chaired by the Chief Information Officer, Marcus Bell (E-002)."
+  },
+  {
+   "term": "Servant leadership",
+   "cert": "PMP",
+   "definition": "A leadership style in which the leader serves the team first: removing impediments, shielding it from distraction and building conditions for it to self-organize. It links to the People task Lead the project team and the Business Environment task Remove impediments and manage issues."
+  },
+  {
+   "term": "Tailoring",
+   "cert": "PMP",
+   "definition": "Deliberately adapting the life cycle, processes, governance and artifacts to fit the project's size, risk, culture and constraints. You tailor on purpose and record why, rather than using every process by default."
+  },
+  {
+   "term": "Predictive life cycle",
+   "cert": "PMP",
+   "definition": "An approach where scope, schedule and cost are defined early and changes go through formal control, often called waterfall. It suits stable, well-understood requirements and regulated work."
+  },
+  {
+   "term": "Adaptive life cycle",
+   "cert": "PMP",
+   "definition": "An iterative and incremental approach, such as agile, where requirements are refined often and working increments are delivered in short cycles for feedback. It suits uncertain or changing requirements."
+  },
+  {
+   "term": "Hybrid approach",
+   "cert": "PMP",
+   "definition": "A mix of predictive and adaptive methods in one project, for example a predictive plan for procurement and infrastructure with agile iterations for report design. You choose the mix based on the uncertainty of each part of the work."
+  },
+  {
+   "term": "MoSCoW prioritization",
+   "cert": "PMP",
+   "definition": "A technique that sorts requirements into Must have, Should have, Could have and Won't have this time. It makes trade-offs explicit when time or budget is fixed."
+  },
+  {
+   "term": "Definition of done (DoD)",
+   "cert": "PMP",
+   "definition": "A checklist the team agrees for every increment, covering everything needed before work counts as complete, such as tested, reviewed and documented. Acceptance criteria are specific to one item; the DoD applies to all items."
+  },
+  {
+   "term": "Burndown chart",
+   "cert": "PMP",
+   "definition": "A chart of work remaining against time in an iteration or release, compared with an ideal line. A burnup chart instead shows work completed against total scope, which makes scope changes visible."
+  },
+  {
+   "term": "Retrospective",
+   "cert": "PMP",
+   "definition": "A recurring team meeting, usually at the end of each iteration, where the team inspects how it worked and agrees a small number of improvements to try next. It is about the process, not the product."
+  },
+  {
+   "term": "Lessons learned register",
+   "cert": "PMP",
+   "definition": "A record of what worked, what did not and what to do differently, captured throughout the project rather than only at the end. At closure the lessons are transferred to the organization, which supports the People task Help ensure knowledge transfer."
+  },
+  {
+   "term": "Firm fixed price (FFP)",
+   "cert": "PMP",
+   "definition": "A contract where the buyer pays one agreed price for a defined scope. The seller carries most of the cost risk, so it suits work with a well-defined scope."
+  },
+  {
+   "term": "Cost plus fixed fee (CPFF)",
+   "cert": "PMP",
+   "definition": "A cost-reimbursable contract where the buyer pays the seller's allowable costs plus a fixed fee agreed at the start. The buyer carries most of the cost risk, so it suits uncertain scope."
+  },
+  {
+   "term": "Time and materials (T&M)",
+   "cert": "PMP",
+   "definition": "A contract that pays agreed unit rates for labour and materials as they are used, often for staff augmentation or small, unclear scopes. Add a not-to-exceed limit so cost cannot grow without control."
+  },
+  {
+   "term": "Semantic model",
+   "cert": "PL-300",
+   "definition": "The Power BI item that holds the tables, relationships, measures, security roles and connection settings that reports use. Microsoft previously called it a dataset; many reports can share one semantic model."
+  },
+  {
+   "term": "Import mode",
+   "cert": "PL-300",
+   "definition": "A storage mode that loads a compressed copy of the data into the semantic model. Queries are fast and every DAX and Power Query feature is available, but data is only as current as the last refresh."
+  },
+  {
+   "term": "DirectQuery",
+   "cert": "PL-300",
+   "definition": "A storage mode that leaves data in the source and sends queries to it each time a visual loads. Data is current and no copy is stored, but speed depends on the source and some transformations and DAX functions are limited."
+  },
+  {
+   "term": "DirectLake",
+   "cert": "PL-300",
+   "definition": "A storage mode, also written Direct Lake, for semantic models in Microsoft Fabric that reads Delta tables in OneLake straight into memory when queried. It gives near-Import speed without a scheduled data copy, because refresh only updates metadata."
+  },
+  {
+   "term": "Composite model",
+   "cert": "PL-300",
+   "definition": "A semantic model that combines storage modes, for example a large fact table in DirectQuery with dimension tables in Import or Dual mode. Dual tables can act as either, depending on the query."
+  },
+  {
+   "term": "Power Query",
+   "cert": "PL-300",
+   "definition": "The data preparation engine in Power BI Desktop where you connect to sources and shape data with recorded steps written in the M language. Each step is repeated in order on every refresh, so the cleaning is repeatable and auditable."
+  },
+  {
+   "term": "Query folding",
+   "cert": "PL-300",
+   "definition": "When Power Query translates your steps into a single query that the source runs, such as one SQL statement. Folding cuts the data moved and speeds refresh; right-click a step and look for View Native Query to check whether it folds."
+  },
+  {
+   "term": "Privacy levels",
+   "cert": "PL-300",
+   "definition": "Settings of Private, Organizational or Public on each data source that control whether Power Query may send data from one source to another when combining them. They stop sensitive values leaking into another source's query."
+  },
+  {
+   "term": "Reference versus duplicate query",
+   "cert": "PL-300",
+   "definition": "Duplicate copies every step into a new, independent query. Reference creates a new query that starts from the output of the original, so later changes to the original flow through."
+  },
+  {
+   "term": "Merge versus append",
+   "cert": "PL-300",
+   "definition": "Merge joins two queries side by side on matching key columns, like a SQL join, and adds columns. Append stacks queries with the same columns on top of each other and adds rows."
+  },
+  {
+   "term": "Unpivot",
+   "cert": "PL-300",
+   "definition": "A Power Query transformation that turns several columns into attribute and value rows, for example monthly columns into a Month column and an Amount column. It produces the narrow, tall shape that facts need."
+  },
+  {
+   "term": "Star schema",
+   "cert": "PL-300",
+   "definition": "A model design with fact tables in the centre related to surrounding dimension tables through one-to-many relationships. It gives predictable filtering, simpler DAX and good performance."
+  },
+  {
+   "term": "Fact table",
+   "cert": "PL-300",
+   "definition": "A table that records events or measurements, such as emergency department visits, daily bed counts or service desk tickets, with numeric columns to aggregate and keys to dimensions. In Beacon, FactEDVisit holds one row per visit. A fact table usually has many rows and grows over time."
+  },
+  {
+   "term": "Dimension table",
+   "cert": "PL-300",
+   "definition": "A table that describes the business entities you filter and group by, such as site, inpatient unit, CTAS level or date. Each row has a unique key that relates to the fact table, for example DimSite[SiteCode] to FactEDVisit[SiteCode]."
+  },
+  {
+   "term": "Grain",
+   "cert": "PL-300",
+   "definition": "The level of detail one row in a fact table represents. In Beacon, FactEDVisit has one row per emergency visit and FactBedCensus has one row per unit per day. Declare the grain first, because mixing grains in one table inflates totals."
+  },
+  {
+   "term": "Cardinality",
+   "cert": "PL-300",
+   "definition": "The type of relationship between two tables: one-to-many, one-to-one or many-to-many. One-to-many from a dimension key to a fact column is the normal star schema pattern."
+  },
+  {
+   "term": "Cross-filter direction",
+   "cert": "PL-300",
+   "definition": "Whether a relationship filters in one direction (single, dimension to fact) or both directions. Single is the default for one-to-many relationships and the safest choice; both can create ambiguous paths and slower queries, so use it only for a specific need."
+  },
+  {
+   "term": "Active and inactive relationships",
+   "cert": "PL-300",
+   "definition": "Only one relationship between two tables can be active and filter by default; others are shown as dashed inactive lines. You switch one on for a single calculation with USERELATIONSHIP inside CALCULATE."
+  },
+  {
+   "term": "Role-playing dimension",
+   "cert": "PL-300",
+   "definition": "One dimension that filters a fact table in more than one role, such as a Date table used for both opened date and resolved date. Handle it with inactive relationships and USERELATIONSHIP, or with a separate copy of the table per role."
+  },
+  {
+   "term": "Date table",
+   "cert": "PL-300",
+   "definition": "A table with one row per day over a continuous range of full years, with no gaps and a unique date column, plus columns such as year and month. Mark it as a date table, which classic DAX time intelligence requires."
+  },
+  {
+   "term": "Measure",
+   "cert": "PL-300",
+   "definition": "A DAX calculation evaluated at query time in the current filter context, such as ED Visits or LWBS Rate. It is not stored row by row, so it adds no data to the model."
+  },
+  {
+   "term": "Calculated column",
+   "cert": "PL-300",
+   "definition": "A DAX column computed row by row at refresh time and stored in the table. Use it when you need the value in a slicer, on an axis or as a relationship key; use a measure for aggregations."
+  },
+  {
+   "term": "Calculated table",
+   "cert": "PL-300",
+   "definition": "A table created by a DAX expression and computed at refresh time, for example a date table built with CALENDAR. It is stored in the model like an imported table."
+  },
+  {
+   "term": "CALCULATE",
+   "cert": "PL-300",
+   "definition": "The DAX function that evaluates an expression in a modified filter context. Its filter arguments add or replace filters, and when it runs inside a row context it performs context transition."
+  },
+  {
+   "term": "Filter context",
+   "cert": "PL-300",
+   "definition": "The set of filters active when a measure is evaluated, coming from visual rows and columns, slicers, the filter pane, RLS and CALCULATE. It explains why the same measure returns different values in each cell."
+  },
+  {
+   "term": "Row context",
+   "cert": "PL-300",
+   "definition": "The idea of a current row, which exists in calculated columns and inside iterator functions such as SUMX. Row context does not filter other tables by itself; CALCULATE turns it into filter context."
+  },
+  {
+   "term": "Context transition",
+   "cert": "PL-300",
+   "definition": "What happens when CALCULATE is used inside a row context: the current row's values become filters. Referencing a measure inside an iterator triggers it automatically, because every measure has an implicit CALCULATE."
+  },
+  {
+   "term": "Iterator function",
+   "cert": "PL-300",
+   "definition": "A DAX function such as SUMX or AVERAGEX that evaluates an expression for each row of a table and then aggregates the results. Use it when the calculation must happen row by row before summing, such as quantity times price."
+  },
+  {
+   "term": "DIVIDE",
+   "cert": "PL-300",
+   "definition": "A DAX function, DIVIDE(numerator, denominator, alternate result), that returns BLANK or your alternate value instead of an error when the denominator is zero. Use it for every ratio measure."
+  },
+  {
+   "term": "Time intelligence",
+   "cert": "PL-300",
+   "definition": "DAX functions that compare or accumulate values over time, such as TOTALYTD, SAMEPERIODLASTYEAR and DATEADD. Classic time intelligence needs a proper date table with no gaps, marked as a date table. Calendar-based time intelligence (preview) is the newer alternative."
+  },
+  {
+   "term": "Semi-additive measure",
+   "cert": "PL-300",
+   "definition": "A measure that can be summed across some dimensions but not across time. Beacon's bed counts are an example: staffed and occupied beds add up across units on the same day, but 30 days of 32 staffed beds is not 960 beds. Return the value at one date, such as the last snapshot, or average the daily values, using functions such as LASTDATE, LASTNONBLANK or AVERAGEX over dates."
+  },
+  {
+   "term": "Calculation group",
+   "cert": "PL-300",
+   "definition": "A model object holding calculation items, such as Current, Prior year and Year to date, that apply to any measure through SELECTEDMEASURE(). It replaces dozens of near-duplicate measures with one reusable set."
+  },
+  {
+   "term": "Visual calculation",
+   "cert": "PL-300",
+   "definition": "A DAX calculation defined on a single visual that works on the data already in that visual, using functions such as RUNNINGSUM or MOVINGAVERAGE. It is stored with the visual, not in the semantic model."
+  },
+  {
+   "term": "Quick measure",
+   "cert": "PL-300",
+   "definition": "A Power BI Desktop feature that writes a DAX measure for you from a template, such as a running total or year-over-year change. Read the generated DAX so you understand and can maintain it."
+  },
+  {
+   "term": "Performance Analyzer",
+   "cert": "PL-300",
+   "definition": "A Power BI Desktop pane that records how long each visual takes, split into DAX query, visual display and other time. You can copy a slow visual's query to study it in DAX query view."
+  },
+  {
+   "term": "DAX query view",
+   "cert": "PL-300",
+   "definition": "A view in Power BI Desktop where you write and run DAX queries that start with EVALUATE and see the results as a table. You can use it to test measures, inspect data and add or update measures in the model."
+  },
+  {
+   "term": "Row-level security (RLS)",
+   "cert": "PL-300",
+   "definition": "Roles defined with DAX filter expressions that restrict which rows a user can see in a semantic model. You create roles in Desktop, assign members in the service and test with View as; RLS applies to workspace Viewers, not to Admins, Members or Contributors."
+  },
+  {
+   "term": "Dynamic RLS",
+   "cert": "PL-300",
+   "definition": "An RLS pattern where one role filters data by the signed-in user, usually by comparing USERPRINCIPALNAME() with an email column in a security table. One role then serves every user instead of one role per site."
+  },
+  {
+   "term": "Workspace roles",
+   "cert": "PL-300",
+   "definition": "The four roles that control what people can do in a workspace: Admin, Member, Contributor and Viewer. Viewer can only view and interact with content; Contributor and above can create and edit it."
+  },
+  {
+   "term": "App",
+   "cert": "PL-300",
+   "definition": "A packaged, read-only set of workspace content published to a wide audience, with optional separate audiences. Consumers do not need workspace access, and workspace changes reach them only when the app is updated."
+  },
+  {
+   "term": "On-premises data gateway",
+   "cert": "PL-300",
+   "definition": "Software installed on a machine inside your network that lets the Power BI service refresh or query data sources it cannot reach directly, such as an on-premises SQL Server. Cloud sources reachable from the internet do not need one."
+  },
+  {
+   "term": "Scheduled refresh",
+   "cert": "PL-300",
+   "definition": "A setting on a semantic model in the Power BI service that refreshes imported data at chosen times. It needs valid credentials, a gateway for private sources, and failure notifications to someone who will act."
+  },
+  {
+   "term": "Sensitivity label",
+   "cert": "PL-300",
+   "definition": "A Microsoft Purview Information Protection label, such as Confidential, applied to Power BI items to show and enforce how they must be handled. Labels can follow data exported to supported formats such as Excel, PowerPoint and PDF."
+  },
+  {
+   "term": "Promoted endorsement",
+   "cert": "PL-300",
+   "definition": "A badge that content owners or people with write permission apply to show an item is ready for others to use. It needs no central approval."
+  },
+  {
+   "term": "Certified endorsement",
+   "cert": "PL-300",
+   "definition": "A badge applied only by reviewers the Fabric or Power BI administrator has authorized, showing the item meets organizational quality standards. Certified carries more weight than promoted."
+  },
+  {
+   "term": "Paginated report",
+   "cert": "PL-300",
+   "definition": "A pixel-perfect, multi-page report built in Power BI Report Builder, designed for printing or exporting, such as invoices or long operational lists. Choose it when every row must print across pages in a fixed layout."
+  },
+  {
+   "term": "Drillthrough",
+   "cert": "PL-300",
+   "definition": "A feature that lets a user right-click a data point and jump to a detail page filtered to that item, such as one site's emergency visits. The target page holds the drillthrough field, and Power BI adds a back button."
+  },
+  {
+   "term": "Bookmark",
+   "cert": "PL-300",
+   "definition": "A saved state of a report page, including filters, slicers, sort order and which visuals are visible. Combined with buttons, bookmarks drive navigation, guided stories and show or hide panels."
+  },
+  {
+   "term": "Sync slicers",
+   "cert": "PL-300",
+   "definition": "A setting that applies one slicer's selection across several report pages, and lets you choose on which pages the slicer is visible."
+  },
+  {
+   "term": "Dashboard",
+   "cert": "PL-300",
+   "definition": "A single-page canvas in the Power BI service made of tiles pinned from reports. Dashboards support data alerts on card, KPI and gauge tiles, and are created only in the service, not in Desktop."
+  },
+  {
+   "term": "CIA triad",
+   "cert": "CISSP",
+   "definition": "The three core security goals: confidentiality (only authorized people see data), integrity (data is accurate and changed only by authorized means) and availability (systems and data are there when needed)."
+  },
+  {
+   "term": "Nonrepudiation",
+   "cert": "CISSP",
+   "definition": "Assurance that someone cannot credibly deny an action they took, such as sending a message or approving a payment. Digital signatures and reliable audit logs provide it."
+  },
+  {
+   "term": "Due care",
+   "cert": "CISSP",
+   "definition": "Acting as a reasonable, prudent person would to protect assets, by putting appropriate controls in place and operating them. In short, due care is doing the right thing."
+  },
+  {
+   "term": "Due diligence",
+   "cert": "CISSP",
+   "definition": "The investigation and ongoing checking that shows controls are understood, in place and working, for example assessing a vendor before signing. In short, due diligence is verifying, and it supports due care."
+  },
+  {
+   "term": "Vulnerability",
+   "cert": "CISSP",
+   "definition": "A weakness in a system, process or control that a threat could exploit, such as an unpatched server or a shared administrator account."
+  },
+  {
+   "term": "Threat",
+   "cert": "CISSP",
+   "definition": "Any potential cause of harm that could exploit a vulnerability, such as an attacker, malware, an insider mistake or a flood. The actor or force behind it is the threat agent."
+  },
+  {
+   "term": "Risk",
+   "cert": "CISSP",
+   "definition": "The likelihood that a threat will exploit a vulnerability, combined with the impact on the business if it does. No vulnerability or no threat means little risk."
+  },
+  {
+   "term": "Residual risk",
+   "cert": "CISSP",
+   "definition": "The risk that remains after controls are applied. A risk owner with the right authority must formally accept it."
+  },
+  {
+   "term": "Asset value (AV)",
+   "cert": "CISSP",
+   "definition": "The value of an asset to the organization in money, used in quantitative risk analysis. It can include replacement cost, lost revenue and legal or reputational costs."
+  },
+  {
+   "term": "Exposure factor (EF)",
+   "cert": "CISSP",
+   "definition": "The percentage of an asset's value expected to be lost in one occurrence of a threat. A fire that destroys a quarter of a data centre has an EF of 25%."
+  },
+  {
+   "term": "Single loss expectancy (SLE)",
+   "cert": "CISSP",
+   "definition": "The expected loss from one occurrence of a threat. SLE = asset value x exposure factor."
+  },
+  {
+   "term": "Annualized rate of occurrence (ARO)",
+   "cert": "CISSP",
+   "definition": "How many times a threat is expected to occur in a year. Once every ten years is an ARO of 0.1."
+  },
+  {
+   "term": "Annualized loss expectancy (ALE)",
+   "cert": "CISSP",
+   "definition": "The expected yearly loss from a threat. ALE = SLE x ARO. A safeguard's annual value is the ALE before it, minus the ALE after it, minus its annual cost."
+  },
+  {
+   "term": "Quantitative risk analysis",
+   "cert": "CISSP",
+   "definition": "Risk analysis that assigns money values and probabilities, such as SLE, ARO and ALE, so you can compare risks and control costs objectively. It needs good data and takes more effort."
+  },
+  {
+   "term": "Qualitative risk analysis",
+   "cert": "CISSP",
+   "definition": "Risk analysis that ranks risks with scales such as high, medium and low, using expert judgment, workshops or a probability and impact matrix. It is faster but more subjective."
+  },
+  {
+   "term": "Risk treatment",
+   "cert": "CISSP",
+   "definition": "The four classic responses to a security risk: mitigate (reduce it with controls), transfer (share it, for example through insurance), avoid (stop the risky activity) and accept (formally live with it). Ignoring a risk is never a valid response."
+  },
+  {
+   "term": "Compensating control",
+   "cert": "CISSP",
+   "definition": "An alternative control used when the preferred control is not practical, giving similar protection. For example, if a small team cannot separate duties, you add independent review of logs."
+  },
+  {
+   "term": "Data owner",
+   "cert": "CISSP",
+   "definition": "A senior business role accountable for a data set, who decides its classification, who may access it and how it may be used. The owner stays accountable even when others handle the data. At Kestrel, Dr. Sarah Whitford owns emergency data and Janelle Cardinal owns bed data."
+  },
+  {
+   "term": "Data custodian",
+   "cert": "CISSP",
+   "definition": "The role, often IT, that carries out the owner's decisions day to day: applying access controls, encryption, backups and retention. The custodian implements; the owner decides. Do not confuse it with a custodian under Alberta's Health Information Act, which is the accountable organization, such as Kestrel."
+  },
+  {
+   "term": "Data steward",
+   "cert": "CISSP",
+   "definition": "A business role that looks after data quality and meaning, such as definitions, metadata and validation rules, on the owner's behalf. Stewardship keeps data fit for use. Tomás Rivera (E-006) is Beacon's data steward."
+  },
+  {
+   "term": "Data classification",
+   "cert": "CISSP",
+   "definition": "Labelling information by sensitivity and value so each level gets proportionate handling rules. Kestrel's scheme (Kestrel policy) is Public, Internal, Confidential and Restricted, where Restricted means individually identifying health information; the de-identified Beacon dashboards are Confidential. Government schemes use levels such as Top Secret, Secret and Confidential."
+  },
+  {
+   "term": "Data at rest",
+   "cert": "CISSP",
+   "definition": "Data stored on disks, databases, backups or removable media. Protect it with encryption, access control and secure disposal."
+  },
+  {
+   "term": "Data in transit",
+   "cert": "CISSP",
+   "definition": "Data moving across a network, such as between a browser and a server. Protect it with encryption in transit, for example TLS or a VPN."
+  },
+  {
+   "term": "Data in use",
+   "cert": "CISSP",
+   "definition": "Data being processed in memory by an application or user. It is the hardest state to protect, relying on access control, process isolation and technologies such as confidential computing."
+  },
+  {
+   "term": "Least privilege",
+   "cert": "CISSP",
+   "definition": "Giving each person or system only the minimum permissions needed to do their job, and nothing more. It limits the damage from mistakes and compromised accounts."
+  },
+  {
+   "term": "Need to know",
+   "cert": "CISSP",
+   "definition": "Restricting access to specific information to people whose current duties require it, even if their clearance or role level would otherwise allow it. It narrows access within a classification level. Alberta's Health Information Act builds in the same idea: use only the amount of health information essential for the purpose."
+  },
+  {
+   "term": "Separation of duties (SoD)",
+   "cert": "CISSP",
+   "definition": "Splitting a sensitive process so no single person can complete it alone, also called segregation of duties. At Kestrel, Kevin Park (E-009) can provision accounts, approve access requests and administer audit logs, a conflict recorded as issue I-01. Related controls include dual control, job rotation and mandatory vacations."
+  },
+  {
+   "term": "Mandatory access control (MAC)",
+   "cert": "CISSP",
+   "definition": "An access model where the system enforces access by comparing security labels on objects with the clearance of subjects. Users cannot change permissions, which suits military and high-security settings."
+  },
+  {
+   "term": "Discretionary access control (DAC)",
+   "cert": "CISSP",
+   "definition": "An access model where the owner of a resource decides who may access it, usually through access control lists, such as file share permissions. It is flexible but can spread excessive access."
+  },
+  {
+   "term": "Role-based access control (RBAC)",
+   "cert": "CISSP",
+   "definition": "An access model that assigns permissions to roles based on job function, then assigns people to roles. Kestrel's role catalogue is an RBAC design: a Registered Nurse can view charts and document care in the Clinical Information System, a Unit Clerk can update bed status, and Vendor Support gets remote support access only."
+  },
+  {
+   "term": "Attribute-based access control (ABAC)",
+   "cert": "CISSP",
+   "definition": "An access model where policies evaluate attributes of the user, the resource, the action and the environment, such as department, data classification and time of day. It allows finer, context-aware decisions than RBAC."
+  },
+  {
+   "term": "AAA",
+   "cert": "CISSP",
+   "definition": "Authentication (proving who you are), authorization (deciding what you may do) and accounting (recording what you did, for audit). Identification, claiming an identity, comes first."
+  },
+  {
+   "term": "Multifactor authentication (MFA)",
+   "cert": "CISSP",
+   "definition": "Authentication using factors from two or more different types: something you know (password), something you have (token or phone) and something you are (biometric). A password plus a PIN is two of the same type, so it is not MFA."
+  },
+  {
+   "term": "Single sign-on (SSO)",
+   "cert": "CISSP",
+   "definition": "Signing in once to reach many systems without logging in again. It improves usability and central control, but one stolen credential opens many doors, so pair it with MFA."
+  },
+  {
+   "term": "Federation",
+   "cert": "CISSP",
+   "definition": "A trust arrangement that lets identities authenticated by one organization's identity provider be accepted by another organization's services. Standards such as SAML and OpenID Connect carry the identity information."
+  },
+  {
+   "term": "SAML",
+   "cert": "CISSP",
+   "definition": "Security Assertion Markup Language, an XML-based standard in which an identity provider sends signed authentication and attribute assertions to a service provider. It is common for enterprise web SSO."
+  },
+  {
+   "term": "OpenID Connect (OIDC)",
+   "cert": "CISSP",
+   "definition": "An identity layer on top of OAuth 2.0 that adds authentication, returning an ID token as a JSON Web Token. OAuth 2.0 on its own is for authorization, letting an app act on your behalf, not for proving identity."
+  },
+  {
+   "term": "Privileged access management (PAM)",
+   "cert": "CISSP",
+   "definition": "Controls for administrator and other high-risk accounts, such as credential vaulting, just-in-time elevation, approval workflows and session recording. It reduces standing privilege and makes privileged actions accountable."
+  },
+  {
+   "term": "Defence in depth",
+   "cert": "CISSP",
+   "definition": "Layering several independent controls, such as physical, technical and administrative ones, so that one failure does not expose the asset. ISC2 material spells it defense in depth."
+  },
+  {
+   "term": "Zero trust",
+   "cert": "CISSP",
+   "definition": "A security model that grants no implicit trust based on network location: every request is authenticated, authorized and checked continuously. NIST SP 800-207 describes zero trust architecture."
+  },
+  {
+   "term": "Symmetric encryption",
+   "cert": "CISSP",
+   "definition": "Encryption that uses the same secret key to encrypt and decrypt, such as AES. It is fast, but the key must be shared securely, and n users need n(n-1)/2 keys to talk privately in pairs."
+  },
+  {
+   "term": "Asymmetric encryption",
+   "cert": "CISSP",
+   "definition": "Encryption using a key pair: data encrypted with the public key can only be decrypted with the matching private key, as in RSA or elliptic curve cryptography. It solves key distribution and enables digital signatures, but it is slower, so it often protects a symmetric session key."
+  },
+  {
+   "term": "Hashing",
+   "cert": "CISSP",
+   "definition": "A one-way function that turns input of any size into a fixed-length digest, such as SHA-256. It checks integrity and stores passwords (with a salt); it is not encryption, because you cannot reverse it."
+  },
+  {
+   "term": "Digital signature",
+   "cert": "CISSP",
+   "definition": "A hash of a message encrypted with the sender's private key, which anyone can verify with the sender's public key. It provides integrity, authentication and nonrepudiation, but not confidentiality."
+  },
+  {
+   "term": "Public key infrastructure (PKI)",
+   "cert": "CISSP",
+   "definition": "The certificate authorities, registration authorities, policies and X.509 certificates that bind public keys to identities. Revocation is checked through certificate revocation lists or OCSP."
+  },
+  {
+   "term": "OSI model",
+   "cert": "CISSP",
+   "definition": "A seven-layer reference model for networking: 7 Application, 6 Presentation, 5 Session, 4 Transport, 3 Network, 2 Data Link, 1 Physical. TCP and UDP work at layer 4, IP and routers at layer 3, and switches and MAC addresses at layer 2."
+  },
+  {
+   "term": "Intrusion detection system (IDS)",
+   "cert": "CISSP",
+   "definition": "A system that monitors network or host activity and alerts on suspicious events, using signatures or anomaly detection. It is passive: it does not block traffic."
+  },
+  {
+   "term": "Intrusion prevention system (IPS)",
+   "cert": "CISSP",
+   "definition": "A system placed inline in the traffic path that detects and actively blocks malicious activity. Because it is inline, a false positive can block legitimate traffic."
+  },
+  {
+   "term": "SIEM",
+   "cert": "CISSP",
+   "definition": "Security information and event management: a platform that collects, normalizes and correlates logs from many sources, raises alerts and keeps records for investigation. It gives the security operations team one view of events."
+  },
+  {
+   "term": "Business impact analysis (BIA)",
+   "cert": "CISSP",
+   "definition": "An analysis that identifies critical business functions, their dependencies and how harm grows over time when they stop. It produces the MTD, RTO and RPO that drive recovery design. Beacon's Release 3 runs one for Kestrel's clinical systems."
+  },
+  {
+   "term": "Maximum tolerable downtime (MTD)",
+   "cert": "CISSP",
+   "definition": "The longest time a business function can be unavailable before the organization suffers unacceptable harm. It is also called the maximum tolerable period of disruption. RTO plus WRT must not exceed the MTD."
+  },
+  {
+   "term": "Recovery time objective (RTO)",
+   "cert": "CISSP",
+   "definition": "The target time to restore a system or service after a disruption. It must be shorter than the MTD to leave time for work recovery. Kestrel's agreed RTO for the Clinical Information System is 4 hours; its last two restore tests took 9.0 and 13.5 hours and failed."
+  },
+  {
+   "term": "Recovery point objective (RPO)",
+   "cert": "CISSP",
+   "definition": "The maximum acceptable data loss, measured backward in time from the disruption. A four-hour RPO means backups or replication must run at least every four hours."
+  },
+  {
+   "term": "Work recovery time (WRT)",
+   "cert": "CISSP",
+   "definition": "The time after systems are restored to verify data, catch up on work and resume normal operations. RTO plus WRT must fit within the MTD."
+  },
+  {
+   "term": "Disaster recovery test types",
+   "cert": "CISSP",
+   "definition": "From least to most disruptive: read-through (checklist), structured walk-through or tabletop, simulation, parallel test (recovery site runs while production continues) and full interruption (production is shut down). Full interruption is the most realistic and the most risky."
+  },
+  {
+   "term": "Incident response phases",
+   "cert": "CISSP",
+   "definition": "The classic NIST SP 800-61 Rev. 2 lifecycle has four phases: preparation; detection and analysis; containment, eradication and recovery; and post-incident activity. Rev. 3, published in April 2025, replaced Rev. 2 and recasts incident response as a CSF 2.0 Community Profile, but the four-phase model is still widely used in study material. CISSP study material often lists seven steps: detection, response, mitigation, reporting, recovery, remediation and lessons learned."
+  },
+  {
+   "term": "CVSS",
+   "cert": "CISSP",
+   "definition": "The Common Vulnerability Scoring System, which rates a vulnerability's technical severity from 0.0 to 10.0: Low 0.1 to 3.9, Medium 4.0 to 6.9, High 7.0 to 8.9 and Critical 9.0 to 10.0. The base score is not a full risk rating, so you add asset value and exposure to prioritize."
+  },
+  {
+   "term": "Secure SDLC",
+   "cert": "CISSP",
+   "definition": "A software development life cycle with security built into every phase: requirements, design, development, testing, deployment, operation and disposal. Fixing flaws early, in requirements and design, costs far less than fixing them in production."
+  },
+  {
+   "term": "Threat modelling",
+   "cert": "CISSP",
+   "definition": "A structured way to find and rank threats to a system, usually from a data flow diagram with trust boundaries, during design. It answers what can go wrong and which controls address it."
+  },
+  {
+   "term": "STRIDE",
+   "cert": "CISSP",
+   "definition": "A threat modelling mnemonic from Microsoft: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service and Elevation of privilege. Each violates one property: authentication, integrity, nonrepudiation, confidentiality, availability and authorization."
+  },
+  {
+   "term": "Service",
+   "cert": "ITIL",
+   "definition": "A means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks. Beacon's patient-flow analytics service, launched with the service desk in Release 1, is an example."
+  },
+  {
+   "term": "Product",
+   "cert": "ITIL",
+   "definition": "A configuration of an organization's resources designed to offer value for a consumer. Services are based on one or more products, and Version 5 brings digital product and service management together."
+  },
+  {
+   "term": "Value",
+   "cert": "ITIL",
+   "definition": "The perceived benefits, usefulness and importance of something. Value is judged by the stakeholder, not declared by the provider."
+  },
+  {
+   "term": "Output",
+   "cert": "ITIL",
+   "definition": "A tangible or intangible deliverable of an activity, such as a published report. An output is what you produce."
+  },
+  {
+   "term": "Outcome",
+   "cert": "ITIL",
+   "definition": "A result for a stakeholder enabled by one or more outputs, such as patient-flow leaders making bed decisions from one trusted set of numbers. An outcome is what the consumer achieves."
+  },
+  {
+   "term": "Utility",
+   "cert": "ITIL",
+   "definition": "The functionality a product or service offers to meet a particular need: what it does. Utility is often summed up as fit for purpose."
+  },
+  {
+   "term": "Warranty",
+   "cert": "ITIL",
+   "definition": "Assurance that a product or service will meet agreed requirements, such as availability, capacity, security and continuity: how well it does it. Warranty is often summed up as fit for use."
+  },
+  {
+   "term": "Value co-creation",
+   "cert": "ITIL",
+   "definition": "The idea that value is created jointly by the provider and the consumer through active collaboration, not delivered one way. Both sides contribute resources and both influence the result."
+  },
+  {
+   "term": "Service relationship",
+   "cert": "ITIL",
+   "definition": "A cooperation between a service provider and a service consumer, covering service provision, service consumption and service relationship management. Value is co-created inside these relationships."
+  },
+  {
+   "term": "Customer, user and sponsor",
+   "cert": "ITIL",
+   "definition": "Three service consumer roles. The customer defines requirements and owns the outcomes, the user uses the service, and the sponsor authorizes the budget; one person can hold more than one role."
+  },
+  {
+   "term": "Four dimensions",
+   "cert": "ITIL",
+   "definition": "The four perspectives you consider for every product and service so nothing is missed: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes."
+  },
+  {
+   "term": "Organizations and People",
+   "cert": "ITIL",
+   "definition": "The dimension covering structures, roles, responsibilities, culture, skills and leadership needed to create and support a product or service."
+  },
+  {
+   "term": "Information and Technology",
+   "cert": "ITIL",
+   "definition": "The dimension covering the information and knowledge a service needs and the technologies, including AI, that support it, along with their security and compliance needs."
+  },
+  {
+   "term": "Partners and Suppliers",
+   "cert": "ITIL",
+   "definition": "The dimension covering relationships with other organizations involved in designing, building, delivering and supporting services, such as cloud providers and contractors, and the contracts behind them."
+  },
+  {
+   "term": "Value Streams and Processes",
+   "cert": "ITIL",
+   "definition": "The dimension covering how the parts of the organization work together: the steps, workflows, controls and procedures that turn demand into value."
+  },
+  {
+   "term": "ITIL value system",
+   "cert": "ITIL",
+   "definition": "The model of how the parts of an organization work together to turn demand and opportunity into value. Its components are guiding principles, governance, value chain activities, management practices and continual improvement."
+  },
+  {
+   "term": "Governance",
+   "cert": "ITIL",
+   "definition": "The means by which an organization is directed and controlled. A governing body evaluates the situation, sets direction and monitors performance and conformance."
+  },
+  {
+   "term": "Value chain activities",
+   "cert": "ITIL",
+   "definition": "The interconnected activities that turn demand into products, services and value, a component of the value system. In Version 5 the eight-stage product and service lifecycle is the organizing model for this work, replacing ITIL 4's six-activity service value chain."
+  },
+  {
+   "term": "Management practice",
+   "cert": "ITIL",
+   "definition": "A set of organizational resources designed for performing work or accomplishing an objective, such as incident management or problem management. Version 5 keeps the ITIL 4 practices with adjustments and new groupings."
+  },
+  {
+   "term": "Guiding principles",
+   "cert": "ITIL",
+   "definition": "Recommendations that guide an organization in all circumstances, regardless of changes in goals, strategy, type of work or structure. ITIL has seven, and they are meant to be used together."
+  },
+  {
+   "term": "Focus on value",
+   "cert": "ITIL",
+   "definition": "Guiding principle: everything you do should link, directly or indirectly, to value for stakeholders. Know who the consumer is, what value means to them and how they experience the service."
+  },
+  {
+   "term": "Start where you are",
+   "cert": "ITIL",
+   "definition": "Guiding principle: do not start from scratch. Observe and measure existing services, processes and tools directly, and reuse what already works."
+  },
+  {
+   "term": "Progress iteratively with feedback",
+   "cert": "ITIL",
+   "definition": "Guiding principle: break work into small, manageable pieces and gather feedback before, during and after each one. Avoid trying to do everything at once."
+  },
+  {
+   "term": "Collaborate and promote visibility",
+   "cert": "ITIL",
+   "definition": "Guiding principle: work together across boundaries and make work, data and decisions visible. Hidden work and poor information lead to poor decisions."
+  },
+  {
+   "term": "Think and work holistically",
+   "cert": "ITIL",
+   "definition": "Guiding principle: no service or component stands alone. Consider the whole system end to end and all four dimensions."
+  },
+  {
+   "term": "Keep it simple and practical",
+   "cert": "ITIL",
+   "definition": "Guiding principle: use the fewest steps needed to achieve the outcome. If a step, rule or report does not add value, remove it."
+  },
+  {
+   "term": "Optimize and automate",
+   "cert": "ITIL",
+   "definition": "Guiding principle: simplify and improve work first, then automate where it adds value. Automating a poor process only makes waste happen faster."
+  },
+  {
+   "term": "Product and service lifecycle",
+   "cert": "ITIL",
+   "definition": "The Version 5 model of the eight stages a product or service moves through: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. It replaces ITIL 4's service value chain as the organizing model."
+  },
+  {
+   "term": "Discover",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where you explore demand, opportunities and stakeholder needs to understand what value a product or service could create, before committing to design."
+  },
+  {
+   "term": "Design",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where you shape the product or service, including its experience, architecture, controls and measures, so it can meet agreed requirements."
+  },
+  {
+   "term": "Acquire",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where you obtain the components and resources you need, such as software, cloud services or skills, from partners, suppliers or internal sources."
+  },
+  {
+   "term": "Build",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where you create, configure, integrate and test the components that make up the product or service."
+  },
+  {
+   "term": "Transition",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where new or changed products and services move into live use in a controlled way, including change, release and deployment."
+  },
+  {
+   "term": "Operate",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where the technology and components are run and maintained so they keep performing as designed."
+  },
+  {
+   "term": "Deliver",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where the product or service is provided to consumers so they can use it and achieve their outcomes."
+  },
+  {
+   "term": "Support",
+   "cert": "ITIL",
+   "definition": "Lifecycle stage where users get help with issues and requests, service is restored when it fails, and what is learned feeds improvement."
+  },
+  {
+   "term": "Value stream",
+   "cert": "ITIL",
+   "definition": "A series of steps an organization undertakes to create and deliver products and services to consumers. Kestrel's access-request journey, from a clinician's request through the service desk to working access, is a value stream that Release 2 redesigns."
+  },
+  {
+   "term": "Value stream mapping",
+   "cert": "ITIL",
+   "definition": "Drawing every step, handoff, wait time and decision in a value stream so you can see where value is added and where delay and waste occur. Use it before choosing automation."
+  },
+  {
+   "term": "Incident",
+   "cert": "ITIL",
+   "definition": "An unplanned interruption to a service or reduction in the quality of a service, such as the Clinical Information System failing to load on a ward. Incident management aims to restore normal service as quickly as possible. A request for something normal and agreed, such as new access, is a service request, not an incident."
+  },
+  {
+   "term": "Problem",
+   "cert": "ITIL",
+   "definition": "A cause, or potential cause, of one or more incidents. Problem management finds and manages causes so incidents happen less often or do less harm."
+  },
+  {
+   "term": "Known error",
+   "cert": "ITIL",
+   "definition": "A problem that has been analyzed but not yet resolved. It is usually recorded with a workaround so support teams can restore service quickly."
+  },
+  {
+   "term": "Workaround",
+   "cert": "ITIL",
+   "definition": "A solution that reduces or removes the impact of an incident or problem when a full resolution is not yet available. A workaround does not close the underlying problem."
+  },
+  {
+   "term": "Change",
+   "cert": "ITIL",
+   "definition": "The addition, modification or removal of anything that could have a direct or indirect effect on services. Change types include standard (pre-authorized, low risk), normal and emergency changes."
+  },
+  {
+   "term": "Service level",
+   "cert": "ITIL",
+   "definition": "One or more metrics that define expected or achieved service quality, such as availability or time to restore. A service level agreement (SLA) documents the agreed levels between provider and customer."
+  },
+  {
+   "term": "Continual improvement model",
+   "cert": "ITIL",
+   "definition": "A step-by-step guide for improvement work. The ITIL 4 model asks seven questions: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? Version 5 refines this model."
+  },
+  {
+   "term": "Readiness score",
+   "cert": "General",
+   "definition": "A score out of 100 for each exam, shown on Progress as a number with bars. It adds four parts: coverage (up to 30, the share of that exam's sessions you have marked done), documents (up to 35, the share of that exam's documents marked complete), judgment (up to 25, the share of your latest practice answers for that exam that are correct, counted over at least 8 answers) and recall (up to 10, written explanations of 80 characters or more, counted over at least 6)."
+  },
+  {
+   "term": "Exam gate",
+   "cert": "General",
+   "definition": "A planned decision point where you sit an exam only when all five checks on Progress are met: (1) every session before the gate is done; (2) every document in the releases up to the gate is complete; (3) two timed sets for that exam at 80% or better; (4) at least 24 decisions recorded for that exam with under 30% wrong; (5) no open wrong answers and at least 6 written explanations of 80 characters or more. The gates are PL-300 and ITIL Foundation in week 6 (day 4), PMP in week 10 (day 3) and CISSP in week 13 (day 4)."
+  },
+  {
+   "term": "Teach-back",
+   "cert": "General",
+   "definition": "Explaining a decision in your own words without notes, written in the Explain it in your own words box of a document in Project. Each explanation of 80 characters or more counts toward the recall part of your readiness score and toward the six explanations the fifth exam gate check asks for."
+  },
+  {
+   "term": "Review queue",
+   "cert": "General",
+   "definition": "The list in Practice, under Review, of questions whose latest answer was wrong or marked Guessing. A question leaves the queue when your latest answer to it is correct and not marked Guessing. Before you try again, restate the scenario, name the principle, say why your answer failed, then update the document."
+  },
+  {
+   "term": "Synthetic data",
+   "cert": "General",
+   "definition": "Fictional data created for practice. Kestrel Health Network, Project Beacon and every visit, bed count, ticket, person and vendor in TriCert Lab are synthetic; visits use pseudonymous IDs and no patient is named. Every document you export ends with a statement saying so."
+  },
+  {
+   "term": "Project Beacon",
+   "cert": "General",
+   "definition": "The fictional programme you run in TriCert Lab as Programme Manager at Kestrel Health Network (KHN), a fictional Alberta health network with four sites. Beacon has one charter, budget, schedule and change-control board and runs from 1 September to 17 December 2026 in three releases: patient-flow analytics, clinician identity and access, and cyber resilience. Every release uses all four exams."
+  },
+  {
+   "term": "Release (Project Beacon)",
+   "cert": "General",
+   "definition": "One of Beacon's three deliveries, each shown in Project with its documents. Release 1, Patient-flow analytics service (weeks 1 to 6), ends at the PL-300 and ITIL Foundation gate. Release 2, Clinician identity and access (week 6 day 5 to week 10 day 3), ends at the PMP gate. Release 3, Cyber resilience (week 10 day 4 to week 13), ends at the CISSP gate. Programme-wide documents such as the charter, schedule, RAID log (risks, assumptions, issues and decisions) and change control live in Release 1."
+  },
+  {
+   "term": "Canadian Triage and Acuity Scale (CTAS)",
+   "cert": "General",
+   "definition": "The five-level scale used at emergency department triage to rank how urgently a patient needs to be seen: Level I Resuscitation, II Emergent, III Urgent, IV Less Urgent (Semi urgent) and V Non Urgent. The time-to-physician objectives are immediate, 15, 30, 60 and 120 minutes. The CTAS guidelines call these times ideals (objectives), not established care standards. The latest adult guideline revision is the 2016 revision."
+  },
+  {
+   "term": "CTAS Level I (Resuscitation)",
+   "cert": "General",
+   "definition": "The most urgent CTAS level. Time-to-physician objective: immediate, with continuous nursing care. Beacon's DimCTAS table stores the target as 0 minutes, so only a physician initial assessment in the same minute as arrival counts as within target."
+  },
+  {
+   "term": "CTAS Level II (Emergent)",
+   "cert": "General",
+   "definition": "The second most urgent CTAS level. Time-to-physician objective: 15 minutes or less, with nurse reassessment every 15 minutes while the patient waits. The CTAS fractile target for Level II is 95% of visits seen within 15 minutes."
+  },
+  {
+   "term": "CTAS Level III (Urgent)",
+   "cert": "General",
+   "definition": "The middle CTAS level. Time-to-physician objective: 30 minutes or less, with nurse reassessment every 30 minutes while the patient waits. It is the largest group in Kestrel's baseline data: 192 of 474 valid visits."
+  },
+  {
+   "term": "CTAS Level IV (Less Urgent)",
+   "cert": "General",
+   "definition": "Also called Semi urgent. Time-to-physician objective: 1 hour (60 minutes) or less, with nurse reassessment every 60 minutes while the patient waits. 158 of Kestrel's 474 valid baseline visits are Level IV."
+  },
+  {
+   "term": "CTAS Level V (Non Urgent)",
+   "cert": "General",
+   "definition": "The least urgent CTAS level. Time-to-physician objective: 2 hours (120 minutes) or less, with nurse reassessment every 120 minutes while the patient waits. The CTAS fractile target for Level V is 80% of visits seen within 2 hours."
+  },
+  {
+   "term": "CTAS fractile response",
+   "cert": "General",
+   "definition": "The proportion of visits at a given triage level where the patient was seen within that level's CTAS time frame. The CTAS documents confirm targets of 95% for Level II and 80% for Level V. The 2016 revision said the 1999 fractile targets are not achievable by busy emergency departments and set an overall benchmark: triage to physician initial assessment at a median of 1 hour and a 90th percentile of 3 hours. Beacon's % PIA Within CTAS Target measure is a fractile response measured from arrival (28.3% across all levels in the baseline)."
+  },
+  {
+   "term": "Physician initial assessment (PIA)",
+   "cert": "General",
+   "definition": "The first time a physician assesses the patient in the emergency department (ED), recorded as a date and time. Kestrel's definition: time to PIA = pia_datetime minus arrival_datetime, because Kestrel's ED clock starts at arrival (registration), which in its data is never after triage. The Canadian Institute for Health Information (CIHI) indicator starts at the earlier of triage or registration. Baseline median at Kestrel General Hospital: 80.5 minutes. In Beacon, PIA always means this term."
+  },
+  {
+   "term": "Emergency department length of stay (ED LOS)",
+   "cert": "General",
+   "definition": "The total time a patient spends in the emergency department (ED). Kestrel's definition: ED LOS = departure_datetime minus arrival_datetime, where departure is when the patient physically leaves the ED; for an admitted patient that is when they leave for an inpatient bed. This follows the approach of the Canadian Institute for Health Information (CIHI), which runs from the earlier of triage or registration until the patient leaves. Report admitted and discharged patients separately: Kestrel's baseline medians are 11.96 hours and 3.61 hours."
+  },
+  {
+   "term": "Left without being seen (LWBS)",
+   "cert": "General",
+   "definition": "Kestrel's definition: an emergency visit where the patient left before a physician initial assessment, recorded as disposition LWBS. The LWBS rate divides LWBS visits by all valid visits: 27 of 474, or 5.7%, across Kestrel in the baseline period, with Kestrel General Hospital highest at 7.5%. The Canadian Institute for Health Information groups not-seen-or-left visits under several disposition codes and does not publish one LWBS definition, so always state the definition you use."
+  },
+  {
+   "term": "Alternate level of care (ALC)",
+   "cert": "General",
+   "definition": "The status of a patient who is occupying a bed in a facility but does not require the intensity of resources or services provided in that care setting (the Canadian Institute for Health Information definition). The most appropriate care team member, such as a physician or discharge planner, designates the patient ALC. ALC time starts at the documented designation and ends when the patient leaves the ALC setting or their care needs change. Adding Kestrel's daily ALC counts gives ALC patient-days: 2,075 in the baseline period."
+  },
+  {
+   "term": "Bed occupancy",
+   "cert": "General",
+   "definition": "Occupied beds divided by staffed beds, from Kestrel's midnight snapshot of each inpatient unit (FactBedCensus, one row per unit per day). Bed counts are semi-additive: they add across units on the same day but not across days. So a period figure is either the average of the daily occupancy values (87.0% in the baseline period) or the value at the last snapshot (84.0% on 30 September 2026, 121 of 144 staffed beds), never a sum of beds over days."
+  },
+  {
+   "term": "Release",
+   "cert": "PMP",
+   "definition": "A planned delivery of a usable set of product increments or capabilities to users, with its own scope, schedule, acceptance and handover. Release planning decides which features go into each release and roughly when, so value reaches users before the whole project ends. Beacon delivers in three releases: Release 1 go-live gate 2026-10-23, Release 2 acceptance 2026-11-26 and programme acceptance 2026-12-17."
+  },
+  {
+   "term": "MEDIANX",
+   "cert": "PL-300",
+   "definition": "A DAX iterator, MEDIANX(table, expression), that evaluates the expression for each row of a table and returns the median of the results; MEDIAN(column) is the simple version for one column. Beacon's Median Minutes to PIA measure uses MEDIANX over FactEDVisit rows where MinutesToPIA is not blank. A median suits waiting times, because a few very long waits pull an average up."
+  },
+  {
+   "term": "USERELATIONSHIP",
+   "cert": "PL-300",
+   "definition": "A DAX function, USERELATIONSHIP(column1, column2), used as a filter argument inside CALCULATE (or another function that takes filter arguments) to make an existing inactive relationship active for that one calculation. The active relationship between the same tables is ignored while it runs. To count Kestrel tickets by resolved date, you would add a ResolvedDate column from ResolvedAt, relate DimDate[Date] to it as an inactive relationship, and use USERELATIONSHIP in that measure."
+  },
+  {
+   "term": "Calendar-based time intelligence (preview)",
+   "cert": "PL-300",
+   "definition": "A newer Power BI approach where you define a calendar in the model and time intelligence functions such as DATESYTD take that calendar reference instead of a date column. It is still in preview: you turn on the Enhanced DAX Time Intelligence preview feature, and Microsoft warns that preview performance is not representative of the end product. Microsoft recommends it, and week functions such as DATESWTD work only with it. Classic time intelligence, which needs a marked date table with contiguous dates, still works and is not deprecated."
+  },
+  {
+   "term": "Service request",
+   "cert": "ITIL",
+   "definition": "A request from a user, or someone authorized to act for them, for a service action that is an agreed, normal part of service delivery, such as new access, a password reset or information. Nothing is broken, so it is fulfilled through service request management rather than handled as an incident. Kestrel's service desk logs Clinical Information System access requests as their own ticket type, Access request."
+  },
+  {
+   "term": "Health Information Act (HIA)",
+   "cert": "CISSP",
+   "definition": "Alberta's law for health information held by custodians. Its duties include collecting, using and disclosing health information with the highest degree of anonymity possible (section 57) and only in the amount essential for the purpose (section 58), keeping administrative, technical and physical safeguards (section 60), notifying breaches where there is a risk of harm (section 60.1), and submitting a privacy impact assessment to the Information and Privacy Commissioner before implementing a new practice or system (section 64). It was amended in June and July 2026. Kestrel's patient data falls under it."
+  },
+  {
+   "term": "Custodian (Health Information Act)",
+   "cert": "CISSP",
+   "definition": "Under the Health Information Act, an organization or person accountable for the health information in its custody or under its control, such as a provincial health agency, an operator of an approved hospital, a licensed pharmacy or a regulated health professional. Kestrel Health Network is a public body and a custodian. A custodian stays responsible for what its affiliates do. It is not the same as the CISSP data custodian role."
+  },
+  {
+   "term": "Affiliate (Health Information Act)",
+   "cert": "CISSP",
+   "definition": "Under the Health Information Act, a person who acts for a custodian. The definition includes an individual employed by the custodian, and affiliates also include contractors, volunteers, students, agents, information managers and privileged providers. Affiliates must comply with the Act, its regulations and the custodian's privacy management program, and must tell the custodian about any loss of, or unauthorized access to or disclosure of, health information. Kestrel treats agency nurses from ClearPath Staffing as affiliates."
+  },
+  {
+   "term": "Privacy impact assessment",
+   "cert": "CISSP",
+   "definition": "Under the Health Information Act (section 64), a custodian's written assessment of how a proposed administrative practice or information system relating to the collection, use and disclosure of individually identifying health information may affect privacy. It must be submitted to the Information and Privacy Commissioner for review and comment before the practice or system is implemented, and changes to existing practices or systems need one too. The Commissioner reviews and comments but does not approve it. At Kestrel, Chief Privacy Officer Priya Raman (E-003) approves it internally. Always write the term in full in Beacon."
+  },
+  {
+   "term": "Risk of harm (Health Information Act)",
+   "cert": "CISSP",
+   "definition": "The breach test in section 60.1 of the Health Information Act. When there is a risk of harm to an individual from the loss of, or unauthorized access to or disclosure of, health information, the custodian must notify the Information and Privacy Commissioner as soon as practicable, and must also notify the Minister responsible under the Act and, in writing, the affected individuals. An affiliate must tell the custodian first. Failing to notify is an offence. It is a lower bar than real risk of significant harm under POPA."
+  },
+  {
+   "term": "Protection of Privacy Act (POPA)",
+   "cert": "CISSP",
+   "definition": "The Alberta law, in force since June 11, 2025, that governs personal information held by public bodies. Together with the Access to Information Act (ATIA) it replaced FOIP. POPA does not apply to health information held by a public body that is a Health Information Act (HIA) custodian, so at Kestrel patient data falls under the HIA while non-health personal information, such as staff records, falls under POPA. Its breach test is real risk of significant harm."
+  },
+  {
+   "term": "Real risk of significant harm (RROSH)",
+   "cert": "CISSP",
+   "definition": "The breach notification test in the Protection of Privacy Act (POPA). If a reasonable person would consider that a real risk of significant harm to an individual exists from the loss of, unauthorized access to or unauthorized disclosure of personal information, the public body must notify the individual, the Information and Privacy Commissioner and the Minister without unreasonable delay. At Kestrel it applies to non-health personal information such as staff records; patient health information uses the Health Information Act's lower risk of harm test."
+  },
+  {
+   "term": "Information manager (Health Information Act)",
+   "cert": "CISSP",
+   "definition": "An organization that processes, stores or disposes of health information, or provides information management or information technology services, for a custodian. Under the Health Information Act an information manager is an affiliate, so it must follow the Act and the custodian's privacy management program, and the custodian stays responsible. Since the 2026 amendments, the Commissioner may review and comment on information security policies submitted by a prospective information manager. Kestrel policy requires a written agreement first; NorthArc Cloud (V-02), which hosts Kestrel's backups, is an example."
+  },
+  {
+   "term": "Least amount of information and highest degree of anonymity",
+   "cert": "CISSP",
+   "definition": "Two linked Health Information Act duties. Section 57: collect, use or disclose health information with the highest degree of anonymity possible, and first consider whether aggregate health information is adequate. Section 58: collect, use or disclose only the amount of health information essential for the intended purpose, treating the individual's expressed wishes as an important factor when deciding how much to disclose. In CR-01 the change-control board declined a patient-level alternate level of care (ALC) list on the bed dashboard and approved unit-level ALC counts instead."
+  },
+  {
+   "term": "Small-count suppression (Kestrel policy)",
+   "cert": "CISSP",
+   "definition": "Kestrel's reporting rule, a Kestrel policy rather than a law: suppress counts under 5 in any report shared outside the care team, by hiding the value or showing a marker such as <5, because a tiny count can identify a patient. Check totals too, since a hidden cell can sometimes be worked out from a total minus the other cells. Prairie Gate Health Centre (PGH), with 55 valid visits in the baseline period, is the site to test first, and the Release 1 go-live decision (D-02) required PGH suppression to be verified in the row-level security (RLS) test pack."
+  },
+  {
+   "term": "Downtime procedures",
+   "cert": "CISSP",
+   "definition": "The planned manual or alternative ways a clinical unit keeps caring for patients while a clinical system is unavailable, for example paper orders and charting, reports of current patients printed before the system went down, and a process to enter the paper records once the system is back. In CISSP terms they belong to business continuity planning and exercises (Domain 7, Security Operations). Beacon's Release 3 tests them together with the Clinical Information System restore."
+  },
+  {
+   "term": "Break-glass access",
+   "cert": "CISSP",
+   "definition": "An emergency procedure that lets an authorized user override normal access restrictions when patient care or service recovery depends on it, for example opening a record outside the user's usual role, or using a sealed emergency administrator account when normal sign-in fails. The user must give a reason, every use is logged and raises an alert, and each use is reviewed afterward. It keeps care moving without granting standing access."
+  },
+  {
+   "term": "Just-in-time (JIT) privileged access",
+   "cert": "CISSP",
+   "definition": "Granting administrator or other privileged rights only when needed, for an approved task and a limited time, then removing them automatically. It replaces standing privilege, so a stolen privileged account has little power most of the time. Vendor remote support, such as Meridian Clinical Systems' access to the Clinical Information System, is a good fit: open it for an approved support window and close it afterward."
+  },
+  {
+   "term": "Clinical workstation fast sign-in",
+   "cert": "CISSP",
+   "definition": "A sign-in approach for shared clinical workstations that lets a clinician unlock or switch to their own session in seconds, for example by tapping an identity badge and entering a short PIN instead of typing a full password, often reconnecting their virtual desktop session where they left it. A badge (something you have) plus a PIN (something you know) is two factors. It keeps strong authentication usable where many staff share computers, which addresses Beacon risk R-03."
+  }
+ ]
+}

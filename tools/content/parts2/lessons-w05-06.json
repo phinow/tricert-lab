@@ -1,0 +1,1076 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w5-s1",
+   "summary": "Design the pages patient-flow leaders will open every morning: an Executive overview that shows Kestrel against its charter targets, and Site ED operations and Beds and flow pages that show where each site is under pressure. You pick each visual for the question it answers, format against triage objectives, and build accessibility and a phone layout in from the start.",
+   "read": [
+    {
+     "heading": "Start from the decision, not the visual",
+     "body": "Today you turn the semantic model into the pages that replace the emailed extracts. Before you place a visual, write down who opens each page and what they decide with it.\n\nRelease 1 serves three audiences through three main pages:\n\n- Executive overview: executives such as Dr. Helen Marchetti (E-001) and Marcus Bell (E-002), with Janelle Cardinal (E-008), Director of Patient Flow. They ask: are we meeting the charter targets, which site is furthest off, and are beds the constraint?\n- Site ED operations: site leaders such as Dr. Sarah Whitford (E-007) and Aisha Mahmoud (E-010), Emergency Charge Nurse, at Kestrel General Hospital (KGH), and Dr. Liam O'Connor (E-012) at Aspen Ridge Hospital (ARH). They ask: which triage levels wait longest at my site, and when?\n- Beds and flow: Janelle Cardinal and the patient-flow team. They ask: how full are the units, and how many alternate level of care (ALC) days are we carrying?\n\nHidden pages support them: Site detail for drillthrough and Site tooltip for hover detail. A Definitions and data notes page holds Kestrel's definitions, the last refresh time and the suppression rule.\n\nEach question should trace to a line in the requirements and traceability register. A visual that answers no listed question goes, or its requirement goes through change control.\n\nUse the five-second test: after five seconds a leader should be able to say what is on track and what is not. Put the most important number top left and keep each page to six to eight visuals.\n\nTitles should state the point. Because the data refreshes daily, build them from a measure:\n\n```\nWait Title =\n\"Median wait to physician: \" & FORMAT ( [Median Minutes to PIA], \"0.0\" ) & \" minutes\"\n```\n\nApply it with the fx button on the visual's title. Put the definition and period in the subtitle: \"Arrival to physician initial assessment (PIA), 1 July to 30 September 2026\"."
+    },
+    {
+     "heading": "The Executive overview: four numbers against target",
+     "body": "The Executive overview opens with four cards across the top. Each card shows one measure from the Data Analysis Expressions (DAX) catalogue with its target and period. For the baseline, 1 July to 30 September 2026, the page must show:\n\n| Card | Measure | Value | Target or context |\n|---|---|---|---|\n| Wait for a physician | Median Minutes to PIA | 80.5 minutes at KGH; 64.0 all sites | KGH target 60 (agreed) |\n| Left without being seen (LWBS) | LWBS Rate | 5.7% all sites | 4.5% (agreed) |\n| Bed occupancy | Occupancy % (Last Snapshot) | 84.0%: 121 of 144 staffed beds on 2026-09-30 | Period average 87.0% |\n| Within triage objective | % PIA Within CTAS Target | 28.3% all sites (126 of 445) | KGH 12.8%, PGH 55.8% |\n\nAn LWBS visit is an emergency department (ED) visit that left before a physician initial assessment. CTAS is the Canadian Triage and Acuity Scale.\n\nTwo choices matter. The charter wait target applies to KGH only, so the card shows KGH against 60 with the all-sites median as context. And occupancy has two honest answers: the last snapshot (how full at the end) and the average of daily ratios (how full across the period). Show the snapshot on the card and the average in the subtitle, both labelled.\n\nBelow the cards, a bar chart compares median minutes to PIA by site, longest first: KGH 80.5, ARH 54.5, Coulee Valley Hospital (CVH) 54.0, Prairie Gate Health Centre (PGH) 45.5, with a constant line at 60 labelled \"KGH target (agreed)\". A weekly trend line of the median wait, a bar chart of occupancy by site (average daily: KGH 89.3%, ARH 84.8%, CVH 87.9%, PGH 76.8%) and a matrix of admitted visits by site with a total complete the page. The matrix uses ED Visits (Shared Total) from the DAX catalogue, so PGH shows \"<5\" and the total of 59 stays blank (test SUP-07). ALC patient-days (2,075, which is 18.4% of occupied bed-days) belong on Beds and flow, with occupancy by unit and the last-snapshot cards."
+    },
+    {
+     "heading": "Choose the visual for the question",
+     "body": "Pick the visual from the verb in the question:\n\n| The question asks for | Use | Beacon example |\n|---|---|---|\n| One number against a goal | Card or key performance indicator (KPI) visual | LWBS rate against 4.5% |\n| A comparison | Bar chart, sorted | Median wait by site |\n| Change over time | Line chart | Daily occupancy |\n| Parts of a whole | 100% stacked bar | Dispositions by site |\n| Detail across two dimensions | Matrix | Triage level by site |\n| A relationship | Scatter chart | Unit occupancy against ALC days |\n\nAvoid crowded pie charts, 3D effects and misleading dual axes. Use the median for waits, because a few very long waits pull an average up.\n\nA visual calculation is a DAX calculation that lives inside one visual and works on the data already in it: the quickest way to add a running total or moving average without a model measure. On the daily occupancy line chart, select New visual calculation and enter:\n\n```\nOccupancy 7-day average = MOVINGAVERAGE ( [Occupancy % (Average Daily)], 7 )\n```\n\nRUNNINGSUM and PREVIOUS are other visual calculation functions. Because a visual calculation exists only in its visual, use a model measure when the logic is needed on several pages or must be reconciled in the DAX catalogue."
+    },
+    {
+     "heading": "Conditional formatting against triage objectives",
+     "body": "The Canadian Triage and Acuity Scale (CTAS) sets a time-to-physician objective for each level: Level I Resuscitation immediate, Level II Emergent 15 minutes, Level III Urgent 30, Level IV Less Urgent 60, Level V Non Urgent 120. The CTAS guidelines call these objectives, not established care standards, so label them that way. DimCTAS[TargetMinutes] already holds them.\n\nOn Site ED operations, a matrix shows each CTAS level with visits, Median Minutes to PIA and % PIA Within CTAS Target. Colour the median against the objective:\n\n```\nPIA Status Colour =\nVAR MedianWait = [Median Minutes to PIA]\nVAR Objective = SELECTEDVALUE ( DimCTAS[TargetMinutes] )\nRETURN\n    SWITCH (\n        TRUE (),\n        ISBLANK ( MedianWait ) || ISBLANK ( Objective ), BLANK (),\n        MedianWait <= Objective, \"#2166AC\",\n        \"#B35806\"\n    )\n```\n\nApply it through Conditional formatting, Background colour, Format style Field value. A second measure, PIA Status, uses the same test to return \"Within objective\" or \"Over objective\"; add it as a column.\n\nFor all sites, the medians for Levels I to V are 1.0, 27.0, 55.0, 76.0 and 100.0 minutes, so only Level V is within its objective. % within target runs 42.9%, 33.3%, 15.6%, 30.5% and 58.9%. CTAS also sets fractile goals; the confirmed ones are 95% for Level II and 80% for Level V, so show only those two as reference values."
+    },
+    {
+     "heading": "Accessibility is part of the design",
+     "body": "The dashboards must work for people with low vision or colour vision deficiency, and for keyboard and screen-reader users.\n\n- Contrast: text needs at least 4.5:1 against its background, and large text and chart marks at least 3:1 (the Web Content Accessibility Guidelines (WCAG) level AA rule). On white, #2166AC scores 5.9:1 and #B35806 scores 4.87:1, so both pass for text. A bright blue such as #118DFF scores 3.35:1 and yellow #FFB900 only 1.72:1, so neither works for small text.\n- Never rely on colour alone. The blue and orange above differ in hue, but against each other they score only 1.21:1, so in greyscale they look almost the same. That is why the matrix carries the PIA Status words.\n- Alt text: give every visual alt text (Format, General, Alt text) that says what it shows and the main finding. Alt text can come from a measure, so it stays true after each refresh.\n- Tab order: in the Selection pane, match the tab order to the reading order and drop decorative shapes from it.\n- A table alternative: every visual must still read correctly with Show as a table, which any viewer can use.\n\nPut the accessible colours in a report theme so every page uses the same set."
+    },
+    {
+     "heading": "Phone layout, and when a paginated report fits",
+     "body": "Charge nurses such as Aisha Mahmoud check their site during a shift, often on a phone, so Site ED operations gets a phone layout. In Power BI Desktop, open that page, choose View, Mobile layout and drag visuals onto the phone canvas. It reuses the visuals already on the page, and larger screens keep the desktop layout. Place the CTAS table first, then length of stay and the weekly LWBS rate, one under another.\n\nA paginated report, built in Power BI Report Builder, is designed to print or export: fixed layout, pages, and every row of a table however long. Use one when the requirement says print, PDF, exact layout or every row. A monthly quality-committee pack with one page per site, in the same layout each month, fits. Daily exploration by leaders does not; that is the interactive report's job.\n\nFormat never overrides privacy. Beacon's pages use de-identified, aggregated data classified Confidential, so a request for a printable list of individual patients is a privacy question first. The Health Information Act (HIA) requires the highest degree of anonymity possible and the least amount of information needed (sections 57 and 58), and Kestrel's own reporting rule suppresses counts under 5 in any report shared outside the care team."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Five-second test",
+     "definition": "A design check: after five seconds on a page, a viewer should be able to say what is on track and what is not. If they cannot, the page has too many visuals or unclear titles."
+    },
+    {
+     "term": "Visual calculation",
+     "definition": "A DAX calculation defined inside one visual that works on the data already in that visual, such as MOVINGAVERAGE or RUNNINGSUM. It is not stored as a model measure."
+    },
+    {
+     "term": "Field value formatting",
+     "definition": "A conditional formatting style in which a measure returns the colour code to use, so the rule, such as median wait against the CTAS objective, lives in DAX and is easy to test."
+    },
+    {
+     "term": "Contrast ratio",
+     "definition": "The difference in luminance between text or a chart mark and its background. WCAG level AA asks for 4.5:1 for normal text and 3:1 for large text and graphics."
+    },
+    {
+     "term": "Mobile layout",
+     "definition": "A phone-shaped canvas in Power BI Desktop where you arrange visuals that already exist on a page, so the Power BI mobile app shows a portrait version of that page."
+    },
+    {
+     "term": "Paginated report",
+     "definition": "A fixed-layout report built in Power BI Report Builder for printing or PDF. It renders every row across as many pages as needed, which an interactive report does not."
+    }
+   ],
+   "build": {
+    "goal": "Design the Executive overview, Site ED operations and Beds and flow pages in the Executive and site operations reports document, with every visual tied to a leader's question and every value reconciled to truth.json.",
+    "steps": [
+     "Open Project, Release 1, Executive and site operations reports. Read How to write it and See the finished example, then list the audience and three to five questions for each page.",
+     "Build the Executive overview cards: Median Minutes to PIA filtered to KGH, % PIA Within CTAS Target, LWBS Rate and Occupancy % (Last Snapshot). Check they read 80.5, 28.3%, 5.7% and 84.0%.",
+     "Add the median-wait bar chart by site, sorted longest first, with a constant line at 60 minutes labelled as the agreed KGH target, then the weekly trend line and occupancy by site. Confirm KGH 80.5, ARH 54.5, CVH 54.0 and PGH 45.5.",
+     "Build Site ED operations (the CTAS matrix with PIA Status Colour and PIA Status, length of stay admitted against discharged, LWBS rate by week) and Beds and flow (occupancy by unit, where KGH-MED4A should read 94.7%, the last-snapshot cards, ALC days by site, and the daily occupancy line with the 7-day moving-average visual calculation).",
+     "Apply the accessible colours through a theme, write alt text for every visual, set the tab order in the Selection pane, and replace field-name titles with measure-driven titles.",
+     "Arrange Site ED operations in Mobile layout: the CTAS table first, then length of stay and the weekly LWBS rate.",
+     "In the writing area, record each page's questions, visuals, expected values, your paginated report decision and the privacy rules. Tick the Done when list and write your explanation in Explain it in your own words."
+    ],
+    "modelAnswer": "Executive overview, question 1: is KGH on track for the physician wait target? Visual: card, Median Minutes to PIA filtered to KGH, 80.5 minutes; subtitle 'Arrival to PIA, 1 July to 30 September 2026; target 60 (agreed)'. Question 2: which site is furthest off? Visual: bar chart sorted longest first (KGH 80.5, ARH 54.5, CVH 54.0, PGH 45.5) with a constant line at 60. Alt text: 'Median minutes from arrival to physician initial assessment by site; KGH longest at 80.5.' Paginated report: not needed for Release 1; reconsider if the quality committee asks for a fixed monthly PDF."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Visual-choice questions turn on the verb: compare (bar), change over time (line), relationship (scatter), one value against a goal (card or KPI). If the colour must follow a rule held in a measure, the answer is conditional formatting with Field value."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "A visual calculation adds logic such as RUNNINGSUM or MOVINGAVERAGE to one visual only. If the scenario needs the logic in several visuals or reused by other reports, choose a model measure instead."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "When a requirement mentions printing, PDF, an exact page layout or exporting every row, the answer is a paginated report. Interactive exploration points to a standard Power BI report."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Process task 3, Help ensure value-based delivery: report design starts from the stakeholder's decision and the acceptance criteria in the requirements register, not from what the tool can draw."
+    }
+   ],
+   "pitfalls": [
+    "Averaging the four site medians to get an all-sites figure. That gives 58.6 minutes; the median across all 445 visits with a valid PIA is 64.0.",
+    "Using colour alone for status. Add words or icons, because a colour-blind viewer or a greyscale print loses the meaning.",
+    "Drawing KGH's 60-minute target across every site as if it applied to them all. The charter target is for KGH; label the line.",
+    "Packing fifteen visuals onto one page. Each adds a query and splits attention; six to eight is a sensible ceiling."
+   ],
+   "check": [
+    {
+     "q": "Janelle asks whether KGH is on track for the charter wait target. What exactly does the card show?",
+     "a": "Median Minutes to PIA filtered to KGH: 80.5 minutes from arrival to physician initial assessment for 1 July to 30 September 2026, with the agreed target of 60 minutes beside it. It is 20.5 minutes over target, and the card says so in words as well as colour."
+    },
+    {
+     "q": "Why does the occupancy card show 84.0% when the period average is 87.0%?",
+     "a": "They answer different questions. 84.0% is the last snapshot: 121 occupied of 144 staffed beds on 2026-09-30. 87.0% is the average of the daily occupancy ratios across the quarter. The card shows the snapshot labelled 'as at 30 September', and the subtitle gives the period average."
+    },
+    {
+     "q": "Your CTAS matrix colours over-objective cells orange and within-objective cells blue. Is that enough for accessibility?",
+     "a": "No. Both colours pass text contrast on white (4.87:1 and 5.9:1), but against each other they score only 1.21:1, so they look alike in greyscale and can confuse some colour-blind viewers. Add the PIA Status words, give the matrix alt text, and place it sensibly in the tab order."
+    }
+   ]
+  },
+  {
+   "key": "w5-s2",
+   "summary": "Connect the pages so each one answers the next question: drill through from a site on the Executive overview to the hidden Site detail page, show a site's key figures in a report page tooltip, swap occupancy views with bookmarks, and keep site and month choices in step with sync slicers.",
+   "read": [
+    {
+     "heading": "Navigation should follow the leader's next question",
+     "body": "Yesterday's pages answer the first question: where are we off target? The next question is why. Navigation features exist to get a leader from the first answer to the second without hunting.\n\nMap each feature to a question before you build it:\n\n| Leader's next question | Feature | Beacon use |\n|---|---|---|\n| Why is this site off target? | Drillthrough | From a site bar to the hidden Site detail page for that site |\n| What sits behind this bar? | Report page tooltip | Hover a site to see its visits, wait, % within target and LWBS rate |\n| Which occupancy answer do I need? | Bookmarks | Swap average daily and last snapshot occupancy |\n| Can I keep my site and month? | Sync slicers | Site and month in step across pages |\n\nAlso decide how visuals on one page affect each other. Select a visual, then Format, Edit interactions: each other visual shows filter, highlight or none. On the Executive overview, a click on a site bar should filter the four cards to that site, so its wait, left without being seen (LWBS) rate and occupancy appear together.\n\nEvery feature must work with row-level security (RLS). A leader at Kestrel General Hospital (KGH) whose role shows only KGH data can drill only into KGH, and every tooltip and bookmark shows only rows the role allows. RLS filters the semantic model itself, so navigation cannot reveal another site's numbers."
+    },
+    {
+     "heading": "Drillthrough from a site to Site detail",
+     "body": "Drillthrough lets a user jump from a data point to a detail page filtered to that data point.\n\n1. Add a page named Site detail and hide it, so users reach it only by drillthrough. With no visual selected, find the Drill through section of the Visualizations pane and drag DimSite[SiteCode] into it. The page becomes a drillthrough target and Power BI adds a back button at the top left.\n2. Decide Keep all filters. On means every filter on the source page, such as a month or a triage level, travels with the user. Off means only the site travels. For Beacon keep it on so the month stays the same, and test that it carries nothing you did not intend.\n3. On the Executive overview, right-click the KGH bar and choose Drill through, Site detail. The page opens for KGH only: 213 visits, a median of 80.5 minutes to physician initial assessment (PIA), 12.8% within the Canadian Triage and Acuity Scale (CTAS) target, LWBS rate 7.5%, and a median emergency department (ED) length of stay (LOS) of 15.14 hours for admitted patients against 4.30 hours for discharged patients.\n4. Right-click is hidden from many users, so add a button: Insert, Buttons, Blank, then set Action to Drill through and Destination to Site detail. The button stays disabled until the user selects one site. Set its disabled tooltip to \"Select a site, then open its page\".\n\nDrillthrough can also work across reports (turn on Cross-report on the target page) when the reports share the same semantic model fields. Beacon keeps both pages in one report, so it does not need it."
+    },
+    {
+     "heading": "Report page tooltips",
+     "body": "A default tooltip lists the fields in the visual. A report page tooltip shows a small page you design, filtered to the data point under the pointer.\n\n1. Add a page named Site tooltip. In the Format pane for the page, open Page information and turn on Allow use as tooltip. Under Canvas settings, set Type to Tooltip so the page is small.\n2. Add one small table or multi-row card with four values: ED Visits (Shared), Median Minutes to PIA, % PIA Within CTAS Target and LWBS Rate (Shared).\n3. Hide the page so it does not appear as a tab.\n4. On the Executive overview site bar chart, open Format, General, Tooltips. Set Type to Report page and Page to Site tooltip.\n\nHover the Prairie Gate Health Centre (PGH) bar and the tooltip shows PGH figures only, such as a median of 45.5 minutes to PIA and 55.8% within target. Keep a tooltip to two or three visuals: it vanishes when the pointer moves, so it suits a quick check, not reading.\n\nDo not put the only copy of important information in a tooltip. Touch-screen and screen-reader users reach tooltips less easily than mouse users. Anything a decision depends on must also be on the page or one drillthrough away.\n\nTooltips are outputs too, so the tooltip page uses the shared measures that suppress small counts; tomorrow's tests check it."
+    },
+    {
+     "heading": "Bookmarks and the Selection pane",
+     "body": "A bookmark saves the state of a report page so a user can return to it with one click. When you add one, choose what it captures:\n\n- Data: filters, slicer selections, sort order and drill state.\n- Display: which visuals are shown or hidden, and spotlight or focus mode.\n- Current page: whether selecting the bookmark moves the user to this page.\n- All visuals or Selected visuals: whether it affects the whole page or only the visuals you selected.\n\nBeacon uses bookmarks to swap the occupancy visuals between the two honest answers from yesterday: Average daily and Last snapshot.\n\n1. Place the last-snapshot occupancy visual over the average-daily one. In the Selection pane, group them, then hide the last-snapshot visual.\n2. In the Bookmarks pane, add Average daily. Then show the last-snapshot visual, hide the average one, and add Last snapshot.\n3. Turn off Data for both. If Data stays on, clicking Last snapshot resets the user's site and month slicers to whatever they were when you made the bookmark. That is the most common bookmark bug.\n4. Add two buttons with Action set to Bookmark, or a bookmark navigator (Insert, Buttons, Navigator).\n\nA Reset filters bookmark keeps Data on, because its job is to return every slicer to all sites and the full period. Viewers in the service can also save personal bookmarks.\n\nThe Selection pane does two more jobs: its layer order decides which visual sits on top where visuals overlap, and its tab order decides the keyboard sequence. They are separate lists, so set both."
+    },
+    {
+     "heading": "Sync slicers and filter scope",
+     "body": "Leaders expect the month they pick on the Executive overview to stay picked on Site ED operations. Sync slicers does this.\n\n1. Put a month slicer (DimDate[MonthName], sorted by MonthNumber) on the Executive overview, and a site slicer (DimSite[SiteCode]) on Site ED operations.\n2. Open View, Sync slicers. For each page the pane shows two boxes: sync applies the selection on that page, and visible shows the slicer there.\n3. Sync the month slicer to Site ED operations and Beds and flow, and the site slicer to Beds and flow. Leave the site slicer off the Executive overview, which compares sites, and off Site detail, because drillthrough already sets the site.\n4. If two different slicer visuals use the same field, give them the same group name under Advanced options so they stay in step.\n\nFilters have three scopes in the Filters pane: this visual, this page and all pages. Use an all-pages filter for rules that apply everywhere, and lock or hide filters users must not change. A filter is not security. Anyone who can edit the report, or build on the semantic model, can change or bypass it. RLS is the control that keeps sites apart.\n\nWith RLS in place, a site slicer lists only the sites the viewer's role allows: a KGH leader sees one value, KGH, while the All sites role sees all four."
+    },
+    {
+     "heading": "Test the navigation before you call it done",
+     "body": "Run these checks and record each result in the document:\n\n1. Drill through from each site bar. Each site page shows that site's visits: KGH 213, Aspen Ridge Hospital (ARH) 105, Coulee Valley Hospital (CVH) 101, PGH 55. The back button returns to the Executive overview with the user's filters intact.\n2. Set the month slicer to August, then drill through. The site page still shows August only.\n3. Hover each site bar. The tooltip shows only that site.\n4. Choose a site and a month, then press Last snapshot and Average daily. The slicers do not change.\n5. Press Reset filters. Every slicer returns to all sites and all months.\n6. Tab through the page with the keyboard only. The order follows the reading order, and every button can be reached and used. While editing in Power BI Desktop, hold Ctrl and click to test a button.\n7. Open the Site ED operations phone layout. The CTAS table and charts still read clearly.\n\nFix each failure before tomorrow's testing session. A navigation defect found today costs minutes; one found by Janelle Cardinal at the morning bed meeting costs trust."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Drillthrough",
+     "definition": "A link from a data point on one page to a detail page filtered to that data point. The drillthrough field is placed on the target page, which gets a back button."
+    },
+    {
+     "term": "Keep all filters",
+     "definition": "A drillthrough setting that carries every filter from the source page to the target page, not only the drillthrough field. Useful, but test it for filters you did not intend."
+    },
+    {
+     "term": "Report page tooltip",
+     "definition": "A small report page, set to Allow use as tooltip, that appears when a user hovers over a data point and is filtered to that point."
+    },
+    {
+     "term": "Bookmark",
+     "definition": "A saved state of a report page. Its Data, Display and Current page options decide whether it restores filters, visibility of visuals, and which page is shown."
+    },
+    {
+     "term": "Selection pane",
+     "definition": "The pane that lists every visual on a page, where you show, hide and group visuals, set the layer order, and set the keyboard tab order."
+    },
+    {
+     "term": "Sync slicers",
+     "definition": "A pane that makes one slicer's selection apply on other pages (sync) and controls whether the slicer appears there (visible). Slicer groups keep different slicers on one field in step."
+    },
+    {
+     "term": "Edit interactions",
+     "definition": "A setting for how a selection in one visual affects each other visual on the page: filter, highlight, or no effect."
+    }
+   ],
+   "build": {
+    "goal": "Add drillthrough, a report page tooltip, occupancy bookmarks and synced slicers to the Executive and site operations reports, and record a navigation map and test results in the document.",
+    "steps": [
+     "Open Project, Release 1, Executive and site operations reports, and add a Navigation section to your writing: one row per feature with the question it answers.",
+     "Make the hidden Site detail page a drillthrough target on DimSite[SiteCode] with Keep all filters on, and add a drillthrough button with a disabled-state tooltip on the Executive overview.",
+     "Build the Site tooltip page (tooltip canvas, Allow use as tooltip on, page hidden) and assign it to the site bar charts.",
+     "Create Average daily and Last snapshot bookmarks with Data turned off, a Reset filters bookmark with Data on, and a bookmark navigator.",
+     "Sync the month slicer across Executive overview, Site ED operations and Beds and flow, and the site slicer across Site ED operations and Beds and flow, keeping it off Site detail.",
+     "Use Edit interactions so a click on the site bar filters the four cards to that site.",
+     "Run the seven navigation tests, record pass or fail with the values you saw, and compare your document with See the finished example."
+    ],
+    "modelAnswer": "Navigation map (extract). Drillthrough: Executive overview site bar to Site detail on DimSite[SiteCode], Keep all filters on. Test: KGH shows 213 visits and 80.5 minutes; August filter kept; back button returns. Tooltip: Site tooltip on the site bar charts. Test: PGH hover shows PGH only, 45.5 minutes and 55.8%. Bookmarks: Average daily and Last snapshot with Data off; Reset filters with Data on. Test: the swap leaves slicers unchanged. Sync slicers: month synced on Executive overview, Site ED operations and Beds and flow; site synced on Site ED operations and Beds and flow, not on Site detail. Result: 7 of 7 tests passed."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "For drillthrough, the drillthrough field goes on the target (detail) page, not the source page. Power BI adds the back button to the target page for you."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "If a bookmark must not change the user's current filters, turn off its Data option. If it must reset filters, keep Data on. Scenario questions often test exactly this choice."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Sync slicers has two settings per page: sync (the selection applies) and visible (the slicer shows). Different slicer visuals on the same field stay in step through a shared group name."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "A report page tooltip needs two settings: Allow use as tooltip on the tooltip page, and Type set to Report page in the target visual's tooltip options."
+    }
+   ],
+   "pitfalls": [
+    "Leaving Data on in a view-toggle bookmark, so every click resets the leader's site and month.",
+    "Treating a hidden or locked filter as security. Only RLS keeps one site's rows away from another site's leaders.",
+    "Putting key facts only in a tooltip, where touch-screen and screen-reader users may never see them.",
+    "Forgetting that Keep all filters carries every source filter, including a triage level the user clicked earlier."
+   ],
+   "check": [
+    {
+     "q": "A leader clicks Last snapshot and her month slicer jumps back to July. What went wrong and how do you fix it?",
+     "a": "The bookmark was saved with Data turned on, so it reapplies the slicer state from when it was made. Turn off Data for Average daily and Last snapshot so they change only which visuals are displayed. Keep Data on only for the Reset filters bookmark."
+    },
+    {
+     "q": "Where does DimSite[SiteCode] go to make drillthrough work, and what does the user see when drilling from the KGH bar?",
+     "a": "It goes in the Drill through section of the hidden Site detail page, the target. Drilling from KGH opens that page filtered to KGH: 213 visits, 80.5 median minutes to PIA, 12.8% within CTAS target, LWBS rate 7.5%, and admitted LOS of 15.14 hours against 4.30 hours for discharged patients."
+    },
+    {
+     "q": "Could a KGH leader use a tooltip or drillthrough to see Aspen Ridge figures?",
+     "a": "No. RLS filters the semantic model itself, so every visual, tooltip page and drillthrough page is evaluated inside the KGH role. The site slicer lists only KGH and drillthrough can only reach KGH. You still prove this with negative RLS tests rather than assuming it."
+    }
+   ]
+  },
+  {
+   "key": "w5-s3",
+   "summary": "Prove the release is right, usable, fast and safe before anyone relies on it. You reconcile every visual to truth.json with Data Analysis Expressions (DAX) queries, test accessibility the way users work, time each visual with Performance Analyzer, and run positive and negative row-level security tests, including the small-count suppression that is the go-live condition.",
+   "read": [
+    {
+     "heading": "Four claims, four kinds of evidence",
+     "body": "Release 1 goes live only if four claims can be proved, not asserted:\n\n| Claim | Test | Evidence goes in |\n|---|---|---|\n| The numbers are right | Reconcile every visual to truth.json | Quality plan |\n| Everyone can use it | Accessibility checks | Quality plan |\n| It is fast enough | Performance Analyzer timings | Quality plan |\n| Each site sees only its own data | Positive and negative row-level security (RLS) tests | RLS test pack |\n\nWrite every test the same way: ID, what is tested, expected result, actual result, pass or fail, evidence (a screenshot or query output), tester and date. Write the expected result before you run the test. A test written after you see the answer only describes what happened.\n\nThe figures below are the approved baseline for 1 July to 30 September 2026: emergency department (ED) visits, minutes to physician initial assessment (PIA), the left without being seen (LWBS) rate, bed occupancy and alternate level of care (ALC) days. Sites are Kestrel General Hospital (KGH), Aspen Ridge Hospital (ARH), Coulee Valley Hospital (CVH) and Prairie Gate Health Centre (PGH).\n\nIn PMP terms this is Process task 7, Plan and optimize quality of products/deliverables. In CISSP terms it is Domain 6, Security Assessment and Testing."
+    },
+    {
+     "heading": "Accuracy: reconcile in DAX query view",
+     "body": "Open DAX query view in Power BI Desktop and run one DAX query per visual family. This one reproduces the site comparison:\n\n```\nEVALUATE\nSUMMARIZECOLUMNS (\n    DimSite[SiteCode],\n    \"ED Visits\", [ED Visits],\n    \"Median Minutes to PIA\", [Median Minutes to PIA],\n    \"Pct Within Target\", [% PIA Within CTAS Target],\n    \"LWBS Rate\", [LWBS Rate],\n    \"Occupancy Avg\", [Occupancy % (Average Daily)],\n    \"ALC Days\", [ALC Days]\n)\nORDER BY DimSite[SiteCode]\n```\n\n| Site | Visits | Median min to PIA | Within target | LWBS rate | Occupancy avg | ALC days |\n|---|---|---|---|---|---|---|\n| ARH | 105 | 54.5 | 34.0% | 4.8% | 84.8% | 561 |\n| CVH | 101 | 54.0 | 39.2% | 4.0% | 87.9% | 377 |\n| KGH | 213 | 80.5 | 12.8% | 7.5% | 89.3% | 835 |\n| PGH | 55 | 45.5 | 55.8% | 3.6% | 76.8% | 302 |\n\nThen check the grand totals:\n\n```\nEVALUATE\nROW (\n    \"ED Visits\", [ED Visits],\n    \"Median Minutes to PIA\", [Median Minutes to PIA],\n    \"LWBS Rate\", [LWBS Rate],\n    \"Occupancy Last\", [Occupancy % (Last Snapshot)],\n    \"ALC Days\", [ALC Days]\n)\n```\n\nExpected: 474, 64.0, 5.7%, 84.0% and 2,075. Round before you compare. Two traps confirm the model is right: the all-sites median is 64.0, not the average of the site medians (58.6), and summing StaffedBeds over every row gives 12,952 bed-days, while Kestrel had 144 staffed beds on 2026-09-30. Finally compare every visual with the query output. A visual that disagrees has a filter, interaction or visual-level setting the query does not."
+    },
+    {
+     "heading": "Performance: Performance Analyzer and DAX query view",
+     "body": "Performance Analyzer records how long each visual takes. Open the Performance Analyzer pane, select Start recording, then Refresh visuals. Each visual gets a line split three ways:\n\n- DAX query: time for the semantic model to answer. A slow measure or a poor relationship shows here.\n- Visual display: time to draw the result. Too many data points or a heavy visual shows here.\n- Other: time spent waiting, often for other visuals on the page. Many visuals push this up.\n\nCopy the query of the slowest visual and paste it into DAX query view. There you can run it alone and try a rewritten measure without changing the model:\n\n```\nDEFINE\n    MEASURE FactEDVisit[LWBS Visits Test] =\n        CALCULATE ( [ED Visits], FactEDVisit[Disposition] = \"LWBS\" )\nEVALUATE\nSUMMARIZECOLUMNS ( DimSite[SiteCode], \"LWBS Visits\", [LWBS Visits Test] )\n```\n\nBeacon's model is small (474 visits, 643 census rows, 219 tickets), so every visual will be quick. Record the timings anyway: they are the baseline for when data grows or someone adds a heavy visual. The agreed quality-plan target (quality gate QG-4) is that every visual renders in 3 seconds or less in Performance Analyzer. Usual fixes when a visual misses: fewer visuals per page, filtering a column rather than a whole table inside CALCULATE, removing unused columns, and reducing granularity."
+    },
+    {
+     "heading": "Accessibility: test it the way users work",
+     "body": "Test with the methods people use:\n\n1. Keyboard only. Put the mouse away and tab through each page. Focus follows the tab order you set, and every button can be reached and used.\n2. Screen reader. Each visual announces useful alt text, such as \"Median minutes to physician initial assessment by site; KGH longest at 80.5\". Show as a table reads as a table.\n3. Contrast. Text is at least 4.5:1 against its background. Beacon's theme uses #252423 for text (15.49:1 on white), #2166AC (5.9:1) and #B35806 (4.87:1).\n4. No colour. View the page in greyscale. Every status still reads, because the triage matrix says Within objective or Over objective in words.\n5. Phone. Open the Site ED operations mobile layout in the Power BI mobile app and read every visual without zooming.\n\nLog each check as pass or fail with a note. A fail is a defect with an owner and a fix date, like any other defect."
+    },
+    {
+     "heading": "Access: positive and negative RLS tests",
+     "body": "Beacon has a role for each site plus All sites for executives and patient-flow leaders. A positive test proves a role sees what it should. A negative test proves it cannot see what it should not. Negative tests are the ones that find leaks.\n\nIn Desktop use Modeling, View as and pick a role (for a dynamic role, also enter Other user). In the service, open the semantic model's Security page and use Test as role.\n\n| Role | Visits | Median min to PIA | Occupancy avg | Staffed beds 2026-09-30 | ALC days |\n|---|---|---|---|---|---|\n| Site KGH | 213 | 80.5 | 89.3% | 72 | 835 |\n| Site ARH | 105 | 54.5 | 84.8% | 40 | 561 |\n| Site CVH | 101 | 54.0 | 87.9% | 22 | 377 |\n| Site PGH | 55 | 45.5 | 76.8% | 10 | 302 |\n| All sites | 474 | 64.0 | 87.0% | 144 | 2,075 |\n\nNegative tests for each site role:\n\n- The site slicer lists one site, and totals equal that site (KGH shows 213, never 474).\n- Beds and flow lists only that site's units. KGH shows KGH-MED4A, KGH-SUR5B and KGH-ICU and nothing from ARH, which proves the filter reaches FactBedCensus through DimUnit.\n- Drillthrough, tooltips and Show as a table show no other site.\n- A user in no role sees no data.\n\nOne test is about people, not DAX. RLS applies only to Viewers and app users; workspace Admins, Members and Contributors see every row. Check the workspace membership list: no site leader may hold Member or Contributor."
+    },
+    {
+     "heading": "Small-count suppression: the go-live condition",
+     "body": "Kestrel's reporting rule (Kestrel policy) suppresses counts under 5 in any report shared outside the care team. It puts into practice the Health Information Act duty to use the highest degree of anonymity possible and the least amount of information needed (sections 57 and 58). Risk R-02 names PGH, with 55 valid visits in the quarter, as the site where small counts could identify patients. Go-live decision D-02 carries one condition: small-count suppression for PGH verified in the RLS test pack.\n\nYour test query shows why. LWBS visits by site are KGH 16, ARH 5, CVH 4 and PGH 2, and PGH had only 4 admitted visits. The rule is about counts, not sites, so the CVH count of 4 is suppressed too.\n\nEvery shared page uses the shared measures from the DAX catalogue:\n\n```\nED Visits (Shared) =\nVAR Visits = [ED Visits]\nRETURN\n    IF ( ISBLANK ( Visits ), BLANK (), IF ( Visits < 5, \"<5\", FORMAT ( Visits, \"#,0\" ) ) )\n\nLWBS Rate (Shared) =\nVAR LWBSVisits =\n    CALCULATE ( [ED Visits], FactEDVisit[Disposition] = \"LWBS\" )\nRETURN\n    IF ( LWBSVisits < 5, BLANK (), [LWBS Rate] )\n```\n\nRates leak too: a PGH LWBS rate of 3.6% on 55 visits tells anyone with a calculator that 2 patients left. The same Kestrel policy blanks any rate whose numerator is under 5, which is what LWBS Rate (Shared) does, and a footnote explains that counts under 5 show as \"<5\". Medians are not suppressed by this rule. Totals can leak as well: if a table shows a total and every cell but one, subtraction reveals the hidden cell.\n\nAdd suppression cases SUP-01 to SUP-07 to the RLS test pack: under the Site PGH and All sites roles, the PGH LWBS and admitted counts show \"<5\", the PGH LWBS rate is blank, a count of exactly 5 still shows, the admitted total that would reveal PGH's 4 by subtraction is blank, and no tooltip or Show as a table view reveals the 2 or the 4."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "DAX query view",
+     "definition": "A view in Power BI Desktop where you write and run DAX queries such as EVALUATE SUMMARIZECOLUMNS, and define test measures, without changing the model."
+    },
+    {
+     "term": "Performance Analyzer",
+     "definition": "A Power BI Desktop pane that records each visual's time split into DAX query, Visual display and Other, and lets you copy the visual's query."
+    },
+    {
+     "term": "Reconciliation",
+     "definition": "Comparing a model or report result with an independently approved figure, such as truth.json, and explaining every difference before release."
+    },
+    {
+     "term": "Negative test",
+     "definition": "A test that proves something is refused or hidden, such as a KGH role seeing no ARH rows. Negative tests find access leaks that positive tests miss."
+    },
+    {
+     "term": "View as",
+     "definition": "A Power BI Desktop feature (Modeling, View as) that shows the report as a chosen RLS role, or as another user for dynamic roles, so you can test security before publishing."
+    },
+    {
+     "term": "Small-count suppression",
+     "definition": "Hiding counts below a threshold, under 5 at Kestrel, and any rate or total that would let someone work them out, so small groups of patients cannot be identified."
+    }
+   ],
+   "build": {
+    "goal": "Record accuracy, accessibility, performance and access test evidence in the Quality plan and the RLS test pack, including the PGH small-count suppression tests that decision D-02 depends on.",
+    "steps": [
+     "Open Project, Release 1, Quality plan and add a Test results table: ID, test, expected, actual, result, evidence, tester, date. Enter every expected value from truth.json before running anything.",
+     "In DAX query view, run the site query and the ROW query and compare with the expected tables (474, 64.0, 5.7%, 84.0%, 2,075). Then compare every visual on both pages with the query output.",
+     "Record Performance Analyzer timings for every visual on every report page and investigate any visual over the agreed target of 3 seconds or less.",
+     "Run the five accessibility checks (keyboard, screen reader, contrast, greyscale, phone) and log each as pass or fail with a note.",
+     "Open the RLS test pack and run positive and negative tests (RLS-01 to RLS-12) for Site KGH, Site ARH, Site CVH, Site PGH and All sites with View as, plus the no-role test and a check of workspace membership.",
+     "Add ED Visits (Shared) and LWBS Rate (Shared) to every shared page and ED Visits (Shared Total) to the admitted-by-site matrix, then record suppression tests SUP-01 to SUP-07, including PGH (LWBS 2, admitted 4), CVH (LWBS 4) and the boundary at exactly 5, under the Site PGH and All sites roles.",
+     "Raise a defect with an owner for every failure, retest, then tick Done when in both documents and compare with See the finished example."
+    ],
+    "modelAnswer": "Example extract. RLS-07, negative, role Site PGH, Beds and flow page. Expected: unit PGH-MED only; 10 staffed beds on 2026-09-30. Actual: as expected. Pass. SUP-01, suppression, roles Site PGH and All sites, LWBS count on the card, the tooltip and Show as a table. Expected: \"<5\" (true value 2) and LWBS Rate (Shared) blank. Actual: as expected. Pass, run by Sam Okafor (E-020) and witnessed by Priya Raman (E-003). A failure would be logged as a defect with an owner, fixed and retested before go-live."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Performance Analyzer splits each visual into DAX query, Visual display and Other. A slow DAX query points to the model or measure, slow display points to the visual, and high Other means the visual waited, often because the page has too many visuals."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Test RLS in Desktop with Modeling, View as, and in the service with Test as role on the semantic model's Security page. RLS filters Viewers and app users, not workspace Admins, Members or Contributors."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Process task 7, Plan and optimize quality of products/deliverables: expected results are planned before testing, and every defect goes through an owned fix and a retest before acceptance."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 6, Security Assessment and Testing: a control is assured only by tests that try to break it. Expect the best answer to include negative tests and independent evidence, not a configuration screenshot alone."
+    }
+   ],
+   "pitfalls": [
+    "Writing expected results after running the test, which turns a test into a description.",
+    "Testing RLS while signed in as a workspace Member, who sees every row anyway.",
+    "Suppressing the PGH count but not the PGH rate, which lets anyone recompute the count from 55 visits.",
+    "Comparing unrounded Power BI values with rounded truth figures and logging false failures."
+   ],
+   "check": [
+    {
+     "q": "Under the Site KGH role, Beds and flow still lists ARH Medicine. What does that tell you and where do you look?",
+     "a": "The site filter is not reaching FactBedCensus. It travels through DimUnit, so check that DimSite[SiteCode] relates one-to-many to DimUnit[SiteCode] and DimUnit[UnitID] one-to-many to FactBedCensus[UnitID], with filters flowing towards the fact table. Under KGH you expect three units and 72 staffed beds on 2026-09-30."
+    },
+    {
+     "q": "A matrix total of median minutes to PIA reads 58.6. Is something wrong?",
+     "a": "Yes. 58.6 is the average of the four site medians, so the total row is averaging site values instead of evaluating the measure. The Median Minutes to PIA measure in the total's filter context returns 64.0, the median of all 445 visits with a valid PIA. Look for an implicit average or a visual calculation over the site rows."
+    },
+    {
+     "q": "Why is a 3.6% LWBS rate for PGH a privacy problem, and what is the test?",
+     "a": "PGH had 55 valid visits, so 3.6% reveals 2 LWBS visits, below Kestrel's threshold of 5. Under the Site PGH and All sites roles, test that the PGH LWBS count shows \"<5\", the rate is blank, and no tooltip or Show as a table view shows the 2. Passing this test is the D-02 condition."
+    }
+   ]
+  },
+  {
+   "key": "w5-s4",
+   "summary": "Plan how Release 1 runs in the Power BI service: who holds which workspace role, how leaders receive the reports through an app, how the semantic model refreshes from the on-premises warehouse through a gateway, how content is labelled and endorsed, and how a change is deployed, checked and rolled back.",
+   "read": [
+    {
+     "heading": "Workspaces and the four roles",
+     "body": "A workspace is where content is built and managed. Beacon uses three: Beacon Dev, Beacon Test and Beacon Prod. Each person or group gets one of four roles:\n\n| Role | Can do | Row-level security (RLS) |\n|---|---|---|\n| Admin | Everything, including adding Admins and deleting the workspace | Sees all rows |\n| Member | Add people with lower roles, publish and update the app, share | Sees all rows |\n| Contributor | Create, edit and publish content; update the app only if an Admin allows it | Sees all rows |\n| Viewer | View and interact with content | RLS applies |\n\nThe last column is the security point. Only Viewers and app users are filtered by RLS, so site leaders must never hold Member or Contributor in Beacon Prod.\n\nBeacon's assignments: Tomás Rivera (E-006) is Admin of all three. Mei Tanaka (E-013) and Lumen Analytics Partners (V-05) are Contributors in Beacon Dev; Lumen's role ends with their contract on 2026-11-30 (risk R-07). A second Prod admin is needed for key-person risk R-06, but an admin sees every site, so it stays pending until a second builder is named and Janelle Cardinal (E-008) approves all-site access for that person. Mei Tanaka holds no workspace role in Beacon Prod: there she uses the app as a Viewer in the Site CVH RLS role, so RLS applies, and her excess \"view all sites\" grant has been removed (SAC-06). User acceptance testers are Viewers in Beacon Test. No one holds Member in any Beacon workspace, and Beacon Prod has no Viewers: leaders receive the app.\n\nAssign roles to security groups from the Identity Directory (A-007), not to named individuals. When someone joins or leaves, the group changes once and every workspace follows. Release 2 will drive those groups from human resources (HR) events."
+    },
+    {
+     "heading": "Distribute through an app",
+     "body": "An app packages content from one workspace for a wider audience. It suits Beacon because leaders get a stable, curated view and building stays separate from consuming.\n\n- Audiences: one app can have several audiences, each seeing chosen reports and pages. Beacon's app, Beacon Patient Flow, has two: Executive (all pages) and Site operations (every page except the Executive overview), each fed by Identity Directory groups. Audiences decide which content people see; RLS decides which rows. You need both.\n- Release control: report changes in the workspace reach app users only when you select Update app. The app reads the workspace's semantic model directly, though, so a model change reaches users at once. Test model changes in Beacon Test first.\n- Build permission on the semantic model lets people create their own reports and query the model, for example from Excel. Give it only to analysts who need it. Their RLS role still applies.\n\n| Method | Fits when | Beacon |\n|---|---|---|\n| App | Many consumers, curated content | Main route |\n| Direct sharing | A few people, one item | Off; hard to audit |\n| Teams or SharePoint | Leaders work in Teams | Possible later |\n| Subscriptions | A page snapshot by email | Optional |\n| Publish to web | Public data only | Never |\n\nPublish to web creates a link anyone can open without signing in, so it must be off for Confidential content. Beacon turns it off; access is through the app only."
+    },
+    {
+     "heading": "Scheduled refresh and when a gateway is required",
+     "body": "Beacon's semantic model uses Import mode: data is copied into the model and refreshed on a schedule. Its source is the de-identified views in the Clinical Data Warehouse (A-010), which is on premises. The Power BI service runs in the cloud and cannot reach that source by itself, so an on-premises data gateway is required.\n\nA gateway is needed when an Import model refreshes from a source inside Kestrel's network, or when a DirectQuery or live connection reaches such a source. It is not needed for cloud sources the service can reach directly.\n\nUse standard mode. Personal mode serves one user and supports Import only, which is wrong for a shared service. Install two gateway members as a cluster so a server patch does not stop refresh, and keep the recovery key in a secure vault. The gateway makes outbound connections only, so no inbound firewall port opens, but Ahmed Haddad (E-017) must still allow its outbound traffic. Its data source uses a service account with read-only rights on the de-identified views and nothing else. The credentials are encrypted, stored in the gateway cloud service and decrypted only on the gateway.\n\nSchedule: daily at 05:00 (agreed), so dashboards show yesterday's data by 06:00, before the morning bed meeting. Shared capacity allows up to 8 scheduled refreshes a day; Premium or Fabric capacity allows 48. Send failure notifications to the Analytics Support mailbox, not one person, so the service desk hears of a failure within 1 hour. Power BI pauses scheduled refresh after two months with no use of the model, so the service owner needs to know. Add a \"Data as at\" card showing the latest census date, so a failed refresh is visible to every leader."
+    },
+    {
+     "heading": "Sensitivity labels and endorsement",
+     "body": "Kestrel classifies the Beacon dashboards as Confidential: de-identified, aggregated data. Show that in the service with a sensitivity label from Microsoft Purview Information Protection.\n\n- A label applies to an item: a semantic model, report, dashboard or dataflow. It does not apply to a column, and the app itself is not labelled. It classifies the whole item.\n- Labels flow. With downstream inheritance, a report built on the labelled semantic model gets the label. Exports to Excel, PowerPoint and PDF carry the label, and any protection set in the label travels with the file. Exports to .csv do not carry it, so Beacon turns .csv export off.\n- A label does not grant or block access inside the service. Access comes from workspace roles, app audiences and RLS. The label tells people how to handle the content and protects exported copies.\n\nApply Confidential to the semantic model and the reports, and record it in the health information classification register.\n\nEndorsement tells people which content to trust:\n\n- Promoted: anyone with write access to the item can promote it, meaning it is ready to use.\n- Certified: only reviewers the Power BI administrator authorizes can certify it, meaning it meets the organization's quality standard.\n\nCertify the Beacon semantic model once its tests pass, so analysts build on the trusted model instead of making copies with their own definitions."
+    },
+    {
+     "heading": "Deployment and rollback",
+     "body": "Content moves from Beacon Dev to Beacon Test to Beacon Prod. A deployment pipeline in the service does this stage by stage and shows what differs between stages. Pipelines need the workspaces on a capacity (Premium Per User, Premium or Fabric). Deployment rules swap stage-specific settings, such as a data source rule: Beacon Dev uses test views, and the rule points Beacon Test and Beacon Prod at the live de-identified views, so release checks run against the approved figures.\n\nEvery Beacon Prod deployment needs:\n\n1. A normal change in the IT Service Management Platform (A-011), approved by Marcus Bell (E-002) or his delegate, with the test evidence attached.\n2. A window away from the 05:00 refresh and the morning bed meeting, such as Tuesday 18:00 to 19:00 (proposed).\n3. A smoke test afterwards: the refresh succeeds, and each page opened as one site role and as an executive shows the five headline values from the test results.\n4. An app update, the moment users see report changes.\n\nRollback means returning to the last version that passed its tests. Keep each released version as a Power BI project (.pbip) in version control, tagged by release. If the smoke test fails, do not update the app; redeploy the tagged version. The proposed target is the last approved version restored within 2 hours. The asset register gives A-009 a recovery time objective (RTO) of 72 hours and a recovery point objective (RPO) of 24 hours, so a same-day rollback sits well inside its targets."
+    },
+    {
+     "heading": "Monitoring and the handover to support",
+     "body": "After go-live, someone must notice problems before leaders do. Plan it now:\n\n| What | How | Who acts |\n|---|---|---|\n| Refresh failed | Failure notification within 1 hour; refresh history each morning | Analytics Support |\n| Gateway offline | Gateway status in the service | Ahmed Haddad (E-017) |\n| Wrong numbers | Smoke test after each deployment | Tomás Rivera (E-006) |\n| Low use | Usage metrics, monthly; unused pages go to the service review | Tomás Rivera (E-006) |\n| Unexpected exports or role changes | Activity log, monthly | Sam Okafor (E-020) |\n\nRecord the configuration items a change can break: the three workspaces, the app and its audiences, the semantic model and its RLS roles, the gateway cluster and data source, the service account, and the label. Together they make up A-009, the Power BI service and Beacon semantic model.\n\nIn ITIL terms you are preparing the Transition stage: the service is built and must move into Operate, Deliver and Support with changes controlled and knowledge in place. In CISSP terms (Domain 7, Security Operations) this is configuration management and change management. Tomorrow you hand all of it to Grace Liu (E-005), the service owner, and her service desk, so write it for someone who was not in the room when it was built."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Workspace role",
+     "definition": "One of Admin, Member, Contributor or Viewer, setting what a person can do in a workspace. Only Viewers (and app users) are filtered by row-level security."
+    },
+    {
+     "term": "App audience",
+     "definition": "A group of app users who see a chosen set of reports and pages. Audiences control which content is visible; RLS still controls which rows."
+    },
+    {
+     "term": "On-premises data gateway",
+     "definition": "Software installed inside Kestrel's network that lets the Power BI service refresh from, or query, on-premises sources such as A-010. Standard mode is the shared, clusterable version."
+    },
+    {
+     "term": "Sensitivity label",
+     "definition": "A Microsoft Purview classification applied to whole items such as semantic models and reports. It flows to downstream items and exported files; it does not apply to columns."
+    },
+    {
+     "term": "Endorsement",
+     "definition": "A trust marker on content: Promoted by anyone with write access, or Certified by reviewers the administrator authorizes."
+    },
+    {
+     "term": "Deployment pipeline",
+     "definition": "A Power BI service feature that moves content between stages such as Development, Test and Production, with rules to change data sources or parameters per stage."
+    },
+    {
+     "term": "Build permission",
+     "definition": "Permission on a semantic model that lets a user create new content on it and query it from tools such as Excel, still within their RLS role."
+    }
+   ],
+   "build": {
+    "goal": "Write the Workspace, refresh and deployment plan: roles by group, app audiences, the refresh and gateway design, labels and endorsement, deployment with a smoke test, rollback and monitoring.",
+    "steps": [
+     "Open Project, Release 1, Workspace, refresh and deployment plan, read How to write it, and list the three workspaces, Beacon Dev, Beacon Test and Beacon Prod, with their purpose.",
+     "Fill a role table per workspace: Tomás Rivera as Admin of all three, the second Prod admin pending, Mei Tanaka and Lumen as Contributors in Beacon Dev (Lumen until 2026-11-30), testers as Viewers in Beacon Test, no Member roles, and no site leader above Viewer.",
+     "Define the app and its two audiences, state that RLS still decides rows, and record who gets Build permission on the semantic model and why.",
+     "Write the refresh design: Import from A-010 through a clustered standard-mode gateway, the service account's rights, the agreed 05:00 schedule, failure notifications to Analytics Support within 1 hour and the Data as at card.",
+     "Record the Confidential label on the semantic model and reports, and the plan to certify the semantic model after its tests pass.",
+     "Write the deployment steps (change record, window, smoke test, app update) and the rollback from the tagged .pbip version, noting that model changes reach app users immediately.",
+     "Add the monitoring table and configuration items, tick Done when, and compare with See the finished example."
+    ],
+    "modelAnswer": "Refresh design (extract). Source: de-identified views in A-010, on premises. Mode: Import. Gateway: on-premises data gateway, standard mode, two-member cluster; outbound connections only; firewall rule owned by Ahmed Haddad (E-017). Credentials: service account svc-bcn-refresh, read-only on the de-identified views, encrypted and decrypted only on the gateway. Schedule: daily at 05:00 (agreed), data ready by 06:00. On failure: notify the Analytics Support mailbox within 1 hour; escalate to Tomás Rivera (E-006). Evidence: refresh history checked each morning; the Data as at card shows the latest census date."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Scheduled refresh of an Import model from an on-premises or private-network source needs an on-premises data gateway; cloud sources the service can reach do not. Personal mode serves one user and supports Import only."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "App audiences control which content a group sees; RLS controls which rows. Report changes reach the app only after Update app, but the shared semantic model changes for app users immediately."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 2, Asset Security: classification drives handling. A Power BI sensitivity label classifies whole items and travels with exports, which supports handling requirements outside the service."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Moving the analytics service into live use is the Transition stage of the product and service lifecycle. It hands over to Operate, Deliver and Support with changes, testing and knowledge in place."
+    }
+   ],
+   "pitfalls": [
+    "Making site leaders workspace Members so they can see everything, which also switches off RLS for them.",
+    "Running the gateway in personal mode on an analyst's laptop, so refresh stops when the laptop sleeps.",
+    "Expecting a sensitivity label on a column. Labels classify items; column exposure is handled by model design and RLS.",
+    "Assuming the app shields users from every change. Report changes wait for Update app; semantic model changes do not."
+   ],
+   "check": [
+    {
+     "q": "Why does Beacon need a gateway, and in which mode?",
+     "a": "The semantic model imports from the Clinical Data Warehouse (A-010), which is on premises, and the cloud service cannot reach it directly. Use the on-premises data gateway in standard mode, clustered for availability, because personal mode serves one user, supports only Import and is not suitable for a shared service."
+    },
+    {
+     "q": "Dr. Sarah Whitford is made a Beacon Prod workspace Member so she can share the report. What changes for her?",
+     "a": "RLS stops applying to her, because it filters only Viewers and app users, so she now sees every row in the model. She also gains rights to change content. Give her the app with the right audience and RLS role instead, and keep Beacon Prod roles to the build team."
+    },
+    {
+     "q": "An administrator asks you to put the Confidential label on the MinutesToPIA column. What do you answer?",
+     "a": "Sensitivity labels apply to items such as the semantic model and reports, not to columns. Apply Confidential to the Beacon semantic model and reports; it then flows to downstream reports and exported files. Which columns people can reach is decided by model design, permissions and RLS."
+    }
+   ]
+  },
+  {
+   "key": "w5-s5",
+   "summary": "Bring the evidence together and make the Release 1 go-live decision: go, go with conditions, or no-go. Then hand the analytics service to Grace Liu's service desk with knowledge articles, known errors with workarounds and a clear escalation path, so support works from the first morning.",
+   "read": [
+    {
+     "heading": "Decide on evidence, not on the date",
+     "body": "The Release 1 go-live gate is 2026-10-23. It sits on the critical path with zero float, straight after user acceptance testing (UAT) with emergency department (ED) and patient-flow leaders from 2026-10-21 to 2026-10-23. A fixed date pushes towards yes; your job is to make the decision rest on evidence anyone can inspect.\n\nWho does what at the gate (Beacon governance):\n\n- You, as Programme Manager, present the evidence and a recommendation.\n- The business owners, Dr. Sarah Whitford (E-007) for emergency data and Janelle Cardinal (E-008) for bed data, confirm the reports meet their acceptance criteria.\n- Grace Liu (E-005), service owner and IT Service Desk Manager, accepts the service for support.\n- Priya Raman (E-003), Chief Privacy Officer, verifies the privacy condition, small-count suppression, in the row-level security test pack.\n- The sponsor, Dr. Helen Marchetti (E-001), decides.\n\nCost and schedule are reported, not used as the reason to go. At the as-of date 2026-10-01, Release 1 had a cost performance index (CPI) of 0.89 and a schedule performance index (SPI) of 0.89. They say the release is costing more and moving slower than planned, not whether the dashboards are safe to use."
+    },
+    {
+     "heading": "Readiness criteria and their evidence",
+     "body": "Each criterion names its evidence. If the evidence does not exist, the criterion is not met. Partial evidence is not met either: \"row-level security (RLS) tested for three of four sites\" is a fail.\n\n| Criterion | Evidence |\n|---|---|\n| Leaders accept the reports | UAT sign-off by E-007 and E-008 against the requirements register |\n| Numbers are right | Quality plan: every visual reconciled to truth.json (474 visits, 64.0 minutes, 5.7%, 84.0%, 2,075) |\n| Each site sees only its data | RLS test pack: positive and negative tests for every role |\n| Small counts suppressed | RLS test pack: counts under 5 hidden, including Prairie Gate Health Centre (PGH) and Coulee Valley Hospital (CVH) |\n| Usable by everyone | Quality plan: keyboard, screen reader, contrast, greyscale, phone |\n| Privacy assessed | Privacy impact assessment approved by Priya Raman (E-003) and submitted to the Commissioner |\n| Security conditions met | Security acceptance criteria all observed |\n| Runs in the service | Workspace plan: gateway, refresh, label, app, rollback tested |\n| Supported | Desk acceptance, knowledge articles, escalation path |\n\nThe privacy row needs care. Under the Health Information Act, section 64, a custodian must submit a privacy impact assessment to the Information and Privacy Commissioner before it implements a new information system or practice involving individually identifying health information. The Commissioner reviews and comments; it does not approve. So the evidence is the submission before go-live, not an approval letter."
+    },
+    {
+     "heading": "Go, go with conditions, or no-go",
+     "body": "The decision has three possible outcomes:\n\n- Go: every criterion is met.\n- Go with conditions: a few criteria are not fully met, the remaining risk is understood and owned, and each gap can be closed and verified before anyone is exposed to it.\n- No-go: a criterion that protects privacy, data accuracy or patient safety is not met and cannot be contained.\n\nA condition is acceptable only if it is specific, testable, owned and dated, and the decision says what happens if it is not met. \"Improve suppression\" is not a condition. \"Small-count suppression for PGH verified in the RLS test pack\" is.\n\nThat is Beacon's decision D-02: Release 1 go-live approved on 2026-10-23 with one condition, small-count suppression for PGH verified in the RLS test pack. It passes the test. The risk is named (R-02, owned by Priya Raman, E-003), the fix is small (suppressed measures), and the test cases already exist from your testing session. In the go-live document, record who verifies the condition (Priya Raman), the evidence attached, and the consequence if it fails: the app opens to users on 2026-10-26, and if the condition is not verified by 08:00 that day, the app stays unpublished.\n\nWrite the decision record with date, decision, conditions, evidence references, decision maker and the risks accepted. A decision without a record cannot be audited later."
+    },
+    {
+     "heading": "Transition into operation and support",
+     "body": "ITIL Version 5 describes eight stages in the product and service lifecycle: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. Release 1 has been in Build. Go-live is Transition: moving a tested change into live use without harming the service or its users. After it, the analytics service lives in Operate (refresh, the gateway and the workspaces monitored and maintained), Deliver (access requests handled, reports reaching leaders each morning, feedback collected) and Support (incidents and problems resolved).\n\nTransition is complete only when the people who run and support the service accept it, with their knowledge in place before the first call.\n\nPlan a short period of early life support, often called hypercare: two weeks, 2026-10-26 to 2026-11-06, in which the Beacon team sits beside the service desk, answers escalations the same day and fixes defects quickly. End it on agreed exit criteria, not on the calendar: no open priority 1 or 2 incident, refresh on time on at least 9 of the 10 working days (proposed), a knowledge article for every ticket type seen, and the first service review held.\n\nTwo guiding principles apply. Collaborate and promote visibility: the desk co-writes the knowledge articles. Keep it simple and practical: three tiers with named contacts beat a matrix nobody reads."
+    },
+    {
+     "heading": "Known errors and knowledge articles",
+     "body": "ITIL separates an incident, an unplanned interruption to a service or reduction in its quality, from a problem, a cause or potential cause of one or more incidents. A known error is a problem that has been analysed but not resolved. A workaround reduces or removes the impact of an incident or problem while a full fix is not available. Known errors with workarounds let the desk resolve calls at first contact.\n\nBeacon's known errors come straight from the data-quality findings:\n\n| Known error | What users see | Workaround |\n|---|---|---|\n| ARH-SUR census missing for 2026-08-16 | Aspen Ridge Hospital (ARH) occupancy that day uses ARH Medicine only | Explain; snapshot requested from A-006 |\n| CVH-MED alternate level of care (ALC) value for 2026-07-22 blanked | That unit-day shows no ALC count | Explain; unit is confirming the value |\n| KGH-MED4A on 2026-09-08 | Occupancy above 100% (34 occupied, 32 staffed) | Not an error: surge beds, flagged |\n| Visits V0070, V0222, V0476, V0075 quarantined | 474 valid visits, not 478 | Explain the rule; corrected at source |\n\nWrite knowledge articles for the calls you expect:\n\n- \"I can't see my site\": check the app audience and the person's RLS group.\n- \"The numbers look old\": check the Data as at card and the refresh history.\n- \"This doesn't match my Excel extract\": explain Beacon's definitions, such as physician initial assessment (PIA) timed from arrival.\n- \"I need access to the dashboards\": log an access request through the service desk."
+    },
+    {
+     "heading": "The support model and escalation",
+     "body": "Three tiers, each with named owners:\n\n| Tier | Who | Handles |\n|---|---|---|\n| 1 | Service desk: Grace Liu (E-005), analysts such as Noah Bergstrom (E-031) and Zainab Yusuf (E-032) | Logging, known errors, access requests, how-to questions |\n| 2 | Analytics Support: Mei Tanaka (E-013) | Refresh failures, report defects, RLS group changes |\n| 3 | Tomás Rivera (E-006), data steward; Lumen Analytics Partners (V-05) until 2026-11-30 | Model and measure faults; the gateway with Ahmed Haddad (E-017) |\n\nTickets keep the desk's existing resolution targets: P1 4 hours, P2 8, P3 24, P4 72. Demand is not new. In August and September 2026 the desk logged 27 tickets in the Power BI category, 21 of them assigned to Analytics Support.\n\nFunctional escalation moves a ticket to a group with the right skills; hierarchical escalation moves it up the management line. Two routes skip the tiers:\n\n- A possible privacy incident, such as a leader seeing another site's rows, goes straight to Priya Raman (E-003). She assesses it. Under the Health Information Act, section 60.1, where there is a risk of harm Kestrel must notify the Commissioner, the Minister responsible under the Act and the affected individuals as soon as practicable.\n- A security event goes to Daniel Osei (E-004) and Sam Okafor (E-020).\n\nDefinition questions go to the data owners: Dr. Whitford (emergency) and Janelle Cardinal (beds)."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Go with conditions",
+     "definition": "A go-live decision that accepts named gaps only if each condition is specific, testable, owned and dated, with a stated consequence if it is not met."
+    },
+    {
+     "term": "Transition",
+     "definition": "The ITIL Version 5 lifecycle stage that moves a tested change into live use and hands it to Operate, Deliver and Support without harming the service."
+    },
+    {
+     "term": "Known error",
+     "definition": "In ITIL, a problem that has been analysed but not yet resolved. Recording it with a workaround lets the service desk resolve related incidents at first contact."
+    },
+    {
+     "term": "Workaround",
+     "definition": "A way to reduce or remove the impact of an incident or problem while a full resolution is not yet available, such as explaining a missing census day."
+    },
+    {
+     "term": "Early life support",
+     "definition": "A short period after go-live, often called hypercare, when the build team supports the service desk closely. It should end on agreed exit criteria, not a date."
+    },
+    {
+     "term": "Functional escalation",
+     "definition": "Passing a ticket to a group with more specialist skills, such as from the service desk to Analytics Support. Hierarchical escalation moves it up the management line instead."
+    }
+   ],
+   "build": {
+    "goal": "Complete the Go-live readiness and support handover document: criteria with evidence, the D-02 decision record and its condition, and a support handover the service desk formally accepts.",
+    "steps": [
+     "Open Project, Release 1, Go-live readiness and support handover. Build the readiness table with one row per criterion, its evidence document, status and owner.",
+     "Mark each criterion met or not met strictly, treating partial evidence as not met. Add CPI 0.89 and SPI 0.89 as reported context, not as a criterion.",
+     "Write the D-02 decision record: 2026-10-23, go-live approved with one condition, the verifier, the evidence to attach, the consequence if it fails, the decision maker and the risks accepted.",
+     "Write the known-error table (ARH-SUR 2026-08-16, CVH-MED 2026-07-22, KGH-MED4A 2026-09-08, the four quarantined visits) with a workaround for each.",
+     "Draft the four knowledge articles: can't see my site, numbers look old, doesn't match my extract, and need access to the dashboards.",
+     "Write the three-tier support model, the priority targets, the privacy and security routes, and the early life support period (2026-10-26 to 2026-11-06) with its exit criteria.",
+     "Record Grace Liu's acceptance, tick Done when, compare with See the finished example, and write your explanation in your own words."
+    ],
+    "modelAnswer": "Decision D-02 (extract). Date: 2026-10-23. Decision: Release 1 go-live approved with one condition. Condition: small-count suppression for PGH verified in the RLS test pack. Verifier: Priya Raman (E-003), owner of R-02. Evidence: suppression cases for PGH and CVH passed under the Site PGH and All sites roles. If not met by 2026-10-26 08:00: the app stays unpublished. Decided by: Dr. Helen Marchetti (E-001). Risks accepted: R-01 data quality, with known errors handed to the desk."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Business Environment task 1, Define and establish project governance: a go-live decision belongs to the authority named in governance and rests on recorded evidence. The Programme Manager recommends; the sponsor decides."
+    },
+    {
+     "cert": "PMP",
+     "tip": "When options are 'go live anyway because the date is fixed' or 'delay everything for a minor gap', look for the answer that records a specific, owned, verifiable condition and the risk accepted."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Know the definitions: incident (unplanned interruption or reduction in quality), problem (cause or potential cause of incidents), known error (analysed but unresolved problem), workaround (reduces impact without a full fix)."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Before go-live, check the service side, not just Desktop: scheduled refresh through the gateway succeeds, the label is applied, app audiences are set, and RLS role members are assigned in the service."
+    }
+   ],
+   "pitfalls": [
+    "Treating the Commissioner's review as an approval to wait for. Under the Health Information Act the privacy impact assessment is submitted before implementation, and the Commissioner comments.",
+    "Writing a condition with no owner, test or consequence, which turns go with conditions into a plain go.",
+    "Handing over a contact list with no known errors or articles, so every call escalates to Tomás Rivera.",
+    "Ending early life support on a date instead of on agreed exit criteria."
+   ],
+   "check": [
+    {
+     "q": "Why was D-02 a go with conditions rather than a no-go?",
+     "a": "The only gap, PGH small-count suppression, was specific and testable, had a named risk and owner (R-02, Priya Raman), and could be verified in the RLS test pack before anyone outside the care team was exposed. Every other criterion had evidence. A no-go fits when a privacy, accuracy or safety gap cannot be contained."
+    },
+    {
+     "q": "A Kestrel General Hospital (KGH) leader calls: ARH occupancy on 16 August looks low. What does the desk do?",
+     "a": "It is a known error: the ARH Surgery census row for 2026-08-16 is missing, so that day's ARH figure uses ARH Medicine only. The desk resolves the call at first contact with the workaround text and links it to the known error; the snapshot has been requested from the Bed Management System (A-006)."
+    },
+    {
+     "q": "A site leader reports seeing another site's numbers. Who is told, and why?",
+     "a": "It is a possible privacy incident, so it goes straight to Priya Raman (E-003) rather than through the normal tiers, with security (E-004, E-020) informed. She assesses the risk of harm; if there is one, section 60.1 of the Health Information Act requires notice to the Commissioner, the Minister responsible under the Act and the affected individuals as soon as practicable."
+    }
+   ]
+  },
+  {
+   "key": "w6-s1",
+   "summary": "Close Release 1 properly: confirm what is accepted and handed over, record lessons that will change how Releases 2 and 3 run, then score your PL-300 readiness against the four skill areas and learn the data preparation and modelling topics Beacon did not need.",
+   "read": [
+    {
+     "heading": "Closing a release, not the programme",
+     "body": "Release 1 closes; Beacon does not. Closing a release means confirming its scope is accepted and handed over, and giving everything still open to a named owner.\n\nRelease 1 closure checklist:\n\n- Acceptance: user acceptance testing (UAT) signed off and the D-02 condition verified and recorded.\n- Handover: Grace Liu (E-005), the service owner, has accepted the service for support; knowledge articles and known errors are live.\n- Benefits: the charter measures are taken three months after the release, on 2027-01-25 (2027-01-23 is a Saturday), which is after programme acceptance on 2026-12-17. So name business owners who will still be there: Dr. Sarah Whitford (E-007) for the median minutes to physician initial assessment (PIA) at Kestrel General Hospital (KGH), baseline 80.5 and target 60 (agreed), and Janelle Cardinal (E-008) for the left without being seen (LWBS) rate, baseline 5.7% and target 4.5% (agreed).\n- Open items: risks and issues move to the programme RAID (risks, assumptions, issues and decisions) log with owners. The Lumen Analytics Partners (V-05) contract stays open until 2026-11-30 (risk R-07), so plan their knowledge transfer now.\n- Records: final versions of the Release 1 documents filed.\n\nIn PMP terms this is Process task 10, Manage project closure, applied to a release, and People task 7, Help ensure knowledge transfer."
+    },
+    {
+     "heading": "Release 1 in numbers",
+     "body": "Lessons need evidence, so start with the facts at the latest status date, 2026-10-01:\n\n| Measure | Release 1 | Programme |\n|---|---|---|\n| Planned value (PV) | CAD 211,400 | CAD 278,900 |\n| Earned value (EV) | CAD 188,000 | CAD 224,000 |\n| Actual cost (AC) | CAD 211,000 | CAD 250,600 |\n| Cost performance index (CPI) | 0.89 | 0.89 |\n| Schedule performance index (SPI) | 0.89 | 0.80 |\n\nRelease 1 cost variance (EV minus AC) is CAD -23,000 and schedule variance (EV minus PV) is CAD -23,400. For the programme, the estimate at completion is CAD 1,342,500, a variance of CAD -142,500 against the CAD 1,200,000 budget. That is more than the CAD 120,000 management reserve, which is why risk R-08 exists.\n\nQuality facts: of 480 emergency department (ED) source rows, 2 were duplicates and 4 were quarantined, leaving 474 valid visits. The bed census had one duplicate, one missing unit-day, one over-capacity row and one negative alternate level of care (ALC) value. All were found by profiling before modelling, and every figure reconciles to truth.json."
+    },
+    {
+     "heading": "Lessons that change behaviour",
+     "body": "A lesson is useful only if someone will act differently. Write each as: what happened, impact, root cause, recommendation, owner, and where it applies. Record what went well too.\n\nWeak: \"Privacy was hard.\" Strong: \"Small-count suppression became a go-live condition (D-02) instead of a design requirement. Impact: late rework of measures and tests. Cause: Kestrel's under-5 rule sat in the classification register but was never turned into acceptance criteria. Recommendation: turn every privacy and security rule into a test case when requirements are written. Owner: Priya Raman (E-003). Applies to: Release 2 requirements, starting with the access-governance dashboard.\"\n\nCandidate lessons from Beacon's own evidence:\n\n| Topic | Evidence | Recommendation |\n|---|---|---|\n| Profiling first | 4 quarantined visits and 4 census problems found before modelling | Profile every Release 2 source first |\n| Privacy as tests | D-02 condition; Coulee Valley Hospital (CVH) also had a count under 5 | Write suppression and row-level security (RLS) tests with the requirements |\n| Calendar | No holidays in the schedule; Thanksgiving 2026-10-12 fell in Release 1 | Add statutory holidays, including Remembrance Day 2026-11-11 |\n| Key person | Model knowledge sat with Tomás Rivera (R-06) | Pair Mei Tanaka on every model change |\n| Cost | Release 1 CPI 0.89 | Re-estimate Release 2 with Release 1 actuals |\n\nRun it with the team and keep it blameless: ask what in the process allowed the outcome."
+    },
+    {
+     "heading": "PL-300 coverage review: the four skill areas",
+     "body": "The PL-300 exam lasts 100 minutes and needs a scaled score of 700 to pass. It measures four skill areas:\n\n| Skill area | Weight | Where Beacon practised it |\n|---|---|---|\n| Prepare the data | 25–30% | Power Query data-quality workbook and quality plan (weeks 1 and 3) |\n| Model the data | 25–30% | Star schema, date table and Data Analysis Expressions (DAX) catalogue (week 4) |\n| Visualize and analyze the data | 25–30% | Executive and site operations reports (week 5) |\n| Manage and secure Power BI | 15–20% | RLS test pack; workspace, refresh and deployment plan (weeks 4 and 5) |\n\nRate yourself 1 to 3 on each area: 3 means you could teach it, 2 means you recognize it, 1 means it is new. Then test the rating against evidence: your recent PL-300 answers in Practice and the documents you completed. Feelings are not evidence. Every topic you rate 1 goes on the study list for the next two sessions.\n\nA real project never touches every exam topic, so the next two sections teach the preparation and modelling topics Beacon did not need."
+    },
+    {
+     "heading": "Prepare the data: topics Beacon did not exercise",
+     "body": "- Storage modes: Import copies data into the model (fast, needs refresh). DirectQuery sends queries to the source when people view the report (current data; the source carries the load; some features are limited). Direct Lake, in Microsoft Fabric, reads Delta tables in OneLake directly, close to Import speed without a full import refresh. A composite model mixes modes.\n- Data source settings: change credentials and privacy levels (Private, Organizational, Public, None). Privacy levels stop data from one source being sent to another when a query combines them.\n- Parameters: an Environment or ServerName parameter lets one query point at Development or Production; deployment rules can set it per stage.\n- Column profiling: Column quality, Column distribution and Column profile use the first 1,000 rows by default. Switch to the entire data set before you trust them.\n- Reference or duplicate: Reference starts a new query from the original's output, so later changes flow through. Duplicate copies every step into an independent query.\n- Merge and append: merge joins columns from two queries on matching keys (left outer, right outer, full outer, inner, left anti, right anti). Append stacks rows of queries with the same columns. A left anti merge finds orphans, such as tickets whose site has no match.\n- Pivot, unpivot and transpose: unpivot turns columns into attribute and value rows (a census sheet with one column per unit becomes one row per unit per day); pivot reverses it; transpose swaps rows and columns.\n- Loading: turn off Enable load for staging queries so they do not become model tables."
+    },
+    {
+     "heading": "Model the data: topics Beacon did not exercise",
+     "body": "- Role-playing dimension: one dimension related to a fact table more than once. Suppose you add FactEDVisit[DepartureDate] = DateTime.Date([DepartureDateTime]) and a second relationship from DimDate[Date]. Only one relationship can be active; a measure turns on the inactive one:\n\n```\nED Visits by Departure Date =\nCALCULATE (\n    [ED Visits],\n    USERELATIONSHIP ( DimDate[Date], FactEDVisit[DepartureDate] )\n)\n```\n\n- Cross-filter direction: keep one-to-many, single direction from dimension to fact; both directions only for a known need, as it can create ambiguity.\n- Calculation groups: reusable calculation items applied to any measure through SELECTEDMEASURE. Adding one switches on the setting that discourages implicit measures, so every value must come from an explicit measure.\n\n```\nYTD = CALCULATE ( SELECTEDMEASURE (), DATESYTD ( DimDate[Date] ) )\n```\n\n- Calculated column or measure: a column is computed row by row at refresh and stored; a measure is computed at query time in the filter context. Use a column when you must slice or filter by the value.\n- Quick measures build common patterns, such as running totals, from a dialog.\n- Semi-structured data (Prepare): expand JSON records into columns and lists into rows.\n- Statistical functions: MEDIAN, MEDIANX, PERCENTILEX.INC and STDEV.S. A 90th percentile wait is PERCENTILEX.INC over visits with a valid MinutesToPIA.\n- Optimize: remove unused columns, reduce granularity (a date, not a date and time), and turn off Auto date/time once you have a marked date table."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Lessons-learned register",
+     "definition": "A record of what happened, its impact, root cause, recommendation, owner and where it applies, kept so later releases act on it rather than rediscover it."
+    },
+    {
+     "term": "Release closure",
+     "definition": "Confirming a release's acceptance and handover, scheduling benefit measurement, and moving open risks, issues and contracts to named owners while the programme continues."
+    },
+    {
+     "term": "Role-playing dimension",
+     "definition": "A dimension, such as a date table, related to one fact table more than once. One relationship is active; the others are inactive and used through USERELATIONSHIP."
+    },
+    {
+     "term": "Calculation group",
+     "definition": "A model object holding reusable calculation items, such as year to date, that apply to any measure through SELECTEDMEASURE. It requires explicit measures."
+    },
+    {
+     "term": "Direct Lake",
+     "definition": "A Microsoft Fabric storage mode in which the semantic model reads Delta tables in OneLake directly, without importing a copy on a refresh schedule."
+    },
+    {
+     "term": "Privacy levels",
+     "definition": "Power Query settings (Private, Organizational, Public, None) that control whether data from one source may be sent to another when queries combine sources."
+    }
+   ],
+   "build": {
+    "goal": "Close Release 1 in the Lessons-learned register with evidence-based lessons and owners, and finish with a scored PL-300 coverage review that names your weak topics.",
+    "steps": [
+     "Open Project, Release 1, Lessons-learned register. Add the closure checklist: acceptance, handover, benefit owners and the January 2027 measurement, open items moved to the RAID log, records filed.",
+     "Add the Release 1 numbers table from truth.json (PV 211,400, EV 188,000, AC 211,000, CPI 0.89, SPI 0.89) and the data-quality counts.",
+     "Write at least five lessons in the what, impact, cause, recommendation, owner and applies-to shape, including at least one that went well.",
+     "Rate each PL-300 skill area from 1 to 3, using your recent PL-300 answers in Practice and your completed documents as evidence.",
+     "For every topic rated 1, write one line in your own words saying what it is and when to use it, and add it to your study list for the next two sessions.",
+     "Tick Done when, compare with See the finished example, and write at least 80 characters in Explain it in your own words."
+    ],
+    "modelAnswer": "PL-300 coverage review (example). Prepare the data: 3; practised in the data-quality workbook; weak topics: Direct Lake, privacy levels. Model the data: 2; weak: calculation groups, role-playing dimensions with USERELATIONSHIP. Visualize and analyze: 3; weak: artificial intelligence (AI) visuals, forecasting. Manage and secure: 2; weak: subscriptions and data alerts. Study list for the next two sessions: these weak topics, plus one PL-300 timed set each day."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "An inactive relationship does nothing until a measure calls USERELATIONSHIP inside CALCULATE. If a fact table has two dates, such as order and ship date, expect a role-playing date dimension."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Reference keeps a query linked to the original's output; Duplicate makes an independent copy. To find unmatched keys between two tables, use a left anti merge."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Process task 10, Manage project closure, applies to phases and releases too: confirm acceptance, transfer ownership, close or transfer open items and contracts, and capture lessons before people move on."
+    },
+    {
+     "cert": "PMP",
+     "tip": "People task 7, Help ensure knowledge transfer: lessons, handover and vendor knowledge transfer are planned work with owners and dates, not a meeting squeezed in at the end."
+    }
+   ],
+   "pitfalls": [
+    "Writing lessons as complaints with no cause, owner or action.",
+    "Filing lessons and never opening them again. Link each one to a Release 2 task or document.",
+    "Rating your PL-300 readiness on feeling rather than on Practice results and completed documents.",
+    "Closing the Lumen contract file with Release 1 when the contract and its knowledge transfer run to 2026-11-30."
+   ],
+   "check": [
+    {
+     "q": "Why are Release 1's benefits measured by business owners rather than the programme team?",
+     "a": "The charter measures are taken three months after the release, on 2027-01-25, after programme acceptance on 2026-12-17. The programme will have closed, so owners who stay must take them: Dr. Sarah Whitford for the KGH median minutes to PIA (80.5 to a target of 60) and Janelle Cardinal for the LWBS rate (5.7% to 4.5%)."
+    },
+    {
+     "q": "FactEDVisit relates to DimDate on both ArrivalDate and DepartureDate. Visits by departure date show the same numbers as by arrival. Why?",
+     "a": "Only one relationship can be active, and it is the arrival one, so slicing by DimDate always uses arrival. Write a measure that switches relationship: CALCULATE ( [ED Visits], USERELATIONSHIP ( DimDate[Date], FactEDVisit[DepartureDate] ) )."
+    },
+    {
+     "q": "Turn 'the schedule was wrong' into a usable lesson.",
+     "a": "What happened: the schedule used a Monday to Friday calendar with no holidays, and Thanksgiving (2026-10-12) fell inside Release 1. Impact: dates assumed a working day that was not available. Cause: no Kestrel holiday calendar in the tool. Recommendation: add statutory holidays, including Remembrance Day 2026-11-11, before Release 2 is baselined. Owner: Programme Manager."
+    }
+   ]
+  },
+  {
+   "key": "w6-s2",
+   "summary": "Learn how the PL-300 exam works and how to answer its question styles, sit your first PL-300 timed set, start an error journal, review high-yield decision rules across all four skill areas, and set up the continual-improvement register for the analytics service.",
+   "read": [
+    {
+     "heading": "How the PL-300 exam works",
+     "body": "Facts to plan around:\n\n- Certification: Microsoft Certified: Power BI Data Analyst Associate, exam PL-300.\n- Time: 100 minutes. Passing score: 700 on a scaled score. A scaled score is not a percentage, so do not try to count marks as you go.\n- Microsoft does not publish a fixed number of questions. Note the count on the start screen and set checkpoints, for example a third of the questions done by a third of the time.\n- Skill areas: Prepare the data 25–30%; Model the data 25–30%; Visualize and analyze the data 25–30%; Manage and secure Power BI 15–20%.\n- Delivery: proctored through Pearson VUE. The exam may include interactive components.\n- A failed first attempt can be retaken after 24 hours. The certification renews every 12 months with a free online assessment.\n\nExpect several formats. Some items ask for one or more answers. Some give a Data Analysis Expressions (DAX) or Power Query snippet with drop-down blanks to complete. Some ask you to put steps in order. A case study gives a longer business scenario, often split into tabs such as background, requirements and existing environment, followed by several questions.\n\nSome sections may not let you return once you leave them, and the exam tells you on screen when that applies. Read those screens, and make every change you want in a section before you move on."
+    },
+    {
+     "heading": "Answering PL-300 questions",
+     "body": "Most PL-300 questions are a requirement plus constraints. Find both:\n\n1. Read the last sentence first. It says what you must do: create, configure, reduce, ensure.\n2. Mark the constraints: \"minimize development effort\", \"users must see only their region\", \"without changing the semantic model\", \"data must be no more than 15 minutes old\". The constraint usually decides between two answers that would both work.\n3. Eliminate answers that work but break a constraint. Bidirectional filtering might fix a total, but not if the question says to avoid ambiguity.\n4. For DAX drop-downs, check what each function needs: CALCULATE takes an expression, then filters; DIVIDE takes a numerator, a denominator and an optional alternate result; USERELATIONSHIP sits inside CALCULATE.\n5. For ordering items, picture the screen. You cannot mark a date table before the date column exists, and you cannot add role members in the service before you publish.\n6. For a case study, read the requirements first, then each question, then go back to the background for the detail that question needs.\n\nPacing: do not spend more than about twice your average time on one item. Give your best answer, mark it for review if the exam allows, and move on."
+    },
+    {
+     "heading": "Timed sets and the error journal",
+     "body": "In TriCert Lab, Practice, Timed set gives you 15 minutes of questions for the exam you choose and records the result as evidence. Choose PL-300. The exam gate needs two timed sets at 80% or better for PL-300 and two for ITIL, so today is your first PL-300 attempt.\n\nRun it like the real exam: no notes, no pausing, answer in order. When you are unsure, mark the answer as a guess. A guessed answer lands in Practice, Review even if it was right, which is what you want, because a lucky answer is not knowledge.\n\nAfterwards open Review. It holds every wrong or guessed answer, linked to the document that teaches it. Keep an error journal entry for each:\n\n1. Restate the scenario in one line.\n2. Name the rule or principle that decides it.\n3. Say why your answer failed: a misread constraint, a wrong fact, or the weaker of two plausible answers.\n4. Write the trigger words you will recognize next time.\n5. Open the linked document, fix your understanding there, and put it in Explain it in your own words.\n\nA wrong answer stays open until you answer that question correctly again. Gate check 5 needs no open wrong answers and at least six written explanations of 80 characters or more, and the journal is how you get there.\n\nLook for patterns: three misses on filter context are one topic to repair."
+    },
+    {
+     "heading": "High-yield PL-300: prepare and model",
+     "body": "Decision rules to know cold:\n\n- Import for speed and full features; DirectQuery when data must be current or is too large to import; Direct Lake for Delta tables in Fabric OneLake.\n- A gateway is needed for on-premises or private-network sources, not for cloud sources the service can reach.\n- Profile the entire data set, not the default first 1,000 rows, before declaring data clean.\n- Replace or remove errors only under a recorded rule, and keep rejected rows as evidence (Kestrel rule DQ-13).\n- Set data types before loading; numbers stored as text break sums and sorting.\n- Fact tables hold events at one grain; dimensions hold descriptions. Relate them on keys, one-to-many, single direction.\n- Mark a contiguous date table for classic time intelligence, and turn off Auto date/time.\n- A measure responds to filter context; a calculated column is fixed at refresh.\n- CALCULATE changes filter context. REMOVEFILTERS or ALL clears filters, for example to get a share of a total.\n- Semi-additive values add across units but not across days: 12,952 staffed bed-days is not 144 beds.\n- Use DIVIDE for ratios so a zero denominator returns blank instead of an error.\n- Use Performance Analyzer to find slow visuals and DAX query view to run and test their queries.\n- Shrink the model: remove unused columns, lower cardinality, reduce granularity."
+    },
+    {
+     "heading": "High-yield PL-300: visualize and manage",
+     "body": "- The visual follows the question: compare (bar), trend (line), relationship (scatter), one value against a goal (a card, or a KPI visual: key performance indicator).\n- Conditional formatting by rules, gradient or field value; field value lets a measure supply the colour.\n- The drillthrough field goes on the target page; Keep all filters carries the source page's filters.\n- Turn off a bookmark's Data option when it must not reset filters.\n- Sync slicers: sync applies the selection; visible shows the slicer.\n- Report page tooltip: Allow use as tooltip on the page, and Type Report page on the visual.\n- Accessibility: alt text, tab order, contrast, never colour alone, a table alternative.\n- Paginated reports for print, PDF and every row; interactive reports for exploration.\n- Workspace roles: Admin, Member, Contributor, Viewer. Row-level security (RLS) filters Viewers and app users only.\n- Static RLS has a fixed filter per role, such as DimSite[SiteCode] = \"KGH\" (Kestrel General Hospital). Dynamic RLS filters a security table with USERPRINCIPALNAME (), so one role serves every site.\n- Assign RLS role members, preferably groups, in the service after publishing; test with View as and Test as role.\n- Apps: audiences control content; Update app releases report changes.\n- Sensitivity labels apply to items and follow exports; endorsement is Promoted or Certified.\n- Build permission lets people create content on a semantic model."
+    },
+    {
+     "heading": "The continual-improvement register",
+     "body": "Now the ITIL part of the session. Continual improvement is one of the five components of the ITIL Value System, with the guiding principles, governance, value chain activities and management practices. ITIL 4 framed it as seven questions, and Version 5 refines that model. The questions still work as prompts:\n\n1. What is the vision?\n2. Where are we now?\n3. Where do we want to be?\n4. How do we get there?\n5. Take action.\n6. Did we get there?\n7. How do we keep the momentum going?\n\nA continual-improvement register (CIR) holds every improvement idea in one place so ideas are compared, prioritized and followed through. Each entry needs an ID, the idea, its source, the value it would create, a baseline and a target, a priority, an owner and a status.\n\nBeacon's first entries come from evidence you already hold. In August and September 2026 the service desk logged 27 tickets in the Power BI category. The 6 that were access requests met their resolution target only once (16.7%), with a median of 105.5 hours. That is a strong candidate: grant dashboard access through Identity Directory groups mapped to app audiences, which Release 2 will automate. Other sources are the known errors from go-live (a missing census day should raise an alert, not a call) and yesterday's lessons.\n\nPrioritize by value against effort, and start where you are."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Scaled score",
+     "definition": "A score converted to a fixed scale, such as PL-300's pass mark of 700. It is not a percentage of questions correct, so counting marks during the exam is pointless."
+    },
+    {
+     "term": "Case study",
+     "definition": "A PL-300 item type with a longer business scenario, often in tabs such as background and requirements, followed by several questions that depend on it."
+    },
+    {
+     "term": "Error journal",
+     "definition": "A record of each wrong or guessed answer: the scenario, the deciding rule, why your answer failed, and trigger words, with the fix written into the linked document."
+    },
+    {
+     "term": "Dynamic RLS",
+     "definition": "Row-level security where one role filters a security table by the signed-in user, using USERPRINCIPALNAME (), instead of one fixed role per site or region."
+    },
+    {
+     "term": "Continual-improvement register",
+     "definition": "A single list of improvement ideas, each with source, value, baseline, target, priority, owner and status, so ideas are compared and followed through."
+    },
+    {
+     "term": "Seven continual-improvement questions",
+     "definition": "The ITIL 4 model that Version 5 refines: vision, where are we now, where do we want to be, how do we get there, take action, did we get there, keep the momentum."
+    }
+   ],
+   "build": {
+    "goal": "Sit your first PL-300 timed set, journal every wrong or guessed answer, and create the Continual-improvement register with at least four evidence-based entries.",
+    "steps": [
+     "Open Practice, Timed set, choose PL-300 and complete the 15 minutes without notes, marking any answer you are unsure of as a guess.",
+     "Open Practice, Review and write an error journal entry for every wrong or guessed answer: scenario, rule, why it failed, trigger words.",
+     "Group your misses by skill area and add any repeating topic to tomorrow's study list.",
+     "Open Project, Release 1, Continual-improvement register and set up the columns: ID, idea, source, value, baseline, target, priority, owner, status.",
+     "Add at least four entries from evidence: Power BI access requests (16.7% within target, median 105.5 hours), missing-census alerting, refresh-failure alerting, and one lesson from the lessons-learned register.",
+     "Apply the seven questions to your top entry, rank all entries by value against effort, and name an owner for each.",
+     "Tick Done when, compare with See the finished example, and write your explanation in your own words."
+    ],
+    "modelAnswer": "CI-01 (example entry). Idea: grant dashboard access through Identity Directory groups mapped to app audiences and RLS roles. Source: Power BI access-request tickets, August and September 2026. Baseline: 6 requests, 1 within target and within 72 hours (16.7%), median 105.5 hours (4.40 days). Target: 80% within 72 hours (agreed, charter). Value: leaders see their site on their first day. Priority: high. Owner: Grace Liu (E-005), delivered with Release 2. Status: accepted, linked to the access-request value stream."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Find the constraint before choosing: 'minimize effort', 'without changing the model', 'only their region'. Two options usually work; the constraint decides which one is right."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Dynamic RLS uses one role whose filter compares a security table's email column with USERPRINCIPALNAME (). Static RLS needs a separate role for every site or region."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Continual improvement is a component of the ITIL Value System. The seven questions, from ITIL 4 and refined in Version 5, begin with the vision and the current state before any action."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Start where you are: measure the current service before replacing anything. Questions that jump straight to a new tool or full redesign usually ignore this principle."
+    }
+   ],
+   "pitfalls": [
+    "Retaking a timed set straight away to reach 80% from memory, which proves recall of those questions, not readiness.",
+    "Answering without marking guesses, so lucky answers never reach Review.",
+    "Filling the improvement register with ideas that have no baseline, owner or measure.",
+    "Studying only the skill area you enjoy. The weights are close, so every area matters."
+   ],
+   "check": [
+    {
+     "q": "Users must see only their region, and the solution must need little maintenance as regions are added. Static or dynamic RLS?",
+     "a": "Dynamic RLS. One role filters a security table by USERPRINCIPALNAME (), so adding a region means adding rows to that table, not creating roles. Static RLS needs a new role and new membership for every region, which breaks the maintenance constraint."
+    },
+    {
+     "q": "You scored 85% on your first PL-300 timed set but marked four answers as guesses. Are you finished with them?",
+     "a": "No. Guessed answers go to Review even when right, because luck is not knowledge. Journal each one, fix your understanding in the linked document, and answer it again. The gate also needs a second PL-300 timed set at 80% or better."
+    },
+    {
+     "q": "Why is the Power BI access-request entry a good continual-improvement item?",
+     "a": "It has a measured baseline (6 requests in August and September, 1 within target, 16.7%, median 105.5 hours), a clear outcome for leaders (access to their site on day one), a feasible approach (groups mapped to app audiences and RLS) and an owner. It also links to Release 2, so it will be delivered rather than parked."
+    }
+   ]
+  },
+  {
+   "key": "w6-s3",
+   "summary": "Learn how the ITIL Foundation (Version 5) exam works and review its high-yield content, sit your second PL-300 timed set and your first ITIL set, cover the remaining PL-300 topics Beacon did not exercise, and run the first service review of the analytics service.",
+   "read": [
+    {
+     "heading": "How the ITIL Foundation (Version 5) exam works",
+     "body": "- 40 multiple-choice questions in 60 minutes. Pass mark 65%, which is 26 of 40.\n- Closed book. Online proctored delivery is available, and no training course is required first.\n- The certificate renews every 3 years, through continuing professional development or a retake.\n\nThat is 90 seconds a question. Plan one pass through all 40 in about 45 minutes, then use the last 15 on the questions you marked.\n\nQuestions test definitions and how they apply:\n\n1. Read the stem twice and find the key word: value, outcome, output, utility, warranty, principle, dimension, stage.\n2. Watch for negatives. \"Which is NOT\" and \"which is LEAST likely\" reverse the task.\n3. Eliminate answers that are true but answer a different question.\n4. Prefer the answer about value for the consumer over the one about internal activity.\n5. Answer every question; a blank cannot score.\n\nThe learning objectives cover product and service management concepts, value co-creation, the four dimensions, the Value System, the guiding principles, the lifecycle, management practices, continual improvement, and value stream mapping and management. Version 5 builds artificial intelligence (AI) use and governance in throughout and is described as AI-native, so expect AI across topics."
+    },
+    {
+     "heading": "High-yield ITIL: value, roles and the guiding principles",
+     "body": "Core ideas, with the Beacon analytics service as the example:\n\n- Value is co-created by provider and consumer. The dashboards create value only when leaders use them to act.\n- An output is what an activity produces (a report page). An outcome is the result a stakeholder wants (leaders acting earlier on bed pressure).\n- Utility is fit for purpose: what the service does (shows waits and occupancy by site). Warranty is fit for use: how well it does it (available, current, secure, recoverable). Value needs both.\n- Roles: the customer defines requirements and owns outcomes (Janelle Cardinal); the user uses the service (a charge nurse); the sponsor authorizes budget (Dr. Helen Marchetti).\n\nThe ITIL Value System has five components: guiding principles, governance, value chain activities, management practices and continual improvement.\n\n| Guiding principle | Beacon example |\n|---|---|\n| Focus on value | Count decisions made, not pages built |\n| Start where you are | Baseline tickets before redesign |\n| Progress iteratively with feedback | Pilot pages with one site |\n| Collaborate and promote visibility | Desk co-writes knowledge |\n| Think and work holistically | Refresh, gateway, security and desk as one service |\n| Keep it simple and practical | Three support tiers |\n| Optimize and automate | Simplify access first, then automate |"
+    },
+    {
+     "heading": "High-yield ITIL: dimensions, lifecycle and practices",
+     "body": "The four dimensions of product and service management must all be considered for every service:\n\n- Organizations and People: roles, skills, culture (Tomás Rivera's key-person risk).\n- Information and Technology: data, tools and platforms (the semantic model, the gateway, the warehouse A-010).\n- Partners and Suppliers: other organizations involved (Lumen Analytics Partners; Microsoft as the Power BI provider).\n- Value Streams and Processes: how work flows to create value (a request for dashboard access, end to end).\n\nVersion 5 organizes work around an eight-stage product and service lifecycle, which replaces ITIL 4's service value chain as the organizing model:\n\n| Stage | For the analytics service |\n|---|---|\n| Discover | Leaders' pain with emailed extracts |\n| Design | Pages, measures, security, service levels |\n| Acquire | Lumen contract; Power BI capacity |\n| Build | Semantic model, reports, tests |\n| Transition | Go-live decision D-02 and handover |\n| Operate | Refresh, gateway and workspaces monitored and maintained |\n| Deliver | Access requests handled; reports used each morning; feedback collected |\n| Support | Incidents and problems resolved, using known errors and workarounds |\n\nManagement practices are sets of organizational resources for a type of work, such as incident, problem and service level management; Version 5 keeps them with adjustments and new groupings. A value stream is the series of steps that turns demand into value; mapping it shows where work waits."
+    },
+    {
+     "heading": "PL-300 topics Beacon did not exercise",
+     "body": "- Analyze: right-click a data point and choose Analyze to explain an increase or decrease, or to find where a distribution differs.\n- Grouping and binning: group selected data points, or bin a numeric field into equal ranges. MinutesToPIA in 30-minute bins makes a wait histogram.\n- Clustering: on a scatter chart, Automatically find clusters groups similar points.\n- AI visuals: Key influencers ranks factors that drive an outcome; Decomposition tree breaks a measure down by dimensions in any order; Q&A answers typed questions.\n- Analytics pane: constant, average, median and percentile lines; trend lines; error bars; forecasting on a line chart with a continuous date axis; Find anomalies on a line chart.\n- Copilot, where allowed: a narrative visual, a new report page from a prompt, suggestions, and a semantic model summary.\n- Personalize visuals lets viewers change a visual's type or fields for themselves.\n- Export settings decide whether users can export summarized data, underlying data, or nothing.\n- Automatic page refresh updates visuals at a fixed interval or on change detection, for DirectQuery sources.\n- Dashboards: one canvas in the service built by pinning tiles from reports.\n- Data alerts: set on dashboard tiles pinned from cards, KPIs and gauges; they notify when a value crosses a threshold. Alerts on report visuals use a separate Fabric feature, Activator.\n- Subscriptions email a snapshot of a report page or dashboard on a schedule.\n- Item access: share with Read, Reshare or Build. Add security groups, not individuals, to row-level security roles in the service."
+    },
+    {
+     "heading": "The first service review",
+     "body": "A service review checks with the customer whether the service delivers what was agreed and what it is worth; it belongs to service level management. Grace Liu (E-005), the service owner, chairs it. Attendees: Janelle Cardinal (E-008), business owner; Tomás Rivera (E-006); Mei Tanaka (E-013); Dr. Sarah Whitford (E-007); and you. Agenda: service levels, experience, outcomes, incidents and known errors, changes, improvements, actions.\n\nThe service has only just gone live, so this first review sets the baseline from the Power BI tickets of August and September 2026. The figures below were computed from khn_service_desk.csv with Kestrel's cleaning rules. \"Met target\" means resolved within the priority's resolution target (P1 4 hours, P2 8, P3 24, P4 72).\n\n| Measure | Power BI tickets | All tickets |\n|---|---|---|\n| Tickets | 27 (13 incidents, 8 service requests, 6 access requests) | 219 |\n| Incidents met target | 66.7% (8 of 12) | 76.4% |\n| Service requests met target | 50.0% (4 of 8) | 82.1% |\n| Access requests met target | 16.7% (1 of 6) | 15.2% |\n| Median incident hours | 12.0 | 14.4 |\n| Satisfaction (1 to 5) | 3.0 from 9 responses | 3.5 from 88 |\n\nThree readings. Power BI service requests miss target far more often than the desk average. Nine satisfaction responses are too few to trust, so collecting more is an action. And targets can look green while leaders still email extracts: the watermelon effect, green outside and red inside. So from go-live the review also tracks app usage by site and the charter measures."
+    },
+    {
+     "heading": "Update the catalogue entry and service levels",
+     "body": "The review ends by updating the service catalogue entry and its service levels so the agreement reflects what you learned:\n\n- Add the measures the review showed you need: Power BI service requests resolved within target, dashboard access granted within target, and refresh completed by the agreed time.\n- Separate warranty measures (refresh success, availability, row-level security defects) from experience measures (satisfaction, time to get access) and outcome measures (leaders using the app each week, and the charter measures in January 2027).\n- Put the baseline beside every target, and mark targets as proposed until Janelle Cardinal agrees them.\n- Keep the review rhythm monthly, with the business owner and the service owner, and record the date of the next review.\n- Copy every gap into the continual-improvement register with an owner.\n\nThen sit your second PL-300 timed set and an ITIL timed set, and journal every miss. Two PL-300 sets at 80% or better meet the PL-300 part of gate check 3; ITIL needs two of its own."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Utility",
+     "definition": "Fit for purpose: what a product or service does to meet a need, such as showing waits and occupancy by site."
+    },
+    {
+     "term": "Warranty",
+     "definition": "Fit for use: assurance that a service meets agreed requirements for things like availability, capacity, security and continuity, such as refresh that survives a server patch."
+    },
+    {
+     "term": "Output and outcome",
+     "definition": "An output is something an activity produces, such as a report page. An outcome is a result a stakeholder wants, such as acting earlier on bed pressure."
+    },
+    {
+     "term": "Service review",
+     "definition": "A regular meeting with the customer to check performance against service levels, experience, outcomes, incidents, changes and improvements, ending in owned actions."
+    },
+    {
+     "term": "Watermelon effect",
+     "definition": "Service measures that look green while the customer's experience or outcomes are poor. It is avoided by measuring use, satisfaction and outcomes, not only targets met."
+    },
+    {
+     "term": "Product and service lifecycle",
+     "definition": "ITIL Version 5's eight stages: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support, the organizing model in place of ITIL 4's value chain."
+    }
+   ],
+   "build": {
+    "goal": "Run the first service review of the analytics service with baseline ticket figures, update the Service catalogue entry and service levels, and complete your second PL-300 timed set and a first ITIL timed set.",
+    "steps": [
+     "Open Project, Release 1, Service catalogue entry and service levels, and add a Service review section with date, attendees and the agenda.",
+     "Enter the Power BI baseline table (27 tickets; 66.7%, 50.0% and 16.7% met target by type; median 12.0 incident hours; satisfaction 3.0 from 9) beside the all-ticket figures.",
+     "Write three findings, including the small satisfaction sample and the watermelon risk, and the use and outcome measures you will add from go-live.",
+     "Update the service levels: separate warranty, experience and outcome measures, show each baseline, and mark unagreed targets as proposed.",
+     "Record actions with owners and dates and copy each into the Continual-improvement register; tick Done when and write your explanation.",
+     "Open Practice, Timed set: complete your second PL-300 set, then an ITIL set. Journal every wrong or guessed answer in Review."
+    ],
+    "modelAnswer": "Service review 1 (example extract). Attendees: Janelle Cardinal, Grace Liu, Tomás Rivera, Mei Tanaka, Dr. Sarah Whitford, Programme Manager. Finding 1: Power BI service requests met target 50.0% (4 of 8) against 82.1% for all service requests. Action: request template and knowledge article for report changes; owner Mei Tanaka (E-013). Finding 2: only 9 satisfaction responses. Action: one-question survey on every Power BI ticket; owner Grace Liu. Finding 3: no usage data yet. Action: review app usage by site monthly; owner Tomás Rivera (E-006), reported at the service review."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "Utility is fit for purpose and warranty is fit for use; value needs both. A question about availability, capacity, security or continuity is asking about warranty."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Outputs are things produced; outcomes are results stakeholders want. When the options mix them, the ITIL answer usually points to the outcome."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Know the eight lifecycle stages in order: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Do not answer with ITIL 4 value chain activity names."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Power BI data alerts are set on dashboard tiles pinned from cards, KPIs and gauges; alerts on report visuals use Fabric Activator instead. Subscriptions send scheduled snapshots of report pages or dashboards by email."
+    }
+   ],
+   "pitfalls": [
+    "Treating green service levels as proof of value without checking use and outcomes.",
+    "Drawing conclusions from 9 satisfaction responses as if they were representative.",
+    "Studying ITIL with ITIL 4 value chain names; the Version 5 exam is organized around the eight-stage lifecycle.",
+    "Presenting the August and September figures as post-go-live performance. They are the baseline before the new service."
+   ],
+   "check": [
+    {
+     "q": "Is 'the gateway cluster has two members so refresh survives a server patch' utility or warranty?",
+     "a": "Warranty. It is about how reliably the service performs (availability and continuity), not what it does. Utility is what the dashboards show: waits, occupancy and alternate level of care (ALC) days by site."
+    },
+    {
+     "q": "Power BI incidents met target 66.7% of the time with a 12.0-hour median. Does that mean the service is good?",
+     "a": "Not on its own. It covers 12 incidents with a known outcome, before go-live. Service requests met target only 50.0%, satisfaction is 3.0 from just 9 responses, and use has not been measured. Green targets with low use would be the watermelon effect, so the review also tracks usage and outcomes."
+    },
+    {
+     "q": "In which lifecycle stage does go-live decision D-02 sit, and which stages follow it?",
+     "a": "Transition. After it the analytics service runs in Operate (refresh, gateway and workspaces monitored and maintained), Deliver (access requests handled and reports used each morning) and Support (incidents and problems resolved by the service desk)."
+    }
+   ]
+  },
+  {
+   "key": "w6-s4",
+   "summary": "Today is the exam gate for PL-300 and ITIL Foundation (Version 5). You read the five gate checks in Progress, decide on evidence whether to sit, follow a simple final-day routine, and record a gate decision. If a check is not met, you do not sit: you repair and rebook.",
+   "read": [
+    {
+     "heading": "What the gate is for",
+     "body": "A gate replaces a feeling with evidence. How ready you feel on the morning of an exam depends on sleep and nerves as much as on knowledge. The gate asks two plainer questions: have you done the work, and do your recent answers show you can apply it under time?\n\nThis gate closes Release 1 and covers two exams: PL-300 (Microsoft Power BI Data Analyst) and ITIL Foundation (Version 5). Its scope is everything before today: the 28 sessions from week 1 day 1 to week 6 day 3, the 28 Release 1 documents, and your practice for both exams.\n\nThe rule is simple: sit an exam only when all five checks are met. If one is not, the honest decision is to repair and rebook, and to write down why. That is not failure. It is the same go or no-go discipline you used for Release 1 on 2026-10-23, applied to yourself.\n\nGate days also test planning. If you booked the exams for today, check the booking rules for moving a date well before the cut-off they give, so a missed check costs you a new date rather than an attempt."
+    },
+    {
+     "heading": "Reading the five checks in Progress",
+     "body": "Open Progress. Beside the four readiness scores (coverage 30, documents 35, judgment 25, recall 10), the next exam gate lists five checks:\n\n| Check | What it needs | If not met |\n|---|---|---|\n| 1 | Every session before the gate done (28 of 28) | Open Today, finish each missing session, Mark done |\n| 2 | Every document in the releases up to the gate complete (28 of 28) | In Project, finish the Done when list of each incomplete document |\n| 3 | Two timed sets at 80% or better for each exam | Practice, Timed set; study the misses between attempts |\n| 4 | At least 24 decisions for each exam, under 30% wrong | Practice, Scenarios for that exam, weakest topic first |\n| 5 | No open wrong answers, and at least 6 written explanations of 80 characters or more | Practice, Review; write explanations in Explain it in your own words |\n\nRead checks 3 and 4 per exam: a PL-300 result does not count for ITIL. Check 4 uses your latest answer to each question, so an old miss you have since answered correctly no longer counts against you. Check 5 counts across both exams, so one open ITIL wrong answer blocks the whole gate.\n\nDo not game the checks. Repeating a timed set until the same questions come out at 80% shows memory, not readiness. Space your attempts and study between them."
+    },
+    {
+     "heading": "The final day before you sit",
+     "body": "Keep the last day light and routine:\n\n1. Run the five checks first thing. If any is not met, stop and go to the repair plan.\n2. Review; do not learn new material. Spend 20 to 30 minutes in Practice, Flashcards filtered to PL-300, then the same for ITIL. New topics today add anxiety, not marks.\n3. Re-read your error journal: the trigger words and the rules, not the questions themselves.\n4. Prepare logistics: the identification your booking asks for, the exact start time, and for online proctoring a quiet room, a clear desk and a computer that has passed the system check beforehand.\n5. Plan the order. If you sit both on one day, a sensible plan is PL-300 first, as the longer and more applied exam, with a real break before ITIL.\n6. Eat, drink water, and arrive or log in early. Rushing costs more focus than any one topic."
+    },
+    {
+     "heading": "In the exam room",
+     "body": "PL-300 (100 minutes, passing score 700 on a scaled score):\n\n- Note the number of questions on the start screen and set checkpoints at about a third and two thirds of the time, leaving time to review.\n- Read the requirement and the constraint before the options.\n- In a case study, read the requirements first. Make every change you want before leaving any section the exam says cannot be revisited.\n- If an item takes more than twice your average time, choose your best answer, mark it if allowed, and move on.\n\nITIL Foundation (40 questions, 60 minutes, 26 correct to pass):\n\n- First pass in about 45 minutes; the last 15 for marked questions.\n- Find the key word in each stem: value, outcome, utility, warranty, principle, dimension, stage.\n- Watch for NOT and LEAST.\n- Answer all 40.\n\nIn both: a run of hard questions does not mean you are failing. Breathe out slowly, reset, and treat the next question as the first. Do not change an answer on review unless you can name the rule that makes the new one right."
+    },
+    {
+     "heading": "If a check fails, or an exam does",
+     "body": "If a check is not met, do not sit. Write a repair plan in the same shape as a go-live condition: what is missing, the action, the evidence that will close it, and a date.\n\n| Failed check | Repair |\n|---|---|\n| 1 or 2 | Finish the work; usually hours, not weeks |\n| 3 | A day or two on the topics behind the misses, then a new timed set |\n| 4 | Practice, Scenarios for the weak exam until 24 decisions with under 30% wrong |\n| 5 | Clear Review, then write the missing explanations in your documents |\n\nRebook only when the plan's evidence is in place.\n\nIf you sit an exam and do not pass, use the score report, which shows how you did in each skill area. Map each weak area to the Beacon documents in your coverage review and repair those first. You may retake PL-300 24 hours after a first failed attempt, but retaking once the repair work is done is wiser than retaking the next day. For ITIL, take the same approach through its learning objectives.\n\nEither way, Beacon continues tomorrow with Release 2. Keep the next session on schedule and fit repair work around it, as a programme keeps delivering while it fixes a defect."
+    },
+    {
+     "heading": "Record the gate decision",
+     "body": "Record the gate decision as you would any programme decision: date, scope, each check with the value Progress shows, the decision for each exam, the pacing plan and the next action. Write it before you sit, while the evidence is in front of you, and add the result afterwards.\n\nA good record lets someone else see exactly why you sat or did not. It also sets the pattern for the later gates: the PMP gate at week 10 day 3 and the CISSP gate at week 13 day 4 use the same five checks.\n\nIf a check changes during the day, for example you clear two open wrong answers in the morning, record both readings and what you did in between. That shows the decision followed the evidence, not the other way round.\n\nThe model answer below is a filled record for PL-300 and ITIL. Every value in it is an example to show the format. Use your own numbers from Progress, and never copy the example's results into your own record."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Exam gate",
+     "definition": "A decision point after each release where you sit the release's exams only if all five checks in Progress are met; otherwise you repair and rebook."
+    },
+    {
+     "term": "Timed set",
+     "definition": "Practice, Timed set in TriCert Lab: 15 minutes of questions for the exam you choose, recorded as evidence. The gate needs two at 80% or better per exam."
+    },
+    {
+     "term": "Decision",
+     "definition": "Your latest recorded answer to a practice question. Check 4 needs at least 24 decisions per exam with under 30% wrong."
+    },
+    {
+     "term": "Open wrong answer",
+     "definition": "A question whose latest answer is wrong. It closes when you answer that question correctly again; check 5 needs none open."
+    },
+    {
+     "term": "Written explanation",
+     "definition": "Text of at least 80 characters in a document's Explain it in your own words box. Check 5 needs at least six."
+    },
+    {
+     "term": "Repair plan",
+     "definition": "For a failed check: what is missing, the action, the evidence that will close it, and a date, written before you rebook."
+    }
+   ],
+   "build": {
+    "goal": "Apply the five gate checks for PL-300 and ITIL, record a gate decision with evidence, then sit the exams only if every check is met, or write a dated repair plan if any is not.",
+    "steps": [
+     "Open Progress and read the five checks for the PL-300 and ITIL V5 gate. Copy each check's detail into your gate record exactly as shown.",
+     "For any check not met, stop and write the repair action, the evidence that will close it, and a date. Do not sit.",
+     "If every check is met, run the final-day routine: 20 to 30 minutes of Flashcards per exam, your error journal, then logistics.",
+     "Sit PL-300 with the checkpoint pacing plan, take a real break, then sit ITIL with the 45 plus 15 minute plan.",
+     "After each exam, record the result and, for any exam not passed, the weak areas from the score report mapped to Beacon documents.",
+     "Mark the session done in Today, whatever the result, so Release 2 starts on schedule tomorrow."
+    ],
+    "modelAnswer": "Example gate decision record. Every value below is an example to show the format; use your own numbers from Progress.\n\nGate: PL-300 and ITIL Foundation (Version 5), end of Release 1. Date: week 6, day 4. Decided by: the learner.\n\n| Check (as named in Progress) | Shown in Progress (example) | Met |\n|---|---|---|\n| 1. Sessions before the gate done | 28 of 28 sessions | Yes |\n| 2. Release documents complete | 28 of 28 documents in Release 1 | Yes |\n| 3. Two timed sets at 80% or better | PL-300 2 of 2, ITIL V5 2 of 2 (example scores 82%, 86%; 80%, 88%) | Yes |\n| 4. No major weak area | PL-300 41 of 24 decisions, 17% wrong; ITIL V5 30 of 24 decisions, 23% wrong | Yes |\n| 5. Mistakes reviewed and explained | 0 wrong answers open, 9 of 6 explanations | Yes, after re-check |\n\nRe-check (example): at 08:00, check 5 showed 2 wrong answers open, both ITIL (utility against warranty, and the Transition stage). Both were journalled, the linked documents updated, and both questions answered correctly at 09:10. Check 5 then showed 0 open.\n\nWeakest topics from the error journal (example): PL-300 calculation groups and data alerts; ITIL utility against warranty.\n\nDecision: sit PL-300 at 13:00 and ITIL at 15:30 (example times) with a 30-minute break.\n\nPacing plan: PL-300 checkpoints at about 33 and 66 minutes, review from 90 to 100. ITIL first pass by 45 minutes, marked questions to 60.\n\nResult (example): PL-300 passed; ITIL passed. Next action: start Release 2 tomorrow with the current-state access map.\n\nIf either had not passed: record the weak PL-300 skill areas from the score report, or the ITIL learning objectives behind your journalled misses, map them to Beacon documents, plan two repair sessions alongside Release 2, and rebook after a new timed set at 80% or better."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "With no published question count, pace from the count on your start screen with checkpoints at thirds. Make every change in a section before leaving it if the exam warns it cannot be revisited."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "40 questions in 60 minutes is 90 seconds each, and 26 correct passes. Make one full pass first, return to marked questions, and answer every item."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "A failed first attempt can be retaken after 24 hours. Use the skill-area results on the score report to target repair before rebooking rather than retaking straight away."
+    }
+   ],
+   "pitfalls": [
+    "Sitting because the booking is today even though a check is not met.",
+    "Cramming new topics on gate day instead of reviewing the error journal.",
+    "Counting a PL-300 timed set toward ITIL; checks 3 and 4 are read per exam.",
+    "Changing answers on review without a rule that makes the new answer right."
+   ],
+   "check": [
+    {
+     "q": "Check 3 shows PL-300 2 of 2 and ITIL V5 1 of 2. What do you do?",
+     "a": "The gate is not met, so you do not sit today. Study the topics behind your ITIL misses, sit another ITIL timed set on a later day, and rebook when it scores 80% or better and every other check is still met. Record the decision, the repair action and its date."
+    },
+    {
+     "q": "Check 5 shows 1 wrong answer open and 7 of 6 explanations. How do you close it?",
+     "a": "Open Practice, Review, journal the wrong answer (scenario, rule, why it failed, trigger words), fix your understanding in the linked document, and answer that question correctly again. Your latest answer then counts as right, and the open count drops to 0."
+    },
+    {
+     "q": "How should you split your time in the ITIL Foundation exam?",
+     "a": "40 questions in 60 minutes is 90 seconds each. Make one full pass in about 45 minutes, marking uncertain questions, then spend the last 15 minutes on the marked ones. Answer all 40; 26 correct is the pass mark."
+    }
+   ]
+  },
+  {
+   "key": "w6-s5",
+   "summary": "Release 2 begins. You map how clinicians get and lose access today from the identity, service desk and access review data: where requests wait (median 4.26 days, 27.3% within 72 hours), where control fails (missed leavers E-014 and E-027), and why Kevin Park's combined rights are a segregation-of-duties conflict.",
+   "read": [
+    {
+     "heading": "Start Release 2 with today's process",
+     "body": "Release 2, clinician identity and access, runs to its acceptance gate on 2026-11-26. Its charter targets are concrete (baselines from data, targets agreed): access requests resolved within 72 hours from 27.3% to 80%; median days to fulfil from 4.26 to 1; missed leavers from 2 to 0; privileged accounts with multifactor authentication (MFA) from 66.7% to 100%; Q3 access reviews on time from 66.7% to 100%.\n\nYou cannot redesign a process you have not seen. A current-state map shows how access is really requested, approved, granted and removed, how long it takes, and where controls fail. It is Release 2's baseline, and it stops the team designing for a process that exists only in a policy.\n\nThis is the ITIL guiding principle Start where you are, and the first step of value stream mapping. In CISSP terms it is Domain 5, Identity and Access Management (IAM), and the identity and access provisioning lifecycle: grant, review, change and remove.\n\nOne privacy point before you open the files. khn_identity.csv holds staff personal information, not patient health information. For a custodian like Kestrel, staff records fall under the Protection of Privacy Act (POPA), not the Health Information Act. The data dictionary classifies most identity fields Confidential (only job role, department, site and worker type are Internal), so handle the files as Confidential."
+    },
+    {
+     "heading": "What the sources prove",
+     "body": "Each file proves something different. Use them together, as of 2026-10-01:\n\n| Source | What it shows | Key figures |\n|---|---|---|\n| khn_identity.csv | Accounts, human resources (HR) status, worker type, privilege, MFA | 42 workers, 40 enabled; 2 missed leavers; 6 enabled privileged accounts, 2 without MFA; MFA on 42.5% of enabled accounts |\n| khn_service_desk.csv | How long access requests take | 49 access requests, 44 resolved; median 4.26 days (102.3 hours); 27.3% within 72 hours; target met 15.2% |\n| khn_access_reviews.csv | Whether managers confirm access | 24 items; 18 due by 2026-09-30, 12 validly done (66.7%), 6 overdue |\n| khn_user_permissions.csv | Who holds what, and who granted it | 171 grants; 8 excess grants; 62.6% granted by Kevin Park (E-009) |\n\nAn excess grant is a permission the worker's current role does not include.\n\nProfile these files as you did the emergency data. Use each worker's latest row only: E-028 has two overlapping current rows. Treat odd values as findings, not noise: E-031's privileged flag says \"Maybe\", and E-037's manager, E-099, does not exist."
+    },
+    {
+     "heading": "The joiner path: where requests wait",
+     "body": "A joiner request today, as the tickets show it:\n\n| Step | Who | Evidence |\n|---|---|---|\n| 1. Request raised | Manager or clinician | 26 by phone, 16 by portal, 7 walk-up |\n| 2. Logged as an access request | Service desk | All 49 go to Identity and Access |\n| 3. Approval | Someone with approve access rights | No approval time in the data |\n| 4. Account and permissions created | Mostly Kevin Park | 107 of 171 grants made by E-009 |\n| 5. Ticket resolved | Identity and Access | Median 102.3 hours |\n\nRequests carry priority P3 (17) or P4 (32), with resolution targets of 24 and 72 hours. Only 7 of the 46 with a known outcome met their target (15.2%). By channel, phone requests met it 28.0% of the time (7 of 25); portal (0 of 16) and walk-up (0 of 5) never did. The longest resolved request took 13.4 days, and 3 of the 49 (6.1%) were reopened.\n\nBe honest about what the data cannot show. Tickets hold only opened and resolved times, so they cannot tell you how much of the 4.26 days is waiting and how much is work. Mark steps 3 and 4 \"to be timed\" and fill them from a sample of real requests and short interviews with the service desk (Grace Liu, E-005), a unit manager and an approver."
+    },
+    {
+     "heading": "Movers and leavers: where control fails",
+     "body": "Movers and leavers carry the bigger risk, because access that should end does not.\n\n- Leaver E-027, Registered Nurse, emergency department at Kestrel General Hospital (KGH): terminated 2026-08-14, still Enabled 48 days later on 2026-10-01, with 5 permissions including chart access in the Clinical Information System (A-001). Last directory sign-in 2026-08-13, before termination; activity in each system still needs checking. Review AR-004 is overdue.\n- Leaver E-014, agency nurse from ClearPath Staffing (V-03): contract ended 2026-08-31, still Enabled 31 days later, with 4 permissions including order entry, which agency nurses should not hold. Her HR status still reads Active, because a contract end is not an HR event. Her reviewer chose Remove on 2026-09-25 (AR-003) and nothing happened.\n- Mover E-028: moved from Unit Clerk at Aspen Ridge Hospital to Clinical Analyst at KGH on 2026-08-17. The old row was never closed, and she kept view chart, update bed status and virtual desktop access from the old role. Review AR-006 is dated 2026-08-28, before it was assigned, so it is not valid evidence.\n- Vendor E-015 from Meridian Clinical Systems (V-01): privileged, no MFA, no end date, and an excess view chart grant on A-001.\n\nThe pattern is the finding: removal depends on someone noticing. HR events do not reach IT, agency and vendor end dates live outside HR, and review decisions are not carried out (issue I-02)."
+    },
+    {
+     "heading": "Kevin Park's conflict",
+     "body": "Kestrel's segregation-of-duties (SoD) rule says no one may hold two or more of provision accounts, approve access and administer audit logs on the Identity Directory (A-007). Kevin Park (E-009), Systems Administrator, holds all three:\n\n- provision accounts, granted in 2016 by Marcus Bell (E-002);\n- approve access, granted on 2025-11-03 by himself;\n- administer audit logs, granted on 2026-02-17 by himself.\n\nTogether these let one person approve a request, create the account, and change the record of having done it. No wrongdoing is needed for this to matter: an honest mistake gets no second look, and nobody can prove afterwards what happened. It also concentrates work, which is part of why requests wait.\n\nThe conflict shows up elsewhere too. He reviewed his own access (AR-001, decision Keep), which is not independent. He is the manager of vendor engineer E-015 and the reviewer of E-015's access (AR-002, overdue). His own privileged account has no MFA.\n\nRecord this as issue I-01, without blame: the process gave one person these rights because nobody else did the work. The fix belongs in Release 2 design: approval to business owners, audit-log administration to security (Sam Okafor, E-020), and re-approval of the self-granted rights through Daniel Osei (E-004). Until then, a compensating control reduces the risk (proposed): a weekly independent review of E-009's changes in the Identity Directory."
+    },
+    {
+     "heading": "Draw the map and measure it",
+     "body": "Put the current state on one page that a clinician, a manager and an auditor can read:\n\n1. Scope: joiner, mover, leaver, agency and vendor access to A-001, the Bed Management System (A-006), the Virtual Desktop Service (A-008) and the dashboards (A-009), all controlled through the Identity Directory (A-007).\n2. Swimlanes: requester, service desk, approver, provisioning, HR, agency or vendor.\n3. Steps with evidence, and steps still to be timed.\n4. Control points: where a control should act (HR event, approval, review, removal) and whether it did.\n5. Pain points: waiting, handoffs and reopened requests.\n6. Baseline measures, so Release 2 can prove change.\n\nRecompute the headline measure yourself in the Beacon semantic model:\n\n```\nAccess Requests Within 72h % =\nVAR Resolved =\n    FILTER (\n        FactServiceTicket,\n        FactServiceTicket[TicketType] = \"Access request\"\n            && NOT ISBLANK ( FactServiceTicket[ResolutionHours] )\n    )\nRETURN\n    DIVIDE (\n        COUNTROWS ( FILTER ( Resolved, FactServiceTicket[ResolutionHours] <= 72 ) ),\n        COUNTROWS ( Resolved )\n    )\n```\n\nIt should return 27.3% (12 of 44). Keep NOT ISBLANK in the Resolved filter, which feeds both the numerator and the denominator: Data Analysis Expressions (DAX) treats a blank as zero in a comparison, so open tickets would otherwise count as resolved within 72 hours. Week 8 reuses this measure, with the same name and code, on the access-governance dashboard. For missed leavers, filter each worker's latest identity row to Enabled accounts whose hr_status is Terminated or whose effective_to is before 2026-10-01. You should find exactly E-014 and E-027."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Current-state map",
+     "definition": "A picture of how a process really runs today, with steps, roles, times, control points and failures, used as the baseline for redesign."
+    },
+    {
+     "term": "Missed leaver",
+     "definition": "An account still Enabled after the worker's termination or contract end. At Kestrel on 2026-10-01 there were two: E-014 and E-027."
+    },
+    {
+     "term": "Segregation of duties (SoD)",
+     "definition": "Splitting sensitive steps such as approving, provisioning and auditing between different people, so no one can complete and hide a sensitive action alone."
+    },
+    {
+     "term": "Excess grant",
+     "definition": "A permission a worker holds that their current role does not include, such as a mover's leftover access or an agency nurse's order entry."
+    },
+    {
+     "term": "Compensating control",
+     "definition": "A temporary or alternative control that reduces a risk when the preferred control is not yet in place, such as independent review of an administrator's changes."
+    },
+    {
+     "term": "Swimlane diagram",
+     "definition": "A process map with one lane per role or team, which makes handoffs, and the waits between them, easy to see."
+    }
+   ],
+   "build": {
+    "goal": "Write the Current-state clinician access process: scope, a swimlane map with evidence, the control failures (E-014, E-027, E-028, E-015, E-009) and the baseline measures Release 2 will be judged against.",
+    "steps": [
+     "Open Project, Release 2, Current-state clinician access process, read How to write it, and write the scope: joiner, mover, leaver, agency and vendor access to A-001, A-006, A-008 and A-009.",
+     "Profile khn_identity.csv, khn_service_desk.csv, khn_access_reviews.csv and khn_user_permissions.csv using latest identity rows only, and fill the baseline table (49 requests, 4.26 days, 27.3%, 15.2%, 2 missed leavers, 66.7% reviews on time).",
+     "Draw the joiner swimlane with the channel and priority figures, and mark the approval and provisioning steps as to be timed from a sample of requests and interviews.",
+     "Write the mover, leaver and vendor findings for E-028, E-027, E-014 and E-015 with dates, days still enabled and review evidence.",
+     "Write Kevin Park's conflict as issue I-01: the three rights, the self-grants, the self-review, the share of grants, and a proposed compensating control.",
+     "Add the Access Requests Within 72h % measure, confirm 27.3% (12 of 44), and confirm the missed-leaver filter returns only E-014 and E-027.",
+     "Tick Done when, compare with See the finished example, and write your explanation in Explain it in your own words."
+    ],
+    "modelAnswer": "Control failures (extract). Leaver E-027: terminated 2026-08-14; Enabled on 2026-10-01 (48 days); 5 permissions; AR-004 overdue. Failed control: HR termination did not trigger removal. Leaver E-014: agency contract ended 2026-08-31; Enabled (31 days); 4 permissions including order entry; AR-003 Remove decided 2026-09-25, not carried out. Failed controls: no end-date feed from ClearPath Staffing; review decisions not tracked to completion. SoD, E-009: provision, approve and audit-log rights, two self-granted (issue I-01)."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 5, Identity and Access Management (IAM): missed leavers are a deprovisioning failure. The best answer ties removal to an authoritative trigger such as HR termination or contract end, not to someone noticing."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management: segregation of duties splits approve, execute and audit. When it cannot be fixed at once, choose a compensating control such as independent review of that person's actions."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Start where you are: observe and measure the current value stream before redesigning. Where data lacks step times, sample real requests rather than guessing."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Business Environment task 4, Remove impediments and manage issues: I-01 and I-02 are happening now, so they need owners and actions now, not only entries in the risk register."
+    }
+   ],
+   "pitfalls": [
+    "Mapping the process the policy describes instead of the one the tickets and accounts show.",
+    "Counting E-028's two rows as two workers, or missing that the mover kept old access.",
+    "Presenting the 4.26-day median as waiting time; the tickets do not separate waiting from work.",
+    "Framing Kevin Park's conflict as personal misconduct. It is a design failure to fix through roles and controls."
+   ],
+   "check": [
+    {
+     "q": "Why is E-014 a missed leaver when her HR status says Active?",
+     "a": "She is an agency nurse whose contract ended on 2026-08-31 (her effective_to), and her account was still Enabled on 2026-10-01, 31 days later. Agency end dates come from ClearPath Staffing, not HR, so no leaver event fired. Her reviewer also chose Remove on 2026-09-25 (AR-003) and the decision was never carried out."
+    },
+    {
+     "q": "What exactly is Kevin Park's segregation-of-duties conflict, and why does it matter even without misconduct?",
+     "a": "On the Identity Directory (A-007) he holds provision accounts, approve access and administer audit logs, and he granted the last two to himself. One person can approve, create and alter the record of access, so mistakes get no independent check and nothing can be proved afterwards. He also reviewed his own access (AR-001) and made 62.6% of all grants."
+    },
+    {
+     "q": "Your measure for access requests within 72 hours returns 38.6% instead of 27.3%. What is the likely bug?",
+     "a": "The numerator is counting the 5 open access requests, whose ResolutionHours is blank, because DAX treats blank as zero in ResolutionHours <= 72. That gives 17 of 44. Count the numerator from the same Resolved table, which keeps only rows where NOT ISBLANK ( FactServiceTicket[ResolutionHours] ); the correct result is 12 of 44, 27.3%."
+    }
+   ]
+  }
+ ]
+}

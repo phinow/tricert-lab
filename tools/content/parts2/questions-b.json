@@ -1,0 +1,1797 @@
+{
+ "type": "questions",
+ "items": [
+  {
+   "id": "q-pl300-01",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Profile and clean the data",
+   "prompt": "You open the ED extract (khn_ed_visits.csv, 480 rows) in Power Query and turn on Column distribution. For visit_id it shows 478 distinct and 476 unique values. What does this tell you, and what should you do next?",
+   "options": [
+    [
+     "A",
+     "478 rows are valid and 2 are invalid, so filter out the 2 invalid rows before loading."
+    ],
+    [
+     "B",
+     "Two visit_id values each appear twice. Compare the repeated rows: if every column matches, they are exact duplicates and you keep one copy (DQ-01); if the content differs, quarantine both and ask the data owner (DQ-02)."
+    ],
+    [
+     "C",
+     "Four rows have a blank visit_id, so replace the blanks with new IDs that follow the V0001 pattern."
+    ],
+    [
+     "D",
+     "Select visit_id and choose Remove Duplicates straight away, because a key must be unique."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Distinct counts the different values in a column. Unique counts the values that appear exactly once. 478 minus 476 leaves 2 values that repeat, and 480 rows minus 476 leaves 4 rows carrying them, so 2 IDs appear twice each. Here they are V0315 and V0318, exact copies from overlapping August and September extracts, so DQ-01 keeps one copy of each and leaves 478 unique rows.",
+   "incorrect": {
+    "A": "Distinct and unique describe how often values repeat, not whether rows are valid. The numbers point to repeated IDs, which affect 4 rows.",
+    "C": "Blanks show up as Empty in Column quality, which is where you check for them. The gap between distinct and unique comes from values that repeat, and inventing IDs would break the link back to the source.",
+    "D": "Removing duplicates on the key alone keeps the first row and silently drops the other, even when two different visits share an ID. DQ-02 says check the content first."
+   },
+   "artifactKey": "r1-power-query-data-quality-workbook"
+  },
+  {
+   "id": "q-pl300-02",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Profile and clean the data",
+   "prompt": "Profiling the ED extract flags four visits: V0070 has ctas_level 6, V0140 has site_code \"kgh\", V0385 has a physician initial assessment time before its triage time, and V0268 (Discharged) has no departure time. Which handling follows Kestrel's data-quality rules?",
+   "options": [
+    [
+     "A",
+     "Quarantine all four visits, because each one breaks a rule and mixed handling is hard to audit."
+    ],
+    [
+     "B",
+     "Delete V0070 and load the other three exactly as they are in the extract."
+    ],
+    [
+     "C",
+     "Change V0070's CTAS level to 5, the nearest valid value, and delete V0385 and V0268."
+    ],
+    [
+     "D",
+     "Quarantine V0070 for the ED data owner; convert V0140's site code to KGH and keep it; keep V0385 and V0268 in visit counts, but null the durations that their bad or missing times affect."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A CTAS level outside 1 to 5 is a bad classifying value, so DQ-05 quarantines V0070. Case does not change meaning, so DQ-03 maps kgh to KGH. Out-of-order or missing timestamps (DQ-06) keep the visit in counts and null only what depends on them: MinutesToPIA and EDLOSMinutes for V0385, and EDLOSMinutes for V0268. That is how the approved 474 valid visits reconcile.",
+   "incorrect": {
+    "A": "Quarantine is for rows that cannot be trusted at all, such as a bad placing date, a bad classifying value, a code that still does not map, or a contradiction. Quarantining V0140, V0385 and V0268 would understate visits and change the LWBS rate.",
+    "B": "Deleting destroys evidence (DQ-13). Loading V0385 unchanged keeps a duration built on timestamps that are out of order, and V0140 still breaks DQ-03.",
+    "C": "Guessing a triage level invents clinical data. Only Dr. Sarah Whitford's team can correct it from the triage record, and the two timing rows are still real visits that must be counted."
+   },
+   "artifactKey": "r1-power-query-data-quality-workbook"
+  },
+  {
+   "id": "q-pl300-03",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Profile and clean the data",
+   "prompt": "Your query ED_Typed sets the column types:\n\n```\nlet\n    Source = ED_Raw,\n    Typed = Table.TransformColumnTypes(\n        Source,\n        {{\"arrival_datetime\", type datetime}, {\"ctas_level\", Int64.Type}}\n    )\nin\n    Typed\n```\n\nColumn quality for arrival_datetime now shows one Error. The row is V0476, whose text value is 2026-09-31 10:41. What is the best way to handle it?",
+   "options": [
+    [
+     "A",
+     "In a query that references ED_Typed, keep the error rows with Table.SelectRowsWithErrors, tag them DQ-04 and load them to the exception table; the query that feeds FactEDVisit drops them with Table.RemoveRowsWithErrors."
+    ],
+    [
+     "B",
+     "Apply Remove Errors to arrival_datetime in the main query and move on."
+    ],
+    [
+     "C",
+     "Replace the error with null and keep the visit in FactEDVisit."
+    ],
+    [
+     "D",
+     "Change arrival_datetime back to the Text type so the error disappears."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "September has 30 days, so the text cannot become a datetime and Power Query marks the cell as an error. DQ-04 says a bad value in the field that places a visit in time quarantines the row, and DQ-13 says quarantined rows are evidence. Selecting the error rows into a referenced exception query keeps that evidence with its rule ID (replace the error value before loading, as the data-quality workbook does with Table.ReplaceErrorValues, so the row loads cleanly), and FactEDVisit loads only visits that can be placed in time.",
+   "incorrect": {
+    "B": "The visit vanishes with no record. Quarantined rows are evidence (DQ-13), and the counts would no longer reconcile back to the source.",
+    "C": "DQ-04 quarantines a row whose placing date is invalid. A null arrival cannot join to DimDate or start any ED clock, so the visit would distort counts by date.",
+    "D": "The error is hidden, not fixed. Text dates break the relationship to DimDate and every duration calculation."
+   },
+   "artifactKey": "r1-power-query-data-quality-workbook"
+  },
+  {
+   "id": "q-pl300-04",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Transform and load the data",
+   "prompt": "stg_EDVisit holds the typed, de-duplicated visit rows. You need two outputs from it: FactEDVisit (rows that pass every rule) and ex_EDVisit, the exception table (rows that fail, with a rule ID). A fix you make later in stg_EDVisit must flow into both. What should you do?",
+   "options": [
+    [
+     "A",
+     "Create both queries with Duplicate from stg_EDVisit and edit each copy."
+    ],
+    [
+     "B",
+     "Load stg_EDVisit to the model and build the two outputs as DAX calculated tables with FILTER."
+    ],
+    [
+     "C",
+     "Create both queries with Reference from stg_EDVisit, filter each one, and turn off Enable load for stg_EDVisit so it does not become a model table."
+    ],
+    [
+     "D",
+     "Append stg_EDVisit to itself and add a column that marks which copy each row came from."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "A referenced query starts from the output of the query it references, so a change upstream flows into every reference. Turning off Enable load keeps stg_EDVisit as a connection-only staging step: it still runs when FactEDVisit and ex_EDVisit refresh, but it does not appear as an extra table of duplicate rows for report authors.",
+   "incorrect": {
+    "A": "Duplicate copies the steps into a new, independent query. A later fix in stg_EDVisit would reach neither copy.",
+    "B": "That stores every row twice in the model and moves data-quality logic out of Power Query, where the rules and the exception evidence belong.",
+    "D": "Appending doubles every row. It does not separate passing rows from failing rows, and it breaks the visit counts."
+   },
+   "artifactKey": "r1-power-query-data-quality-workbook"
+  },
+  {
+   "id": "q-pl300-05",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Transform and load the data",
+   "prompt": "To apply DQ-10, you merge the ED staging query with DimSite (Left outer join, site_code to SiteCode) and expand SiteName. Visits V0140 and V0309 come back with a null SiteName, although KGH is in DimSite. What is the cause, and what is the fix?",
+   "options": [
+    [
+     "A",
+     "A Power Query merge matches text exactly, including case, so kgh does not match KGH. Trim and upper-case site_code before the merge, as DQ-03 and the source-to-target rule require."
+    ],
+    [
+     "B",
+     "Change the join kind to Inner so only matching rows load."
+    ],
+    [
+     "C",
+     "Switch on fuzzy matching so near matches join automatically."
+    ],
+    [
+     "D",
+     "Load both rows against the Unknown site member and send them to the data owner."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Text matching in a Power Query merge is case-sensitive by default. Standardizing the key first makes the match exact and repeatable:\n\n```\nTable.TransformColumns(Source, {{\"site_code\", each Text.Upper(Text.Trim(_)), type text}})\n```\n\nAfter this step V0140 and V0309 match KGH, which gives the approved 213 KGH visits.",
+   "incorrect": {
+    "B": "An inner join drops V0140 and V0309, two real KGH visits, without leaving any record.",
+    "C": "Fuzzy matching can join values that only look alike and leaves no governed rule behind. DQ-03 asks for an exact, repeatable mapping.",
+    "D": "Unknown is for codes that still match nothing after cleaning. kgh is a known site in the wrong case, so DQ-03 maps it to KGH and both visits count for KGH."
+   },
+   "artifactKey": "r1-power-query-data-quality-workbook"
+  },
+  {
+   "id": "q-pl300-06",
+   "certification": "PL-300",
+   "domain": "Prepare the data · Get or connect to data",
+   "prompt": "In production, Beacon reads de-identified views in the Clinical Data Warehouse (A-010), an on-premises relational database that is loaded once each morning. The model is small, needs Power Query steps and median measures, and leaders use it throughout the day. Which storage mode fits best?",
+   "options": [
+    [
+     "A",
+     "DirectQuery, so every visual reads the warehouse live."
+    ],
+    [
+     "B",
+     "Direct Lake, to get Import speed without any refresh."
+    ],
+    [
+     "C",
+     "Import, refreshed on a schedule after the morning load through an on-premises data gateway."
+    ],
+    [
+     "D",
+     "A live connection to the warehouse database."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Import copies the data into the semantic model, so every Power Query step and DAX function is available and visuals respond quickly. A source that loads once a day needs only a daily scheduled refresh, and because the warehouse is on premises, the refresh runs through an on-premises data gateway.",
+   "incorrect": {
+    "A": "The data changes once a day, so live queries add load on the warehouse and slower visuals for no gain. DirectQuery also limits Power Query to steps that can fold back to the source.",
+    "B": "Direct Lake reads Delta tables in Microsoft Fabric OneLake. An on-premises relational database is not a Direct Lake source.",
+    "D": "A live connection points to a published semantic model or an Analysis Services model, not to a relational database."
+   },
+   "artifactKey": "r1-star-schema-and-relationship-design"
+  },
+  {
+   "id": "q-pl300-07",
+   "certification": "PL-300",
+   "domain": "Model the data · Design and implement a data model",
+   "prompt": "Janelle Cardinal asks for one PatientFlow table that combines ED visits and the daily bed census, so she can see both on one page. FactEDVisit has one row per visit. FactBedCensus has one row per unit per census date. What is the best model design?",
+   "options": [
+    [
+     "A",
+     "Merge the bed census into FactEDVisit by date and site."
+    ],
+    [
+     "B",
+     "Keep the two fact tables at their own grain and relate both to shared dimensions: DimDate for dates, and DimSite (through DimUnit for beds) for sites."
+    ],
+    [
+     "C",
+     "Append the two tables into one table, with blanks where the columns do not match."
+    ],
+    [
+     "D",
+     "Relate FactEDVisit directly to FactBedCensus on date with a many-to-many relationship."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "A star schema keeps each fact table at one declared grain and lets shared dimensions filter both. A date slicer and a site slicer then filter visits and census rows together, and each measure aggregates its own table correctly.",
+   "incorrect": {
+    "A": "Each day's bed numbers would repeat on every visit row for that site, so any sum of beds is multiplied by the number of visits.",
+    "C": "Two grains in one table make every count and sum ambiguous, and every measure would need extra filters to skip the other kind of row.",
+    "D": "A fact-to-fact relationship at different grains gives ambiguous filtering. Shared dimensions are the right bridge."
+   },
+   "artifactKey": "r1-star-schema-and-relationship-design"
+  },
+  {
+   "id": "q-pl300-08",
+   "certification": "PL-300",
+   "domain": "Model the data · Design and implement a data model",
+   "prompt": "DimDate[Date] has an active relationship to FactEDVisit[ArrivalDate]. Tomás adds FactEDVisit[DepartureDate] (the date part of DepartureDateTime) and a second relationship to it, which Power BI makes inactive. Janelle wants visits counted by the day patients left the ED, without adding another table. Which measure is correct?",
+   "options": [
+    [
+     "A",
+     "ED Departures = CALCULATE ( [ED Visits], TREATAS ( VALUES ( DimDate[Date] ), FactEDVisit[DepartureDate] ) )"
+    ],
+    [
+     "B",
+     "Make the departure relationship active and the arrival relationship inactive."
+    ],
+    [
+     "C",
+     "Set the arrival relationship's cross-filter direction to Both."
+    ],
+    [
+     "D",
+     "ED Departures = CALCULATE ( [ED Visits], USERELATIONSHIP ( DimDate[Date], FactEDVisit[DepartureDate] ) )"
+    ]
+   ],
+   "correct": "D",
+   "explanation": "DimDate plays two roles here. USERELATIONSHIP turns on the inactive relationship for this one calculation, and because only one relationship between two tables can be active at a time, the arrival relationship is ignored while it runs. The date filter lands on DepartureDate, and every other measure keeps using arrival date.",
+   "incorrect": {
+    "A": "The active arrival relationship still filters too, so this counts only visits that arrived and left on the same date. Admitted patients who leave the next day drop out.",
+    "B": "Every arrival-based measure (visits, waits, LWBS rate) would then slice by departure date, which breaks Kestrel's definitions.",
+    "C": "Filter direction does not choose which date column is used, and it adds ambiguity to the model."
+   },
+   "artifactKey": "r1-star-schema-and-relationship-design"
+  },
+  {
+   "id": "q-pl300-09",
+   "certification": "PL-300",
+   "domain": "Model the data · Design and implement a data model",
+   "prompt": "Tomás built DimDate by appending the ArrivalDate, CensusDate and OpenedDate columns from the three fact queries. When he tries Mark as date table, Power BI refuses. What is the best fix?",
+   "options": [
+    [
+     "A",
+     "Mark FactEDVisit[ArrivalDate] as the date table instead."
+    ],
+    [
+     "B",
+     "Turn on auto date/time and skip the date table."
+    ],
+    [
+     "C",
+     "Generate a continuous calendar in Power Query, for example List.Dates(#date(2026, 1, 1), 365, #duration(1, 0, 0, 0)), relate it to the three fact date columns and mark it as the date table."
+    ],
+    [
+     "D",
+     "Set every date relationship to filter in both directions."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Marking checks that the date column has unique values, no blanks and contiguous dates. Appended fact dates repeat every date many times, so the check fails. A generated calendar for the full year 2026 (2026-01-01 to 2026-12-31) gives 365 unique, contiguous dates, matches the source-to-target rule and covers every ArrivalDate, CensusDate and OpenedDate.",
+   "incorrect": {
+    "A": "A fact column repeats each date once per visit. A date table needs one row per date, with no blanks and no gaps.",
+    "B": "Auto date/time builds a hidden table for each date column, so the three facts would not share one calendar, and Kestrel's classic time intelligence needs one marked date table.",
+    "D": "Filter direction cannot fix a date column that fails the uniqueness check."
+   },
+   "artifactKey": "r1-date-table-and-dax-catalogue"
+  },
+  {
+   "id": "q-pl300-10",
+   "certification": "PL-300",
+   "domain": "Model the data · Create model calculations by using DAX",
+   "prompt": "A card on the bed page uses Staffed Beds = SUM ( FactBedCensus[StaffedBeds] ) and shows 12,952 for July to September, with no date filter. Kestrel has 144 staffed beds on the last census date. Which measure should the card use?",
+   "options": [
+    [
+     "A",
+     "Staffed Beds = VAR LastCensusDate = MAX ( FactBedCensus[CensusDate] ) RETURN CALCULATE ( SUM ( FactBedCensus[StaffedBeds] ), DimDate[Date] = LastCensusDate )"
+    ],
+    [
+     "B",
+     "Staffed Beds = AVERAGE ( FactBedCensus[StaffedBeds] )"
+    ],
+    [
+     "C",
+     "Staffed Beds = CALCULATE ( SUM ( FactBedCensus[StaffedBeds] ), LASTDATE ( DimDate[Date] ) )"
+    ],
+    [
+     "D",
+     "Staffed Beds = SUMX ( FactBedCensus, FactBedCensus[StaffedBeds] )"
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Beds are semi-additive: you can add them across units on one day, but not across days. 12,952 is staffed bed-days. Finding the latest census date in the current filter and summing only that day gives 144 for the network on 2026-09-30, and each site's own last-day figure when the card is filtered by site.",
+   "incorrect": {
+    "B": "This averages unit-day rows, so it returns staffed beds per unit (about 20), not the network total.",
+    "C": "With no date filter, LASTDATE returns 2026-12-31, the last row of DimDate, which has no census rows, so the card goes blank.",
+    "D": "SUMX over every row returns the same 12,952 staffed bed-days as SUM."
+   },
+   "artifactKey": "r1-date-table-and-dax-catalogue"
+  },
+  {
+   "id": "q-pl300-11",
+   "certification": "PL-300",
+   "domain": "Model the data · Create model calculations by using DAX",
+   "prompt": "The DAX catalogue defines:\n\n```\nMedian Minutes to PIA =\nMEDIANX (\n    FILTER ( FactEDVisit, NOT ISBLANK ( FactEDVisit[MinutesToPIA] ) ),\n    FactEDVisit[MinutesToPIA]\n)\n```\n\nA matrix by site shows KGH 80.5, ARH 54.5, CVH 54.0, PGH 45.5 and a Total of 64.0. Janelle says the total is wrong, because the average of the four site medians is 58.6. What should you tell her?",
+   "options": [
+    [
+     "A",
+     "She is right. Change the total to AVERAGEX ( VALUES ( DimSite[SiteCode] ), [Median Minutes to PIA] )."
+    ],
+    [
+     "B",
+     "The total is a known MEDIANX problem, and wrapping the measure in ISINSCOPE fixes it."
+    ],
+    [
+     "C",
+     "The total should be the sum of the four medians, so the matrix total is missing values."
+    ],
+    [
+     "D",
+     "The total is right. At the total level the measure takes the median of all 445 visits with a valid time to PIA, and the median of all visits is not the average of the site medians."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A median is non-additive. KGH has the most timed visits (196 of 445) and the longest waits, so it pulls the all-site median above the simple average of four site medians. The approved all-site figure is 64.0 minutes.",
+   "incorrect": {
+    "A": "That averages four medians and weights each site equally, so PGH's 52 timed visits count as much as KGH's 196. The result is not the median wait of any group of patients.",
+    "B": "There is no problem to fix. MEDIANX evaluates over whatever rows the filter context leaves, which at the total is every site.",
+    "C": "Medians are not additive. Adding them gives a number of minutes that no patient waited."
+   },
+   "artifactKey": "r1-date-table-and-dax-catalogue"
+  },
+  {
+   "id": "q-pl300-12",
+   "certification": "PL-300",
+   "domain": "Model the data · Create model calculations by using DAX",
+   "prompt": "Leaders want each site's share of all-site ED visits in a table by site. The share must still respect the month and CTAS level slicers on the page. Which measure is correct?",
+   "options": [
+    [
+     "A",
+     "Share of Visits = DIVIDE ( [ED Visits], CALCULATE ( [ED Visits], ALL ( FactEDVisit ) ) )"
+    ],
+    [
+     "B",
+     "Share of Visits = DIVIDE ( [ED Visits], CALCULATE ( [ED Visits], REMOVEFILTERS ( DimSite ) ) )"
+    ],
+    [
+     "C",
+     "Share of Visits = DIVIDE ( [ED Visits], SUMX ( VALUES ( DimSite[SiteCode] ), [ED Visits] ) )"
+    ],
+    [
+     "D",
+     "Share of Visits = DIVIDE ( [ED Visits], CALCULATE ( [ED Visits], DimSite[SiteCode] = \"KGH\" ) )"
+    ]
+   ],
+   "correct": "B",
+   "explanation": "CALCULATE changes the filter context for the denominator only. REMOVEFILTERS ( DimSite ) clears the site filter but keeps the month and CTAS filters, so with no slicers KGH shows 213 of 474 visits, about 44.9%.",
+   "incorrect": {
+    "A": "ALL on the fact table also removes the filters that reach it from DimDate and DimCTAS, so the share ignores the month and CTAS slicers.",
+    "C": "On a site row, VALUES holds only that site, so the denominator equals the numerator and every row shows 100%.",
+    "D": "This divides by KGH's visits on every row, which is a ratio to one site, not a share of all sites."
+   },
+   "artifactKey": "r1-date-table-and-dax-catalogue"
+  },
+  {
+   "id": "q-pl300-13",
+   "certification": "PL-300",
+   "domain": "Model the data · Optimize model performance",
+   "prompt": "The site operations page is slow. In Performance Analyzer, the matrix that shows % PIA Within CTAS Target spends almost all of its time in DAX query, with very little in Visual display or Other. What should you do next?",
+   "options": [
+    [
+     "A",
+     "Change the matrix to a different visual type, because rendering is the problem."
+    ],
+    [
+     "B",
+     "Switch the semantic model to DirectQuery so the warehouse does the work."
+    ],
+    [
+     "C",
+     "Copy the matrix's query into DAX query view, run it on its own, and test a rewritten measure against the same query to compare timings."
+    ],
+    [
+     "D",
+     "Remove the page's slicers to reduce the Other time."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Performance Analyzer splits each visual's time into DAX query, Visual display and Other. When DAX query dominates, the measure or the model is the cause. DAX query view lets you run the exact query, change the measure, and check that the result still matches the approved 28.3% while the time drops.",
+   "incorrect": {
+    "A": "Visual display time is small, so rendering is not the bottleneck. The time is spent calculating the measure.",
+    "B": "That sends every query to the on-premises warehouse through the gateway, which usually makes visuals slower, and it does not fix the measure.",
+    "D": "Other is time a visual spends waiting for other work, and it is already small here. Removing slicers also removes features leaders need."
+   },
+   "artifactKey": "r1-quality-plan"
+  },
+  {
+   "id": "q-pl300-14",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Enhance reports for usability and storytelling",
+   "prompt": "You built a Site detail page and dragged FactEDVisit[SiteCode] into its Drill through well. On the Executive overview page, the visits bar chart uses DimSite[SiteCode] on its axis. When Janelle right-clicks the KGH bar, no Drill through option appears. What fixes it?",
+   "options": [
+    [
+     "A",
+     "Put DimSite[SiteCode], the field the bar chart uses, in the Site detail page's Drill through well."
+    ],
+    [
+     "B",
+     "Turn on Keep all filters on the Site detail page."
+    ],
+    [
+     "C",
+     "Create a bookmark for each site and a button for each bookmark."
+    ],
+    [
+     "D",
+     "Set the relationship between DimSite and FactEDVisit to filter in both directions."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Power BI offers drillthrough from a data point only when the source visual contains the field that sits in the target page's Drill through well. FactEDVisit[SiteCode] and DimSite[SiteCode] share a name but are different fields. Using the same DimSite field on both pages makes the option appear and passes the clicked site as a filter, and the back button Power BI adds to the page returns leaders to the overview.",
+   "incorrect": {
+    "B": "Keep all filters controls which other filters travel with the drillthrough. The option still appears only when the source visual uses the drillthrough field.",
+    "C": "Four hand-built bookmarks must be maintained by hand and break when sites change. Drillthrough passes the clicked site automatically.",
+    "D": "Relationship direction does not decide whether drillthrough is offered. The field in the source visual and the field in the drillthrough well must match."
+   },
+   "artifactKey": "r1-executive-and-site-operations-reports"
+  },
+  {
+   "id": "q-pl300-15",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Enhance reports for usability and storytelling",
+   "prompt": "On the site operations page, % PIA Within CTAS Target uses red and green cell backgrounds to show which sites are under target. A reviewer with red-green colour vision deficiency cannot tell the cells apart. What is the best fix?",
+   "options": [
+    [
+     "A",
+     "Use a darker red and a brighter green."
+    ],
+    [
+     "B",
+     "Add a cue that does not depend on colour, such as an icon or a status label like Below target, and check the contrast between text and background."
+    ],
+    [
+     "C",
+     "Add a legend that explains what red and green mean."
+    ],
+    [
+     "D",
+     "Replace the table with a pie chart of the four sites."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Accessible design never uses colour as the only way to carry meaning. An icon or text gives a second cue, and enough contrast keeps labels readable for everyone. While you are there, add alt text to the visual and check the tab order in the Selection pane.",
+   "incorrect": {
+    "A": "The meaning still depends on colour alone, which the reviewer cannot rely on.",
+    "C": "A legend explains the colours, but it does not help someone who cannot tell them apart.",
+    "D": "A pie chart still needs colour to separate slices and is a poor way to compare four rates against their targets."
+   },
+   "artifactKey": "r1-executive-and-site-operations-reports"
+  },
+  {
+   "id": "q-pl300-16",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Create reports",
+   "prompt": "Janelle wants a fixed-layout document every morning that lists every inpatient unit's staffed beds, occupied beds and ALC patients for the previous day (unit-level counts only). It is printed for the bed meeting and sent by email as a PDF. What should you build?",
+   "options": [
+    [
+     "A",
+     "Export the bed page of the interactive report to PDF by hand each morning."
+    ],
+    [
+     "B",
+     "A dashboard with one pinned tile per unit."
+    ],
+    [
+     "C",
+     "Analyze in Excel, so Janelle formats a workbook each day."
+    ],
+    [
+     "D",
+     "A paginated report built in Power BI Report Builder on the Beacon semantic model, with a subscription that sends the PDF each morning."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Paginated reports are designed for fixed, multi-page layouts that print or export exactly, such as a list that must show every unit on paper. A subscription delivers the PDF on a schedule without anyone remembering to do it. Keeping the content at unit level matches the change-control decision in CR-01 not to show patient names.",
+   "incorrect": {
+    "A": "A manual export depends on one person every day, and an interactive page is not designed for a fixed, multi-page print layout.",
+    "B": "Dashboards are for monitoring on screen. They do not give a print-ready, paged layout.",
+    "C": "That brings back the manual Excel routine Beacon is replacing."
+   },
+   "artifactKey": "r1-executive-and-site-operations-reports"
+  },
+  {
+   "id": "q-pl300-17",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Identify patterns and trends",
+   "prompt": "The daily occupancy line chart by unit should make any day above 100% stand out. On 2026-09-08, KGH-MED4A had 34 occupied beds and 32 staffed beds, a row that DQ-11 keeps and flags. What should you add to the chart?",
+   "options": [
+    [
+     "A",
+     "A forecast from the Analytics pane."
+    ],
+    [
+     "B",
+     "Anomaly detection on the line."
+    ],
+    [
+     "C",
+     "A trend line."
+    ],
+    [
+     "D",
+     "A constant line at 100% from the Analytics pane, with a data label."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A constant line draws a fixed reference value across the chart, so any point above it, such as KGH-MED4A at 34 of 32 beds (about 106%), is easy to spot. The row stays in the data because hallway surge beds are possible; the line makes the review item visible.",
+   "incorrect": {
+    "A": "A forecast projects future values. It does not mark a fixed capacity threshold.",
+    "B": "Anomaly detection flags values that are unusual for the series' expected pattern, not values that cross a fixed 100% threshold.",
+    "C": "A trend line shows the overall direction of the series, not the days that exceed capacity."
+   },
+   "artifactKey": "r1-executive-and-site-operations-reports"
+  },
+  {
+   "id": "q-pl300-18",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Enhance reports for usability and storytelling",
+   "prompt": "Testing shows that report users can export underlying data from the visits by CTAS level chart. The export contains visit-level rows: VisitID, arrival times, CTAS level and age band. Priya Raman wants users limited to the aggregated values they see on the page. What should you change?",
+   "options": [
+    [
+     "A",
+     "Apply the Confidential sensitivity label to the report."
+    ],
+    [
+     "B",
+     "Hide the VisitID column in the model view."
+    ],
+    [
+     "C",
+     "In the report's settings, change export data to allow summarized data only."
+    ],
+    [
+     "D",
+     "Rely on RLS, because users only see their own site."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "The export data setting decides whether users can export nothing, only summarized data (the values the visual shows), or underlying data as well. Summarized only keeps exports at the level of the page, which supports the least-amount principle in section 58 of the Health Information Act. Administrators can also restrict export in tenant settings. Record the setting as a security acceptance criterion and test it.",
+   "incorrect": {
+    "A": "A label classifies the report and travels with exported files, but it does not stop users exporting rows.",
+    "B": "Hiding a field tidies the field list; it is not a security control, and the other visit-level fields, such as arrival times, are still there.",
+    "D": "RLS limits which site's rows a user sees. It does not stop visit-level export for the site they can see."
+   },
+   "artifactKey": "r1-security-acceptance-criteria"
+  },
+  {
+   "id": "q-pl300-19",
+   "certification": "PL-300",
+   "domain": "Visualize and analyze the data · Enhance reports for usability and storytelling",
+   "prompt": "Leaders want to hover over a site's bar on the overview page and see that site's visits by CTAS level as a small chart, without leaving the page. What should you build?",
+   "options": [
+    [
+     "A",
+     "A report page tooltip: a small page with Allow use as tooltip turned on and a CTAS chart, set as the bar chart's tooltip."
+    ],
+    [
+     "B",
+     "A drillthrough page filtered by site."
+    ],
+    [
+     "C",
+     "Add DimCTAS[CTASLevel] to the bar chart's Tooltips well."
+    ],
+    [
+     "D",
+     "A bookmark that shows a hidden CTAS chart when a button is clicked."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "A report page tooltip renders a whole page filtered to the data point under the pointer, so hovering on KGH shows KGH's visits by CTAS level. Keep the page small so it reads well, and use the same measures as the main page, with counts under 5 blanked as the shared pages require, so the numbers agree and small counts stay hidden.",
+   "incorrect": {
+    "B": "Drillthrough takes the user to another page. Leaders asked to stay on the overview.",
+    "C": "The default tooltip lists field values as text. It cannot show a chart of visits by CTAS level.",
+    "D": "A bookmark needs a click and shows the same chart whichever site the user is looking at."
+   },
+   "artifactKey": "r1-executive-and-site-operations-reports"
+  },
+  {
+   "id": "q-pl300-20",
+   "certification": "PL-300",
+   "domain": "Manage and secure Power BI · Secure and govern Power BI items",
+   "prompt": "For the RLS test pack, the ARH role needs the rule [SiteCode] = \"ARH\". With one rule and no relationship changes, where should it go so that ARH users see only ARH rows in FactEDVisit, FactServiceTicket and FactBedCensus?",
+   "options": [
+    [
+     "A",
+     "On FactEDVisit, because it holds the patient visits."
+    ],
+    [
+     "B",
+     "On DimSite, because its filter flows one-to-many to FactEDVisit and FactServiceTicket, and through DimUnit to FactBedCensus."
+    ],
+    [
+     "C",
+     "On DimUnit, because it links sites to beds."
+    ],
+    [
+     "D",
+     "On FactServiceTicket, with the other tables limited by visual-level filters."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "RLS filters travel along relationships the same way slicer filters do. DimSite is on the one side of every path to the three facts, so one rule there secures them all. In the test pack, an ARH test user should see 105 ED visits and no rows for KGH, CVH or PGH.",
+   "incorrect": {
+    "A": "A rule on FactEDVisit filters only that table. Tickets and bed census rows for every site stay visible.",
+    "C": "DimUnit filters FactBedCensus, but it sits on the many side of DimSite, so with single-direction relationships it never reaches FactEDVisit or FactServiceTicket.",
+    "D": "Visual filters are not an access boundary. Anyone who can explore the model would still see other sites."
+   },
+   "artifactKey": "r1-rls-test-pack"
+  },
+  {
+   "id": "q-pl300-21",
+   "certification": "PL-300",
+   "domain": "Manage and secure Power BI · Secure and govern Power BI items",
+   "prompt": "Dr. Liam O'Connor (ARH) was added to the Beacon Prod workspace as a Contributor so he could give feedback. He is also a member of the ARH RLS role, yet he sees all four sites. Why, and what is the fix?",
+   "options": [
+    [
+     "A",
+     "The ARH role's DAX rule is wrong, so rewrite it."
+    ],
+    [
+     "B",
+     "Add him to the ARH role a second time through a security group."
+    ],
+    [
+     "C",
+     "RLS restricts only users with the Viewer role or app access. Remove his workspace role, give him access through the Beacon app, and keep him in the ARH role."
+    ],
+    [
+     "D",
+     "Make him a Member so he inherits the workspace's security."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Admin, Member and Contributor roles can edit the content, so RLS does not filter what they see. Consumers who must be limited by site should reach Beacon through the app or with Viewer access only, and the RLS test pack should test with real Viewer accounts.",
+   "incorrect": {
+    "A": "The rule works for Viewers. His Contributor role is what bypasses it.",
+    "B": "Extra membership changes nothing while his workspace role bypasses RLS.",
+    "D": "Members also bypass RLS and get more rights, the opposite of least privilege."
+   },
+   "artifactKey": "r1-rls-test-pack"
+  },
+  {
+   "id": "q-pl300-22",
+   "certification": "PL-300",
+   "domain": "Manage and secure Power BI · Create and manage workspaces and assets",
+   "prompt": "Tomás fixed a mislabelled card and deployed the corrected report to the Beacon Prod workspace. Janelle opens the report through the Beacon app and still sees the old label. What is the most likely cause?",
+   "options": [
+    [
+     "A",
+     "The semantic model has not refreshed yet."
+    ],
+    [
+     "B",
+     "Janelle's RLS role hides the new label."
+    ],
+    [
+     "C",
+     "Janelle needs direct access to the report in the workspace."
+    ],
+    [
+     "D",
+     "The app has not been updated. Report changes in the workspace reach app users only after someone with permission updates the app."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "An app gives its audiences a published version of the workspace's reports. The team can check a change in the workspace first, then update the app so every consumer gets the new version at once.",
+   "incorrect": {
+    "A": "A label is part of the report design, not the data. A refresh changes values, not report text.",
+    "B": "RLS filters rows of data. It never changes report text.",
+    "C": "That bypasses the app as the governed route to consumers and gives her more access than she needs."
+   },
+   "artifactKey": "r1-workspace-refresh-and-deployment-plan"
+  },
+  {
+   "id": "q-pl300-23",
+   "certification": "PL-300",
+   "domain": "Manage and secure Power BI · Create and manage workspaces and assets",
+   "prompt": "For the pilot, Tomás installed the on-premises data gateway in personal mode on his laptop and set the refresh to use his own warehouse account. Before go-live, what is the right set-up?",
+   "options": [
+    [
+     "A",
+     "Install the gateway in standard mode on a Kestrel-managed server, connect with a read-only service account limited to the de-identified views, name at least two gateway administrators, and schedule refresh after the warehouse's morning load."
+    ],
+    [
+     "B",
+     "Keep personal mode, but move it to a desktop computer that never sleeps."
+    ],
+    [
+     "C",
+     "Switch to DirectQuery so that no gateway is needed."
+    ],
+    [
+     "D",
+     "Keep Tomás's account on the connection, because he owns the model."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "A cloud refresh from an on-premises source needs a gateway. Standard mode runs as a shared service with its own connections and administrators, a service account follows least privilege, and a second administrator removes the single point of failure behind R-06. Scheduling the refresh after the source finishes loading means leaders see the newest data.",
+   "incorrect": {
+    "B": "Personal mode serves one user and cannot be shared, so Beacon would still depend on Tomás.",
+    "C": "DirectQuery to an on-premises source needs a gateway too, and the switch would slow every visual.",
+    "D": "Refresh would fail when his password changes or he leaves, and it would run with more access than the views need. This is the key-person risk in R-06."
+   },
+   "artifactKey": "r1-workspace-refresh-and-deployment-plan"
+  },
+  {
+   "id": "q-pl300-24",
+   "certification": "PL-300",
+   "domain": "Manage and secure Power BI · Secure and govern Power BI items",
+   "prompt": "Beacon content is classified Confidential under Kestrel's scheme. Daniel Osei asks what applying the Confidential sensitivity label to the Beacon semantic model and reports will do. What is the best answer?",
+   "options": [
+    [
+     "A",
+     "It limits each user to their own site's rows."
+    ],
+    [
+     "B",
+     "It marks the items as Confidential wherever users see them and carries the label, with any protection it defines, into supported exported files such as Excel, PowerPoint and PDF. It does not decide which rows anyone sees."
+    ],
+    [
+     "C",
+     "It replaces workspace roles, so only people cleared for Confidential can open the items."
+    ],
+    [
+     "D",
+     "It deletes any exported file that leaves Kestrel's network."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Sensitivity labels from Microsoft Purview Information Protection classify Power BI items and follow the data into supported exports, so a Confidential workbook stays marked, and protected if the label defines protection, outside the service. Pair labels with RLS, workspace roles and export settings: each control does a different job.",
+   "incorrect": {
+    "A": "That is RLS. A label classifies content; it does not filter data.",
+    "C": "Workspace roles and app access still decide who can open Beacon content.",
+    "D": "Labels do not delete files. Protection settings in a label control who can open an exported file."
+   },
+   "artifactKey": "r1-health-information-classification-register"
+  },
+  {
+   "id": "q-cissp-01",
+   "certification": "CISSP",
+   "domain": "Security and Risk Management · Risk management concepts (quantitative analysis)",
+   "prompt": "For the residual risk register, Daniel Osei's team uses planning estimates, not Kestrel data, for a ransomware attack that encrypts the Clinical Information System (A-001): asset value CAD 5,000,000 (estimate), exposure factor 30% (estimate), and an annualized rate of occurrence (ARO) of 0.2, about once in five years (estimate). What is the annualized loss expectancy (ALE)?",
+   "options": [
+    [
+     "A",
+     "CAD 300,000"
+    ],
+    [
+     "B",
+     "CAD 1,000,000"
+    ],
+    [
+     "C",
+     "CAD 1,500,000"
+    ],
+    [
+     "D",
+     "CAD 7,500,000"
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Single loss expectancy (SLE) = asset value x exposure factor = 5,000,000 x 0.30 = CAD 1,500,000. ALE = SLE x ARO = 1,500,000 x 0.2 = CAD 300,000 a year. ALE gives an annual figure you can compare with the annual cost of a safeguard. It is only as good as the estimates and does not capture harm to patients, so present it beside the business impact analysis. Exam tip (Security and Risk Management): learn the two formulas and the order you apply them.",
+   "incorrect": {
+    "B": "This multiplies asset value by ARO and skips the exposure factor. Only 30% of the asset value is lost in one event.",
+    "C": "This is the single loss expectancy. It still has to be multiplied by the ARO to give an annual figure.",
+    "D": "This divides SLE by ARO. ALE multiplies SLE by ARO."
+   },
+   "artifactKey": "r3-residual-risk-register"
+  },
+  {
+   "id": "q-cissp-02",
+   "certification": "CISSP",
+   "domain": "Security and Risk Management · Risk management concepts (quantitative analysis)",
+   "prompt": "Planning estimates, not Kestrel data, for a compromised clinical mailbox on Email and Collaboration (A-013): asset value CAD 300,000 (estimate) and exposure factor 50% (estimate). The annualized rate of occurrence is 2 today (estimate) and 0.2 with phishing-resistant MFA (estimate). The MFA safeguard costs CAD 90,000 a year (estimate). What is the safeguard's annual value?",
+   "options": [
+    [
+     "A",
+     "CAD -60,000 a year, so reject the safeguard"
+    ],
+    [
+     "B",
+     "CAD 180,000 a year, so the safeguard is cost-justified"
+    ],
+    [
+     "C",
+     "CAD 210,000 a year, so the safeguard is cost-justified"
+    ],
+    [
+     "D",
+     "CAD 270,000 a year, so the safeguard is cost-justified"
+    ]
+   ],
+   "correct": "B",
+   "explanation": "SLE = 300,000 x 0.50 = CAD 150,000. ALE before = 150,000 x 2 = CAD 300,000. ALE after = 150,000 x 0.2 = CAD 30,000. Value of the safeguard = ALE before minus ALE after minus its annual cost = 300,000 - 30,000 - 90,000 = CAD 180,000 a year. A positive value supports funding it. The risk owner still decides, and also weighs the harm to patients that the numbers leave out.",
+   "incorrect": {
+    "A": "This subtracts the cost from the remaining ALE (30,000 - 90,000). A safeguard's value is the loss it removes minus what it costs.",
+    "C": "This ignores the loss that remains with the safeguard in place (ALE after of CAD 30,000).",
+    "D": "This is the drop in ALE before paying for the safeguard. Its annual cost of CAD 90,000 must come off."
+   },
+   "artifactKey": "r2-mfa-and-sso-recommendation"
+  },
+  {
+   "id": "q-cissp-03",
+   "certification": "CISSP",
+   "domain": "Security and Risk Management · Legal, regulatory and compliance",
+   "prompt": "SEC-003 was a High-severity unauthorized access incident on the Clinical Information System (A-001). Suppose the investigation confirms that a staff account opened the charts of patients it had no care relationship with. What does the Health Information Act require of Kestrel?",
+   "options": [
+    [
+     "A",
+     "Notify only if a reasonable person would see a real risk of significant harm, because that is the Health Information Act test."
+    ],
+    [
+     "B",
+     "Wait until the forensic investigation is complete and the staff member has been disciplined, then decide whether to tell anyone."
+    ],
+    [
+     "C",
+     "Notify the affected patients only, because the Commissioner hears only about large breaches."
+    ],
+    [
+     "D",
+     "As custodian, assess whether the access creates a risk of harm to the patients and, if it does, notify the Information and Privacy Commissioner, the Minister responsible under the Act and the affected individuals as soon as practicable."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Under section 60.1 of the Health Information Act, an affiliate who learns of the access must tell the custodian, and the custodian must notify the Commissioner, the Minister and the affected individuals as soon as practicable where there is a risk of harm to an individual. Notice to individuals is in writing. Exam tip (Security and Risk Management): know which law covers which information and the exact test it uses.",
+   "incorrect": {
+    "A": "Real risk of significant harm is the Protection of Privacy Act test for personal information. The Health Information Act uses the lower risk-of-harm test for health information.",
+    "B": "The Act requires notice as soon as practicable once there is a risk of harm. Discipline is a separate process and must not hold up notice.",
+    "C": "Section 60.1 requires notice to the Commissioner, the Minister and the affected individuals. The duty is triggered by risk of harm, not by the number of patients."
+   },
+   "artifactKey": "r3-escalation-and-breach-notification-matrix"
+  },
+  {
+   "id": "q-cissp-04",
+   "certification": "CISSP",
+   "domain": "Security and Risk Management · Legal, regulatory and compliance",
+   "prompt": "Priya Raman has approved Beacon's privacy impact assessment inside Kestrel. Marcus Bell asks whether Release 1 can go live on 2026-10-23 as soon as the Information and Privacy Commissioner approves the assessment. What is the correct position?",
+   "options": [
+    [
+     "A",
+     "Go live first and submit the assessment within 30 days, because the dashboards show de-identified data."
+    ],
+    [
+     "B",
+     "Hold go-live until the Commissioner issues written approval of the assessment."
+    ],
+    [
+     "C",
+     "Kestrel must submit the assessment to the Commissioner for review and comment before it implements the system. The Commissioner comments but does not approve, and Kestrel stays accountable for the decision."
+    ],
+    [
+     "D",
+     "No submission is needed, because Kestrel's Chief Privacy Officer has approved it."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Section 64 of the Health Information Act requires a custodian to prepare a privacy impact assessment for a new information system that collects, uses or discloses individually identifying health information, and to submit it to the Commissioner for review and comment before implementing it. Plan the submission date into the schedule, and do not plan around an approval that will never come.",
+   "incorrect": {
+    "A": "Section 64 requires submission before implementation. The pipeline that de-identifies the data uses individually identifying health information, so the duty applies.",
+    "B": "The Commissioner reviews the assessment and comments on it. It does not approve or accept it.",
+    "D": "Internal approval is good governance, but the Act still requires the custodian to submit the assessment to the Commissioner before implementation."
+   },
+   "artifactKey": "r1-privacy-impact-assessment"
+  },
+  {
+   "id": "q-cissp-05",
+   "certification": "CISSP",
+   "domain": "Security and Risk Management · Supply chain risk management",
+   "prompt": "Sentinel SOC Services (V-04), Kestrel's managed security monitoring provider, processes Kestrel's security logs in the United States. Some log sources, such as Clinical Information System access logs, can identify patients. Priya Raman owns this risk (R-05). What is the best course of action?",
+   "options": [
+    [
+     "A",
+     "Review what each log feed sends, remove or pseudonymize patient identifiers that monitoring does not need, put the required safeguards in a written agreement, and have the risk owner record the decision."
+    ],
+    [
+     "B",
+     "End the contract, because Alberta law bans storing health information outside Canada."
+    ],
+    [
+     "C",
+     "Take no action, because security logs are never health information."
+    ],
+    [
+     "D",
+     "Accept the vendor's latest assurance report as enough."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Section 60 of the Health Information Act requires reasonable safeguards, including protection of the confidentiality of health information stored or used outside Alberta. The risk-based answer limits what leaves, binds the vendor by contract, and ends in an owned, recorded decision. Exam tip (Security and Risk Management): manage supply chain risk through due diligence, contracts and ongoing assurance, not assumptions.",
+   "incorrect": {
+    "B": "No Alberta statute bans it. The Health Information Act requires safeguards for health information stored or used outside Alberta. Any keep-it-in-Canada rule would be a Kestrel contract or policy term.",
+    "C": "Access logs can identify the patient whose chart was opened. Whether a feed holds health information is exactly what the review must establish.",
+    "D": "An assurance report tests the vendor's controls. It does not decide what Kestrel should send outside the country or what the contract must require."
+   },
+   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+  },
+  {
+   "id": "q-cissp-06",
+   "certification": "CISSP",
+   "domain": "Asset Security · Identify and classify information and assets",
+   "prompt": "While building the health information classification register, Tomás Rivera, who builds and runs the Beacon semantic model, proposes reclassifying the ED visit data from Confidential to Internal so more staff can use it. Who should decide?",
+   "options": [
+    [
+     "A",
+     "Tomás, because he knows the data and the model best."
+    ],
+    [
+     "B",
+     "Dr. Sarah Whitford, the business owner of emergency data, with privacy and security advice. Tomás then applies the handling rules as data steward and custodian."
+    ],
+    [
+     "C",
+     "Daniel Osei, because the CISO decides every classification."
+    ],
+    [
+     "D",
+     "Kevin Park, because he administers the systems that store the data."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "In Asset Security, the data owner is accountable for classification and acceptable use, and custodians carry out the controls. Pseudonymous visit-level ED data is Confidential in Kestrel's data dictionary. Lowering it would change who may see it, so the owner decides and the register records the decision and its reason.",
+   "incorrect": {
+    "A": "Custodians and stewards apply handling rules. Classification is the owner's accountability.",
+    "C": "The CISO sets the scheme and advises, but the owner of the information classifies it.",
+    "D": "System administrators are custodians of platforms, not owners of the information."
+   },
+   "artifactKey": "r1-health-information-classification-register"
+  },
+  {
+   "id": "q-cissp-07",
+   "certification": "CISSP",
+   "domain": "Asset Security · Data security controls and compliance requirements",
+   "prompt": "Janelle Cardinal asks for the bed dashboard to list alternate level of care (ALC) patients by name and bed number. Which response best fits Kestrel's duties as a custodian of health information?",
+   "options": [
+    [
+     "A",
+     "Approve it, because Janelle is a Kestrel employee and may see any health information."
+    ],
+    [
+     "B",
+     "Approve it, and use RLS so only Janelle's role can see the names."
+    ],
+    [
+     "C",
+     "Show unit-level ALC counts and days on the dashboard, and leave patient detail in the Clinical Information System for the care team."
+    ],
+    [
+     "D",
+     "Approve it, with a confidentiality banner across the top of the page."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Sections 57 and 58 of the Health Information Act require the highest degree of anonymity possible and only the amount of health information essential to the purpose, and section 57 asks the custodian first to consider whether aggregate information is enough. Unit-level counts meet the patient flow purpose. This is the alternative the change-control board approved in CR-01.",
+   "incorrect": {
+    "A": "Being an affiliate does not remove the duty to use only the information essential to the purpose.",
+    "B": "RLS limits who sees the list. It does not answer whether a patient flow dashboard needs names at all.",
+    "D": "A banner is a reminder, not a safeguard, and it does not reduce the information shown."
+   },
+   "artifactKey": "r1-privacy-impact-assessment"
+  },
+  {
+   "id": "q-cissp-08",
+   "certification": "CISSP",
+   "domain": "Security Architecture and Engineering · Secure design principles",
+   "prompt": "In the Beacon threat model, staging tables in the Clinical Data Warehouse (A-010) hold Restricted data, and the semantic model in the Power BI service is Confidential. Where should identifying fields be removed?",
+   "options": [
+    [
+     "A",
+     "In the semantic model, by hiding the identifying columns."
+    ],
+    [
+     "B",
+     "In the reports, by leaving identifying columns off every visual."
+    ],
+    [
+     "C",
+     "Nowhere, because RLS stops users from seeing other sites' data."
+    ],
+    [
+     "D",
+     "In the warehouse's de-identified views, before data crosses the trust boundary to the Power BI service, so only the fields the measures need ever leave Kestrel's network."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Secure design reduces data at the earliest trust boundary: data minimization, least privilege and defence in depth. De-identifying in the views (flow F3) means a mistake in the cloud cannot expose what never arrived there. Exam tip (Security Architecture and Engineering): place controls where data crosses a trust boundary.",
+   "incorrect": {
+    "A": "Hidden columns are still in the model, and the data has already crossed the boundary. Hiding is a usability setting, not a control.",
+    "B": "The data would still sit in the cloud model, reachable by anyone with build access or a query tool.",
+    "C": "RLS filters rows by site. It does nothing about which columns are in the model."
+   },
+   "artifactKey": "r1-threat-model-and-architecture"
+  },
+  {
+   "id": "q-cissp-09",
+   "certification": "CISSP",
+   "domain": "Security Architecture and Engineering · Security models",
+   "prompt": "A refresh job reads Restricted staging tables and writes rows into the Confidential de-identified views. Which security model rule would this flow break unless a trusted de-identification step removes the identifying content first?",
+   "options": [
+    [
+     "A",
+     "The Bell-LaPadula star property: no write down."
+    ],
+    [
+     "B",
+     "The Biba simple integrity property: no read down."
+    ],
+    [
+     "C",
+     "The Clark-Wilson requirement for well-formed transactions."
+    ],
+    [
+     "D",
+     "The Brewer-Nash (Chinese Wall) rule."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Bell-LaPadula is a confidentiality model. Its star property stops a subject working at a higher level from writing information to a lower level, where it could leak. The de-identification step is the trusted process allowed to lower the classification, which is why it needs its own review and testing.",
+   "incorrect": {
+    "B": "Biba protects integrity. Its rules stop low-integrity data from corrupting high-integrity data, not leaks of confidential data.",
+    "C": "Clark-Wilson is an integrity model built on well-formed transactions and separation of duties.",
+    "D": "Brewer-Nash prevents conflicts of interest between competing clients' data."
+   },
+   "artifactKey": "r1-threat-model-and-architecture"
+  },
+  {
+   "id": "q-cissp-10",
+   "certification": "CISSP",
+   "domain": "Security Architecture and Engineering · Cryptographic solutions",
+   "prompt": "Clinical Information System backups are copied to the Backup Platform (A-012), hosted by NorthArc Cloud (V-02). Daniel Osei wants assurance that NorthArc staff cannot read the backup contents. What should Kestrel do?",
+   "options": [
+    [
+     "A",
+     "Rely on NorthArc's default encryption, with keys that NorthArc manages."
+    ],
+    [
+     "B",
+     "Store the encryption keys in the same NorthArc storage as the backups, so restores are faster."
+    ],
+    [
+     "C",
+     "Encrypt the backups with keys that Kestrel controls and keeps apart from NorthArc's environment, with a tested key-recovery procedure so a restore never fails for lack of a key."
+    ],
+    [
+     "D",
+     "Hash every backup file with SHA-256."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Confidentiality from a provider depends on who controls the keys. Keys held by Kestrel separate the data host from the key holder. Losing the keys would make every backup useless, so key backup and recovery belong in the restore test. Exam tip (Security Architecture and Engineering): key management decides how strong encryption really is.",
+   "incorrect": {
+    "A": "If the provider holds the keys, its administrators can decrypt the data.",
+    "B": "Anyone who reaches the backups also reaches the keys, so the encryption adds little.",
+    "D": "A hash shows whether a file changed. It does not hide the contents."
+   },
+   "artifactKey": "r3-disaster-recovery-and-downtime-plan"
+  },
+  {
+   "id": "q-cissp-11",
+   "certification": "CISSP",
+   "domain": "Communication and Network Security · Secure design principles in network architectures",
+   "prompt": "After SEC-004, a Critical ransomware precursor on the Virtual Desktop Service (A-008), Ahmed Haddad's review finds that virtual desktops can reach the Clinical Information System database servers and the Backup Platform's management console directly. What is the best design change?",
+   "options": [
+    [
+     "A",
+     "Put each group on its own VLAN and leave traffic between the VLANs open."
+    ],
+    [
+     "B",
+     "Put desktops, the CIS database tier and backup management in separate zones; allow desktops to reach only the CIS application tier on the ports it needs; allow backup management only from administrator workstations; and log denied traffic."
+    ],
+    [
+     "C",
+     "Rely on the internet firewall, because an attack would come from outside."
+    ],
+    [
+     "D",
+     "Install stronger antivirus on the desktops and leave the network flat."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Segmentation limits lateral movement. If a desktop is compromised, it can reach only the services it needs, and the backups that recovery depends on stay out of reach. Logging denied flows gives the security operations centre early warning. Exam tip (Communication and Network Security): zones plus enforced allowed flows, not just VLANs.",
+   "incorrect": {
+    "A": "VLANs without enforced rules between them separate broadcast traffic, not access.",
+    "C": "SEC-004 was already inside, on the desktops. Perimeter controls do not limit movement within the network.",
+    "D": "Endpoint protection helps, but a flat network still lets one compromised desktop reach backups and clinical databases."
+   },
+   "artifactKey": "r3-network-segmentation-and-logging-design"
+  },
+  {
+   "id": "q-cissp-12",
+   "certification": "CISSP",
+   "domain": "Communication and Network Security · Secure network components",
+   "prompt": "Ahmed Haddad plans to open an inbound port on the internet-facing firewall so the Power BI service can reach Beacon's on-premises data gateway. What is the better design?",
+   "options": [
+    [
+     "A",
+     "Open the inbound port, but limit it to Microsoft's published address ranges."
+    ],
+    [
+     "B",
+     "Put the gateway server in the internet-facing zone with a public address."
+    ],
+    [
+     "C",
+     "Give the gateway server unrestricted outbound internet access so refresh never fails."
+    ],
+    [
+     "D",
+     "Open no inbound rule, because the gateway makes outbound connections to the Power BI service. Allow only that outbound traffic from the gateway server, and let the gateway reach only the warehouse views it reads."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "The on-premises data gateway starts its connections outbound, so data reaches the cloud without opening the network to inbound traffic. Limiting both the gateway's outbound destinations and its internal reach keeps it a narrow, controlled crossing point at trust boundary TB2.",
+   "incorrect": {
+    "A": "It still adds an inbound path that the gateway does not need.",
+    "B": "That exposes a server holding data-source credentials to the internet.",
+    "C": "Least privilege applies to outbound traffic too. Unrestricted access gives malware an easy way out."
+   },
+   "artifactKey": "r3-network-segmentation-and-logging-design"
+  },
+  {
+   "id": "q-cissp-13",
+   "certification": "CISSP",
+   "domain": "Communication and Network Security · Secure communication channels",
+   "prompt": "Raj Patel, a support engineer at Meridian Clinical Systems (V-01), needs remote access to fix Clinical Information System problems. Today Meridian uses a VPN that lands on Kestrel's internal network. What is the best design?",
+   "options": [
+    [
+     "A",
+     "Keep the VPN, but require Meridian engineers to use long passwords."
+    ],
+    [
+     "B",
+     "Let Meridian engineers share one vendor account, so staff changes need no new accounts."
+    ],
+    [
+     "C",
+     "Route vendor sessions through a remote access gateway or jump host in a separate vendor zone that reaches only the CIS servers, with MFA, approval for each session, time limits and session recording."
+    ],
+    [
+     "D",
+     "Publish remote desktop to the CIS servers on the internet, protected by a strong password."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "A brokered path limits where the vendor can go, proves who connected and records what they did. Approval for each session and time limits tie access to a real support need. Exam tip (Communication and Network Security): secure remote access is a protected channel plus least privilege plus monitoring.",
+   "incorrect": {
+    "A": "The VPN still places a third party on the internal network with broad reach.",
+    "B": "Shared accounts destroy accountability: Kestrel could not tell which engineer did what.",
+    "D": "Remote desktop exposed to the internet is a common way into networks for ransomware groups."
+   },
+   "artifactKey": "r2-privileged-account-process"
+  },
+  {
+   "id": "q-cissp-14",
+   "certification": "CISSP",
+   "domain": "Identity and Access Management (IAM) · Authorization mechanisms",
+   "prompt": "Kevin Park, Systems Administrator, holds provision accounts, approve access and administer audit logs on the Identity Directory (A-007). He granted 62.6% of all user permissions, and two of his own rights were self-granted. What is the strongest response?",
+   "options": [
+    [
+     "A",
+     "Remove approve access and administer audit logs from Kevin, give approval to business owners and log administration to security, and have Daniel Osei re-approve the rights Kevin granted himself."
+    ],
+    [
+     "B",
+     "Enforce MFA on Kevin's account so every action is strongly authenticated."
+    ],
+    [
+     "C",
+     "Keep his rights, and review his activity once a quarter."
+    ],
+    [
+     "D",
+     "Ask Kevin to sign an acceptable use agreement."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Segregation of duties splits incompatible steps so no one person can grant access, approve it and erase the evidence. Kestrel's rule says no one may hold two or more of these three on the Identity Directory. A person must never approve their own access, so the self-granted rights need independent re-approval.",
+   "incorrect": {
+    "B": "MFA proves it is Kevin. It does not stop one person controlling the whole process.",
+    "C": "A quarterly review finds misuse after the fact and leaves the conflict in place.",
+    "D": "A signature does not change what his account can do."
+   },
+   "artifactKey": "r2-segregation-of-duties-analysis"
+  },
+  {
+   "id": "q-cissp-15",
+   "certification": "CISSP",
+   "domain": "Identity and Access Management (IAM) · Authentication systems",
+   "prompt": "Control CT-006 failed: 4 of 6 enabled privileged accounts use MFA (66.7%). Kevin Park (E-009) and Raj Patel (E-015, vendor) are not enrolled. Kevin argues that MFA would slow emergency fixes at 3 a.m. What should Kestrel do?",
+   "options": [
+    [
+     "A",
+     "Exempt Kevin's account, because he is the main administrator and needs speed."
+    ],
+    [
+     "B",
+     "Exempt Raj's account, because Meridian has its own security controls."
+    ],
+    [
+     "C",
+     "Accept 66.7% until the next annual review."
+    ],
+    [
+     "D",
+     "Require MFA for all privileged access now, and meet the emergency need with a few vaulted break-glass accounts that alert on use, are reviewed after every use and are tested."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Privileged accounts are the highest-value targets, so MFA is not optional for them. Emergency access is a design problem: sealed credentials, close monitoring and review after use give speed without leaving a standing gap. Exam tip (Identity and Access Management (IAM)): fix the exception path, do not exempt the account.",
+   "incorrect": {
+    "A": "The most powerful accounts most need strong authentication. Speed comes from a break-glass process, not an exemption.",
+    "B": "Kestrel cannot rely on another organization's controls for access to its own systems, and the account has no end date either.",
+    "C": "The agreed charter target is 100%, and the gap sits on two of the accounts with the widest reach."
+   },
+   "artifactKey": "r2-privileged-account-process"
+  },
+  {
+   "id": "q-cissp-16",
+   "certification": "CISSP",
+   "domain": "Identity and Access Management (IAM) · Manage the identity and access provisioning lifecycle",
+   "prompt": "Olivia Grant (E-014, agency nurse, contract ended 2026-08-31) and E-027 (terminated 2026-08-14) still have enabled accounts. Access review AR-003 decided Remove for E-014 on 2026-09-25, but nothing changed. Which control fixes the cause?",
+   "options": [
+    [
+     "A",
+     "Run access reviews monthly instead of quarterly."
+    ],
+    [
+     "B",
+     "Disable accounts automatically from authoritative end dates (HR leaver events for employees, contract end dates for agency and vendor workers), with a daily report of enabled accounts that have no active HR or contract record."
+    ],
+    [
+     "C",
+     "Ask managers to email the service desk whenever someone leaves."
+    ],
+    [
+     "D",
+     "Disable any account with no sign-in for 90 days."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "The joiner-mover-leaver lifecycle should be driven by the authoritative source of employment, not by someone remembering. Automation removes access on the end date, the daily report catches anything the feed misses, and the two accounts still need disabling by hand today.",
+   "incorrect": {
+    "A": "Reviews detect problems after the fact, and AR-003 shows a review decision that was never acted on.",
+    "C": "A manual step is the gap that already failed twice.",
+    "D": "A dormancy rule helps, but it leaves a leaver's account usable for up to 90 days and does not fix the missing trigger."
+   },
+   "artifactKey": "r2-joiner-mover-leaver-workflow"
+  },
+  {
+   "id": "q-cissp-17",
+   "certification": "CISSP",
+   "domain": "Security Assessment and Testing · Analyze test output and generate reports",
+   "prompt": "Both Clinical Information System restore tests failed against the 4-hour RTO: CT-001 took 9.0 hours and CT-002 took 13.5 hours (2025-08-14, the last test, with an out-of-date runbook). The backup job BK-A001-DAILY runs every day. Marcus Bell suggests reporting the backup control as effective. How should the results be reported?",
+   "options": [
+    [
+     "A",
+     "Report it as effective, because the daily backup job runs."
+    ],
+    [
+     "B",
+     "Change the RTO to 14 hours so that the next test passes."
+    ],
+    [
+     "C",
+     "Report the recovery control as failed against the business's 4-hour RTO, with the evidence, to the risk owner, and track the runbook and rebuild fixes to a dated retest."
+    ],
+    [
+     "D",
+     "Report the average of the two tests, 11.25 hours, as an improving trend."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "The report must state the result against the agreed objective and go to the person who owns the risk (R-04, Daniel Osei). The last test was 413 days before 2026-10-01, so the retest in schedule task 22 matters. Exam tip (Security Assessment and Testing): a test is judged against its expected result, not against how busy the control looks.",
+   "incorrect": {
+    "A": "A backup job shows that data was copied, not that the service can be restored in time.",
+    "B": "The RTO comes from the business impact analysis and belongs to the business. IT cannot lower the bar to fit current capability.",
+    "D": "The later test was slower, not faster, and averaging hides that both failed."
+   },
+   "artifactKey": "r3-control-testing-plan"
+  },
+  {
+   "id": "q-cissp-18",
+   "certification": "CISSP",
+   "domain": "Security Assessment and Testing · Collect security process data",
+   "prompt": "While testing the Q3 access review control, you find AR-006 recorded as completed on 2026-08-28, although it was assigned on 2026-09-01. How should you treat it?",
+   "options": [
+    [
+     "A",
+     "Treat it as not validly completed, record it as an exception in the test results, have the review done again, and find out how the date was recorded."
+    ],
+    [
+     "B",
+     "Accept it, because a Keep decision is recorded."
+    ],
+    [
+     "C",
+     "Change the completed date to 2026-09-01 so the record is valid."
+    ],
+    [
+     "D",
+     "Remove AR-006 from the test population."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Evidence must be reliable and complete. AR-006 counts as one of the six overdue reviews, and the exception shows a process gap the workflow should prevent, such as allowing completion before assignment. Exam tip (Security Assessment and Testing): exceptions stay in the population and are reported.",
+   "incorrect": {
+    "B": "A decision dated before the review existed is not reliable evidence that a review happened.",
+    "C": "A tester never alters evidence. That would hide a control failure.",
+    "D": "Dropping awkward items biases the result. Exceptions stay in and are reported."
+   },
+   "artifactKey": "r2-quarterly-access-review-workflow"
+  },
+  {
+   "id": "q-cissp-19",
+   "certification": "CISSP",
+   "domain": "Security Assessment and Testing · Conduct or facilitate security audits",
+   "prompt": "The vendor register shows no assurance report for ClearPath Staffing (V-03), and Lumen Analytics Partners' (V-05) latest is dated 2025-06-30, more than 12 months before 2026-10-01. Which evidence best shows that a supplier's controls actually operated over time?",
+   "options": [
+    [
+     "A",
+     "A SOC 2 Type I report."
+    ],
+    [
+     "B",
+     "A security questionnaire the supplier completes about itself."
+    ],
+    [
+     "C",
+     "A signed letter from the supplier's account manager stating that it is secure."
+    ],
+    [
+     "D",
+     "A current SOC 2 Type II report that covers the services Kestrel uses, reviewed for exceptions and for the controls Kestrel itself must run."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A Type II report gives an independent auditor's opinion on whether controls operated across a period, not just whether they were designed well. Check that its scope covers the service Kestrel buys, follow up any exceptions it lists, and make sure Kestrel runs the controls the report expects of customers.",
+   "incorrect": {
+    "A": "Type I describes control design at a point in time. It does not test whether controls operated over a period.",
+    "B": "Self-assessment helps with scoping but is not independent evidence.",
+    "C": "A statement is an assertion, not tested evidence."
+   },
+   "artifactKey": "r3-supplier-and-software-risk-assessment"
+  },
+  {
+   "id": "q-cissp-20",
+   "certification": "CISSP",
+   "domain": "Security Operations · Conduct incident management",
+   "prompt": "At 03:05 on 2026-08-11, Sam Okafor confirms ransomware precursor activity (SEC-004) on several Virtual Desktop Service (A-008) hosts. Clinicians use these desktops to reach the Clinical Information System. What should happen first?",
+   "options": [
+    [
+     "A",
+     "Power off every virtual desktop host at once."
+    ],
+    [
+     "B",
+     "Isolate the affected hosts from the network while keeping them powered on for evidence, start downtime procedures for the clinical areas that lose desktops, and notify the incident lead under the ransomware playbook."
+    ],
+    [
+     "C",
+     "Restore the affected hosts from last night's backup straight away."
+    ],
+    [
+     "D",
+     "Wait until 08:00 so the vendor can confirm the finding."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Containment comes first and should be targeted: isolation stops the spread but keeps evidence. Because the desktops are how clinicians reach patient records, containment and downtime procedures go together, so patient safety is protected while the threat is stopped. SEC-004 was contained at 05:45. Exam tip (Security Operations): contain before you eradicate or recover.",
+   "incorrect": {
+    "A": "Shutting everything down destroys volatile evidence and cuts off every clinical area, not just the affected ones.",
+    "C": "Restoring before scoping and eradication can let the attacker straight back in, and it wipes evidence.",
+    "D": "Precursor activity often comes shortly before encryption. Waiting gives the attacker hours."
+   },
+   "artifactKey": "r3-ransomware-response-playbook"
+  },
+  {
+   "id": "q-cissp-21",
+   "certification": "CISSP",
+   "domain": "Security Operations · Apply patch and vulnerability management",
+   "prompt": "Open findings on 2026-10-01 include SEC-012 (High, CVSS 8.1, missing patch on the Clinical Information System, tier 1, past due), SEC-017 (Critical remote code execution on PACS, tier 2, recorded CVSS 11.5, past due) and SEC-018 (Low, CVSS 3.7, weak cipher on the IT Service Management Platform). What is the best basis for the remediation order?",
+   "options": [
+    [
+     "A",
+     "Sort by the recorded CVSS score, highest first."
+    ],
+    [
+     "B",
+     "Fix the oldest finding first."
+    ],
+    [
+     "C",
+     "Rank by risk: severity and exploitability together with the asset's tier, its exposure and the impact on patient care, treating SEC-017 as Critical until it is rescored."
+    ],
+    [
+     "D",
+     "Fix the quick, low-risk items first to cut the open count."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "CVSS measures technical severity, but risk also depends on what the asset does and how exposed it is. A tier 1 clinical system and a Critical remote code execution finding come before a Low cipher issue. A bad score must not make a Critical finding disappear, which is why DQ-05 keeps SEC-017 on the open-risk list.",
+   "incorrect": {
+    "A": "A CVSS base score cannot exceed 10.0, so 11.5 is a data error, and base scores ignore Kestrel's asset criticality and exposure.",
+    "B": "Age matters for due dates, but it says nothing about which finding could hurt patients most.",
+    "D": "Closing easy findings improves a metric while the critical exposures stay open."
+   },
+   "artifactKey": "r3-vulnerability-remediation-plan"
+  },
+  {
+   "id": "q-cissp-22",
+   "certification": "CISSP",
+   "domain": "Security Operations · Conduct logging and monitoring activities",
+   "prompt": "Kevin Park administers the Identity Directory (A-007) and also its audit logs, which record his own administrator actions. Which design best makes those logs trustworthy for investigations?",
+   "options": [
+    [
+     "A",
+     "Forward the logs as they are written to a central log platform that Kevin cannot change or delete, keep time synchronized across all sources, and give log administration to security."
+    ],
+    [
+     "B",
+     "Have Kevin review his own logs weekly and sign them off."
+    ],
+    [
+     "C",
+     "Increase log retention on the directory servers."
+    ],
+    [
+     "D",
+     "Stop logging routine administrator actions to reduce noise."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Logs are evidence only if their integrity is protected from the people they record. Central collection, restricted write access and synchronized time make events reliable and easy to correlate across systems. Exam tip (Security Operations): separate log administration from system administration.",
+   "incorrect": {
+    "B": "Self-review is not independent, and the person reviewed can edit the evidence.",
+    "C": "Longer retention keeps logs that the administrator can still alter.",
+    "D": "Administrator actions are the events investigators most need."
+   },
+   "artifactKey": "r3-network-segmentation-and-logging-design"
+  },
+  {
+   "id": "q-cissp-23",
+   "certification": "CISSP",
+   "domain": "Software Development Security · Assess the security impact of acquired software",
+   "prompt": "Janelle Cardinal wants to buy a bed-board mobile app from a small vendor. It would read bed status from the Bed Management System (A-006) and show it on nurses' phones. What should Kestrel require before buying?",
+   "options": [
+    [
+     "A",
+     "Buy it if other hospitals already use it."
+    ],
+    [
+     "B",
+     "Scan the installer with antivirus before it is deployed."
+    ],
+    [
+     "C",
+     "Leave security to the vendor and approve the price."
+    ],
+    [
+     "D",
+     "Assess the vendor's secure development and vulnerability handling, write security and privacy requirements into the contract, complete the privacy review, and test the app in Kestrel's environment before production."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Acquired software brings the supplier's development practices into your environment. Evidence of secure development, contract commitments on patching and breach reporting, and testing before go-live let Kestrel decide on facts. As custodian, Kestrel stays responsible for the health information the app touches. Exam tip (Software Development Security): acquired software gets assessed like software you build.",
+   "incorrect": {
+    "A": "Popularity is not assurance, and other hospitals' risk decisions do not cover Kestrel's data or network.",
+    "B": "An antivirus scan finds known malware, not insecure design, weak data handling or slow patching.",
+    "C": "As custodian, Kestrel stays responsible for the health information the app handles."
+   },
+   "artifactKey": "r3-supplier-and-software-risk-assessment"
+  },
+  {
+   "id": "q-cissp-24",
+   "certification": "CISSP",
+   "domain": "Software Development Security · Integrate security in the software development lifecycle",
+   "prompt": "Kevin Park wrote the script that reads HR leaver events and disables accounts in the Identity Directory. He tested it on his own account and wants to deploy it to production himself today, because missed leavers are urgent. What is the best response?",
+   "options": [
+    [
+     "A",
+     "Deploy today, because missed leavers are a bigger risk than an untested script."
+    ],
+    [
+     "B",
+     "Have the code peer-reviewed, test it outside production with leaver, mover and failure cases (such as a late or malformed HR file), and deploy it through change control by someone other than the author."
+    ],
+    [
+     "C",
+     "Deploy today and add logging to the script later."
+    ],
+    [
+     "D",
+     "Ask Kevin to approve his own test results in writing."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Security belongs in every step of the development lifecycle: requirements, review, testing and controlled release. An identity script can disable many accounts at once, so failure cases matter as much as the normal case. Separating author and deployer stops one person controlling the whole change. Exam tip (Software Development Security): urgency changes the schedule, not the controls.",
+   "incorrect": {
+    "A": "A faulty script could disable clinicians' accounts during care. The urgent fix for E-014 and E-027 is to disable those two accounts by hand today.",
+    "C": "Logging added afterwards does not prevent a bad deployment.",
+    "D": "Self-approval is the segregation-of-duties problem Beacon is trying to remove."
+   },
+   "artifactKey": "r2-user-acceptance-test-scripts"
+  },
+  {
+   "id": "q-x-09",
+   "certification": "Intersection",
+   "domain": "PMP Plan and manage schedule · CISSP Legal, regulatory and compliance",
+   "prompt": "Suppose the privacy impact assessment had slipped. On 2026-10-01 the programme register shows WP-102 (privacy impact assessment and threat model) at 90% complete against 100% planned, and schedule task 4, Complete privacy impact assessment, has zero total float. Dr. Helen Marchetti suggests starting the production data pipeline from the clinical systems now and submitting the assessment after go-live, to protect the 2026-10-23 go-live gate. What should you do as Programme Manager?",
+   "options": [
+    [
+     "A",
+     "Agree, and submit the assessment after go-live, because the delay is small."
+    ],
+    [
+     "B",
+     "Move the go-live gate quietly and tell stakeholders once the assessment is done."
+    ],
+    [
+     "C",
+     "Keep identifying data out of production until the assessment has been submitted to the Commissioner, let model work continue on test data, and take the schedule impact and recovery options to change control."
+    ],
+    [
+     "D",
+     "Take task 4 off the critical path by deleting its links in Microsoft Project."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Task 4 is on the critical path, so its delay threatens the gate unless time is recovered elsewhere. The answer combines PMP judgment (assess the impact and decide through change control) with the privacy duty in section 64 of the Health Information Act (no implementation before the Commissioner has the assessment). Building on synthetic or de-identified test data keeps work moving without breaking the law.",
+   "incorrect": {
+    "A": "Section 64 requires submission before implementation. A sponsor cannot waive a legal duty.",
+    "B": "Silent baseline changes break governance. The board and the sponsor must see the impact and decide.",
+    "D": "Deleting links hides the dependency on paper, but the work still depends on it."
+   },
+   "artifactKey": "r1-microsoft-project-schedule"
+  },
+  {
+   "id": "q-x-10",
+   "certification": "Intersection",
+   "domain": "PL-300 Model the data · Kestrel small-count rule · Quality testing",
+   "prompt": "D-02 approved go-live on condition that small-count suppression for PGH is verified in the RLS test pack. A new page for a regional planning group, outside the care team, shows ED visits by site and disposition in a matrix with totals, using the shared measure from the report specification:\n\n```\nED Visits (Shared) =\nVAR Visits = [ED Visits]\nRETURN\n    IF ( ISBLANK ( Visits ), BLANK (), IF ( Visits < 5, \"<5\", FORMAT ( Visits, \"#,0\" ) ) )\n```\n\nPGH's Admitted cell (4) shows \"<5\". The Admitted column shows KGH 31, ARH 15, CVH 9 and a total of 59. What problem remains, and what is the fix?",
+   "options": [
+    [
+     "A",
+     "The total is calculated from unsuppressed counts, so 59 - 31 - 15 - 9 reveals PGH's 4. Also suppress a second cell or the total wherever one suppressed cell could be worked out, and add a subtraction test to the RLS test pack."
+    ],
+    [
+     "B",
+     "Nothing remains, because the measure shows every count under 5 as \"<5\"."
+    ],
+    [
+     "C",
+     "Show a blank instead of \"<5\" so readers cannot tell that a value exists."
+    ],
+    [
+     "D",
+     "Rely on RLS, because the planning group cannot open PGH's site page."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Small-count suppression is a Kestrel policy, not a law, but D-02 made it a go-live condition. Primary suppression hides small cells; complementary suppression hides enough other cells or totals that no hidden cell can be recalculated. The PGH figures come from the cleaned Q3 data (Admitted 4, Discharged 40, LWBS 2, Transferred 9). A good test tries the subtraction, not just a check that small cells show \"<5\".",
+   "incorrect": {
+    "B": "Each small cell is hidden, but the totals still let anyone recalculate it by subtraction.",
+    "C": "A blank does not stop the subtraction. PGH's 4 can still be worked out from the column total.",
+    "D": "RLS decides which sites a user may see. It does not stop small counts appearing on a page the user is allowed to open."
+   },
+   "artifactKey": "r1-rls-test-pack"
+  },
+  {
+   "id": "q-x-11",
+   "certification": "Intersection",
+   "domain": "PL-300 Secure and govern · CISSP IAM · ITIL Service request",
+   "prompt": "Mei Tanaka (E-013, Clinical Analyst at CVH) holds \"view all sites\" on the Beacon semantic model (A-009), granted by Tomás Rivera on 2026-08-24. On A-009, the Clinical Analyst role allows only \"view site dashboards\" and \"build\". Mei says she needs all sites to check reconciliation. What is the best action?",
+   "options": [
+    [
+     "A",
+     "Keep it, because analysts need broad access to do their jobs."
+    ],
+    [
+     "B",
+     "Make her a workspace Member so RLS no longer limits her."
+    ],
+    [
+     "C",
+     "Ask Tomás to confirm the grant, since he gave it."
+    ],
+    [
+     "D",
+     "Treat it as an excess grant: remove it or, if the need is real, raise an access request for a time-bound exception that the model's business owner approves as risk owner, and update her RLS role membership and the test pack to match."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Least privilege (CISSP Identity and Access Management) says access follows the role unless an approved exception exists. The service desk request route (ITIL) records the request, approval and expiry, and RLS role membership in Power BI makes the decision real. Her reconciliation need may be met another way, such as a review session with an analyst who already holds all-site access.",
+   "incorrect": {
+    "A": "Need must be shown and approved. Kestrel's role matrix sets least privilege for analysts.",
+    "B": "That removes the RLS boundary completely and adds edit rights, which widens the problem.",
+    "C": "The person who granted access cannot independently approve it. The system's business owner approves an exception as risk owner."
+   },
+   "artifactKey": "r2-access-exception-process"
+  },
+  {
+   "id": "q-x-12",
+   "certification": "Intersection",
+   "domain": "PL-300 Model the data · CISSP Security Operations",
+   "prompt": "You are building the security-operations dashboard. SEC-008's contained time is earlier than its detected time, an impossible sequence. SEC-009 is contained but not yet recovered. How should the incident count, MTTD and MTTR measures handle these records?",
+   "options": [
+    [
+     "A",
+     "Delete SEC-008 from the table so every measure is clean."
+    ],
+    [
+     "B",
+     "Count both in the 10 incidents; leave SEC-008 out of MTTD, MTTC and MTTR until the SOC liaison confirms the true times; leave SEC-009 out of MTTR only; and show n beside each mean (MTTD 25.29 hours, n = 9; MTTR 28.33 hours, n = 8)."
+    ],
+    [
+     "C",
+     "Swap SEC-008's detected and contained times so the sequence works."
+    ],
+    [
+     "D",
+     "Treat SEC-009's missing recovery time as zero hours."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "A measure must follow stated rules: records with untrustworthy timestamps stay in counts but not in durations, and unfinished incidents stay out of the measure they cannot yet support. Showing n tells Daniel Osei how many incidents each mean rests on, which matters with only 10 incidents in a quarter.",
+   "incorrect": {
+    "A": "SEC-008 was a real incident. Deleting it understates the incident count and destroys evidence.",
+    "C": "That invents data. Only the SOC can say which time is wrong.",
+    "D": "Zero would pull MTTR down for an incident that has not been recovered."
+   },
+   "artifactKey": "r3-security-operations-dashboard"
+  },
+  {
+   "id": "q-x-13",
+   "certification": "Intersection",
+   "domain": "PMP Manage project closure · CISSP Security and Risk Management",
+   "prompt": "At programme closure, suppose the restore retest in task 22 still misses the Clinical Information System's 4-hour RTO, and the fix needs a hardware purchase after Beacon ends. Risk R-04 is still open. What is the best way to deal with it at closure?",
+   "options": [
+    [
+     "A",
+     "Close R-04, because the programme is ending."
+    ],
+    [
+     "B",
+     "Have Dr. Helen Marchetti, the CIS business owner and sponsor, formally accept or reject the residual risk on Daniel Osei's advice, record it in the residual risk register with compensating measures and a review date, and hand the fix to an operational owner in the closure report."
+    ],
+    [
+     "C",
+     "Have Daniel Osei accept the risk, because he is the security owner."
+    ],
+    [
+     "D",
+     "Have Kevin Park accept it, because he is the CIS custodian."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Risk acceptance is a management decision by the accountable business owner, made with security advice and recorded with conditions. PMP closure hands open risks to operational owners, and CISSP expects explicit, owned acceptance. Tested downtime procedures are the obvious compensating measure while the restore cannot meet its target.",
+   "incorrect": {
+    "A": "Closing the programme does not close the risk. It moves to operations with an owner.",
+    "C": "Daniel owns R-04 in the RAID log and advises on acceptance, but the business owner who lives with the impact makes the decision.",
+    "D": "Custodians run controls. They do not accept risk on behalf of the business."
+   },
+   "artifactKey": "r3-residual-risk-register"
+  },
+  {
+   "id": "q-x-14",
+   "certification": "Intersection",
+   "domain": "ITIL Incident and problem management · CISSP Security Operations",
+   "prompt": "The Virtual Desktop Service (A-008) had three security incidents in Q3: SEC-002 (malware, July), SEC-004 (ransomware precursor, August) and SEC-008 (malware, September). Each was closed once service was restored. What should happen next?",
+   "options": [
+    [
+     "A",
+     "Reopen SEC-004 and keep it open until the cause is found."
+    ],
+    [
+     "B",
+     "Rebuild every desktop host again without further analysis."
+    ],
+    [
+     "C",
+     "Nothing more, because each incident was closed after service was restored."
+    ],
+    [
+     "D",
+     "Open a problem record for the recurring desktop incidents, run a blameless post-incident review of SEC-004, and track corrective actions with owners and due dates."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "In ITIL, incident management restores normal service quickly, while problem management reduces the likelihood and impact of incidents by finding their causes. In CISSP Security Operations, lessons learned is the last phase of incident response. Together they turn three incidents into owned fixes such as segmentation and patching.",
+   "incorrect": {
+    "A": "Incident management restores service; cause analysis belongs to problem management. Mixing them distorts incident measures.",
+    "B": "Rebuilding without knowing the cause invites a fourth incident.",
+    "C": "Repeated incidents on one service are a sign that a cause remains."
+   },
+   "artifactKey": "r3-incident-and-problem-management-workflow"
+  },
+  {
+   "id": "q-x-15",
+   "certification": "Intersection",
+   "domain": "PMP Manage conflicts · ITIL Change control · CISSP Communication and Network Security",
+   "prompt": "In week 9, Tomás Rivera wants the firewall change that the on-premises data gateway needs made this week, to protect the refresh schedule. Ahmed Haddad refuses until a later window because the change touches the clinical network. Both escalate to you. What should you do?",
+   "options": [
+    [
+     "A",
+     "Bring them together in a facilitated session to agree the risk and the need, then raise the firewall change through change control with a risk assessment, test and back-out plan, scheduled in an agreed change window."
+    ],
+    [
+     "B",
+     "Tell Ahmed to make the change now, because the schedule comes first."
+    ],
+    [
+     "C",
+     "Escalate straight to Marcus Bell and let him decide."
+    ],
+    [
+     "D",
+     "Give Tomás temporary firewall rights so he can make the change himself."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "The PMP answer is collaborative problem-solving, the ITIL answer is the change practice, which balances speed and risk, and the CISSP answer protects the clinical network. An agreed change window meets all three, which is how Beacon resolved this conflict.",
+   "incorrect": {
+    "B": "Forcing ends the argument but risks the clinical network and the team's trust.",
+    "C": "Escalation is for conflicts the team cannot resolve. Try collaboration first.",
+    "D": "That bypasses change control and segregation of duties on a clinical network."
+   },
+   "artifactKey": "r2-team-charter-and-conflict-record"
+  },
+  {
+   "id": "q-x-16",
+   "certification": "Intersection",
+   "domain": "PMP Help ensure knowledge transfer · PL-300 Model documentation · ITIL Support",
+   "prompt": "R-07: Lumen Analytics Partners' (V-05) contract ends 2026-11-30, before the Release 3 dashboards. R-06: only Tomás Rivera understands the semantic model. What is the best response?",
+   "options": [
+    [
+     "A",
+     "Extend Lumen's contract with no end date."
+    ],
+    [
+     "B",
+     "Ask Tomás to work extra hours to cover the gap."
+    ],
+    [
+     "C",
+     "Plan knowledge transfer now: finish the DAX catalogue and model design documents, keep the model and report files in Kestrel's own source control, pair Mei Tanaka with Lumen and Tomás on real changes, and make handover an acceptance condition before the contract ends."
+    ],
+    [
+     "D",
+     "Deal with it when Release 3 starts."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Knowledge transfer (PMP) needs time, documentation and practice before people leave. Documented measures and model design (PL-300) let a second analyst maintain the model, and the service desk gets knowledge it can use (ITIL). Making handover an acceptance condition uses the contract while it still exists.",
+   "incorrect": {
+    "A": "It defers the risk and adds cost while CPI is 0.89.",
+    "B": "That deepens the key-person dependency instead of reducing it.",
+    "D": "By then the contract has ended and the knowledge has left with Lumen."
+   },
+   "artifactKey": "r1-raid-log"
+  }
+ ]
+}

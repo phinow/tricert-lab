@@ -1,0 +1,172 @@
+employee_id,system_id,permission,granted_date,granted_by
+E-001,A-007,approve access,2019-04-02,E-009
+E-001,A-009,view all sites,2026-08-24,E-006
+E-001,A-013,email,2019-04-03,E-032
+E-002,A-007,approve access,2021-01-16,E-009
+E-002,A-009,view all sites,2026-08-24,E-006
+E-002,A-013,email,2021-01-14,E-032
+E-003,A-007,approve access,2020-06-16,E-009
+E-003,A-009,view all sites,2026-08-18,E-006
+E-003,A-013,email,2020-06-20,E-032
+E-004,A-007,approve access,2022-02-09,E-009
+E-004,A-009,view all sites,2026-08-24,E-006
+E-004,A-013,email,2022-02-08,E-032
+E-005,A-007,reset passwords,2018-09-06,E-009
+E-005,A-011,manage tickets,2018-09-05,E-032
+E-005,A-013,email,2018-09-08,E-032
+E-006,A-009,build,2026-08-24,E-008
+E-006,A-009,view site dashboards,2026-08-27,E-008
+E-006,A-010,query de-identified data,2020-10-23,E-009
+E-006,A-013,email,2020-10-23,E-032
+E-007,A-001,document care,2017-07-04,E-009
+E-007,A-001,order entry,2017-07-05,E-009
+E-007,A-001,view chart,2017-07-05,E-009
+E-007,A-002,view tracking board,2017-07-04,E-009
+E-007,A-008,virtual desktop access,2017-07-04,E-009
+E-007,A-009,view site dashboards,2026-08-17,E-006
+E-007,A-013,email,2017-07-05,E-032
+E-008,A-007,approve access,2021-05-05,E-009
+E-008,A-009,view all sites,2026-08-21,E-006
+E-008,A-013,email,2021-05-08,E-032
+E-009,A-007,administer audit logs,2026-02-17,E-009
+E-009,A-007,approve access,2025-11-03,E-009
+E-009,A-007,provision accounts,2016-03-16,E-002
+E-009,A-008,administer virtual desktops,2016-03-19,E-002
+E-009,A-013,email,2016-03-19,E-032
+E-010,A-001,document care,2019-11-28,E-009
+E-010,A-001,view chart,2019-11-29,E-009
+E-010,A-002,view tracking board,2019-11-28,E-009
+E-010,A-008,virtual desktop access,2019-11-26,E-009
+E-010,A-013,email,2019-11-29,E-032
+E-011,A-001,view chart,2023-01-12,E-009
+E-011,A-006,update bed status,2023-01-12,E-009
+E-011,A-008,virtual desktop access,2023-01-12,E-009
+E-011,A-013,email,2023-01-11,E-032
+E-012,A-001,document care,2022-09-01,E-009
+E-012,A-001,order entry,2022-09-02,E-009
+E-012,A-001,view chart,2022-08-31,E-009
+E-012,A-002,view tracking board,2022-08-30,E-009
+E-012,A-008,virtual desktop access,2022-09-03,E-009
+E-012,A-009,view site dashboards,2026-08-21,E-006
+E-012,A-013,email,2022-08-30,E-032
+E-013,A-009,build,2026-08-23,E-006
+E-013,A-009,view all sites,2026-08-24,E-006
+E-013,A-009,view site dashboards,2026-08-17,E-006
+E-013,A-010,query de-identified data,2024-04-20,E-009
+E-013,A-013,email,2024-04-16,E-032
+E-014,A-001,document care,2026-06-04,E-009
+E-014,A-001,order entry,2026-06-15,E-009
+E-014,A-001,view chart,2026-06-06,E-009
+E-014,A-008,virtual desktop access,2026-06-04,E-009
+E-015,A-001,remote support,2025-02-07,E-009
+E-015,A-001,view chart,2025-06-09,E-009
+E-016,A-011,submit tickets,2023-06-13,E-032
+E-016,A-013,email,2023-06-13,E-032
+E-017,A-007,provision accounts,2019-02-23,E-009
+E-017,A-008,administer virtual desktops,2019-02-20,E-009
+E-017,A-013,email,2019-02-23,E-032
+E-018,A-011,submit tickets,2021-09-11,E-032
+E-018,A-013,email,2021-09-11,E-032
+E-019,A-011,submit tickets,2026-08-27,E-032
+E-019,A-013,email,2026-08-28,E-032
+E-020,A-007,administer audit logs,2022-11-15,E-009
+E-020,A-011,manage tickets,2022-11-16,E-032
+E-020,A-013,email,2022-11-15,E-032
+E-021,A-001,document care,2015-05-08,E-009
+E-021,A-001,view chart,2015-05-09,E-009
+E-021,A-002,view tracking board,2015-05-08,E-009
+E-021,A-008,virtual desktop access,2015-05-08,E-009
+E-021,A-013,email,2015-05-07,E-032
+E-022,A-001,document care,2018-01-18,E-009
+E-022,A-001,view chart,2018-01-17,E-009
+E-022,A-002,view tracking board,2018-01-18,E-009
+E-022,A-008,virtual desktop access,2018-01-19,E-009
+E-022,A-013,email,2018-01-17,E-032
+E-023,A-001,document care,2017-10-06,E-009
+E-023,A-001,view chart,2017-10-07,E-009
+E-023,A-002,view tracking board,2017-10-07,E-009
+E-023,A-008,virtual desktop access,2017-10-03,E-009
+E-023,A-013,email,2017-10-03,E-032
+E-024,A-001,document care,2016-04-16,E-009
+E-024,A-001,view chart,2016-04-15,E-009
+E-024,A-002,view tracking board,2016-04-16,E-009
+E-024,A-008,virtual desktop access,2016-04-13,E-009
+E-024,A-013,email,2016-04-16,E-032
+E-025,A-001,document care,2020-03-06,E-009
+E-025,A-001,view chart,2020-03-04,E-009
+E-025,A-002,view tracking board,2020-03-05,E-009
+E-025,A-008,virtual desktop access,2020-03-05,E-009
+E-025,A-013,email,2020-03-04,E-032
+E-026,A-007,approve access,2019-08-20,E-009
+E-026,A-009,view all sites,2026-08-22,E-006
+E-026,A-013,email,2019-08-21,E-032
+E-027,A-001,document care,2021-04-02,E-009
+E-027,A-001,view chart,2021-04-02,E-009
+E-027,A-002,view tracking board,2021-04-01,E-009
+E-027,A-008,virtual desktop access,2021-04-03,E-009
+E-027,A-013,email,2021-03-31,E-032
+E-028,A-001,view chart,2022-03-16,E-009
+E-028,A-006,update bed status,2022-03-18,E-009
+E-028,A-008,virtual desktop access,2022-03-15,E-009
+E-028,A-009,build,2026-08-20,E-006
+E-028,A-009,view site dashboards,2026-08-26,E-006
+E-028,A-010,query de-identified data,2026-08-21,E-009
+E-028,A-013,email,2022-03-19,E-032
+E-029,A-001,document care,2023-07-06,E-009
+E-029,A-001,order entry,2023-07-08,E-009
+E-029,A-001,view chart,2023-07-06,E-009
+E-029,A-002,view tracking board,2023-07-05,E-009
+E-029,A-008,virtual desktop access,2023-07-07,E-009
+E-029,A-009,view site dashboards,2026-08-21,E-006
+E-029,A-013,email,2023-07-07,E-032
+E-030,A-001,document care,2022-06-01,E-009
+E-030,A-001,view chart,2022-05-31,E-009
+E-030,A-002,view tracking board,2022-06-02,E-009
+E-030,A-008,virtual desktop access,2022-06-04,E-009
+E-030,A-013,email,2022-05-31,E-032
+E-031,A-007,reset passwords,2024-09-06,E-009
+E-031,A-011,manage tickets,2024-09-04,E-032
+E-031,A-013,email,2024-09-06,E-032
+E-032,A-007,reset passwords,2023-03-02,E-009
+E-032,A-011,manage tickets,2023-03-01,E-005
+E-032,A-013,email,2023-03-02,E-005
+E-033,A-007,provision accounts,2020-07-15,E-009
+E-033,A-008,administer virtual desktops,2020-07-16,E-009
+E-033,A-013,email,2020-07-17,E-032
+E-034,A-001,document care,2021-11-09,E-009
+E-034,A-001,view chart,2021-11-09,E-009
+E-034,A-002,view tracking board,2021-11-10,E-009
+E-034,A-008,virtual desktop access,2021-11-11,E-009
+E-034,A-013,email,2021-11-11,E-032
+E-035,A-001,document care,2026-07-08,E-009
+E-035,A-001,view chart,2026-07-10,E-009
+E-035,A-008,virtual desktop access,2026-07-11,E-009
+E-036,A-001,document care,2018-06-29,E-009
+E-036,A-001,order entry,2018-06-29,E-009
+E-036,A-001,view chart,2018-06-26,E-009
+E-036,A-002,view tracking board,2018-06-26,E-009
+E-036,A-008,virtual desktop access,2018-06-28,E-009
+E-036,A-009,view site dashboards,2026-08-19,E-006
+E-036,A-013,email,2018-06-27,E-032
+E-037,A-001,view chart,2024-02-16,E-009
+E-037,A-006,update bed status,2024-02-13,E-009
+E-037,A-008,virtual desktop access,2024-02-13,E-009
+E-037,A-013,email,2024-02-14,E-032
+E-038,A-001,document care,2019-09-19,E-009
+E-038,A-001,view chart,2019-09-18,E-009
+E-038,A-002,view tracking board,2019-09-21,E-009
+E-038,A-008,virtual desktop access,2019-09-20,E-009
+E-038,A-013,email,2019-09-17,E-032
+E-039,A-012,remote support,2026-01-08,E-009
+E-040,A-001,document care,2020-02-05,E-009
+E-040,A-001,view chart,2020-02-06,E-009
+E-040,A-002,view tracking board,2020-02-07,E-009
+E-040,A-008,virtual desktop access,2020-02-07,E-009
+E-040,A-013,email,2020-02-08,E-032
+E-041,A-001,document care,2021-04-21,E-009
+E-041,A-001,order entry,2021-04-21,E-009
+E-041,A-001,view chart,2021-04-21,E-009
+E-041,A-002,view tracking board,2021-04-21,E-009
+E-041,A-008,virtual desktop access,2021-04-20,E-009
+E-041,A-009,view site dashboards,2026-08-18,E-006
+E-041,A-013,email,2021-04-20,E-032

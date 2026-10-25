@@ -1,0 +1,1797 @@
+{
+ "type": "questions",
+ "items": [
+  {
+   "id": "q-pmp-01",
+   "certification": "PMP",
+   "domain": "People · Develop a common vision",
+   "prompt": "It is the first week of Project Beacon and the charter is approved (D-01). At the kickoff, Dr. Sarah Whitford calls Beacon \"the emergency wait-time dashboard\", Grace Liu calls it \"a new tool the service desk must support\", and Daniel Osei calls it \"a security clean-up\". Each is planning work around their own version. What should you do first?",
+   "options": [
+    [
+     "A",
+     "Send the approved charter to all three leaders and ask them to base their plans on its objectives and scope sections, since it is signed."
+    ],
+    [
+     "B",
+     "Ask Dr. Helen Marchetti, as sponsor, to email all stakeholders a short statement of Beacon's goal before the next programme meeting."
+    ],
+    [
+     "C",
+     "Run a session with the sponsor and these leaders to agree one shared statement of Beacon's outcome, tied to the charter's success measures."
+    ],
+    [
+     "D",
+     "Let each group keep its own description for now, since every one of the three views matches one of Beacon's three releases and their scope."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "A common vision holds when the people who act on it help shape it. Each leader sees a true part of Beacon. Agreeing one statement with the sponsor, tied to measures such as the Kestrel General Hospital median of 80.5 minutes to physician initial assessment (target 60), gives everyone the same test for later trade-offs.",
+   "incorrect": {
+    "A": "Sending a document is one-way. It does not surface or settle the different readings the leaders already hold.",
+    "B": "An announcement informs people, but it does not build shared understanding or commitment, and each leader's concerns stay hidden.",
+    "D": "Three separate goals invite competing priorities inside one budget, one schedule and one change-control board."
+   },
+   "artifactKey": "r1-programme-charter"
+  },
+  {
+   "id": "q-pmp-02",
+   "certification": "PMP",
+   "domain": "People · Manage conflicts",
+   "prompt": "During Release 2, Tomás Rivera wants the firewall change for the on-premises data gateway made this week so refresh testing can continue. Ahmed Haddad, the network engineer, says it must wait for a later window because the rule touches the network that carries clinical traffic. They have argued in two stand-ups and the team is taking sides. What should you do first?",
+   "options": [
+    [
+     "A",
+     "Meet Tomás and Ahmed together, ask each to explain the need behind his position, and work with them toward an option both can accept."
+    ],
+    [
+     "B",
+     "Decide in Ahmed's favour, because any risk to the network that carries clinical traffic outweighs a delay in testing."
+    ],
+    [
+     "C",
+     "Ask Marcus Bell, the chief information officer, to rule on the timing at the next change-control board meeting, since he chairs the board."
+    ],
+    [
+     "D",
+     "Ask both to settle the matter between themselves outside the stand-up so the rest of the team can keep working."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Collaborating on the underlying problem is the right first step. Tomás needs test data flowing; Ahmed needs the clinical network protected. A facilitated session can find an option that meets both needs. Beacon settled it this way, with an agreed change window recorded in the conflict record.",
+   "incorrect": {
+    "B": "Forcing a decision without exploring the needs may leave the testing problem unsolved and costs trust. The two may find a safe way to make the change sooner.",
+    "C": "Escalation is for conflicts the team cannot resolve. Going straight to the chief information officer skips the step most likely to work and teaches the team to hand problems upward.",
+    "D": "They have already failed to agree in two stand-ups and the team is taking sides. Sending them away without help withdraws you from a conflict that is now hurting the team, and leaving it alone lets it grow."
+   },
+   "artifactKey": "r2-team-charter-and-conflict-record"
+  },
+  {
+   "id": "q-pmp-03",
+   "certification": "PMP",
+   "domain": "People · Lead the project team",
+   "prompt": "The Release 1 report pages are built in two-week iterations by Kestrel analysts and Lumen Analytics Partners consultants. You notice the team waits for you to hand out every task at the daily stand-up, and work stalls on days you are in governance meetings. What is the best action?",
+   "options": [
+    [
+     "A",
+     "Publish a detailed task list at the start of each iteration so the team knows exactly what to do when you are away."
+    ],
+    [
+     "B",
+     "Move the daily stand-up to a time that fits around your governance meetings so you can keep assigning the work."
+    ],
+    [
+     "C",
+     "Ask Tomás Rivera to assign the tasks when you are away, since he knows the semantic model better than anyone else on the release team."
+    ],
+    [
+     "D",
+     "Coach the team to plan each iteration together and pull work from the prioritized backlog, while you focus on clearing what blocks them."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "In an adaptive team the project manager leads as a servant leader. The team owns how it plans and pulls work; you coach, protect its focus and remove impediments. That stops you being the bottleneck and builds the team's ability to work without you.",
+   "incorrect": {
+    "A": "A detailed list still makes you the person who decides the work, so the team never learns to organize itself.",
+    "B": "This keeps you as the bottleneck and keeps the team dependent on you.",
+    "C": "This moves the bottleneck to Tomás, who is already a key-person risk (R-06)."
+   },
+   "artifactKey": "r2-team-charter-and-conflict-record"
+  },
+  {
+   "id": "q-pmp-04",
+   "certification": "PMP",
+   "domain": "People · Engage stakeholders",
+   "prompt": "Emergency physicians at Aspen Ridge Hospital (ARH), including Dr. Liam O'Connor, have not attended any Release 1 requirement sessions. You hear that ARH staff are telling colleagues the dashboards will show \"Kestrel General numbers\" that do not fit their department. What should you do first?",
+   "options": [
+    [
+     "A",
+     "Ask Dr. Sarah Whitford, the emergency medical director at Kestrel General Hospital, to tell ARH physicians that attendance at Beacon sessions is expected."
+    ],
+    [
+     "B",
+     "Meet Dr. O'Connor and ARH emergency leaders to understand their concerns and needs, then update their engagement level and plan in the stakeholder register."
+    ],
+    [
+     "C",
+     "Send ARH the minutes and slides from every requirement session so far, so its physicians can catch up on the decisions already made for them."
+    ],
+    [
+     "D",
+     "Leave the ARH pages out of the first iteration and add them once the Kestrel General pages have proved their worth."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Engagement starts with understanding why a group is disengaged and what it needs. ARH staff fear the dashboards will not reflect their department. Hearing them, recording their current and desired engagement, and acting on it builds support and may surface real requirements, such as site-level views.",
+   "incorrect": {
+    "A": "Pressure from a director at another site may get attendance but not support, and it does nothing about the concern itself.",
+    "C": "Documents are one-way. They do not tell you what ARH needs or why its staff are worried.",
+    "D": "Delaying ARH confirms the fear that Beacon is a Kestrel General product and leaves the concern unaddressed."
+   },
+   "artifactKey": "r1-stakeholder-register"
+  },
+  {
+   "id": "q-pmp-05",
+   "certification": "PMP",
+   "domain": "People · Align stakeholder expectations",
+   "prompt": "The Release 1 team has capacity for one more page in the next iteration. Dr. Sarah Whitford wants the page showing time to physician initial assessment by Canadian Triage and Acuity Scale (CTAS) level. Janelle Cardinal wants the bed occupancy page. Each says hers is essential for go-live. What should you do?",
+   "options": [
+    [
+     "A",
+     "Ask the team and the Lumen consultants to work overtime this iteration so both pages are ready, since both leaders say they are essential."
+    ],
+    [
+     "B",
+     "Choose the page asked for by the more senior of the two leaders, then explain the reasons for the choice to the other leader in writing."
+    ],
+    [
+     "C",
+     "Ask Lumen Analytics Partners to decide the order, since their fixed-price contract covers both pages and they know the build effort best."
+    ],
+    [
+     "D",
+     "Bring both leaders together, with the sponsor if needed, to agree the order against the charter's success measures, and record it."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Aligning expectations means getting stakeholders to agree on priorities when they conflict. A joint session anchored to the agreed success measures makes the trade-off visible, and a recorded decision gives both leaders a shared basis for the order of work.",
+   "incorrect": {
+    "A": "Overtime hides the trade-off instead of resolving it and raises the risk of defects in both pages.",
+    "B": "Seniority is not a value test, and deciding alone leaves the other leader unaligned and likely to resist.",
+    "C": "The supplier delivers the work; it does not own Kestrel's priorities."
+   },
+   "artifactKey": "r1-requirements-and-traceability-register"
+  },
+  {
+   "id": "q-pmp-06",
+   "certification": "PMP",
+   "domain": "People · Manage stakeholder expectations",
+   "prompt": "Two weeks before the Release 1 go-live gate, Janelle Cardinal says she expects the bed dashboard to show occupancy live, minute by minute. The approved scope uses the daily bed census snapshot from the Bed Management System (A-006). What should you do first?",
+   "options": [
+    [
+     "A",
+     "Meet Janelle to review the agreed scope, learn which decisions need fresher data, and raise a change request if a real gap remains."
+    ],
+    [
+     "B",
+     "Promise Janelle live occupancy data in a later release, so that she stays supportive of Beacon through the go-live gate and after."
+    ],
+    [
+     "C",
+     "Ask Tomás Rivera to switch the bed tables to DirectQuery before the gate, so the dashboard shows data much closer to live for her team."
+    ],
+    [
+     "D",
+     "Tell Janelle the request is out of scope and send her the signed scope statement, which clearly shows the daily snapshot she agreed to."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Managing expectations is ongoing work. Start by understanding the need behind the request and showing what was agreed. If a real need is not met, change control is where it is assessed and decided, not a hallway promise or a quiet design change.",
+   "incorrect": {
+    "B": "A promise made without analysis or approval creates an expectation the programme may not be able to meet.",
+    "C": "This is an unapproved design change late in the release, and it cannot make a daily snapshot any more current.",
+    "D": "Being right about scope does not manage the expectation. She still has an unmet need that may matter to patient flow."
+   },
+   "artifactKey": "r1-scope-statement"
+  },
+  {
+   "id": "q-pmp-07",
+   "certification": "PMP",
+   "domain": "People · Help ensure knowledge transfer",
+   "prompt": "Risk R-06 in the RAID log (risks, assumptions, issues and decisions) records a key-person dependency on Tomás Rivera for the semantic model. Mei Tanaka, a clinical analyst, has offered to learn the model. Release 3 will need model changes while Tomás is busy elsewhere. What should you do?",
+   "options": [
+    [
+     "A",
+     "Ask Tomás to write a full manual for the semantic model before the end of Release 2, and give Mei protected time to study it."
+    ],
+    [
+     "B",
+     "Accept R-06, because Tomás is a permanent Kestrel employee and nothing suggests that he is planning to leave the organization."
+    ],
+    [
+     "C",
+     "Pair Mei with Tomás on real model changes, keep the model documents current, and confirm Mei can make and test a change alone."
+    ],
+    [
+     "D",
+     "Add semantic model support to the Lumen Analytics Partners contract so that the dependency moves to an experienced supplier."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Knowledge transfer works best when it combines explicit knowledge, such as the model design and measure catalogue, with tacit knowledge shared by working side by side. Checking that Mei can make and test a change unaided is the evidence that R-06 has really been reduced.",
+   "incorrect": {
+    "A": "Documents help, but much of Tomás's knowledge is tacit. Without practice, Mei may still be unable to make a safe change.",
+    "B": "The risk is about availability as well as departure. Tomás is on many critical tasks, so accepting the risk leaves the bottleneck in place.",
+    "D": "Lumen's contract ends on 2026-11-30 (R-07), so this moves the dependency to a supplier that is leaving."
+   },
+   "artifactKey": "r1-raid-log"
+  },
+  {
+   "id": "q-pmp-08",
+   "certification": "PMP",
+   "domain": "People · Plan and manage communication",
+   "prompt": "Grace Liu, the IT Service Desk Manager, tells you her analysts first heard about the Release 1 go-live date when Aisha Mahmoud, a charge nurse, called to ask how to get dashboard access. The communication plan lists the sponsor, the steering group and clinical leaders, but not the service desk. What should you do?",
+   "options": [
+    [
+     "A",
+     "Send the full weekly status report to every service desk analyst from now on, so that nobody in support misses a Beacon date again."
+    ],
+    [
+     "B",
+     "Brief Grace now, then add the service desk to the communication plan with the content, channel, owner and timing it needs for each release."
+    ],
+    [
+     "C",
+     "Ask Grace to check the RAID log (risks, assumptions, issues and decisions) each week for dates and decisions affecting her team."
+    ],
+    [
+     "D",
+     "Apologize to Grace and ask Aisha to pass on any Beacon updates she hears about to the service desk in future, since she is often in contact."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "The fix has two parts: close the immediate gap and correct the plan. A communication plan matches each audience to the content, channel, owner and timing it needs. The service desk supports the dashboards, so it must hear about each release before users do.",
+   "incorrect": {
+    "A": "More volume is not better communication. The desk needs specific, timely information such as dates, access routes and known issues.",
+    "C": "This puts the burden on the audience, and the RAID log is not built to tell a support team what it must do.",
+    "D": "A frontline nurse is not an owned channel, and the gap in the plan stays open."
+   },
+   "artifactKey": "r1-communication-plan"
+  },
+  {
+   "id": "q-pmp-09",
+   "certification": "PMP",
+   "domain": "Process · Develop an integrated project management plan and plan delivery",
+   "prompt": "You are planning Release 3. The business impact analysis, the restore testing and the downtime procedures follow a fixed order toward a firm programme acceptance date. The security operations dashboard is new to its users, and Sam Okafor expects its measures to change once analysts see real data. Which delivery approach should you plan?",
+   "options": [
+    [
+     "A",
+     "A fully predictive plan, with every dashboard measure fixed and signed off by Sam Okafor before any build work starts, to protect the acceptance date."
+    ],
+    [
+     "B",
+     "A hybrid plan: predictive sequencing for the recovery work and short iterations with user reviews for the dashboard, in one integrated plan."
+    ],
+    [
+     "C",
+     "A fully adaptive plan, so the recovery work can be reprioritized every two weeks in the same way as the dashboard, on one cadence."
+    ],
+    [
+     "D",
+     "Let each team choose its own approach and bring the separate plans together only at the programme acceptance gate in December."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Tailoring means choosing the approach for each part of the work by its uncertainty. Stable, dependent recovery work suits predictive planning; a dashboard whose measures will change suits short iterations with feedback. Both still sit in one integrated plan, one schedule and one change-control process.",
+   "incorrect": {
+    "A": "Fixing uncertain requirements early invites rework and change requests later, which is exactly what Sam expects.",
+    "C": "The recovery work has a fixed order and firm dependencies. Reprioritizing it every two weeks adds no value and risks the acceptance date.",
+    "D": "Without one integrated plan, dependencies, resources and changes are not managed together, and problems surface too late to fix."
+   },
+   "artifactKey": "r3-release-3-plan"
+  },
+  {
+   "id": "q-pmp-10",
+   "certification": "PMP",
+   "domain": "Process · Develop and manage project scope",
+   "prompt": "Reviewing the requirements and traceability register, you find a requirement from Janelle Cardinal that reads \"The dashboards must be fast.\" Lumen Analytics Partners says it cannot design a test for it. What should you do?",
+   "options": [
+    [
+     "A",
+     "Remove the requirement from the register, because a statement that cannot be tested does not belong in a baseline."
+    ],
+    [
+     "B",
+     "Let Lumen Analytics Partners define what \"fast\" means, since they will build the pages, run the performance tests and know the platform limits."
+    ],
+    [
+     "C",
+     "Keep the wording as it is and let Janelle judge whether the pages are fast enough during user acceptance testing."
+    ],
+    [
+     "D",
+     "Work with Janelle to agree a measurable acceptance criterion, such as a load time for named pages under typical use, and trace it to a test."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A requirement must be clear and testable, with acceptance criteria agreed by its owner. Turning \"fast\" into a measurable criterion lets the team design for it, test it and trace it to acceptance, which protects both the requester and the team at the gate.",
+   "incorrect": {
+    "A": "The need behind it is real. Deleting it loses the requirement and Janelle's trust.",
+    "B": "The business owner defines acceptance. Here the supplier would be setting its own pass mark.",
+    "C": "Without an agreed criterion, acceptance becomes a matter of opinion, which leads to disputes at the gate."
+   },
+   "artifactKey": "r1-scope-statement"
+  },
+  {
+   "id": "q-pmp-11",
+   "certification": "PMP",
+   "domain": "Process · Help ensure value-based delivery",
+   "prompt": "Two weeks after Release 1 goes live, Dr. Helen Marchetti asks whether it has achieved its benefit: cutting the Kestrel General Hospital median time from arrival to physician initial assessment from 80.5 minutes to the agreed target of 60. What should you tell her?",
+   "options": [
+    [
+     "A",
+     "Say the dashboards are delivered, the benefit is measured three months after the release as the charter sets, and share early signs of use."
+    ],
+    [
+     "B",
+     "Say the benefit is achieved, because the dashboards went live on the planned date, passed user acceptance testing and are in daily use."
+    ],
+    [
+     "C",
+     "Say benefits belong to operations after go-live, so the programme no longer tracks the median time to physician initial assessment at Kestrel General."
+    ],
+    [
+     "D",
+     "Calculate the median for the two weeks since go-live, compare it with the 80.5-minute baseline and report that as the Release 1 result."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Value-based delivery separates outputs (live dashboards) from outcomes (shorter waits). Beacon's charter takes each baseline from data, agrees the target with the sponsor and measures it three months after the release. Reporting that honestly, with early adoption signals, keeps attention on the value the business case promised.",
+   "incorrect": {
+    "B": "On-time delivery is an output. The benefit is an outcome that depends on how leaders use the dashboards to change practice.",
+    "C": "Beacon's charter measures each benefit three months after its release, and the business case depends on it.",
+    "D": "Two weeks is too early and too short a period to judge the agreed measure, and it may mislead the sponsor."
+   },
+   "artifactKey": "r1-business-case"
+  },
+  {
+   "id": "q-pmp-12",
+   "certification": "PMP",
+   "domain": "Process · Plan and manage resources",
+   "prompt": "Building the schedule in Microsoft Project, you see Tomás Rivera assigned full time to two tasks that both start on 2026-09-09: task 4, Complete privacy impact assessment (12 days, on the critical path), and task 5, Profile and clean emergency department (ED) and bed census sources (10 days, 2 days of total float). What should you do first?",
+   "options": [
+    [
+     "A",
+     "Run automatic resource levelling in Microsoft Project so that task 5 starts only after task 4 has finished, which removes the overallocation cleanly."
+    ],
+    [
+     "B",
+     "Ask Tomás to work evenings and weekends during September until both of his tasks are complete, so that neither task has to move."
+    ],
+    [
+     "C",
+     "Agree with Tomás, Priya Raman and Mei Tanaka how much of his time each task needs, shift profiling to Mei, and keep any slip within task 5's float."
+    ],
+    [
+     "D",
+     "Take Tomás off task 4 so he can focus on profiling, because Priya Raman owns the privacy impact assessment and can complete it alone."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Start by understanding the real demand on the person before choosing a fix. Tomás may need only part of his time for the assessment, and Mei, the other analyst on task 5, can take more of the profiling. Any shift should use task 5's 2 days of float, not the critical path, so the Release 1 go-live gate holds.",
+   "incorrect": {
+    "A": "Task 5 would start 12 working days late, far past its 2 days of float. Task 6 needs task 5, so the critical path and the Release 1 go-live gate would move.",
+    "B": "Overtime as the plan wears out a key person (R-06) and raises the chance of errors in both tasks.",
+    "D": "As data steward, Tomás knows the data flows the assessment must describe. Removing him from a critical task without analysis puts its quality and dates at risk."
+   },
+   "artifactKey": "r1-microsoft-project-schedule"
+  },
+  {
+   "id": "q-pmp-13",
+   "certification": "PMP",
+   "domain": "Process · Plan and manage procurement",
+   "prompt": "Risk R-07: the fixed-price contract with Lumen Analytics Partners (V-05) ends on 2026-11-30, but the security operations dashboard in Release 3 is scheduled for 2026-12-08 to 2026-12-11. What should you do now?",
+   "options": [
+    [
+     "A",
+     "Decide now whether Kestrel staff build the dashboard or it needs a contract change or new purchase, and start that action in time."
+    ],
+    [
+     "B",
+     "Ask Lumen's lead consultant to keep working into December on the understanding that the contract paperwork will follow later."
+    ],
+    [
+     "C",
+     "Wait until Release 2 has closed before deciding, because the Release 3 scope may still change and an early decision could be wasted."
+    ],
+    [
+     "D",
+     "Ask Lumen to add the dashboard under the existing fixed price, since the contract already covers Power BI work for Beacon."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "An early make-or-buy decision leaves time to act on it. If Kestrel builds, plan the capacity and knowledge transfer. If it buys, run a contract change or purchase with agreed scope, price and terms before the work starts.",
+   "incorrect": {
+    "B": "Work outside a signed contract has no agreed scope, price or terms, and it exposes Kestrel to disputes.",
+    "C": "Procurement has lead time. Waiting turns a manageable risk into an issue close to the date.",
+    "D": "The contract covers Release 1. New scope is a contract change that the seller must agree to and price."
+   },
+   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+  },
+  {
+   "id": "q-pmp-14",
+   "certification": "PMP",
+   "domain": "Process · Plan and manage finance",
+   "prompt": "At the 2026-10-01 status date, Beacon's budget at completion (BAC) is CAD 1,200,000, earned value (EV) is CAD 224,000 and actual cost (AC) is CAD 250,600, a cost performance index of 0.89. Dr. Helen Marchetti asks whether the team can still finish within the BAC without using the management reserve. What should you tell her?",
+   "options": [
+    [
+     "A",
+     "The to-complete performance index is (1,200,000 - 250,600) / (1,200,000 - 224,000), about 0.97, so the remaining work can run a little less efficiently."
+    ],
+    [
+     "B",
+     "The to-complete performance index is (1,200,000 - 224,000) / (1,200,000 - 250,600), about 1.03, better than the 0.89 so far, so a recovery plan is needed."
+    ],
+    [
+     "C",
+     "The to-complete performance index is 250,600 / 224,000, about 1.12, the inverse of the cost performance index, so costs must fall by 12% at once."
+    ],
+    [
+     "D",
+     "The to-complete performance index is 1 / 0.80, about 1.25, the inverse of the schedule performance index, because the delay is what drives cost."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "TCPI = (BAC - EV) / (BAC - AC) = 976,000 / 949,400 = 1.028. Each remaining dollar must earn about 1.03 dollars of planned work, against 0.89 so far. That needs a real change in cost performance, so the honest answer is a recovery plan or a revised forecast, not hope.",
+   "incorrect": {
+    "A": "This turns the formula upside down. TCPI divides the value of the work left by the money left.",
+    "C": "1 / CPI is not TCPI. TCPI compares the value of the work left with the budget left.",
+    "D": "The schedule performance index measures schedule efficiency. It is not part of the TCPI formula."
+   },
+   "artifactKey": "r2-earned-value-status-report"
+  },
+  {
+   "id": "q-pmp-15",
+   "certification": "PMP",
+   "domain": "Process · Plan and optimize quality of products/deliverables",
+   "prompt": "In final testing before the Release 1 gate, the dashboard's median minutes to physician initial assessment for Kestrel General Hospital (KGH) does not match the approved reconciliation figure of 80.5. Lumen Analytics Partners suggests going live on time with a footnote saying the figures are being checked. What should you do?",
+   "options": [
+    [
+     "A",
+     "Go live with the footnote, as Lumen suggests, and reconcile the figure at the first service review, when more data will be available."
+    ],
+    [
+     "B",
+     "Ask Tomás Rivera to update the approved reconciliation figure so that it matches what the dashboard shows after the latest refresh."
+    ],
+    [
+     "C",
+     "Remove the KGH card from the page for go-live so the mismatch is not visible, and add it back once the figure has been checked."
+    ],
+    [
+     "D",
+     "Keep the accuracy test failed and have the team trace the difference through the cleaning rules, model and measure until it reconciles."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Accuracy is a quality gate, not a cosmetic issue. Reconciling to approved figures is how Beacon proves its numbers. A difference usually comes from a cleaning rule (visits V0385 and V0421, with impossible timestamps, must be left out of time measures), a relationship or the measure itself. Find and fix the cause, then record the evidence in the quality plan.",
+   "incorrect": {
+    "A": "Releasing a known wrong headline measure damages the trust Beacon exists to build (R-01).",
+    "B": "Changing the expected answer to fit the result hides the defect instead of finding it.",
+    "C": "Hiding the measure removes a key requirement and the evidence of the defect, which stays in the model."
+   },
+   "artifactKey": "r1-quality-plan"
+  },
+  {
+   "id": "q-pmp-16",
+   "certification": "PMP",
+   "domain": "Process · Plan and manage schedule",
+   "prompt": "Daniel Osei tells you the threat model of the analytics architecture (task 7) will take 5 more working days because his team found a new trust boundary. Task 7 has 14 days of total float and 0 days of free float. Its successors are task 9, Configure row-level security and sensitivity labels, and task 13, Design role catalogue and role-based access control model. What should you do?",
+   "options": [
+    [
+     "A",
+     "Raise a change request to move the Release 1 go-live gate back by 5 working days so the baseline matches the new forecast."
+    ],
+    [
+     "B",
+     "Add a second security analyst to task 7 so the team can recover the 5 lost days before task 13 is due to start."
+    ],
+    [
+     "C",
+     "Update the schedule, tell Daniel and Nora Lindqvist that task 13 starts 5 days later, and confirm the go-live gate holds."
+    ],
+    [
+     "D",
+     "Take no action, because task 7 has 14 days of float and the extra days therefore have no effect on any other task."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Total float (14 days) shows the slip will not delay the finish or the gate. Free float (0) shows the next task's early start does move: task 13 now starts 5 days later. Update the plan, tell the people on task 13 (Daniel Osei and Nora Lindqvist) and watch the float that remains.",
+   "incorrect": {
+    "A": "14 days of total float absorbs a 5-day slip, so the gate does not move.",
+    "B": "This crashes the task, adding cost to recover time the float already covers.",
+    "D": "Free float is 0, so task 13's early start does move. Its people need to know, and less float is now left."
+   },
+   "artifactKey": "r1-microsoft-project-schedule"
+  },
+  {
+   "id": "q-pmp-17",
+   "certification": "PMP",
+   "domain": "Process · Evaluate project status",
+   "prompt": "You are writing Beacon's status report for 2026-10-01. The programme register shows planned value (PV) CAD 278,900, earned value (EV) CAD 224,000 and actual cost (AC) CAD 250,600. Which statement should the report make?",
+   "options": [
+    [
+     "A",
+     "Cost variance is CAD -26,600 and schedule variance is CAD -54,900, so Beacon is over budget and behind schedule."
+    ],
+    [
+     "B",
+     "Beacon is under budget by CAD 28,300, because its actual cost to date is lower than its planned value to date."
+    ],
+    [
+     "C",
+     "Cost variance is CAD -54,900 and schedule variance is CAD -26,600, so the cost problem is larger than the schedule problem."
+    ],
+    [
+     "D",
+     "Cost variance is CAD +26,600, so Beacon is under budget, and schedule variance is CAD -54,900, so it is behind schedule."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Cost variance = EV - AC = 224,000 - 250,600 = -26,600. Schedule variance = EV - PV = 224,000 - 278,900 = -54,900. Both are negative: over budget and behind schedule. The matching indexes are a cost performance index of 0.89 and a schedule performance index of 0.80.",
+   "incorrect": {
+    "B": "Comparing AC with PV mixes cost and schedule. Cost performance compares AC with EV, the value of the work actually done.",
+    "C": "The two variances are swapped. Cost variance = EV - AC; schedule variance = EV - PV.",
+    "D": "EV - AC = 224,000 - 250,600, which is negative. A negative cost variance means over budget."
+   },
+   "artifactKey": "r2-earned-value-status-report"
+  },
+  {
+   "id": "q-pmp-18",
+   "certification": "PMP",
+   "domain": "Process · Manage project closure",
+   "prompt": "The Release 2 pilot has passed and the acceptance gate is on 2026-11-26. Several Release 2 team members are due to move onto Release 3 work the next day. What must happen before you release them?",
+   "options": [
+    [
+     "A",
+     "Nothing more: release them on time and complete the Release 2 closure documents in December, when the team has more time."
+    ],
+    [
+     "B",
+     "Record formal acceptance, hand the access service to Grace Liu's service desk with its knowledge and escalation model, and capture lessons."
+    ],
+    [
+     "C",
+     "Keep the whole team on Release 2 until its benefits have been measured three months after the release, so the results can be explained to the sponsor."
+    ],
+    [
+     "D",
+     "Skip lessons learned for Release 2, since the same people will carry what they learned straight into the Release 3 work."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Closing a release means confirming acceptance, transferring the result to operations with what support needs, closing records and capturing lessons, and only then releasing people. Doing it before they move on is what makes the handover and the learning stick.",
+   "incorrect": {
+    "A": "Once people move on, knowledge and lessons are lost, and handover gaps appear in live service.",
+    "C": "Benefit measurement is planned and owned after closure. Holding the team for it wastes capacity Release 3 needs.",
+    "D": "Lessons must be recorded to reach the organization and future work, not only the people who happen to stay."
+   },
+   "artifactKey": "r2-release-2-closure-report"
+  },
+  {
+   "id": "q-pmp-19",
+   "certification": "PMP",
+   "domain": "Business Environment · Define and establish project governance",
+   "prompt": "At the Release 1 go-live gate on 2026-10-23, every readiness criterion has passed except one: small-count suppression for Prairie Gate Health Centre (PGH) has not yet been verified in the row-level security (RLS) test pack. Dr. Helen Marchetti, the sponsor, wants to go live. What should you do?",
+   "options": [
+    [
+     "A",
+     "Postpone go-live yourself, because a programme manager must not allow any unmet readiness criterion through a release gate."
+    ],
+    [
+     "B",
+     "Mark the PGH test as passed, since the suppression rule is already written into the approved design and was peer reviewed by the analytics team."
+    ],
+    [
+     "C",
+     "Record go-live as approved without conditions and add the PGH test to the backlog for the first iteration after go-live."
+    ],
+    [
+     "D",
+     "Present the evidence and record the sponsor's decision as approval on condition that PGH suppression is verified, with an owner and due date."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Governance sets who decides what, on which evidence. The sponsor may approve go-live with a stated condition, which is what Beacon did (D-02). Your job is to make the gap visible and to record the condition with an owner and a date so that it is actually met.",
+   "incorrect": {
+    "A": "The gate decision belongs to the sponsor and the gate's decision makers. Your role is to give them clear evidence and options.",
+    "B": "A design is not test evidence. Marking the test passed would falsify the gate record.",
+    "C": "Dropping the condition removes control of a privacy risk (R-02) that the gate exists to manage."
+   },
+   "artifactKey": "r1-go-live-readiness-and-support-handover"
+  },
+  {
+   "id": "q-pmp-20",
+   "certification": "PMP",
+   "domain": "Business Environment · Plan and manage project compliance",
+   "prompt": "A week before the Release 1 gate, Marcus Bell sees a schedule milestone called \"Commissioner approves privacy impact assessment\" that has not been met. He asks whether go-live must wait for that approval. What should you tell him?",
+   "options": [
+    [
+     "A",
+     "Yes. Under the Health Information Act the system cannot go live until the Information and Privacy Commissioner issues a written approval letter."
+    ],
+    [
+     "B",
+     "No assessment is needed at all, because the Beacon dashboards only show de-identified, aggregated data that identifies no patient."
+    ],
+    [
+     "C",
+     "The Commissioner comments on a privacy impact assessment but does not approve it. Confirm it was submitted before go-live and fix the milestone."
+    ],
+    [
+     "D",
+     "Go live now and submit the assessment after go-live, since the Commissioner only reviews and comments on it and cannot block it."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Compliance means knowing exactly what the law requires. Section 64 of the Health Information Act requires a custodian to prepare a privacy impact assessment and submit it to the Information and Privacy Commissioner for review and comment before implementing the system. At Kestrel, Priya Raman approves it internally; the Commissioner does not approve it.",
+   "incorrect": {
+    "A": "The Commissioner does not approve privacy impact assessments. It reviews them and comments.",
+    "B": "Beacon's pipeline stages identifying health information from clinical systems before it is de-identified, which is why the schedule includes the assessment.",
+    "D": "The Health Information Act requires the assessment to be submitted before the system is implemented."
+   },
+   "artifactKey": "r1-privacy-impact-assessment"
+  },
+  {
+   "id": "q-pmp-21",
+   "certification": "PMP",
+   "domain": "Business Environment · Manage and control changes",
+   "prompt": "On 2026-10-29 the change-control board, chaired by Marcus Bell, decides CR-01. Janelle Cardinal's request for a list of alternate level of care (ALC) patients with names and bed numbers is not approved as asked. The board approves unit-level ALC counts and days instead: 3 days of model work and no change to the Release 2 gate. What should you do next?",
+   "options": [
+    [
+     "A",
+     "Start the 3 days of model work straight away and update the scope and schedule baselines at the end of the release."
+    ],
+    [
+     "B",
+     "Record the decision in the change log, update scope, traceability and schedule, and explain the approved alternative to Janelle."
+    ],
+    [
+     "C",
+     "Suggest that Janelle take her original request to the sponsor, since she is the business owner of the bed data and may win approval."
+    ],
+    [
+     "D",
+     "Close CR-01 with no further action, because the request as Janelle submitted it was not approved by the board."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "After a change decision, the project manager records it, updates every affected baseline and plan, and tells stakeholders what was decided and why. Janelle needs to hear that her underlying need, seeing ALC pressure by unit, is met in a way the Health Information Act allows.",
+   "incorrect": {
+    "A": "Baselines and traceability should change with the decision, so that status reports and tests stay accurate.",
+    "C": "The board decided within its authority. Encouraging a way around it undermines change control.",
+    "D": "An alternative was approved, so there is work to plan, track and communicate."
+   },
+   "artifactKey": "r1-change-control-process"
+  },
+  {
+   "id": "q-pmp-22",
+   "certification": "PMP",
+   "domain": "Business Environment · Plan and manage risk",
+   "prompt": "Marcus Bell owns risk R-08: cost performance could exhaust the management reserve. At 2026-10-01 the budget at completion (BAC) is CAD 1,200,000, earned value (EV) CAD 224,000 and actual cost (AC) CAD 250,600, so the cost performance index (CPI) is 0.89 and the schedule performance index (SPI) is 0.80. The sponsor holds a CAD 120,000 management reserve. Marcus asks whether, if Beacon keeps spending at its current efficiency, the reserve will cover the overrun. What should you tell him?",
+   "options": [
+    [
+     "A",
+     "No. The estimate at completion (EAC) is BAC / CPI, about CAD 1,342,500, so the variance at completion is CAD -142,500, CAD 22,500 more than the reserve."
+    ],
+    [
+     "B",
+     "Yes. EAC = AC + (BAC - EV) = CAD 1,226,600, so the forecast overrun is only CAD 26,600 and fits easily inside the CAD 120,000 reserve."
+    ],
+    [
+     "C",
+     "Yes. EAC = BAC x CPI, about CAD 1,072,600, so Beacon is forecast to finish about CAD 127,400 under its budget at completion, leaving the reserve untouched."
+    ],
+    [
+     "D",
+     "No. EAC = BAC / SPI, about CAD 1,494,100, an overrun of about CAD 294,100, so the reserve covers less than half of it."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "When current performance is expected to continue, EAC = BAC / CPI = 1,200,000 / (224,000 / 250,600) = 1,342,500. Variance at completion = BAC - EAC = -142,500, which is CAD 22,500 more than the reserve and above the CAD 1,320,000 total authorized. R-08 needs response options taken to the sponsor now.",
+   "incorrect": {
+    "B": "That formula assumes the overrun so far was a one-off and the rest will go to plan. Marcus asked about current efficiency continuing.",
+    "C": "Multiplying by a CPI below 1 lowers the forecast. EAC divides BAC by CPI.",
+    "D": "SPI measures schedule performance. The cost forecast uses CPI."
+   },
+   "artifactKey": "r2-earned-value-status-report"
+  },
+  {
+   "id": "q-pmp-23",
+   "certification": "PMP",
+   "domain": "Business Environment · Support organizational change",
+   "prompt": "During the Release 2 pilot of multi-factor authentication (MFA), Aisha Mahmoud, an emergency charge nurse at Kestrel General Hospital, tells you some nurses stay signed in on one shared workstation for a whole shift to avoid repeated prompts. Risk R-03, owned by Janelle Cardinal, predicted that MFA prompts would slow clinicians. What should you do?",
+   "options": [
+    [
+     "A",
+     "Issue a reminder that sharing a signed-in session is a disciplinary matter, and continue the rollout to the other units exactly as planned and on schedule."
+    ],
+    [
+     "B",
+     "Turn off MFA on shared clinical workstations so that nurses are no longer slowed down by repeated prompts during busy shifts."
+    ],
+    [
+     "C",
+     "With Janelle and frontline nurses, find where the prompts disrupt care, then adjust the sign-in design with Daniel Osei's team and use unit champions."
+    ],
+    [
+     "D",
+     "Schedule extra classroom training on how MFA works for all nurses before the rollout continues, so they understand why the prompts matter for safety."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "People adopt change when it works in their real workflow. The workaround signals that the design clashes with how care is given at shared workstations, as R-03 predicted. Understanding it with the risk owner and frontline staff, adjusting the design with security, and supporting adoption through champions addresses the cause. The session sharing is also a security concern for Daniel Osei's team.",
+   "incorrect": {
+    "A": "Enforcement alone treats the symptom. The workflow clash remains, so new workarounds will appear.",
+    "B": "This removes a control the release exists to deliver, and it is not a programme manager's decision to make alone.",
+    "D": "The nurses understand MFA; the prompts clash with their workflow. Training does not fix the cause."
+   },
+   "artifactKey": "r2-change-communication-and-training-plan"
+  },
+  {
+   "id": "q-pmp-24",
+   "certification": "PMP",
+   "domain": "Business Environment · Evaluate external business environment changes",
+   "prompt": "In week 1, Priya Raman mentions that the Health Information Act was amended in June and July 2026, including new rules for putting identifying health information into automated systems such as artificial intelligence (AI) tools. Beacon's business case and charter were drafted before she had reviewed the changes. What should you do?",
+   "options": [
+    [
+     "A",
+     "Carry on as planned, because the charter was approved by the sponsor before anyone raised the amendments with the programme."
+    ],
+    [
+     "B",
+     "Pause all Release 1 work until the amended Act has been in force for a full year and its practical effects are clearer."
+    ],
+    [
+     "C",
+     "Ask the analysts to read the amended Act themselves and adjust the requirements wherever they think the changes apply to Beacon's dashboards."
+    ],
+    [
+     "D",
+     "Ask Priya Raman to assess what the amendments mean for Beacon's scope, requirements and privacy impact assessment, and record the impacts."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "When the external environment changes, the project manager has its impact on scope, schedule, risk and compliance assessed by the right expert, then updates the plans through normal control. Priya Raman, the Chief Privacy Officer, owns Kestrel's reading of the amended Act.",
+   "incorrect": {
+    "A": "An approved charter does not exempt Beacon from current law. External changes must be assessed when they appear.",
+    "B": "There is no basis for a blanket pause. An impact assessment shows what, if anything, must change.",
+    "C": "Interpreting the law is the Chief Privacy Officer's job, and analysts changing requirements on their own bypasses change control."
+   },
+   "artifactKey": "r1-raid-log"
+  },
+  {
+   "id": "q-itil-01",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Focus on value",
+   "prompt": "Grace Liu drafts the measures for the patient-flow analytics service: report pages published and refreshes run each month. Janelle Cardinal says what matters to her team is having trusted numbers ready when the morning bed huddle starts. Which change best applies the guiding principle Focus on value?",
+   "options": [
+    [
+     "A",
+     "Publish more report pages each month so that the output measure shows the service growing and adding value for its users."
+    ],
+    [
+     "B",
+     "Add measures of the consumer's outcome, such as data refreshed and checked before the huddle, and agree them with Janelle."
+    ],
+    [
+     "C",
+     "Keep the two measures, because they are simple and practical to collect straight from the platform without extra work."
+    ],
+    [
+     "D",
+     "Automate the monthly count of pages and refreshes so that producing the service report needs no manual effort at all from the team."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Focus on value means everything links to value for stakeholders, as they see it. Janelle's team judges the service by whether trusted numbers are there when decisions are made, so the measures should reflect that outcome and be agreed with the consumer.",
+   "incorrect": {
+    "A": "More output does not show that the consumer's outcome improved.",
+    "C": "Ease of collection matters, but measures that ignore the consumer's outcome cannot show value.",
+    "D": "Automating a measure that misses the outcome only produces the wrong measure faster."
+   },
+   "artifactKey": "r1-service-value-proposition"
+  },
+  {
+   "id": "q-itil-02",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Start where you are",
+   "prompt": "In the first Release 2 workshop, a consultant proposes designing the clinician access process from a blank page because \"the current one is broken\". What best applies the guiding principle Start where you are?",
+   "options": [
+    [
+     "A",
+     "Design from a blank page, since a baseline as poor as this shows there is nothing in the current process worth keeping."
+    ],
+    [
+     "B",
+     "Ask managers to describe from memory how they believe access requests flow today, and design the new process from what they report."
+    ],
+    [
+     "C",
+     "Choose a new identity tool first, then design the access process around the features and workflow the tool provides."
+    ],
+    [
+     "D",
+     "Observe and measure the current process directly, starting from the service desk baseline (median 4.26 days), and keep what works."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Start where you are means assessing what exists objectively, through direct observation and data, before deciding what to change. Kestrel's service desk data already gives a measured baseline. Reuse what works and change only what needs to change.",
+   "incorrect": {
+    "A": "Even a slow process has parts that work, such as existing forms, roles and records. Discarding them wastes effort and adds risk.",
+    "B": "The principle calls for observing the work directly. Accounts from memory are often wrong about where time is lost.",
+    "C": "Choosing a tool before understanding the current state risks automating the same problems."
+   },
+   "artifactKey": "r2-current-state-clinician-access-process"
+  },
+  {
+   "id": "q-itil-03",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Progress iteratively with feedback",
+   "prompt": "Grace Liu plans to switch every site to the redesigned access-request process on the same day, to \"get it over with\". Which approach best applies the guiding principle Progress iteratively with feedback?",
+   "options": [
+    [
+     "A",
+     "Pilot it on one unit, such as Medicine 4A at Kestrel General Hospital, gather feedback, adjust, then extend it in steps."
+    ],
+    [
+     "B",
+     "Launch at all four sites on the same day and collect feedback from every unit at a single review three months later."
+    ],
+    [
+     "C",
+     "Hold the launch until the design is perfect and every stakeholder at every site has signed it off in writing."
+    ],
+    [
+     "D",
+     "Launch at all sites on one day but keep the old process running alongside it indefinitely as a fallback."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Progress iteratively with feedback means breaking work into small, manageable pieces and using feedback before, during and after each one. A pilot on one unit limits the impact of mistakes and lets real users shape the process before it reaches every site.",
+   "incorrect": {
+    "B": "One big launch delays learning, and any flaw hits every site at once.",
+    "C": "Waiting for perfection delays value. Feedback from real use is what improves the design.",
+    "D": "Two processes running side by side add confusion and cost, and they do not create structured feedback."
+   },
+   "artifactKey": "r2-access-request-value-stream"
+  },
+  {
+   "id": "q-itil-04",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Collaborate and promote visibility",
+   "prompt": "Unit managers complain they cannot tell where their access requests are. Requests sit in approvers' email inboxes, and the service desk only learns of a delay when a manager calls. Which action best applies the guiding principle Collaborate and promote visibility?",
+   "options": [
+    [
+     "A",
+     "Add a second approval step so that every access request is checked twice and nothing reaches provisioning by mistake."
+    ],
+    [
+     "B",
+     "Send a monthly summary of access request volumes and average waits to the chief information officer for follow-up with the approvers."
+    ],
+    [
+     "C",
+     "Give requesters, approvers and the desk a shared view of each request's status and wait, and agree with approvers how waits are handled."
+    ],
+    [
+     "D",
+     "Automate daily reminder emails to approvers, without changing how access requests are tracked or who can see where each one is waiting."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Hidden work leads to poor decisions and frustration. Making the queue and the waits visible to everyone involved, and working with approvers on how they handle them, lets the people in the value stream see and fix delays together.",
+   "incorrect": {
+    "A": "More steps add waiting and do nothing to make the current queue visible.",
+    "B": "A monthly summary for one executive does not help the people who must act on waiting requests now.",
+    "D": "Reminders may help a little, but the work stays hidden in inboxes and nobody shares a view of the queue."
+   },
+   "artifactKey": "r2-future-state-access-process"
+  },
+  {
+   "id": "q-itil-05",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Think and work holistically",
+   "prompt": "The Release 2 team plans to fix the joiner part of clinician access first and treat movers and leavers as separate future projects. The data shows a mover (E-028) still holding old Unit Clerk access and two missed leavers (E-014 and E-027) with enabled accounts. Which approach best applies the guiding principle Think and work holistically?",
+   "options": [
+    [
+     "A",
+     "Fix joiners first, because slow access for new staff is what clinicians and their managers complain about most often."
+    ],
+    [
+     "B",
+     "Treat joiners, movers and leavers as one stream across human resources (HR), the Identity Directory, the desk and suppliers."
+    ],
+    [
+     "C",
+     "Ask the service desk to check every enabled account by hand once a month and disable any leavers that it finds."
+    ],
+    [
+     "D",
+     "Hand the leaver problem to HR, since HR is the source of termination events and owns the data that starts each leaver in the process."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "No part of a service stands alone. Joiners, movers and leavers share the same roles, data feeds, directory and approvals. Designing them as one stream, across all four dimensions, avoids fixing one part while the others keep failing.",
+   "incorrect": {
+    "A": "Speed for joiners matters, but designing it alone leaves the mover and leaver failures, which are the security exposure, untouched.",
+    "C": "A manual check treats symptoms in one team and ignores the HR feed and supplier end dates that cause them.",
+    "D": "HR is one part of the system. The failure spans HR, ClearPath end dates, the directory and the desk."
+   },
+   "artifactKey": "r2-joiner-mover-leaver-workflow"
+  },
+  {
+   "id": "q-itil-06",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Keep it simple and practical",
+   "prompt": "In the access-request value-stream workshop, approvers explain that the second IT approval on every Clinical Information System access request only checks that the business owner has already approved it. Which action best applies the guiding principle Keep it simple and practical?",
+   "options": [
+    [
+     "A",
+     "Remove the second IT approval, or fold its check into the business owner's step, so each step adds value."
+    ],
+    [
+     "B",
+     "Automate the second IT approval so that it happens within minutes instead of hours, keeping the extra check."
+    ],
+    [
+     "C",
+     "Keep the second approval for extra assurance, since more checks on clinical access always make it safer."
+    ],
+    [
+     "D",
+     "Add a field to the form so the second approver can record why each request was approved, for the audit trail."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Keep it simple and practical means using the fewest steps needed to reach the outcome. If a step adds no value, remove it. Here the second approval only repeats a check, so it adds waiting for clinicians and nothing for control.",
+   "incorrect": {
+    "B": "Automating a step that adds nothing still keeps a useless step. Simplify first, then automate.",
+    "C": "A step that repeats a check adds waiting without reducing risk.",
+    "D": "This adds work to a step that should not exist."
+   },
+   "artifactKey": "r2-access-request-value-stream"
+  },
+  {
+   "id": "q-itil-07",
+   "certification": "ITIL",
+   "domain": "Guiding principles · Optimize and automate",
+   "prompt": "Nora Lindqvist, the human resources (HR) business partner, suggests that new accounts be created automatically from HR joiner events. The current process still has unclear role definitions and duplicate approvals. Which sequence best applies the guiding principle Optimize and automate?",
+   "options": [
+    [
+     "A",
+     "Automate provisioning from HR events now, and tidy up the role definitions and approvals once the automation is live and stable."
+    ],
+    [
+     "B",
+     "Avoid automation, because access to clinical systems should always be granted by hand so a person checks each one."
+    ],
+    [
+     "C",
+     "Automate only the reminder emails to approvers, and leave the provisioning steps as they are today until Release 3."
+    ],
+    [
+     "D",
+     "Agree the role catalogue and remove duplicate approvals first, then automate provisioning from HR events, with exceptions reviewed."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Optimize and automate means simplifying and improving the work first, then automating where it adds value. Clear roles and a clean approval path are what make automated provisioning from HR events safe and useful.",
+   "incorrect": {
+    "A": "Automating unclear roles and duplicate steps makes the waste and the access errors happen faster.",
+    "B": "Automation that follows clear, approved rules can be more consistent than manual work. The principle is to optimize first, not to avoid automation.",
+    "C": "This automates around a symptom of the delay without improving the flow itself."
+   },
+   "artifactKey": "r2-future-state-access-process"
+  },
+  {
+   "id": "q-itil-08",
+   "certification": "ITIL",
+   "domain": "Four dimensions · Partners and Suppliers",
+   "prompt": "Olivia Grant (E-014), an agency nurse supplied by ClearPath Staffing (V-03), finished her contract, but her account stayed enabled because nobody told Kestrel the end date. Which of the four dimensions most directly covers fixing how ClearPath tells Kestrel about start and end dates?",
+   "options": [
+    [
+     "A",
+     "Organizations and People"
+    ],
+    [
+     "B",
+     "Information and Technology"
+    ],
+    [
+     "C",
+     "Partners and Suppliers"
+    ],
+    [
+     "D",
+     "Value Streams and Processes"
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Partners and Suppliers covers Kestrel's relationships with other organizations involved in its services, including the contracts and agreements behind them. What ClearPath must tell Kestrel, and when, belongs in that arrangement.",
+   "incorrect": {
+    "A": "This covers Kestrel's own roles, skills and culture. The gap here is in the arrangement with an outside supplier.",
+    "B": "A data feed may carry the dates, but agreeing what ClearPath must tell Kestrel, and when, is a supplier arrangement.",
+    "D": "The leaver process is affected, but the fix described is the agreement with the supplier."
+   },
+   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+  },
+  {
+   "id": "q-itil-09",
+   "certification": "ITIL",
+   "domain": "Four dimensions · Organizations and People",
+   "prompt": "Lumen Analytics Partners presents its design for the analytics service: the semantic model, the gateway, the refresh schedule, the support workflow and Lumen's own support terms. Grace Liu asks who owns the service and whether her analysts have the skills to answer Power BI questions. Which dimension has the design left out?",
+   "options": [
+    [
+     "A",
+     "Organizations and People"
+    ],
+    [
+     "B",
+     "Information and Technology"
+    ],
+    [
+     "C",
+     "Partners and Suppliers"
+    ],
+    [
+     "D",
+     "Value Streams and Processes"
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Organizations and People covers structures, roles, responsibilities, skills, culture and leadership. Service ownership and the service desk's skills are exactly what Grace is asking about, and the design does not address them.",
+   "incorrect": {
+    "B": "The semantic model, the gateway and the refresh schedule already cover this dimension.",
+    "C": "Lumen's support terms already cover the supplier relationship.",
+    "D": "The support workflow already covers how the work flows."
+   },
+   "artifactKey": "r1-go-live-readiness-and-support-handover"
+  },
+  {
+   "id": "q-itil-10",
+   "certification": "ITIL",
+   "domain": "ITIL Value System · Governance",
+   "prompt": "Kestrel's board and executive team evaluate how its services perform, set direction through policies such as the rule to suppress counts under 5 in reports shared outside the care team, and monitor performance and conformance. Which component of the ITIL value system do these activities represent?",
+   "options": [
+    [
+     "A",
+     "Guiding principles"
+    ],
+    [
+     "B",
+     "Governance"
+    ],
+    [
+     "C",
+     "Management practices"
+    ],
+    [
+     "D",
+     "Continual improvement"
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Governance is the means by which an organization is directed and controlled: evaluating, setting direction and monitoring. The other components of the value system are the guiding principles, value chain activities, management practices and continual improvement.",
+   "incorrect": {
+    "A": "Guiding principles are recommendations that guide decisions in all circumstances. They are not the people and policies that direct and control.",
+    "C": "Practices are sets of resources for doing types of work, such as incident management. Direction and control sit above them.",
+    "D": "Continual improvement is the recurring work of improving at every level, not the direction and control of the organization."
+   },
+   "artifactKey": "r1-change-control-process"
+  },
+  {
+   "id": "q-itil-11",
+   "certification": "ITIL",
+   "domain": "Product and service lifecycle · Discover",
+   "prompt": "Before any design work on the clinician access service, Grace Liu interviews unit managers and ClearPath coordinators about who waits for access, how long they wait, and what the waiting costs patient care. In which stage of the product and service lifecycle is she working?",
+   "options": [
+    [
+     "A",
+     "Design"
+    ],
+    [
+     "B",
+     "Acquire"
+    ],
+    [
+     "C",
+     "Support"
+    ],
+    [
+     "D",
+     "Discover"
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Discover is where you explore demand, opportunities and stakeholder needs to understand what value a product or service could create, before committing to design. Learning who waits, for how long and at what cost to care is exactly that.",
+   "incorrect": {
+    "A": "Design shapes the service, such as roles, rules and forms, once the needs are understood.",
+    "B": "Acquire obtains components and resources from partners, suppliers or internal sources.",
+    "C": "Support restores normal service when something goes wrong in live service, through incident and problem work."
+   },
+   "artifactKey": "r2-current-state-clinician-access-process"
+  },
+  {
+   "id": "q-itil-12",
+   "certification": "ITIL",
+   "domain": "Product and service lifecycle · Acquire",
+   "prompt": "For Release 2, Kestrel signs an agreement with ClearPath Staffing for a daily feed of agency nurse start and end dates, and obtains the licences for the identity tooling. In which stage of the product and service lifecycle is this work?",
+   "options": [
+    [
+     "A",
+     "Design"
+    ],
+    [
+     "B",
+     "Build"
+    ],
+    [
+     "C",
+     "Acquire"
+    ],
+    [
+     "D",
+     "Transition"
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Acquire is where you obtain the components and resources you need, such as software, services, data feeds or skills, from partners, suppliers or internal sources.",
+   "incorrect": {
+    "A": "Design decides what the service needs. Obtaining it from a supplier is the next step.",
+    "B": "Build creates, configures, integrates and tests the components once they have been obtained.",
+    "D": "Transition moves new or changed products and services into live use."
+   },
+   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+  },
+  {
+   "id": "q-itil-13",
+   "certification": "ITIL",
+   "domain": "Product and service lifecycle · Transition",
+   "prompt": "The Release 1 emergency department and bed pages are built and have passed the team's tests. Next come change authorization, training for patient-flow leaders and the cut-over from emailed Excel extracts to live use of the dashboards. Which stage of the product and service lifecycle is this?",
+   "options": [
+    [
+     "A",
+     "Build"
+    ],
+    [
+     "B",
+     "Transition"
+    ],
+    [
+     "C",
+     "Deliver"
+    ],
+    [
+     "D",
+     "Operate"
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Transition is where new or changed products and services move into live use in a controlled way, including change authorization, release, deployment and the training that makes the move work.",
+   "incorrect": {
+    "A": "The components are already built and tested. Moving them into live use is the next stage.",
+    "C": "Deliver is providing the live service to consumers, which begins after the cut-over.",
+    "D": "Operate runs and maintains the components once they are live."
+   },
+   "artifactKey": "r1-go-live-readiness-and-support-handover"
+  },
+  {
+   "id": "q-itil-14",
+   "certification": "ITIL",
+   "domain": "Product and service lifecycle · Operate",
+   "prompt": "Each morning at 05:00 the on-premises data gateway runs the scheduled refresh of the Beacon semantic model. Tomás Rivera's team monitors the refresh, applies routine gateway maintenance and keeps the platform performing as designed. Which stage of the product and service lifecycle does this work belong to?",
+   "options": [
+    [
+     "A",
+     "Operate"
+    ],
+    [
+     "B",
+     "Transition"
+    ],
+    [
+     "C",
+     "Deliver"
+    ],
+    [
+     "D",
+     "Support"
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Operate is where the technology and components are run and maintained so they keep performing as designed. A daily scheduled refresh, its monitoring and routine maintenance are operational work.",
+   "incorrect": {
+    "B": "Transition moves new or changed services into live use. This service is already live.",
+    "C": "Deliver is about providing the service to consumers so they can use it and reach their outcomes.",
+    "D": "Support restores normal service after incidents and problems. Nothing has failed here; this is routine running of the technology."
+   },
+   "artifactKey": "r1-workspace-refresh-and-deployment-plan"
+  },
+  {
+   "id": "q-itil-15",
+   "certification": "ITIL",
+   "domain": "Value co-creation · Provider and consumer contributions",
+   "prompt": "At a Release 1 review, Tomás Rivera says the analytics team will \"deliver value to Janelle on go-live day\". Janelle's team still has to agree the bed definitions, take part in testing and change how the morning huddle uses the numbers. Which statement best describes how value is created for this service?",
+   "options": [
+    [
+     "A",
+     "Value is delivered by the analytics team on the day the dashboards go live and pass acceptance."
+    ],
+    [
+     "B",
+     "Value is created when the service meets the availability and refresh service levels agreed for it in the service catalogue entry."
+    ],
+    [
+     "C",
+     "Value is co-created: both teams contribute, and it is realized when the dashboards improve patient-flow decisions."
+    ],
+    [
+     "D",
+     "Value is the money Kestrel saves each month by no longer preparing and emailing Excel extracts."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Value is co-created through active collaboration between provider and consumer. Janelle's team brings definitions, testing and new ways of working; the analytics team brings the service. Value shows up in the consumer's outcomes, not on go-live day.",
+   "incorrect": {
+    "A": "This is a one-way view. Go-live is an output; value depends on what the consumer does with it.",
+    "B": "Meeting service levels shows warranty. On its own it does not mean the consumer gets value.",
+    "D": "Cost is one factor, but value is the benefit, usefulness and importance stakeholders perceive, which here means better decisions."
+   },
+   "artifactKey": "r1-service-value-proposition"
+  },
+  {
+   "id": "q-itil-16",
+   "certification": "ITIL",
+   "domain": "Product and service management concepts · Utility and warranty",
+   "prompt": "In user acceptance testing, the bed dashboard answered every question Janelle Cardinal asked. In the first weeks after go-live, some morning refreshes fail and the page still shows the previous refresh's numbers when the huddle starts. What does this show about the service?",
+   "options": [
+    [
+     "A",
+     "Its utility is poor, because the dashboard does not do what Janelle's team needs it to do when the morning huddle starts."
+    ],
+    [
+     "B",
+     "Both utility and warranty are fine, because the dashboard passed user acceptance testing before go-live."
+    ],
+    [
+     "C",
+     "Its warranty is good, because the figures it shows are always accurate once the refresh has finished."
+    ],
+    [
+     "D",
+     "Its utility is good but its warranty falls short: it is not reliably available, as needed, when the consumer uses it."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Utility is what the service does: fit for purpose. Warranty is assurance that it meets agreed requirements such as availability, capacity, security and continuity: fit for use. Consumers need both to get value. A dashboard that is right but stale at the huddle fails on warranty.",
+   "incorrect": {
+    "A": "Testing showed the dashboard does the right things. The failure is in how reliably it does them.",
+    "B": "Acceptance testing checked the functions. It did not prove the service would be current every morning.",
+    "C": "Accurate figures that arrive after the decision is made do not give the assurance warranty is about."
+   },
+   "artifactKey": "r1-service-catalogue-entry-and-service-levels"
+  },
+  {
+   "id": "q-itil-17",
+   "certification": "ITIL",
+   "domain": "Management practices · Incident versus service request",
+   "prompt": "Three calls reach the Kestrel service desk one morning. Ben Kowalski asks for bed dashboard access for a new unit clerk. Aisha Mahmoud reports that the emergency department page will not load. Mei Tanaka asks how to export a report page to PDF. How should the desk classify the three calls, in that order?",
+   "options": [
+    [
+     "A",
+     "Incident, incident, service request"
+    ],
+    [
+     "B",
+     "Service request, incident, service request"
+    ],
+    [
+     "C",
+     "Service request, problem, incident"
+    ],
+    [
+     "D",
+     "Service request, incident, incident"
+    ]
+   ],
+   "correct": "B",
+   "explanation": "An incident is an unplanned interruption to a service or a reduction in its quality. A service request is a user's request for something that is a normal part of service delivery, such as access or information. Only Aisha's call reports something not working.",
+   "incorrect": {
+    "A": "A request for access is a normal, expected part of the service, not an interruption.",
+    "C": "A page failing to load is an incident; a problem is the cause of one or more incidents. A how-to question is a request for information.",
+    "D": "A how-to question is a request for information, which is a service request. Nothing is broken."
+   },
+   "artifactKey": "r2-service-desk-knowledge-and-escalation-model"
+  },
+  {
+   "id": "q-itil-18",
+   "certification": "ITIL",
+   "domain": "Management practices · Incident versus problem",
+   "prompt": "On several Monday mornings the bed dashboard has failed to refresh. Each time, the service desk restarts the gateway service and the dashboard works again. What should happen next?",
+   "options": [
+    [
+     "A",
+     "Keep resolving each incident with the restart, and log a problem so the underlying cause can be found and removed."
+    ],
+    [
+     "B",
+     "Keep restarting the gateway; service is restored each time, so no further action is needed."
+    ],
+    [
+     "C",
+     "Keep each incident open until the underlying cause is found and fixed, so the incident records stay complete and accurate."
+    ],
+    [
+     "D",
+     "Raise a change to replace the gateway server now, before the cause of the failures is known."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Incident management restores normal service as quickly as possible. Problem management finds the cause of one or more incidents to reduce how often they happen and how much harm they do. Both run here, each with its own goal.",
+   "incorrect": {
+    "B": "Repeated incidents point to an underlying cause. Ignoring it means more disruption and effort every week.",
+    "C": "An incident is resolved when service is restored. Finding the cause belongs to problem management.",
+    "D": "Acting before analysis may cost money and still leave the cause in place."
+   },
+   "artifactKey": "r3-incident-and-problem-management-workflow"
+  },
+  {
+   "id": "q-itil-19",
+   "certification": "ITIL",
+   "domain": "Management practices · Known errors and workarounds",
+   "prompt": "Problem analysis shows the Monday refresh failures come from a defect in the gateway version Kestrel runs. The vendor's fix will be installed through a change next month. Until then, re-running the refresh by hand restores the data. What should be done now?",
+   "options": [
+    [
+     "A",
+     "Close the problem now, because its cause has been found and documented, and track the fix as a separate change."
+    ],
+    [
+     "B",
+     "Treat the manual re-run as the permanent solution and cancel the vendor fix that is planned for next month."
+    ],
+    [
+     "C",
+     "Ask the service desk to escalate every refresh failure to Tomás Rivera until the vendor's fix has been installed and tested."
+    ],
+    [
+     "D",
+     "Record a known error with the documented workaround in the knowledge base, and keep the problem open until the fix is in."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "A known error is a problem that has been analyzed but not yet resolved. Recording it with its workaround lets the service desk restore service quickly and the same way every time, while the permanent fix goes through change.",
+   "incorrect": {
+    "A": "Finding the cause does not remove it. The problem stays open as a known error until the fix is in place.",
+    "B": "A workaround reduces impact. It does not remove the cause, and it costs manual effort every time.",
+    "C": "With a documented workaround the desk can restore service itself. Escalating adds delay and loads a key person."
+   },
+   "artifactKey": "r3-incident-and-problem-management-workflow"
+  },
+  {
+   "id": "q-itil-20",
+   "certification": "ITIL",
+   "domain": "Management practices · Standard change",
+   "prompt": "Applying the monthly update to the on-premises data gateway follows a documented, tested procedure. It is low risk, well understood and has been done many times without trouble. How should Kestrel handle this change?",
+   "options": [
+    [
+     "A",
+     "As a normal change, assessed and authorized by the change authority every month before it is applied."
+    ],
+    [
+     "B",
+     "As an emergency change, so that it can be applied quickly each month without waiting for any authorization or review."
+    ],
+    [
+     "C",
+     "As a standard change: pre-authorized, carried out using the documented procedure and recorded each time."
+    ],
+    [
+     "D",
+     "Without a change record, because routine maintenance like this does not count as a change."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "A standard change is a low-risk, pre-authorized change that is well understood and fully documented, so it needs no separate authorization each time. Normal changes are assessed and authorized one by one; emergency changes are for urgent needs.",
+   "incorrect": {
+    "A": "That adds effort and delay to a low-risk change whose risk is already understood.",
+    "B": "Emergency changes are for urgent needs, such as resolving a major incident or a security threat.",
+    "D": "It modifies a live component, so it is a change. Standard changes are still recorded."
+   },
+   "artifactKey": "r1-change-control-process"
+  },
+  {
+   "id": "q-itil-21",
+   "certification": "ITIL",
+   "domain": "Management practices · Emergency change",
+   "prompt": "On 2026-08-11 a ransomware precursor (SEC-004) is detected on the Virtual Desktop Service (A-008) at 03:05. To contain it, the security team must isolate a group of virtual desktop hosts straight away. How should this change be handled?",
+   "options": [
+    [
+     "A",
+     "As an emergency change: authorized quickly by the emergency change authority, made at once and fully documented afterwards."
+    ],
+    [
+     "B",
+     "As a normal change, assessed in full and scheduled for the next regular change-control meeting, so nothing is rushed or missed."
+    ],
+    [
+     "C",
+     "As a standard change, because isolating hosts is a routine, documented task that the security team performs often."
+    ],
+    [
+     "D",
+     "Outside change control altogether, because the work is part of handling a security incident, not a change."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "An emergency change must be made as soon as possible, for example to resolve an incident or respond to a security threat. Assessment and authorization are expedited, often by a smaller emergency change authority, and documentation can be completed after the change is made.",
+   "incorrect": {
+    "B": "Waiting for a scheduled meeting to contain an active threat would put clinical systems at risk.",
+    "C": "Standard changes are low-risk and pre-authorized. Isolating clinical hosts during an attack carries real risk.",
+    "D": "Emergency changes still need authorization and records, so the organization knows what changed and can review it."
+   },
+   "artifactKey": "r3-major-incident-service-restoration-review"
+  },
+  {
+   "id": "q-itil-22",
+   "certification": "ITIL",
+   "domain": "Management practices · Service levels",
+   "prompt": "Grace Liu's monthly report tells unit managers that the service desk met its service levels on 64.6% of tickets with a known outcome. Managers still say new staff often cannot work their first shift. The same data shows access requests met their target only 15.2% of the time, with a median of 4.26 days. What should Grace change?",
+   "options": [
+    [
+     "A",
+     "Keep the single figure, because it sums up every ticket type in one simple number that unit managers can follow."
+    ],
+    [
+     "B",
+     "Report service levels by type of work and agree with managers a measure of their outcome, such as access working before the first shift."
+    ],
+    [
+     "C",
+     "Raise the overall service level target so that the desk is pushed to work faster on every type of ticket it receives each month."
+    ],
+    [
+     "D",
+     "Stop reporting service levels to unit managers, since the figures are causing frustration without changing anything about the service."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Service levels should reflect what the consumer values and be agreed with them. One 64.6% figure looks acceptable while access requests, which decide whether a clinician can work, meet target only 15.2% of the time. Splitting the measures and tying one to the managers' outcome shows the real experience.",
+   "incorrect": {
+    "A": "The blended figure hides the poor access-request result that matters most to these managers.",
+    "C": "A higher blended target neither shows nor fixes the access-request gap.",
+    "D": "Hiding the measures removes the basis for improving the service and the relationship."
+   },
+   "artifactKey": "r1-service-catalogue-entry-and-service-levels"
+  },
+  {
+   "id": "q-itil-23",
+   "certification": "ITIL",
+   "domain": "Continual improvement · Improvement model",
+   "prompt": "The redesigned access-request process went live a month ago and the team wants to start the next improvement straight away. Nobody has yet compared the current median days, or the share resolved within 72 hours, with the baseline of 4.26 days and 27.3%. Which question of the continual improvement model has the team skipped?",
+   "options": [
+    [
+     "A",
+     "What is the vision?"
+    ],
+    [
+     "B",
+     "Where are we now?"
+    ],
+    [
+     "C",
+     "How do we keep the momentum going?"
+    ],
+    [
+     "D",
+     "Did we get there?"
+    ]
+   ],
+   "correct": "D",
+   "explanation": "The continual improvement model from ITIL 4, which Version 5 refines, asks seven questions: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? After taking action, measure against the baseline and the agreed targets (median 1 day, 80% within 72 hours) before moving on.",
+   "incorrect": {
+    "A": "The vision was set before the redesign: the right access on the first shift and none after the last.",
+    "B": "The baseline answers this, and it was measured before the redesign.",
+    "C": "This comes after checking the results, to embed and build on the improvement."
+   },
+   "artifactKey": "r1-continual-improvement-register"
+  },
+  {
+   "id": "q-itil-24",
+   "certification": "ITIL",
+   "domain": "Value stream mapping and management · Scope of a value stream",
+   "prompt": "Grace Liu is about to map the clinician access value stream for Release 2. Where should the map begin and end?",
+   "options": [
+    [
+     "A",
+     "From when the service desk logs the ticket to when the service desk closes it, since that is the part of the clinician's journey the desk controls."
+    ],
+    [
+     "B",
+     "From account provisioning to multi-factor authentication enrolment, the steps where most of the technical work is done."
+    ],
+    [
+     "C",
+     "From the demand that triggers it, such as a human resources joiner event, to the clinician working with the right access on the first shift."
+    ],
+    [
+     "D",
+     "From the business owner's approval to the creation of the account, since nothing can happen before approval."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "A value stream is the series of steps an organization takes to create and deliver products and services to consumers. Mapping it from demand to realized value, here access that works on the first shift, shows every handoff and wait, including those outside the service desk.",
+   "incorrect": {
+    "A": "This is the desk's internal view. It misses the waiting before the ticket is logged and whether the clinician can actually work.",
+    "B": "This maps one team's part of the flow, not the whole stream from demand to value.",
+    "D": "It leaves out the trigger and the early steps where requests wait, and stops before value is confirmed."
+   },
+   "artifactKey": "r2-access-request-value-stream"
+  },
+  {
+   "id": "q-x-01",
+   "certification": "Intersection",
+   "domain": "PMP Manage and control changes · Health Information Act · PL-300 Model security",
+   "prompt": "Janelle Cardinal, business owner of bed data, asks for the bed dashboard to list alternate level of care (ALC) patients by name and bed number so her team can chase discharges. The dashboard is classified Confidential and built on de-identified, aggregated data. What should you do first?",
+   "options": [
+    [
+     "A",
+     "Build the list, because Janelle is the business owner of the bed data and has the authority to decide which of her staff may see patient names."
+    ],
+    [
+     "B",
+     "Log it as a change request with an impact assessment, including Priya Raman's privacy review against the Health Information Act, for the board."
+    ],
+    [
+     "C",
+     "Add the list behind a row-level security (RLS) role so that only Janelle's own team can see the patient names and bed numbers."
+    ],
+    [
+     "D",
+     "Reject the request yourself, because the Health Information Act forbids patient names on any report or dashboard."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "The request touches scope, privacy, security and the model at once, so it goes through change control with a privacy review. Under sections 57 and 58 of the Health Information Act, Kestrel must use the highest degree of anonymity possible and only the information essential to the purpose. That is why the board approved unit-level ALC counts and days instead (CR-01), with the care team using the Clinical Information System for patient detail.",
+   "incorrect": {
+    "A": "Owning the data does not override the Health Information Act or change control, and names would make the dashboard Restricted.",
+    "C": "RLS limits who sees rows. It does not show that names are essential, and it skips the change and privacy decisions.",
+    "D": "The Act requires the least information and highest anonymity for the purpose; it is not a blanket ban. The decision belongs to the board, informed by a privacy review."
+   },
+   "artifactKey": "r1-change-control-process"
+  },
+  {
+   "id": "q-x-02",
+   "certification": "Intersection",
+   "domain": "PMP Plan and manage procurement · CISSP Security and Risk Management · ITIL Partners and Suppliers",
+   "prompt": "For Release 3, Kestrel plans to have Sentinel SOC Services (V-04) monitor logs from the Identity Directory and the Clinical Information System. Sentinel processes security log data in the United States (risk R-05). The contract change is ready to sign. What should happen before any logs flow?",
+   "options": [
+    [
+     "A",
+     "Stop the change, because Alberta law bans storing or processing health information outside Canada, so a Canadian monitoring provider is needed instead."
+    ],
+    [
+     "B",
+     "Sign now, because security logs are technical records about systems and contain no personal or health information."
+    ],
+    [
+     "C",
+     "Sign now, and ask Sentinel to show evidence of its privacy and security safeguards at the first annual contract review next year."
+    ],
+    [
+     "D",
+     "Have Priya Raman review the personal and health information in the logs and the safeguards for use outside Alberta, and put them in the contract."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Supplier risk sits across procurement, privacy and security. Section 60 of the Health Information Act requires safeguards that protect health information stored or used outside Alberta, so the privacy review and the contract terms must come before the data moves. This is R-05's response: privacy review and contract safeguards, owned by Priya Raman.",
+   "incorrect": {
+    "A": "No Alberta statute bans this. The Health Information Act requires safeguards for health information used outside Alberta. A keep-in-Canada rule would be a Kestrel policy or contract term.",
+    "B": "Logs carry user IDs and names, and access logs from a clinical system can identify the patients whose records were opened.",
+    "C": "Evidence a year later does not put the required safeguards in place before the data moves."
+   },
+   "artifactKey": "r3-supplier-and-software-risk-assessment"
+  },
+  {
+   "id": "q-x-03",
+   "certification": "Intersection",
+   "domain": "ITIL Change · CISSP Communication and Network Security · PMP Manage conflicts",
+   "prompt": "After a facilitated session, Tomás Rivera and Ahmed Haddad agree what the firewall change for the on-premises data gateway must allow and when it should happen. What is the best next step?",
+   "options": [
+    [
+     "A",
+     "Raise a normal change allowing only the traffic the gateway needs, with a rollback plan, authorized for the agreed window."
+    ],
+    [
+     "B",
+     "Let Ahmed apply the firewall rule tonight, since the two people who disagreed now agree on exactly what it must allow."
+    ],
+    [
+     "C",
+     "Open a broad firewall rule now so refresh testing can continue, and narrow it to the minimum needed after go-live."
+    ],
+    [
+     "D",
+     "Install a personal-mode gateway on Tomás's workstation, so that no firewall change is needed and testing starts today."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "The conflict is settled, but the change still needs control. A normal change is assessed, authorized and scheduled. Limiting the rule to the minimum traffic the gateway needs follows least privilege, and a tested rollback plan protects the network that carries clinical traffic if something goes wrong.",
+   "incorrect": {
+    "B": "Agreement between two people is not change authorization, and an unrecorded change is hard to review or roll back.",
+    "C": "A broad rule breaks least privilege and exposes the clinical network, and temporary rules tend to stay.",
+    "D": "This ties refresh to one person's computer (R-06) and bypasses the governed gateway design."
+   },
+   "artifactKey": "r1-workspace-refresh-and-deployment-plan"
+  },
+  {
+   "id": "q-x-04",
+   "certification": "Intersection",
+   "domain": "CISSP Identity and Access Management · ITIL Problem management · PMP Remove impediments and manage issues",
+   "prompt": "Profiling identity data for Release 2, Mei Tanaka finds that Olivia Grant (E-014), an agency nurse whose contract has ended, still has an enabled account with order-entry permission in the Clinical Information System. What should happen first?",
+   "options": [
+    [
+     "A",
+     "Leave the account for the joiner-mover-leaver automation that Release 2 will deliver, which will disable it along with all the others."
+    ],
+    [
+     "B",
+     "Delete the account and its whole audit history now, so that the identity record is clean before the quarterly access review begins."
+    ],
+    [
+     "C",
+     "Disable the account and remove its permissions now, check its use since the contract ended, and log the issue for a leaver-process fix."
+    ],
+    [
+     "D",
+     "Email Olivia Grant to ask whether she still needs access, and disable the account straight away if she says no."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Contain the exposure first by disabling the account and removing its permissions. Then check activity after the end date, because any use since then could be unauthorized access to health information that must be assessed under the Health Information Act's breach rules. Finally, log the issue (I-02) and remove the cause: how ClearPath end dates reach Kestrel.",
+   "incorrect": {
+    "A": "The exposure exists today. Waiting weeks leaves an active account with clinical permissions.",
+    "B": "Deleting audit history destroys the evidence needed to see whether the account was used after the contract ended.",
+    "D": "A former contractor cannot authorize her own access, and the account stays open while you wait."
+   },
+   "artifactKey": "r2-joiner-mover-leaver-workflow"
+  },
+  {
+   "id": "q-x-05",
+   "certification": "Intersection",
+   "domain": "PL-300 Model the data · CISSP Identity and Access Management · PMP Plan and optimize quality of products/deliverables",
+   "prompt": "A week before the Release 1 gate, the site operations page is slow for site users. A Lumen consultant suggests removing row-level security (RLS) from the semantic model, because pages load faster without it, and publishing a separate report for each site instead. What should you do?",
+   "options": [
+    [
+     "A",
+     "Keep RLS and use Performance Analyzer and DAX query view to find the slow visuals and measures, then fix and retest them."
+    ],
+    [
+     "B",
+     "Remove RLS as the consultant suggests, since one report per site gives each site the same protection with faster pages for everyone."
+    ],
+    [
+     "C",
+     "Accept the slow page for go-live and record the performance problem in the lessons-learned register for Release 2."
+    ],
+    [
+     "D",
+     "Switch every table to DirectQuery so the data stays in the warehouse and each page loads faster for site users."
+    ]
+   ],
+   "correct": "A",
+   "explanation": "Security controls are not a performance budget to spend. Performance Analyzer and DAX query view show which visuals and measures are slow, so the team can fix the cause while RLS keeps each site to its own data. Retest both performance and RLS before the gate.",
+   "incorrect": {
+    "B": "Separate reports are harder to govern and easy to share wrongly, and anyone with access to the shared model could still see every site.",
+    "C": "Performance is a quality criterion. A page too slow to use damages adoption from day one.",
+    "D": "DirectQuery usually makes visuals slower, not faster, and changing storage mode this late is an untested design change."
+   },
+   "artifactKey": "r1-rls-test-pack"
+  },
+  {
+   "id": "q-x-06",
+   "certification": "Intersection",
+   "domain": "CISSP Security Operations · ITIL Incident management · PMP Plan and manage communication",
+   "prompt": "In the Release 3 tabletop exercise, ransomware encrypts the Clinical Information System at 07:00 on a weekday. At 07:30 Kevin Park wants to restore from last night's backup at once to meet the 4-hour recovery time objective (RTO). The emergency department is already on downtime procedures. What is the best response?",
+   "options": [
+    [
+     "A",
+     "Restore from last night's backup at once, because meeting the 4-hour RTO is the top priority for patient care."
+    ],
+    [
+     "B",
+     "Hold all updates to clinical areas until the system is back, so that busy staff on downtime procedures are not confused by changing estimates."
+    ],
+    [
+     "C",
+     "Keep the system isolated until containment and a clean backup are confirmed, while the service desk updates clinical areas regularly."
+    ],
+    [
+     "D",
+     "Wipe and rebuild every server first, and decide how and when to communicate with clinical areas once recovery is under way."
+    ]
+   ],
+   "correct": "C",
+   "explanation": "Incident response contains the threat before recovery, and a restore is only safe from a backup known to be clean. Major-incident handling runs alongside: the service desk keeps clinical areas informed while they work on downtime procedures. The RTO matters, but not enough to justify restoring into an active attack.",
+   "incorrect": {
+    "A": "Restoring before containment, or from a backup not yet checked, can reinfect the system and lose more time than it saves.",
+    "B": "Clinicians on downtime procedures need regular, honest updates to plan care. Silence leads to unsafe workarounds.",
+    "D": "Eradication and recovery follow scoping and containment, and communication cannot wait for recovery."
+   },
+   "artifactKey": "r3-ransomware-response-playbook"
+  },
+  {
+   "id": "q-x-07",
+   "certification": "Intersection",
+   "domain": "CISSP Security and Risk Management · ITIL Warranty · PMP Plan and manage risk",
+   "prompt": "The Clinical Information System has a 4-hour recovery time objective (RTO), but its two restore tests took 9.0 and 13.5 hours, the last on 2025-08-14 (risk R-04). In a Release 3 meeting someone proposes setting the RTO to 14 hours so the next test passes. What is the best response?",
+   "options": [
+    [
+     "A",
+     "Set the RTO to 14 hours, because a recovery target the system cannot meet gives clinicians a false sense of safety."
+    ],
+    [
+     "B",
+     "Keep the 4-hour RTO and mark the restore control as passed, because the nightly backup jobs complete without errors and are monitored."
+    ],
+    [
+     "C",
+     "Ask Meridian Clinical Systems to set the RTO, since they supply the Clinical Information System and know its limits."
+    ],
+    [
+     "D",
+     "Keep the RTO as the clinical need, record the gap as a risk, plan fixes and a retest, and have the business accept any residual risk."
+    ]
+   ],
+   "correct": "D",
+   "explanation": "Recovery targets come from the business: how long care can tolerate an outage, confirmed through the business impact analysis. When capability falls short, you do not move the target. You treat the gap as a risk, plan improvements and stronger downtime procedures, retest, and have the business owner accept any residual risk. In ITIL terms this is warranty: continuity the consumer can rely on.",
+   "incorrect": {
+    "A": "The RTO reflects how long care can tolerate the outage. Changing it to fit current capability hides the risk to patients.",
+    "B": "A finished backup job does not prove a restore within 4 hours. Both tests show it fails.",
+    "C": "The vendor helps meet the target, but Kestrel's clinical leaders decide what outage care can tolerate."
+   },
+   "artifactKey": "r3-rto-and-rpo-recommendation"
+  },
+  {
+   "id": "q-x-08",
+   "certification": "Intersection",
+   "domain": "CISSP Identity and Access Management · ITIL Value streams · PMP Remove impediments and manage issues",
+   "prompt": "Issue I-01: Kevin Park (E-009) can provision accounts, approve access requests and administer the Identity Directory audit logs, and he granted 62.6% of current user permissions. Grace Liu worries that removing his approval rights will make access requests, already at a median of 4.26 days, even slower. What should you do?",
+   "options": [
+    [
+     "A",
+     "Leave Kevin's rights in place until the value-stream redesign is live, then separate the duties in a way that does not slow access for clinicians."
+    ],
+    [
+     "B",
+     "Separate the duties now, giving approval to business owners and audit logs to security, and speed up requests through the value stream."
+    ],
+    [
+     "C",
+     "Keep his rights, and ask him to sign a statement that he will never approve his own access or change the logs."
+    ],
+    [
+     "D",
+     "Remove only his audit-log rights, since approving and provisioning together is what keeps access requests moving for clinicians."
+    ]
+   ],
+   "correct": "B",
+   "explanation": "Segregation of duties stops one identity from controlling incompatible steps: here granting, approving and covering the trail. Kestrel's rule allows no one to hold two of these on the Identity Directory. Request speed is a real need, but the fix is to remove waits in the value stream, not to keep a toxic combination.",
+   "incorrect": {
+    "A": "One person who can grant, approve and change the evidence is a live control failure. Speed does not justify keeping it.",
+    "C": "He has already approved his own rights. A promise is not a control, and he could still alter the logs.",
+    "D": "Approving and provisioning are also incompatible under Kestrel's rule, so one person would still control the whole grant."
+   },
+   "artifactKey": "r2-segregation-of-duties-analysis"
+  }
+ ]
+}

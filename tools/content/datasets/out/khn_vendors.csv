@@ -1,0 +1,6 @@
+vendor_id,vendor_name,service,data_location,has_remote_access,last_assurance_report,contract_end,risk_rating
+V-01,Meridian Clinical Systems,CIS software and remote support,Canada,Yes,2026-03-31,2029-03-31,High
+V-02,NorthArc Cloud,Hosting and backup,Canada,Yes,2026-05-15,2028-06-30,High
+V-03,ClearPath Staffing,Agency nurses,Canada,No,,2027-03-31,Medium
+V-04,Sentinel SOC Services,Managed security monitoring,United States,Yes,2025-11-30,2027-12-31,High
+V-05,Lumen Analytics Partners,Power BI consulting for Release 1,Canada,Yes,2025-06-30,2026-11-30,Medium

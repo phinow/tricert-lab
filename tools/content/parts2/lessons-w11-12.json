@@ -1,0 +1,1031 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w11-s1",
+   "summary": "Design Kestrel's network zones and the flows allowed between them, decide where firewalls, intrusion detection and secure protocols act, and choose the logs the managed security operations centre needs, with rules for time, integrity and retention.",
+   "read": [
+    {
+     "heading": "Why a flat hospital network is dangerous",
+     "body": "Ransomware rarely starts on the system it encrypts. It lands on a workstation or a remote session, steals credentials, then moves sideways to the servers that matter. On a flat network, where every device can reach every other, that is easy. Segmentation splits the network into zones and allows only the flows each zone needs.\n\nKestrel's records show the risk. SEC-004, the Critical ransomware precursor of 2026-08-11, hit the Virtual Desktop Service (A-008), which is how clinicians reach the Clinical Information System (CIS, A-001) from shared workstations. The same service had malware in July (SEC-002) and September (SEC-008). And 12 of Kestrel's 15 systems depend directly on the Identity Directory (A-007) in khn_assets.csv, so an attacker who reaches it reaches almost everything.\n\nToday you design the zones, the allowed flows and the logging that lets the security operations centre (SOC) see an attack in progress."
+    },
+    {
+     "heading": "Kestrel's zones and micro-segmentation",
+     "body": "In this lesson ED means emergency department, PACS is the Picture Archiving and Communication System and MFA is multi-factor authentication.\n\n| Zone | What lives there | Main rule |\n|---|---|---|\n| Z1 Clinical core | CIS (A-001), ED Tracking Board (A-002), Laboratory (A-003), Pharmacy (A-005), Bed Management (A-006) | Users arrive only through the Z5 virtual desktops; interfaces between named servers only |\n| Z2 Imaging | PACS (A-004) and imaging devices | Devices talk only to the systems they feed; no internet |\n| Z3 Legacy quarantine | Clinical Paging (A-014), past end of support | Paging traffic only; nothing else in or out |\n| Z4 Management and identity | Identity Directory (A-007), administrator jump hosts, log collector | Administrators only, with MFA |\n| Z5 User access | Virtual Desktop Service (A-008) hosts | Clinician sessions after MFA and single sign-on |\n| Z6 Workstations | Shared clinical workstations and staff devices | Untrusted by default; no direct route to Z1 |\n| Z7 Analytics | Warehouse (A-010) and the on-premises data gateway | Scheduled extracts in; the gateway only opens outbound connections to the Power BI service |\n\nEverything else is External: NorthArc Cloud (A-011, A-012, A-013, A-015), the Power BI service (A-009), Sentinel SOC Services (V-04) and vendor support. External parties reach Kestrel only through defined flows.\n\nBetween zones, a firewall or access control list applies default deny: everything is blocked and logged unless a documented flow allows it, with source, destination, port, reason and owner. Medical and imaging devices are isolated because manufacturers must validate patches first, so you protect them by isolation rather than fast patching. A-014 gets a quarantine zone for a stronger reason: it no longer receives security fixes at all.\n\nMicro-segmentation applies policy per workload, often with host firewalls or software-defined networking. The CIS database accepts connections only from the CIS application servers, so a compromised server elsewhere in Z1, such as the Bed Management System, cannot reach it even though both sit in the same zone. That stops ransomware moving sideways inside a zone."
+    },
+    {
+     "heading": "Firewalls, VPN and zero trust network access",
+     "body": "Firewall types, with the Open Systems Interconnection (OSI) layers they work at:\n\n- Packet filter: stateless; checks addresses and ports (layers 3 and 4). Fast but blind to sessions.\n- Stateful inspection: tracks connections and allows return traffic only for permitted sessions. The usual zone boundary control.\n- Application-level proxy: understands the protocol at layer 7; slower but precise.\n- Next-generation firewall: stateful inspection plus application awareness, user identity and intrusion prevention.\n- Web application firewall: blocks attacks such as injection against web applications.\n\nA virtual private network (VPN) builds an encrypted tunnel and usually places the signed-in user on the network, free to try whatever they can route to. Zero trust network access (ZTNA) brokers one application at a time, checks identity, MFA and device health every session, and never gives the user an address inside Kestrel. NIST Special Publication 800-207, from the National Institute of Standards and Technology, describes zero trust architecture.\n\nBeacon's decision: Meridian (V-01) and NorthArc (V-02) support reach Kestrel only through a jump host in Z4, with MFA, a ticket approved by the system owner, a time limit and recording (flow FL-09). ZTNA is the stronger long-term option. The Meridian engineer, Raj Patel (E-015), shows why this matters: his enabled privileged account has no MFA and no end date, and holds an excess grant to view charts in the CIS."
+    },
+    {
+     "heading": "Where controls act: layers, IDS and IPS, secure protocols",
+     "body": "| Layer | Name | Example controls |\n|---|---|---|\n| 7 | Application | Web application firewall, email filtering, CIS audit logging |\n| 4 | Transport | Stateful rules on TCP and UDP ports |\n| 3 | Network | Routing, access control lists, IPsec tunnels |\n| 2 | Data link | VLANs, 802.1X port authentication |\n| 1 | Physical | Locked closets, disabled unused wall ports |\n\nTCP and UDP are the Transmission Control Protocol and User Datagram Protocol, IPsec is Internet Protocol Security, and VLANs are virtual local area networks.\n\nAn intrusion detection system (IDS) watches a copy of traffic and alerts; it cannot block. An intrusion prevention system (IPS) sits inline and blocks, so a false positive stops legitimate traffic. Either can be network-based or host-based and detect by signature (known patterns) or anomaly (departure from a baseline, which catches new attacks but raises more false alarms). A wrongly blocked clinical interface is a patient-safety event, so Beacon runs new IPS rules in detect-only mode in front of clinical and device zones, tunes them, then blocks.\n\nSecure protocol swaps: Telnet to Secure Shell (SSH); File Transfer Protocol to SSH File Transfer Protocol (SFTP); plain web traffic to Hypertext Transfer Protocol Secure (HTTPS) with Transport Layer Security (TLS) 1.2 or 1.3; Simple Network Management Protocol versions 1 and 2c to version 3; directory queries to Lightweight Directory Access Protocol over TLS (LDAPS). Domain Name System Security Extensions (DNSSEC) prove name answers are genuine but do not encrypt them. Two weak cipher findings are open: SEC-013 on Email (A-013) and SEC-018 on IT Service Management (A-011)."
+    },
+    {
+     "heading": "What the SOC needs to see",
+     "body": "Security information and event management (SIEM) collects logs, normalizes them, correlates events across sources, raises alerts and keeps records for investigation. Sentinel SOC Services (V-04) monitors Kestrel's SIEM; Sam Okafor (E-020) is the liaison.\n\n| Log source | What it shows | Kestrel case |\n|---|---|---|\n| Identity Directory (A-007) | Sign-ins, failures, MFA, new accounts, privileged group changes | SEC-009 |\n| Zone firewalls and the vendor jump host | Allowed and denied flows, vendor sessions | Movement from A-008 |\n| Endpoint detection and response (EDR) | Processes, file changes, encryption behaviour | SEC-004 |\n| Email security (A-013) | Phishing, malicious attachments | SEC-001, SEC-007, SEC-010 |\n| Backup Platform (A-012) | Failed jobs, deletions, immutability changes | Attackers target backups first |\n| CIS (A-001) audit log | Who opened which patient record | SEC-003 |\n| Power BI activity log (A-009) | Exports, sharing, permission changes | SEC-006 |\n\nPrivacy shapes the design. Sentinel processes log data in the United States (risk R-05). No Alberta statute bans storage outside Canada, but section 60 of the Health Information Act (HIA) requires safeguards that protect health information stored or used outside Alberta. So Kestrel forwards security events only, replaces patient identifiers in CIS audit events with a pseudonymous token, and keeps the full CIS audit logs, which identify the patient record opened, in its own store in Canada. Priya Raman (E-003) owns R-05 and reviews the design and the contract safeguards."
+    },
+    {
+     "heading": "Time, integrity and retention",
+     "body": "Time: every device and the SIEM use the same internal Network Time Protocol (NTP) sources, and logs record Coordinated Universal Time (UTC) or the offset. SEC-008 shows contained_at at 13:10, before detected_at at 14:30 on 2026-09-09; until the SOC corrects it, the record is useless for timing.\n\nIntegrity: forward logs in near real time to the SIEM and to write-once storage, hash archived files so tampering shows, and separate duties so nobody administers the logs of systems they run. Today Kevin Park (E-009) provisions accounts, approves access and administers audit logs (issue I-01); Beacon moves log administration to security (E-020).\n\nRetention: Kestrel policy sets the period for each log type. Beacon proposes 1 year for security logs and 10 years for CIS access logs, the period the provincial logging standard sets for Alberta electronic health record access logs. These are proposals; Priya Raman (E-003) and Daniel Osei (E-004) agree the final values."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Segmentation",
+     "definition": "Dividing a network into zones of similar trust and allowing only documented flows between them, with a default deny rule for everything else."
+    },
+    {
+     "term": "Micro-segmentation",
+     "definition": "Applying access policy per workload or server rather than per zone, so a compromised device cannot reach other systems even inside the same zone."
+    },
+    {
+     "term": "Zero trust network access (ZTNA)",
+     "definition": "Access brokered to one application per session after checking identity, MFA and device health, without giving the user a network address inside the organization."
+    },
+    {
+     "term": "Intrusion detection system (IDS)",
+     "definition": "A passive monitor that inspects a copy of traffic or host activity and raises alerts. It cannot block traffic."
+    },
+    {
+     "term": "Intrusion prevention system (IPS)",
+     "definition": "An inline control that detects and blocks malicious traffic. A false positive blocks legitimate traffic, so rules are tuned in detect mode first."
+    },
+    {
+     "term": "Security information and event management (SIEM)",
+     "definition": "A platform that collects, normalizes and correlates logs from many sources, raises alerts and keeps records for investigation."
+    },
+    {
+     "term": "Default deny",
+     "definition": "A firewall stance in which every flow is blocked unless a documented rule allows it, with a source, destination, port, reason and owner."
+    }
+   ],
+   "build": {
+    "goal": "Produce the Network segmentation and logging design: Kestrel's zones, a flow table ending in default deny, the vendor remote access decision, and the log sources the SOC needs, with time, integrity and retention rules.",
+    "steps": [
+     "Open Project, Release 3, Network segmentation and logging design, and read How to write it.",
+     "Write the zone table with the seven zones, Z1 to Z7, plus External, and name Ahmed Haddad (E-017) as network owner and Sam Okafor (E-020) as logging owner.",
+     "Write the allowed flows with an ID, source, destination, what is allowed and the control (the finished example has ten, FL-01 to FL-10), including Z6 workstations to the Z5 virtual desktops (FL-01), Z5 to the clinical zones (FL-02) and the Z7 gateway's outbound-only link to the Power BI service (FL-06). State the default deny rule: any flow not in the table is blocked and logged.",
+     "Record the vendor remote access decision (a recorded jump host in Z4 with MFA, an owner-approved ticket and a time limit, with ZTNA as the longer-term option) and list E-015's missing MFA and end date as findings.",
+     "List each log source, what it detects and the Kestrel incident that proves the need; mark the sources that carry health information and stay inside Kestrel because of R-05.",
+     "Add the NTP rule, write-once storage, the move of audit-log administration away from E-009 (I-01), and retention periods labelled proposed.",
+     "Compare your work with See the finished example, tick the Done when checklist, then answer Check yourself."
+    ],
+    "modelAnswer": "| ID | From | To | Allowed | Control |\n|---|---|---|---|---|\n| FL-01 | Z6 Workstations | Z5 User access (A-008) | Virtual desktop sessions | MFA and single sign-on through A-007 |\n| FL-02 | Z5 | Z1, Z2 | Clinical application clients | Desktop pool only; no workstation reaches Z1 |\n| FL-06 | Z7 gateway | Power BI service | Outbound encrypted web traffic (port 443) | The gateway opens every connection |\n| FL-09 | V-01, V-02 | Z4 jump host | Remote support | MFA, approved ticket, time limit, recorded |\n| Default | Any | Any | Anything not in the table | Blocked and logged |"
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 4, Communication and Network Security: when a question asks how to limit the spread of ransomware, segmentation and micro-segmentation beat stronger passwords or more antivirus. An inline control that blocks is an IPS; a passive monitor that only alerts is an IDS."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 4, Communication and Network Security: match controls to layers. VLANs and 802.1X work at layer 2, IPsec at layer 3, stateful port rules at layer 4, and web application firewalls and proxies at layer 7."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (logging and monitoring): synchronized time is a precondition for correlation and for evidence. If logs disagree on time, fix NTP before you trust any timeline built from them."
+    }
+   ],
+   "pitfalls": [
+    "Allowing any-to-any traffic between internal zones because a flow is hard to document. Every allowed flow needs a source, destination, port, reason and owner.",
+    "Switching a new IPS straight to block mode in front of clinical systems. A false positive that stops a clinical interface is a patient-safety event.",
+    "Sending CIS audit logs that identify patient records to a SOC that processes data in the United States without privacy review and contract safeguards (R-05).",
+    "Letting system administrators administer their own audit logs, which lets one person act and erase the evidence (I-01)."
+   ],
+   "check": [
+    {
+     "q": "Why does Beacon micro-segment the CIS database even though it already sits in the clinical core zone (Z1)?",
+     "a": "Zone rules control traffic between zones, not inside them. A compromised server elsewhere in Z1, such as the Bed Management System, could still reach the database. Micro-segmentation lets the database accept connections only from the CIS application servers, which stops ransomware moving sideways inside the zone."
+    },
+    {
+     "q": "What is the practical difference between a VPN and ZTNA for Meridian's support engineer?",
+     "a": "A VPN usually places the engineer on Kestrel's network after sign-in, so they can try to reach anything routable. ZTNA brokers access to one named application per session, checks identity, MFA and device health each time, and never gives an address inside Kestrel. It also makes expiry and session recording simple."
+    },
+    {
+     "q": "SEC-008 shows contained_at before detected_at. Which logging control helps prevent this, and how is the record treated now?",
+     "a": "Synchronized time: every device and the SIEM use the same NTP sources and record UTC or an offset, so timestamps line up. Until Sam Okafor (E-020) supplies the true times, SEC-008 stays in incident counts but is left out of every time measure."
+    }
+   ]
+  },
+  {
+   "key": "w11-s2",
+   "summary": "Build a consistent way to rate security incidents by severity, impact, urgency and priority, write a ransomware playbook from preparation to recovery, and connect incidents to problem management using Kestrel's real incident records.",
+   "read": [
+    {
+     "heading": "Severity, impact, urgency and priority",
+     "body": "Four words get mixed up in incident work. Keep them apart.\n\n- Severity: how serious the security event is. Kestrel records Critical, High, Medium or Low in khn_security_events.csv.\n- Impact: how much harm results: patient safety, number of sites and users, sensitivity of the data, legal consequences.\n- Urgency: how fast the harm grows if nothing is done.\n- Priority: the order in which work is done. In ITIL it comes from impact and urgency.\n\nKestrel's incident classification model uses severity as its impact measure and adds urgency (the incident is spreading, or a shift or clinic is about to start). It uses the service desk's priority codes so one queue works:\n\n| Priority | Usually | Triage (proposed) | Containment started (proposed) | Service restored |\n|---|---|---|---|---|\n| P1 | Critical, or High and spreading | 15 minutes | 1 hour | 4 hours |\n| P2 | High | 30 minutes | 4 hours | 8 hours |\n| P3 | Medium | 4 hours | 24 hours | 24 hours |\n| P4 | Low | Next business day | 72 hours | 72 hours |\n\nThe restore column is the service desk's existing targets (sla_target_hours in the service desk data). For a security incident it means service back, perhaps with a workaround; full recovery is tracked separately. Severity criteria, patient safety first:\n\n- Critical: a tier 1 clinical service down or at imminent risk at one or more sites, or Restricted health information encrypted, copied or destroyed at scale.\n- High: a tier 1 system affected while care continues, a privileged account compromised, or confirmed unauthorized access to Restricted or Confidential data.\n- Medium: a tier 2 or 3 system, or one tier 1 device, contained, with no confirmed access to Restricted data.\n- Low: one user, no service impact, nothing exposed.\n\nTwo rules: the highest level any criterion reaches sets the severity, and when you are unsure you classify one level higher and lower it later with evidence. Privacy is assessed separately: any incident touching Restricted data goes to Priya Raman (E-003) whatever its severity. Kestrel's 10 unique incidents split Critical 1, High 3, Medium 4, Low 2."
+    },
+    {
+     "heading": "The incident response lifecycle",
+     "body": "The classic model is NIST Special Publication (SP) 800-61 Rev. 2 from the National Institute of Standards and Technology. It has four phases:\n\n1. Preparation: policy, playbooks, trained people, contact lists, tools, tested backups.\n2. Detection and analysis: spot the signs, confirm an incident, scope it, rate it, record it.\n3. Containment, eradication and recovery: stop the spread, remove the cause, restore service and watch for return.\n4. Post-incident activity: lessons learned, evidence retention and improvement actions.\n\nThe phases loop. Analysis often finds more affected systems, which sends you back to containment, and lessons learned feed preparation.\n\nRev. 3, published in April 2025, superseded Rev. 2. It frames incident response around the six Functions of the NIST Cybersecurity Framework (CSF) 2.0: Govern, Identify, Protect, Detect, Respond and Recover. Preparation now sits mostly in Govern, Identify and Protect, and response and recovery in Respond and Recover. Many teams and study guides still teach the four phases, so learn both. CISSP study material also often lists seven steps: detection, response, mitigation, reporting, recovery, remediation and lessons learned.\n\nKestrel's SEC-004 shows the lifecycle in real times: the activity began at 02:20 on 2026-08-11, was detected at 03:05, the record was opened at 03:20, containment came at 05:45, and normal service returned at 18:30 on 2026-08-13."
+    },
+    {
+     "heading": "Ransomware playbook: the first hours",
+     "body": "A playbook is a pre-agreed set of steps with an owner and a trigger for each. For ransomware, the first hours decide how bad the day becomes.\n\n1. Declare. An endpoint detection and response (EDR) alert, a ransom note or locked files makes the service desk raise a P1 and call security. Daniel Osei (E-004) or his delegate becomes incident commander and declares a major incident.\n2. Isolate, do not power off. Cut affected hosts from the network through EDR isolation, a switch port or a firewall rule, but leave them running. Powering off destroys memory evidence: running processes, network connections and sometimes keys.\n3. Protect what recovery needs. Separate the Backup Platform (A-012) from production, end vendor remote sessions and confirm the immutable backup copy. CT-005 confirmed an immutable Clinical Information System (CIS) backup copy in NorthArc's Canadian region on 2026-09-24.\n4. Contain identities. Disable compromised accounts and reset privileged credentials from a clean administrator workstation. The Identity Directory (A-007) is the attacker's prize, since 12 of 15 systems depend on it.\n5. Preserve evidence: memory images, logs and a copy of the ransom note, under chain of custody.\n6. Start clinical downtime. Chloe Dubois (E-016), Business Continuity Lead, activates downtime procedures for affected areas."
+    },
+    {
+     "heading": "Ransomware playbook: eradicate, recover, decide",
+     "body": "Eradication removes the attacker, not just the encryption. Find the entry point and every persistence mechanism, rebuild affected hosts from known-good images rather than cleaning them, close the weakness used, and reset all privileged and service account passwords.\n\nRecovery restores from backups taken before the infection and scanned clean. Restore in the inventory order: the Identity Directory (A-007) first; then the Backup Platform (A-012) and Clinical Paging (A-014); then the Virtual Desktop Service (A-008) and the CIS (A-001); then A-002, A-003 and A-005; then tier 2 and tier 3. Clinical owners check the data before go-live, monitoring stays heightened for re-infection, and zones reconnect in stages.\n\nPlan for the evidence you have. Both CIS restore tests failed: 9.0 hours and 13.5 hours against a 4-hour recovery time objective (RTO), and the last test was on 2025-08-14. The playbook must assume downtime procedures may run for more than half a day.\n\nPaying a ransom is not an IT decision. It belongs to Kestrel's accountable executives, with legal counsel and law enforcement input and the Chief Information Security Officer's advice. Payment does not guarantee working decryption or the deletion of stolen data, and counsel must confirm whether a payment would be lawful. The playbook names the decision-makers in advance and lists the facts they need, above all how long recovery will take without paying."
+    },
+    {
+     "heading": "Incident, major incident, problem, known error",
+     "body": "ITIL keeps restoring service and removing causes apart.\n\n- Incident: an unplanned interruption to a service or a reduction in its quality. Incident management restores normal service as fast as possible.\n- Major incident: an incident with such high impact that it needs its own procedure: a dedicated lead, shorter timescales, frequent communication and a review afterwards. SEC-004 was Kestrel's major incident.\n- Problem: the cause, or potential cause, of one or more incidents. Problem management reduces how often incidents happen and how much harm they do.\n- Known error: a problem that has been analyzed but not yet resolved.\n- Workaround: a way to reduce or remove the impact of an incident or problem while a full fix is not available.\n\nPatterns in the data call for problem records. The Virtual Desktop Service had SEC-002 (Medium malware, 2026-07-14), SEC-004 (Critical, 2026-08-11) and SEC-008 (Medium malware, 2026-09-09): three incidents on one tier 1 system in three months. Email (A-013) had three phishing incidents: SEC-001 (High), SEC-007 (Medium) and SEC-010 (Low). Each incident was closed, but the causes remain.\n\nThe workflow runs: incident logged, categorized and prioritized; diagnosed; resolved or worked around; closed. Trends and major incidents raise a problem; analysis finds the cause; a known error is recorded with its workaround; a change removes the cause; the problem closes once the fix is verified. Grace Liu (E-005) owns incident records, Sam Okafor (E-020) leads security analysis, and each problem gets a named owner. In ITIL's product and service lifecycle this work sits in the Operate and Support stages, and fixes return through Build and Transition as changes."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Priority",
+     "definition": "The order in which incidents are worked, set from impact (how much harm) and urgency (how fast harm grows), not from who shouts loudest."
+    },
+    {
+     "term": "Major incident",
+     "definition": "An incident with high impact that needs a separate procedure: a dedicated lead, shorter timescales, frequent communication and a formal review afterwards."
+    },
+    {
+     "term": "Problem",
+     "definition": "The cause, or potential cause, of one or more incidents. Problem management finds and removes causes so incidents happen less often or do less harm."
+    },
+    {
+     "term": "Known error",
+     "definition": "A problem that has been analyzed but not yet resolved, usually recorded with a workaround so support teams can restore service quickly."
+    },
+    {
+     "term": "Workaround",
+     "definition": "A way to reduce or remove the impact of an incident or problem while a full resolution is not yet available."
+    },
+    {
+     "term": "Containment",
+     "definition": "Actions that stop an incident spreading or causing more harm, such as isolating hosts and disabling accounts, while preserving evidence."
+    },
+    {
+     "term": "Eradication",
+     "definition": "Removing the cause of an incident: the malware, the attacker's persistence and the weakness used, often by rebuilding from known-good images."
+    }
+   ],
+   "build": {
+    "goal": "Build three linked documents: the Incident classification model, the Ransomware response playbook and the Incident and problem management workflow, each tested against Kestrel's real incident records.",
+    "steps": [
+     "Open Project, Release 3, and the three documents for today. Read How to write it for each before you start.",
+     "In the Incident classification model, define the severity criteria (patient safety first), the priority table that combines severity with urgency, and response targets; label every target you set as proposed.",
+     "Test the model: classify all 10 unique incidents in khn_security_events.csv, compare your rating with the recorded severity, and explain any you would change.",
+     "In the Ransomware response playbook, write the steps by NIST phase with an owner and a trigger for each: isolation without power-off, backup protection, evidence, downtime activation, and the executive and legal payment decision.",
+     "Add the recovery order (A-007; then A-012 and A-014; then A-008 and A-001; then A-002, A-003 and A-005; then tier 2 and tier 3) and state that both CIS restore tests failed, so downtime may be long.",
+     "In the Incident and problem management workflow, draw the path from incident to problem, known error and change, and open problem records PRB-01 for recurring malware on A-008 and PRB-02 for repeat phishing on A-013.",
+     "Compare all three with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "| Record | What happened | Severity | Priority (proposed) | Handling |\n|---|---|---|---|---|\n| SEC-004 | Ransomware precursor, A-008, tier 1 | Critical | P1 | Major incident declared |\n| SEC-003 | Unauthorized access, CIS (A-001) | High | P2 | Health Information Act risk-of-harm assessment by Priya Raman (E-003) |\n| SEC-009 | Unauthorized access, A-007 | High (Critical if a privileged account was used) | P2 | Contained, not yet recovered; staff data, so a Protection of Privacy Act assessment |\n| SEC-006 | Misconfiguration, A-009, tier 3 | Medium | P3 | Check exposure of Confidential data |\n| SEC-010 | Phishing, A-013, single user | Low | P4 | Close with user advice |"
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (incident management): know the NIST SP 800-61 Rev. 2 phases in order, and that Rev. 3 (April 2025) superseded it and frames response around the CSF 2.0 Functions. In ransomware questions, the first action is usually to contain by isolating affected systems, not to power them off, pay or restore at once."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Incident management restores service; problem management removes causes. A workaround restores service but does not close the problem, and a known error is a problem analyzed but not yet resolved."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management: paying a ransom is a business decision for senior management with legal advice. The security professional gives facts and advice; they do not decide."
+    }
+   ],
+   "pitfalls": [
+    "Powering off infected machines. It destroys memory evidence; isolate them from the network instead.",
+    "Restoring from the newest backup without proving it predates the infection, which can restore the attacker along with the data.",
+    "Closing the problem when the incident closes. Three malware incidents on A-008 need a problem record and a root cause even though each was restored.",
+    "Leaving the ransom decision to whoever is on call. The playbook names the executive and legal decision-makers in advance."
+   ],
+   "check": [
+    {
+     "q": "SEC-002, SEC-004 and SEC-008 all occurred on the Virtual Desktop Service. What ITIL record should this pattern create, and why?",
+     "a": "A problem record, because a problem is the cause or potential cause of one or more incidents. Each incident was restored, but three malware incidents on one tier 1 system in three months suggest a shared cause. Problem management finds it, records a known error and workaround, and raises a change to remove it."
+    },
+    {
+     "q": "In the first hour of a suspected ransomware attack on a server, why isolate it rather than shut it down?",
+     "a": "Isolation stops the spread while keeping volatile evidence such as running processes, network connections and memory contents, which may show how the attacker got in and sometimes hold keys. Shutting down loses that evidence and can trigger more damage on restart."
+    },
+    {
+     "q": "Name the four phases of NIST SP 800-61 Rev. 2 and say what changed with Rev. 3.",
+     "a": "Preparation; detection and analysis; containment, eradication and recovery; post-incident activity. Rev. 3, published in April 2025, superseded Rev. 2 and frames incident response around the CSF 2.0 Functions: Govern, Identify, Protect, Detect, Respond and Recover."
+    }
+   ]
+  },
+  {
+   "key": "w11-s3",
+   "summary": "Decide who is told about a security incident, by whom and how fast: internal escalation tiers, the Health Information Act breach duty for patient information, the Protection of Privacy Act test for staff information, communication roles, and evidence handling with chain of custody.",
+   "read": [
+    {
+     "heading": "Two laws, two tests",
+     "body": "Kestrel is a public body and a custodian under the Health Information Act (HIA). Patient health information falls under the HIA. Non-health personal information, such as staff records, falls under the Protection of Privacy Act (POPA), which does not apply to health information held by a public body that is an HIA custodian.\n\n| Question | HIA: patient health information | POPA: staff and other non-health personal information |\n|---|---|---|\n| What triggers the duty | Loss of, or unauthorized access to or disclosure of, health information | Loss of, or unauthorized access to or disclosure of, personal information |\n| The test | A risk of harm to an individual | A reasonable person would consider there is a real risk of significant harm |\n| Who is notified | The Commissioner, the Minister responsible under the Act and the affected individuals | The affected individuals, the Commissioner and the Minister responsible under the Act |\n| How fast | The Commissioner as soon as practicable | Without unreasonable delay |\n\nThe HIA test, risk of harm, is a lower bar than POPA's real risk of significant harm. Do not mix them up. Under section 60.1 of the HIA, an affiliate (employees, contractors, volunteers, students, agents and information managers) must tell the custodian about a breach. The custodian then notifies the Commissioner, the Minister responsible under the Act and the affected individuals. Notice to individuals is in writing. The factors for judging risk of harm are set in the Health Information Regulation. Kestrel may withhold notice to an individual if it could reasonably be expected to harm that person's mental or physical health, but must then tell the Commissioner. Failing to notify is an offence under the Act.\n\nUnder POPA, if the incident falls below the real risk of significant harm threshold, notice to the Commissioner and the Minister is not required. Kestrel policy still records every assessment and its reasoning, whichever law applies."
+    },
+    {
+     "heading": "Applying the tests to Kestrel's incidents",
+     "body": "Practise on real records from khn_security_events.csv. The data shows what happened to systems; the assessment needs facts the investigation must still supply.\n\n- SEC-003, unauthorized access on the Clinical Information System (CIS, A-001). The CIS holds Restricted, individually identifying health information, so the HIA applies if records were viewed. The access began at 22:10 on 2026-07-29 and was detected at 10:15 on 2026-08-02, about 84 hours later, a long exposure window. Facts needed: which records, by whom, for what purpose. Given the lower HIA bar, plan for notice to the Commissioner, the Minister and each affected patient.\n- SEC-009, unauthorized access on the Identity Directory (A-007). The directory holds staff account data, not health information, so POPA applies; if the attacker reached health information through it, the HIA applies too. Facts needed: which accounts and fields, whether passwords or other credentials were exposed. It is still Contained, not recovered.\n- SEC-005, a lost device with access to Email (A-013). Was it encrypted? Was it wiped? Did the mailbox hold patient details? If patient health information was on it, the HIA test applies; if only staff information, POPA.\n- SEC-006, a misconfiguration on Power BI (A-009). Beacon dashboards hold de-identified, aggregated data, but small counts at Prairie Gate (risk R-02) could identify people, so assess before concluding there is no risk.\n\nPriya Raman (E-003), Chief Privacy Officer, leads every assessment and decides on notice for Kestrel, with legal counsel. Security supplies the facts; privacy applies the test."
+    },
+    {
+     "heading": "Internal escalation tiers",
+     "body": "In the table, CISO means Chief Information Security Officer and SOC means security operations centre.\n\n| Tier | Who | Joins when | Decides |\n|---|---|---|---|\n| 1 | Service desk, Grace Liu (E-005) | Every report | Log, prioritize, route security reports to tier 2 |\n| 2 | Security analyst Sam Okafor (E-020) with Sentinel SOC Services (V-04) | Any security alert or report | Confirm an incident, set initial severity, first containment |\n| 3 | CISO Daniel Osei (E-004) as incident commander | High or Critical severity, or any possible privacy breach | Containment strategy, declare a major incident |\n| 4 | Marcus Bell (E-002), Dr. Helen Marchetti (E-001), Priya Raman (E-003) | Critical severity, clinical disruption or likely notification | Downtime, external notice, legal and ransom decisions |\n\nChloe Dubois (E-016) joins at any clinical disruption, and Kestrel's legal counsel and communications lead join at tier 4.\n\nThe finished matrix sets these Kestrel policy times, which are proposed targets, not law. For a Critical incident, Sam Okafor (E-020) tells Daniel Osei, Marcus Bell, Grace Liu, Chloe Dubois and Priya Raman within 15 minutes, and Daniel Osei tells Dr. Helen Marchetti within 1 hour. For High, the CISO and the system custodian (and Priya Raman if data is involved) hear within 1 hour; Medium within 4 hours; Low by the next business day. Any suspected privacy breach reaches the Privacy Office within the same shift, and Priya Raman completes the risk-of-harm assessment within 24 hours of the report.\n\nAffiliates must report too, and many do not know it. Agency and vendor workers, such as ClearPath (V-03) nurses and Meridian (V-01) engineers, are affiliates under the HIA, yet only 48% of that group had completed privacy and security awareness training by 2026-09-30. Reporting routes belong in their onboarding."
+    },
+    {
+     "heading": "Communication roles during an incident",
+     "body": "Clear roles stop five people giving five different answers.\n\n- Incident commander (E-004 or delegate): one voice, owns decisions, sets the update rhythm.\n- Technical lead (E-020, with V-04 and Ahmed Haddad, E-017, for the network): runs containment and analysis.\n- Scribe: records the timeline, decisions and evidence; this record feeds the post-incident review.\n- Communications lead: drafts staff messages and media statements, which executives approve before release.\n- Clinical liaisons (Dr. Sarah Whitford, E-007, for emergency care; Janelle Cardinal, E-008, for patient flow): translate technical status into clinical impact and back.\n- Privacy lead (E-003): runs the breach assessment and writes the notices.\n- Service desk (E-005): keeps users informed and the ticket current.\n\nPlan for broken channels. If Email (A-013) or Clinical Paging and Secure Messaging (A-014) is affected, or possibly watched by the attacker, switch to a pre-agreed phone bridge and printed contact lists. Share incident details on a need-to-know basis, which protects both the investigation and the privacy of the people involved."
+    },
+    {
+     "heading": "Evidence handling and chain of custody",
+     "body": "An incident can start as an administrative matter and become criminal, civil or regulatory. The five investigation types are administrative, criminal, civil, regulatory and industry standards. Handle evidence from the start as if it may reach a court.\n\nCollect in order of volatility, most fragile first: memory and running processes, network connections, temporary files, disk contents, logs held on other systems, then archives and backup media.\n\nMake forensic copies. Take a bit-for-bit image through a write blocker, hash the original and the copy (for example with Secure Hash Algorithm 256, SHA-256), and analyze only the copy. Matching hashes prove the copy is exact.\n\nKeep a chain of custody record for each item: description, hash, who collected it, when and where; then every transfer, with from whom, to whom, when, why and signatures; plus where it was stored and who accessed it. A gap lets someone argue the evidence was changed. Good evidence is authentic, complete, reliable and handled so it stays admissible.\n\nEvidence can hold patient data. A CIS server image contains Restricted health information, so store it under Restricted handling and limit who can open it. When legal action or a regulator's investigation is likely, place a legal hold that suspends routine deletion of the related logs and mailboxes."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Risk of harm (HIA)",
+     "definition": "The HIA breach test for health information. If loss or unauthorized access or disclosure creates a risk of harm to an individual, the custodian notifies the Commissioner, the Minister and the individuals."
+    },
+    {
+     "term": "Real risk of significant harm (POPA)",
+     "definition": "The POPA test for non-health personal information: notice is required when a reasonable person would consider there is a real risk of significant harm. It is a higher bar than the HIA test."
+    },
+    {
+     "term": "Affiliate",
+     "definition": "Under the HIA, a person acting for a custodian, such as an employee, contractor, volunteer, student, agent or information manager. Affiliates must report breaches to the custodian."
+    },
+    {
+     "term": "Chain of custody",
+     "definition": "The documented record of who collected each item of evidence, how it was identified and hashed, every transfer, and where it was stored, proving it was not altered."
+    },
+    {
+     "term": "Order of volatility",
+     "definition": "Collecting the most short-lived evidence first: memory and running processes, then network state, temporary files, disk, remote logs and archives."
+    },
+    {
+     "term": "Incident commander",
+     "definition": "The single person who owns decisions during an incident, sets the update rhythm and speaks for the response, so teams do not act on conflicting instructions."
+    }
+   ],
+   "build": {
+    "goal": "Build the Escalation and breach-notification matrix: escalation tiers with triggers and owners, the HIA and POPA notification paths, communication roles and evidence rules, tested on SEC-003, SEC-005 and SEC-009.",
+    "steps": [
+     "Open Project, Release 3, Escalation and breach-notification matrix, and read How to write it.",
+     "Write the four escalation tiers with who, trigger and decision; label every time target you set as proposed Kestrel policy.",
+     "Add the notification table with one row for the HIA and one for POPA, using the exact tests and recipients, and name Priya Raman (E-003) as owner of every assessment.",
+     "Write three worked assessments for SEC-003, SEC-009 and SEC-005: which law applies, the facts still needed, and the decision rule for notice.",
+     "Add the communication roles and the out-of-band channel to use if Email (A-013) or Clinical Paging (A-014) is down.",
+     "Add the evidence section: order of volatility, hashing, the fields of the chain of custody form, Restricted handling and legal hold.",
+     "Compare with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "SEC-009 assessment (excerpt). Law: POPA, because the Identity Directory holds staff account data, not health information (and the HIA too if health information was reached). Facts needed: which accounts and fields were read, and whether credentials were exposed. Test: would a reasonable person consider there is a real risk of significant harm? If yes, notify the affected staff, the Commissioner and the Minister responsible under the Act without unreasonable delay. If no, record the reasoning; notice to the Commissioner and the Minister is not required. Owner: Priya Raman (E-003)."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management (legal, regulatory and compliance; investigation types): expect the right answer to involve legal counsel and the privacy officer before any external notice. Know the five investigation types: administrative, criminal, civil, regulatory and industry standards."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (investigations): collect evidence in order of volatility, memory before disk, hash the original and the copy, and analyze only the copy. Any break in the chain of custody weakens admissibility."
+    },
+    {
+     "cert": "PMP",
+     "tip": "People task 8, Plan and manage communication: in a crisis, the communication plan must say who speaks, who approves messages and which channel replaces email if it fails. Escalation paths are part of that plan."
+    }
+   ],
+   "pitfalls": [
+    "Applying POPA's real risk of significant harm test to patient health information. Patient information falls under the HIA, whose test is the lower risk of harm.",
+    "Notifying only the Commissioner. The HIA also requires notice to the Minister responsible under the Act and to the affected individuals, in writing.",
+    "Analyzing the original disk instead of a hashed forensic copy, which breaks the chain of custody.",
+    "Coordinating an incident by email when email itself may be down or watched by the attacker."
+   ],
+   "check": [
+    {
+     "q": "Why is the HIA test easier to meet than the POPA test, and which applies to SEC-003?",
+     "a": "The HIA asks whether there is a risk of harm to an individual; POPA asks whether a reasonable person would consider there is a real risk of significant harm, a higher bar. SEC-003 was unauthorized access on the CIS, which holds health information, so the HIA applies if patient records were accessed."
+    },
+    {
+     "q": "Under the HIA, whom must Kestrel notify, and how must individuals be told?",
+     "a": "The Commissioner as soon as practicable, the Minister responsible under the Act, and the affected individuals, in writing. Kestrel may withhold notice to an individual if it could reasonably be expected to harm that person's mental or physical health, but must then tell the Commissioner."
+    },
+    {
+     "q": "What must a chain of custody record show?",
+     "a": "What the item is and its hash, who collected it, when and where, then every transfer with from whom, to whom, when, why and signatures, plus where it was stored and who accessed it. Any gap lets someone argue the evidence was altered."
+    }
+   ]
+  },
+  {
+   "key": "w11-s4",
+   "summary": "Rank Kestrel's open vulnerabilities by risk to patient care, not by score alone: read CVSS correctly, weigh exploitability, asset tier and exposure, and plan patches, changes, compensating controls and risk acceptance for each finding.",
+   "read": [
+    {
+     "heading": "The vulnerability management cycle",
+     "body": "Vulnerability management is a loop, not a scan:\n\n1. Discover: scanners, vendor advisories and findings from the security operations centre (SOC).\n2. Assess: confirm the finding and score it.\n3. Prioritize: decide what to fix first, using risk, not just the score.\n4. Remediate or mitigate: patch, reconfigure, upgrade, replace, or add compensating controls.\n5. Verify: rescan to prove the fix worked.\n6. Report: trends, overdue items and exceptions to the owners.\n\nThe loop depends on the asset inventory you built in week 10. SEC-016 is a missing patch on A-021, a system that is not in khn_assets.csv. You cannot patch what you do not know you own, so the first fix for SEC-016 is to register the system and name an owner.\n\nKestrel's remediation policy sets due dates from detection: Critical 7 days, High 30, Medium 60, Low 90. On the as-of date, 2026-10-01, Kestrel has 10 unique vulnerability records. Two are remediated (SEC-011 and SEC-019), 8 are open, and 3 are past their due date: SEC-012, SEC-015 and SEC-017."
+    },
+    {
+     "heading": "CVSS: what the score means and what it does not",
+     "body": "The Common Vulnerability Scoring System (CVSS) rates a vulnerability's technical severity from 0.0 to 10.0. Learn the bands:\n\n| Score | Rating |\n|---|---|\n| 0.0 | None |\n| 0.1 to 3.9 | Low |\n| 4.0 to 6.9 | Medium |\n| 7.0 to 8.9 | High |\n| 9.0 to 10.0 | Critical |\n\nThe base score describes the flaw itself: how it is reached (network, adjacent network, local or physical access), how complex the attack is, what privileges and user action it needs, and the impact on confidentiality, integrity and availability. CVSS version 4.0 also has threat metrics (called temporal in version 3.1) and environmental metrics, so you can adjust for exploit activity and your own setting.\n\nA base score is not a risk rating. It says nothing about whether your system is reachable, what it does for patients, or whether someone is already exploiting the flaw.\n\nCheck the data before you use it. Every score in khn_security_events.csv matches its severity band except one: SEC-017 is scored 11.5, which is impossible. Kestrel's rule DQ-05 says the record is not valid until it is rescored, but it stays on the open-risk list. A Critical remote code execution finding on PACS (the Picture Archiving and Communication System, A-004) must not vanish because its number is wrong. Sam Okafor (E-020) obtains the correct score; until then you treat it as Critical."
+    },
+    {
+     "heading": "Prioritizing by risk to patient care",
+     "body": "Weigh five things together: severity, exploitability (is there a public exploit, is it being used in attacks; published lists of known exploited vulnerabilities and exploit prediction scores help), asset criticality (tier and patient impact), exposure (internet-facing, reachable from user or vendor zones, or isolated), and how long it is overdue. Ages and overdue days below are calculated to 2026-10-01, and CIS is the Clinical Information System.\n\n| Rank | Record and system | Score | Due, status | Why this rank |\n|---|---|---|---|---|\n| 1 | SEC-017 remote code execution, PACS (A-004), tier 2 | 11.5 invalid, treat as Critical | 2026-09-28, 3 days overdue | Lets an attacker run code; imaging supports clinical care |\n| 2 | SEC-012 missing patch, CIS (A-001), tier 1 | 8.1 High | 2026-09-25, 6 days overdue | The most important clinical system, and its restores have failed twice |\n| 3 | SEC-015 end-of-support software, Clinical Paging (A-014), tier 1 | 8.6 High | 2026-08-19, 43 days overdue | Support ended 2026-06-30, so no patch will come; isolate it |\n| 4 | SEC-014 excessive permission, Identity Directory (A-007), tier 1 | 7.5 High | 2026-10-15, open 16 days | 12 systems depend on A-007 |\n| 5 | SEC-016 missing patch, A-021, not in inventory | 6.5 Medium | 2026-11-07, open 23 days | Owner and exposure unknown |\n| 6 | SEC-020 excessive permission, Clinical Data Warehouse (A-010), tier 2 | 5.4 Medium | 2026-11-28, open 2 days | Staging holds Restricted data |\n| 7 | SEC-013 weak cipher, Email (A-013), tier 2 | 5.9 Medium | 2026-11-01, open 29 days | Email carries Confidential data |\n| 8 | SEC-018 weak cipher, IT Service Management Platform (A-011), tier 2 | 3.7 Low | 2026-12-21, open 9 days | Lower impact |\n\nYou could argue SEC-015 belongs above SEC-012 because it is the most overdue. That is fine: the point of the plan is that you state the factors and can defend the order. The finished plan puts the CIS higher because its restores have failed twice, so an attack there is the hardest to recover from, and puts SEC-020 above SEC-013 although its score is lower, because warehouse staging holds Restricted data. Ranks 1 to 3 are all overdue and all need action this week."
+    },
+    {
+     "heading": "Patching clinical systems safely",
+     "body": "Patch management is a controlled process: keep an inventory and baseline; receive and assess the vendor patch; test in non-production; schedule a change window; take a backup and confirm the restore path; deploy in stages; verify with a rescan and a clinical check; document; and keep a rollback plan ready.\n\nThe CIS needs extra care. Both CIS restore tests failed: 9.0 hours and 13.5 hours against a 4-hour recovery time objective (RTO). If the SEC-012 patch damaged the database, recovery could take most of a day. So before patching: take a verified backup, confirm Meridian Clinical Systems' (V-01) rollback steps, choose a low-demand window and have downtime procedures ready.\n\nMedical devices are different again. Their patches usually need the manufacturer's validation, so you protect them with segmentation and monitoring until a validated patch exists.\n\nLink the plan to the schedule. Task 24, Remediate priority vulnerabilities, runs 7 working days from 2026-11-27 to 2026-12-07 with 2 days of float. SEC-012, SEC-015 and SEC-017 were already overdue on 2026-10-01, so waiting for task 24 is not acceptable. They go through Kestrel's operational change process now; task 24 covers the rest and the verification evidence."
+    },
+    {
+     "heading": "Change management and compensating controls",
+     "body": "Every fix to a production system is a change. ITIL's change practice (change control) and change management (CISSP) follow the same pattern: request, impact and risk assessment, approval by the right authority, scheduling, implementation, verification, review and records. Three types:\n\n- Standard change: pre-approved, low risk and repeatable, such as routine workstation patches.\n- Normal change: assessed and approved by the change authority, often a change advisory board (CAB).\n- Emergency change: an urgent fix approved through a faster route and reviewed afterwards. An overdue Critical remote code execution such as SEC-017 qualifies.\n\nOperational changes follow Kestrel's operational change process. The programme's change-control board, chaired by Marcus Bell (E-002), controls Beacon's baselines, not production patches.\n\nA compensating control is an alternative that reduces the same risk when the primary control is not possible. SEC-015 is the case: Clinical Paging and Secure Messaging (A-014) is tier 1, its support ended on 2026-06-30 (93 days before the as-of date) and no patch will come. Until it is replaced:\n\n- Move it to its own segment and allow only the flows it needs.\n- Block internet access.\n- Allow administration only from the management zone with multi-factor authentication.\n- Ask the SOC to alert on any new outbound connection.\n- Fund and date a replacement.\n\nThen record a formal, time-bound risk acceptance by the business owner, Dr. Helen Marchetti (E-001), advised by Daniel Osei (E-004), with a review on 2026-12-17 (proposed). A compensating control must be documented, owned, tested and reviewed; it is never permanent."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "CVSS base score",
+     "definition": "A 0.0 to 10.0 rating of a vulnerability's technical severity: Low 0.1 to 3.9, Medium 4.0 to 6.9, High 7.0 to 8.9, Critical 9.0 to 10.0. It is not a full risk rating."
+    },
+    {
+     "term": "Exploitability",
+     "definition": "How easily and how actively a flaw can be or is being used by attackers, for example whether a public exploit exists or attacks have been seen."
+    },
+    {
+     "term": "Asset criticality",
+     "definition": "How much the business depends on a system. At Kestrel it is the tier in khn_assets.csv, with tier 1 for systems that patient care relies on."
+    },
+    {
+     "term": "Compensating control",
+     "definition": "An alternative control that reduces the same risk when the primary control cannot be applied. It must be documented, owned, tested and time-limited."
+    },
+    {
+     "term": "Emergency change",
+     "definition": "A change that must be made urgently, approved through a faster route and reviewed afterwards. It still needs authorization and records."
+    },
+    {
+     "term": "End of support",
+     "definition": "The date after which a vendor no longer issues fixes for a product. Unsupported systems must be replaced, isolated or covered by a formal risk acceptance."
+    }
+   ],
+   "build": {
+    "goal": "Write the Vulnerability-remediation plan: every open finding ranked by risk to patient care, with owner, due date, fix, change type, and any compensating control or risk acceptance.",
+    "steps": [
+     "Open Project, Release 3, Vulnerability-remediation plan, and read How to write it.",
+     "List the 8 open vulnerabilities from khn_security_events.csv (duplicate removed, severity casing fixed) with detected date, due date, age and days overdue on 2026-10-01.",
+     "Check every CVSS score against its band; record SEC-017's 11.5 as invalid, keep it open as Critical, and assign rescoring to Sam Okafor (E-020).",
+     "Rank the findings using severity, exploitability, tier, exposure and overdue days, and write one line that defends each rank.",
+     "For each finding, name the owner from khn_assets.csv, the fix and the change type (emergency, normal or standard); for SEC-012 add the backup and rollback check before patching the CIS.",
+     "Write the compensating controls and time-bound risk acceptance for SEC-015 on A-014, and the asset registration action for SEC-016 on A-021.",
+     "Link the plan to schedule task 24, then compare with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "SEC-015, Clinical Paging and Secure Messaging (A-014), High 8.6, end of support since 2026-06-30, due 2026-08-19, 43 days overdue on 2026-10-01. No patch is possible. Compensating controls: own segment with only the flows it needs; no internet; administration only from the management zone with multi-factor authentication; SOC alert on any new outbound connection. Replacement: business case to the sponsor. Risk acceptance: Dr. Helen Marchetti (E-001), advised by Daniel Osei (E-004), review on 2026-12-17 (proposed)."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (patch and vulnerability management): CVSS measures severity, not risk. Given a lower-scored flaw on an exposed critical system and a higher-scored flaw on an isolated test server, the exposed critical system usually comes first."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 2, Asset Security (asset retention, end of life and end of support): unsupported software cannot be patched. The answers that fit are replace, isolate with compensating controls, or formally accept the risk with an owner and an expiry date."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (change management): an emergency change still needs authorization and documentation. It is approved faster and reviewed afterwards; it never skips control."
+    }
+   ],
+   "pitfalls": [
+    "Ranking only by CVSS score, which ignores asset tier, exposure and whether an exploit exists.",
+    "Dropping SEC-017 from the list because its score is invalid. Fix the score and keep the risk visible.",
+    "Patching the CIS without a verified backup and rollback plan when its restores have failed twice.",
+    "Treating a compensating control as permanent. It needs an owner, a test and an end date."
+   ],
+   "check": [
+    {
+     "q": "Why is SEC-017 kept on the open-risk list even though its CVSS score of 11.5 is invalid?",
+     "a": "CVSS scores run from 0.0 to 10.0, so 11.5 is a data error, not a reason to ignore the finding. The record describes a Critical remote code execution on PACS (A-004), 3 days past its 2026-09-28 due date. Kestrel keeps it visible as Critical, has E-020 rescore it, and leaves it out of score statistics until then."
+    },
+    {
+     "q": "What makes SEC-015 different from a missing-patch finding, and how should Kestrel respond?",
+     "a": "It is end-of-support software on Clinical Paging (A-014), whose support ended 2026-06-30, so no vendor patch will come. Kestrel must replace the system and, until then, isolate, restrict and monitor it as compensating controls, with a time-bound risk acceptance by the business owner advised by the Chief Information Security Officer."
+    },
+    {
+     "q": "Why should the SEC-012 patch on the CIS be preceded by a backup and restore check?",
+     "a": "If the patch damages the CIS, recovery may need a restore, and both CIS restore tests failed (9.0 and 13.5 hours against a 4-hour RTO). A verified backup, the vendor's rollback steps, a low-demand window and ready downtime procedures limit the harm if the patch goes wrong."
+    }
+   ]
+  },
+  {
+   "key": "w11-s5",
+   "summary": "Build the security-operations dashboard in Power BI: incidents by severity and category, mean times to detect, contain and recover that reconcile to 25.29, 1.93 and 28.33 hours, vulnerabilities by severity and age, control results, restore performance and awareness completion.",
+   "read": [
+    {
+     "heading": "What the dashboard must answer",
+     "body": "Daniel Osei (E-004), Sam Okafor (E-020) and Marcus Bell (E-002) need answers. Are we detecting, containing and recovering fast enough? Which vulnerabilities are overdue? Which controls fail? Can we restore the Clinical Information System (CIS)? Are people trained? Build three pages:\n\n1. Incidents: counts by severity and category; mean time to detect (MTTD), mean time to contain (MTTC) and mean time to recover (MTTR).\n2. Vulnerabilities: open findings by severity and age, and the overdue list.\n3. Controls and recovery: control results, restore time against recovery time objective (RTO), and awareness by group.\n\nSome measures are key performance indicators (KPIs), showing how a process performs; others are key risk indicators (KRIs), warning that risk is rising, such as overdue vulnerabilities and failed restores.\n\nSecurity event data is Confidential in Kestrel's data dictionary. Apply the Confidential sensitivity label, publish to the Beacon Security Operations workspace, which only the security and executive group can reach, and give consumers the Viewer role or app access. Import mode suits these small files. It is schedule task 25: 4 working days from 2026-12-08, with 2 days of float."
+    },
+    {
+     "heading": "Prepare the data in Power Query",
+     "body": "Load three tables and give them model names: FactSecurityEvent from khn_security_events.csv, FactControlTest from khn_controls.csv and DimAsset from khn_assets.csv. Power Query renames the source columns to the names the measures use (record_type to RecordType, occurred_at to OccurredAt, remediation_due to RemediationDue and so on). Apply Kestrel's quality rules to the security events:\n\n- Remove exact duplicates (DQ-01): SEC-005 appears twice; keep one copy.\n- Fix casing (DQ-03): SEC-019's severity 'hIGH' becomes 'High'.\n- Set types: the five timestamp columns as date/time, so blank times load as null; remediation_due as date; cvss_score as decimal number.\n- Add SequenceValid (DQ-06), typed logical. It is false for SEC-008 and for every vulnerability.\n- Null SEC-017's impossible CVSS score of 11.5 (DQ-05) but keep the row, so it still counts as open and overdue.\n- Keep SEC-008, SEC-016 and SEC-017: flag them as evidence, never delete them.\n\nBuild the file work as a staging query named SecurityEventsStaging, with Enable load turned off:\n\n```\nlet\n    Source = Csv.Document(File.Contents(\"C:\\Beacon\\khn_security_events.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),\n    Deduped = Table.Distinct(Promoted),\n    Severity = Table.TransformColumns(Deduped, {{\"severity\", each Text.Proper(Text.Trim(_)), type text}}),\n    Typed = Table.TransformColumnTypes(Severity, {{\"occurred_at\", type datetime}, {\"opened_at\", type datetime}, {\"detected_at\", type datetime}, {\"contained_at\", type datetime}, {\"recovered_at\", type datetime}, {\"remediation_due\", type date}, {\"cvss_score\", type number}}),\n    #\"Renamed Columns\" = Table.RenameColumns(Typed, {{\"record_id\", \"RecordID\"}, {\"record_type\", \"RecordType\"}, {\"occurred_at\", \"OccurredAt\"}, {\"opened_at\", \"OpenedAt\"}, {\"detected_at\", \"DetectedAt\"}, {\"contained_at\", \"ContainedAt\"}, {\"recovered_at\", \"RecoveredAt\"}, {\"severity\", \"Severity\"}, {\"category\", \"Category\"}, {\"asset_id\", \"AssetID\"}, {\"status\", \"Status\"}, {\"remediation_due\", \"RemediationDue\"}, {\"cvss_score\", \"CVSSScore\"}}),\n    WithSequence = Table.AddColumn(\n        #\"Renamed Columns\",\n        \"SequenceValid\",\n        each [RecordType] = \"Incident\"\n            and [OccurredAt] <= [DetectedAt]\n            and [DetectedAt] <= [ContainedAt]\n            and ([RecoveredAt] = null or [ContainedAt] <= [RecoveredAt]),\n        type logical\n    ),\n    CvssChecked = Table.TransformColumns(WithSequence, {{\"CVSSScore\", each if _ <> null and (_ < 0 or _ > 10) then null else _, type nullable number}})\nin\n    CvssChecked\n```\n\nChange the path to your copy. The result has 20 rows: 10 incidents and 10 vulnerabilities. M stops evaluating an and as soon as one side is false, so vulnerability rows, which have no occurred time, return false at the first test."
+    },
+    {
+     "heading": "DimAsset, the Unknown member and the controls table",
+     "body": "DimAsset holds the 15 unique systems from khn_assets.csv plus one Unknown row, so a security record on an unregistered system stays visible (DQ-10):\n\n```\nlet\n    Source = Csv.Document(File.Contents(\"C:\\Beacon\\khn_assets.csv\"), [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),\n    Deduped = Table.Distinct(Promoted),\n    Kept = Table.SelectColumns(Deduped, {\"asset_id\", \"system_name\", \"tier\", \"rto_target_hours\"}),\n    #\"Renamed Columns\" = Table.RenameColumns(Kept, {{\"asset_id\", \"AssetID\"}, {\"system_name\", \"SystemName\"}, {\"tier\", \"Tier\"}, {\"rto_target_hours\", \"RTOTargetHours\"}}),\n    WithUnknown = Table.InsertRows(#\"Renamed Columns\", Table.RowCount(#\"Renamed Columns\"), {[AssetID = \"Unknown\", SystemName = \"Unknown asset\", Tier = null, RTOTargetHours = null]}),\n    Typed = Table.TransformColumnTypes(WithUnknown, {{\"AssetID\", type text}, {\"SystemName\", type text}, {\"Tier\", Int64.Type}, {\"RTOTargetHours\", type number}})\nin\n    Typed\n```\n\nFactSecurityEvent then references the two queries above. It maps SEC-016's A-021 to Unknown and keeps the original value in SourceAssetID as evidence. It reads no file itself, because the Power Query privacy firewall can stop a query that both reads a data source and references another query; that is why the file work sits in the staging query.\n\n```\nlet\n    KnownAssets = List.Buffer(DimAsset[AssetID]),\n    SourceAsset = Table.DuplicateColumn(SecurityEventsStaging, \"AssetID\", \"SourceAssetID\"),\n    AssetMapped = Table.TransformColumns(SourceAsset, {{\"AssetID\", each if List.Contains(KnownAssets, _) then _ else \"Unknown\", type text}})\nin\n    AssetMapped\n```\n\nFactControlTest loads khn_controls.csv the same way: 13 rows, QuoteStyle.Csv kept because some results contain commas, dates and hours typed, and the columns renamed to ControlTestID, ControlName, AssetID, TestDate, Status, RestoreTestDate, RTOTargetHours, RestoreHours, TrainingGroup and TrainingCompletePct.\n\nRelate DimAsset[AssetID] to both facts, one to many, single direction, so the dimension filters the facts. Leave FactControlTest unrelated to the date table: its restore tests go back to 2025, outside the date table's range."
+    },
+    {
+     "heading": "How MTTD, MTTC and MTTR are computed",
+     "body": "Kestrel defines the three times like this, in hours:\n\n- MTTD: the mean of detected_at minus occurred_at.\n- MTTC: the mean of contained_at minus detected_at.\n- MTTR: the mean of recovered_at minus detected_at, over incidents that have recovered.\n\nAll three use only incidents with a possible sequence: occurred, then detected, then contained, then recovered, never going backwards. The approved results are MTTD 25.29 hours (n = 9), MTTC 1.93 hours (n = 9) and MTTR 28.33 hours (n = 8).\n\nWhy SEC-008 is excluded: it was contained at 13:10 on 2026-09-09 but detected at 14:30, which is impossible. Its containment time would be negative, and you cannot tell which timestamp is wrong, so all three durations are dropped. It still counts as an incident.\n\nThe SEC-005 duplicate is one lost-device incident recorded twice; counting both gives it double weight. MTTR has n = 8 because SEC-009 is still Contained, with no recovered_at.\n\nErrors move the numbers (calculated from the CSV):\n\n| Version | MTTD | MTTC | MTTR |\n|---|---|---|---|\n| Correct: duplicate removed, SEC-008 excluded | 25.29 (n 9) | 1.93 (n 9) | 28.33 (n 8) |\n| Duplicate left in | 24.23 (n 10) | 1.82 (n 10) | 25.55 (n 9) |\n| SEC-008 left in | 23.11 (n 10) | 1.60 (n 10) | 27.24 (n 9) |\n\nKestrel's MTTR runs from detection, not occurrence, and some organizations use MTTR for mean time to respond or repair, so print the definition on the card. Means are pulled by outliers: SEC-003 took 84.08 hours to detect and SEC-006 76.33, so the median time to detect is 14.67 hours. Show both."
+    },
+    {
+     "heading": "The DAX columns and measures",
+     "body": "Data Analysis Expressions (DAX) does the rest. SequenceValid already comes from Power Query, so you need only two calculated columns on FactSecurityEvent: a sort key for severity and the age of each vulnerability on the as-of date.\n\n```\nSeverity Rank =\nSWITCH ( FactSecurityEvent[Severity], \"Critical\", 1, \"High\", 2, \"Medium\", 3, \"Low\", 4 )\n\nAge Days =\nIF (\n    FactSecurityEvent[RecordType] = \"Vulnerability\",\n    DATEDIFF ( FactSecurityEvent[DetectedAt], DATE ( 2026, 10, 1 ), DAY )\n)\n```\n\nSelect the Severity column and set Sort by column to Severity Rank, so visuals show Critical, High, Medium, Low instead of alphabetical order. Then the measures. The first ten are the finished specification's; the last two serve the controls page.\n\n```\nAs Of Date = DATE ( 2026, 10, 1 )\n\nIncidents =\nCALCULATE ( COUNTROWS ( FactSecurityEvent ), FactSecurityEvent[RecordType] = \"Incident\" )\n\nMTTD Hours =\nAVERAGEX (\n    FILTER ( FactSecurityEvent, FactSecurityEvent[SequenceValid] = TRUE () ),\n    DATEDIFF ( FactSecurityEvent[OccurredAt], FactSecurityEvent[DetectedAt], MINUTE ) / 60\n)\n\nMTTC Hours =\nAVERAGEX (\n    FILTER ( FactSecurityEvent, FactSecurityEvent[SequenceValid] = TRUE () ),\n    DATEDIFF ( FactSecurityEvent[DetectedAt], FactSecurityEvent[ContainedAt], MINUTE ) / 60\n)\n\nMTTR Hours =\nAVERAGEX (\n    FILTER (\n        FactSecurityEvent,\n        FactSecurityEvent[SequenceValid] = TRUE ()\n            && NOT ISBLANK ( FactSecurityEvent[RecoveredAt] )\n    ),\n    DATEDIFF ( FactSecurityEvent[DetectedAt], FactSecurityEvent[RecoveredAt], MINUTE ) / 60\n)\n\nOpen Vulnerabilities =\nCALCULATE (\n    COUNTROWS ( FactSecurityEvent ),\n    FactSecurityEvent[RecordType] = \"Vulnerability\",\n    FactSecurityEvent[Status] = \"Open\"\n)\n\nOverdue Vulnerabilities =\nVAR AsOf = [As Of Date]\nRETURN\n    CALCULATE ( [Open Vulnerabilities], FactSecurityEvent[RemediationDue] < AsOf )\n\nControls Passing % =\nDIVIDE (\n    CALCULATE ( COUNTROWS ( FactControlTest ), FactControlTest[Status] = \"Pass\" ),\n    COUNTROWS ( FactControlTest )\n)\n\nRestore Tests Within RTO =\nCOUNTROWS (\n    FILTER (\n        FactControlTest,\n        NOT ISBLANK ( FactControlTest[RestoreHours] )\n            && FactControlTest[RestoreHours] <= FactControlTest[RTOTargetHours]\n    )\n)\n\nDays Since Last CIS Restore Test =\nDATEDIFF (\n    CALCULATE ( MAX ( FactControlTest[RestoreTestDate] ), FactControlTest[AssetID] = \"A-001\" ),\n    [As Of Date],\n    DAY\n)\n\nFailed Controls =\nCALCULATE ( COUNTROWS ( FactControlTest ), FactControlTest[Status] = \"Fail\" )\n\nAwareness Completion % =\nIF (\n    HASONEVALUE ( FactControlTest[TrainingGroup] ),\n    DIVIDE ( MAX ( FactControlTest[TrainingCompletePct] ), 100 )\n)\n```\n\nAVERAGEX averages a duration that exists in no column, over only the rows you pass it. Writing the SequenceValid filter into each time measure means nobody can forget the exclusion, and because SequenceValid is false for every vulnerability, the time measures only ever see valid incidents. Awareness Completion % returns a value only for a single training group, because averaging percentages across groups of different sizes misleads. Beacon fixes the as-of date at 2026-10-01 so the expected values do not change from day to day; at go-live As Of Date becomes TODAY (). With no filters you should see 10 incidents, MTTD 25.29, MTTC 1.93 and MTTR 28.33 hours, 8 open and 3 overdue vulnerabilities, Controls Passing % of 30.8% (4 of 13), 1 restore test within its RTO (CT-003), 413 days since the last CIS restore test and 8 failed controls."
+    },
+    {
+     "heading": "Visuals that tell the truth",
+     "body": "Incidents page: MTTD, MTTC and MTTR cards with the definition and n in each subtitle; incidents by severity (Critical 1, High 3, Medium 4, Low 2) with category in the tooltip (Phishing 3, Malware 2, Unauthorized access 2, Ransomware precursor 1, Lost device 1, Misconfiguration 1); and an incident table with SequenceValid shown, marking SEC-009 not recovered and SEC-008 times under review.\n\nVulnerabilities page: open findings by severity (Critical 1, High 3, Medium 3, Low 1) and by age band from Age Days (0 to 30 days: 6; 31 to 60: 1; over 60: 1); and an overdue table for SEC-012, SEC-015 and SEC-017 that flags SEC-017's invalid score instead of hiding the row.\n\nControls and recovery page: control results (Pass 4, Fail 8, Not tested 1); restore_hours against rto_target_hours (CT-001 CIS 9.0 against 4, CT-002 CIS 13.5 against 4, CT-003 Identity Directory 1.5 against 2, CT-004 Pharmacy not tested); a card for the last CIS restore test, 2025-08-14, 413 days before the as-of date; and awareness by group against a 90% target line (Nursing 86%, Physicians 71%, IT staff 96%, Agency and vendor workers 48%, Executives and leaders 100%).\n\nNever rely on colour alone: add Pass and Fail labels, alt text and a logical tab order, and check load times with Performance Analyzer."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Mean time to detect (MTTD)",
+     "definition": "At Kestrel, the average of detected_at minus occurred_at in hours, over incidents with a possible time sequence. Approved value 25.29 hours (n = 9)."
+    },
+    {
+     "term": "Mean time to contain (MTTC)",
+     "definition": "At Kestrel, the average of contained_at minus detected_at in hours, over incidents with a possible time sequence. Approved value 1.93 hours (n = 9)."
+    },
+    {
+     "term": "Mean time to recover (MTTR)",
+     "definition": "At Kestrel, the average of recovered_at minus detected_at in hours, over recovered incidents with a possible sequence. Approved value 28.33 hours (n = 8)."
+    },
+    {
+     "term": "Impossible sequence",
+     "definition": "A record whose timestamps go backwards, such as SEC-008 contained before it was detected. It stays in counts but is left out of every time measure."
+    },
+    {
+     "term": "Key risk indicator (KRI)",
+     "definition": "A measure that warns when risk is rising, such as overdue vulnerabilities or failed restore tests, as opposed to a KPI that shows process performance."
+    },
+    {
+     "term": "Sort by column",
+     "definition": "A Power BI column property that orders a text column by another column, such as Severity Rank, so categories appear in a meaningful rather than alphabetical order."
+    }
+   ],
+   "build": {
+    "goal": "Build the Security-operations dashboard in Power BI: incident, vulnerability, control, restore and awareness measures that reconcile to the approved figures, on three accessible pages with a Confidential label.",
+    "steps": [
+     "Open Project, Release 3, Security-operations dashboard, and read How to write it. Take khn_security_events.csv, khn_controls.csv and khn_assets.csv from the Kestrel datasets in Practice, Labs.",
+     "In Power Query, build SecurityEventsStaging, DimAsset, FactSecurityEvent and FactControlTest: remove the duplicate SEC-005 row, apply Text.Proper to severity, set types, rename the columns, add SequenceValid, null SEC-017's invalid score, map A-021 to the Unknown asset, and keep every other row.",
+     "Relate DimAsset to both facts, add the Severity Rank and Age Days columns, sort Severity by Severity Rank, and check that SequenceValid is false for SEC-008 and true for the other nine incidents.",
+     "Create the measures and check them: 10 incidents, MTTD 25.29, MTTC 1.93, MTTR 28.33 hours, 8 open and 3 overdue vulnerabilities, Controls Passing % 30.8%, 1 restore test within RTO, 413 days since the last CIS restore test and 8 failed controls.",
+     "Build the incidents, vulnerabilities, and controls and recovery pages, printing each metric's definition and n on its card.",
+     "Apply the Confidential sensitivity label, give consumers Viewer access only, add alt text, and test the pages with Performance Analyzer.",
+     "Paste screenshots and measure definitions into the document, compare with See the finished example, and answer Check yourself."
+    ],
+    "modelAnswer": "Card: MTTD 25.29 h. Subtitle: mean of detected_at minus occurred_at over 9 incidents with a possible sequence; SEC-008 excluded (contained before detected); duplicate SEC-005 removed. Median 14.67 h, because SEC-003 (84.08 h) and SEC-006 (76.33 h) pull the mean up. Card: MTTR 28.33 h, measured from detection to recovery over 8 recovered incidents; SEC-009 is still Contained."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Model the data: AVERAGEX iterates a table and averages an expression row by row, so it fits when the value you need, such as a duration, is not stored in a column. The table you pass to it, filtered or not, decides which rows count."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Visualize and analyze the data: to show Critical, High, Medium, Low in order, sort the text column by a numeric rank column. Alphabetical order would give Critical, High, Low, Medium."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Manage and secure Power BI: sensitivity labels classify and can protect content, workspace roles control who can edit, and row-level security filters rows only for users with the Viewer role."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 6, Security Assessment and Testing (collect security process data): metrics need stated definitions and data-quality rules. A KPI built on duplicates or impossible timestamps misleads management, which is worse than no metric."
+    }
+   ],
+   "pitfalls": [
+    "Counting the duplicate SEC-005 row, which gives one Low incident double weight and drops MTTR from 28.33 to 25.55 hours.",
+    "Letting SEC-008's negative containment time into MTTC. Exclude impossible sequences from every time measure but keep them in counts.",
+    "Averaging awareness percentages across groups of different sizes. Show each group against the 90% target instead.",
+    "Showing MTTR without saying where the clock starts. Kestrel measures from detection, not occurrence."
+   ],
+   "check": [
+    {
+     "q": "How is Kestrel's MTTR of 28.33 hours computed, and why is n only 8?",
+     "a": "MTTR is the mean of recovered_at minus detected_at, in hours, over incidents with a possible sequence that have recovered. Of the 10 unique incidents, SEC-008 is excluded for its impossible sequence and SEC-009 has not recovered, which leaves 8."
+    },
+    {
+     "q": "Why is SEC-008 kept in the incident count but left out of MTTD, MTTC and MTTR?",
+     "a": "The incident happened, so it belongs in counts by severity and category. Its contained_at (13:10) is before its detected_at (14:30), which is impossible, and you cannot tell which timestamp is wrong, so every duration built on it is unreliable until E-020 supplies the true times."
+    },
+    {
+     "q": "Why sort the severity axis by a Severity Rank column?",
+     "a": "Text sorts alphabetically, giving Critical, High, Low, Medium. A rank column (Critical 1, High 2, Medium 3, Low 4) set as the Sort by column shows severities in order of seriousness, which is how the audience reads them."
+    }
+   ]
+  },
+  {
+   "key": "w12-s1",
+   "summary": "Complete Kestrel's business impact analysis: rank clinical services by how harm grows over time, patient safety first, map each to its systems and dependencies from khn_assets.csv, propose the maximum tolerable downtime and set the recovery priority order.",
+   "read": [
+    {
+     "heading": "What a business impact analysis is for",
+     "body": "A business impact analysis (BIA) answers four questions. Which business functions matter most? How does harm grow over time when each one stops? What does each depend on? How fast must each come back? Its outputs, the maximum tolerable downtime (MTD) and a recovery priority order, drive every later decision: the recovery time objective (RTO), the recovery point objective (RPO), the disaster recovery plan and what you test.\n\nBusiness continuity planning follows a sequence: set scope and get management support, run the BIA, choose recovery strategies, write the plans, test and train, then maintain. The BIA comes before strategy because you cannot choose a recovery site or a backup design until you know how long each function can be down.\n\nIn a hospital, start from clinical services, not systems. Clinicians lose emergency care or medication management, not a server. You map services to systems afterwards.\n\nBeacon's schedule holds task 21, Complete business impact analysis and recovery targets: 5 working days, 2026-11-27 to 2026-12-03, on the critical path. Chloe Dubois (E-016), Business Continuity Lead, runs the workshops. Clinical owners rate the impacts and the sponsor, Dr. Helen Marchetti (E-001), approves the result. IT supplies facts; it does not decide how long care can run without a system."
+    },
+    {
+     "heading": "Impact categories, patient safety first",
+     "body": "Rate each service in a fixed order of categories so that money never outranks safety:\n\n1. Patient safety: delayed treatment, medication errors, missed critical results, lost alerts.\n2. Clinical operations: longer waits, fewer patients seen, beds blocked. Kestrel General Hospital (KGH) already has a median of 80.5 minutes from arrival to physician initial assessment in Q3 (July to September), so any outage there starts from a stretched baseline.\n3. Legal, regulatory and privacy: duties under the Health Information Act (HIA), incomplete records, notification.\n4. Financial: overtime, recovery costs, lost activity.\n5. Reputation and trust: patients, staff and the board.\n\nRate each category at fixed time points (1, 4, 8, 24 and 72 hours) on a five-point scale: 1 minimal, 2 minor, 3 moderate, 4 major, 5 severe. The scale and the ratings are Beacon proposals that the clinical owners confirm in the workshop.\n\nRate impact assuming downtime procedures are running, because they will be. The question is not whether care stops when the Clinical Information System (CIS) goes down. It is how long paper and workarounds stay safe.\n\nAt Kestrel, MTD is the longest time a clinical service can run on downtime procedures before harm, patient safety first, becomes unacceptable. A service's rating at each time point is its highest category, and its MTD sits at or before the first time point rated 5 (severe); the owners agree the exact value. Qualitative ratings suit patient safety, where a dollar figure would mislead."
+    },
+    {
+     "heading": "Map services to systems and dependencies",
+     "body": "In this table ED means emergency department and PACS is the Picture Archiving and Communication System.\n\n| Clinical service | Systems | Business owner |\n|---|---|---|\n| S1 Clinical communication | Clinical Paging and Secure Messaging (A-014), Identity Directory (A-007) | Dr. Helen Marchetti (E-001) |\n| S2 Emergency care | ED Tracking Board (A-002), CIS (A-001), Laboratory (A-003), PACS (A-004), Virtual Desktop Service (A-008), A-007 | Dr. Sarah Whitford (E-007) |\n| S3 Inpatient care and medication | CIS (A-001), Pharmacy System (A-005), A-008, A-007 | Dr. Helen Marchetti (E-001); no owner recorded for A-005 |\n| S4 Laboratory testing | Laboratory Information System (A-003), A-001, A-007 | Dr. Helen Marchetti (E-001) |\n| S5 Patient flow | Bed Management System (A-006), A-001, A-007 | Janelle Cardinal (E-008) |\n| S6 Diagnostic imaging | PACS (A-004), A-007 | Dr. Helen Marchetti (E-001) |\n| S7 Patient-flow analytics | Power BI and the Beacon semantic model (A-009), Clinical Data Warehouse (A-010) | Janelle Cardinal (E-008) |\n\nThe depends_on column in khn_assets.csv gives the technical chain. The Identity Directory (A-007) is listed as a dependency of 12 of Kestrel's 15 systems. The CIS (A-001) is a dependency of four: the ED Tracking Board, Pharmacy, Bed Management and the Clinical Data Warehouse (A-010). So Pharmacy cannot be back before both the CIS and the directory are.\n\nThe column is not complete. Add the dependencies it misses:\n\n- Access path: the Virtual Desktop Service (A-008) is how clinicians reach the CIS from shared workstations, yet A-001 lists only A-007. A CIS that runs but cannot be reached still stops care. SEC-004 hit A-008 on 2026-08-11 and normal service took 63.42 hours to return after detection.\n- Restore path: every restore needs the Backup Platform (A-012), and A-012 depends on A-007 for sign-in. If the directory is encrypted, administrators need break-glass accounts that do not rely on it.\n- Conflicting targets: A-012 has an 8-hour RTO, longer than the 4-hour CIS RTO that a restore relies on. Flag it for the owner, Marcus Bell (E-002).\n- People and suppliers: Meridian Clinical Systems (V-01) for CIS recovery, NorthArc Cloud (V-02) for the backup platform, and staff to run downtime procedures."
+    },
+    {
+     "heading": "Recovery priority",
+     "body": "In the finished BIA the owners agreed these MTDs at the 2026-12-01 workshop: clinical communication 4 hours; emergency care, inpatient care and medication, and laboratory testing 8 hours; patient flow 24 hours; imaging 48 hours; analytics 120 hours. A system inherits the shortest MTD of the services it supports, so the CIS (A-001) and Pharmacy (A-005) get 8 hours and the Identity Directory (A-007) 4 hours.\n\nCombine impact with dependencies to get the order. Recovery enablers come first, because nothing else can be restored without them. The RTO values are the targets recorded in khn_assets.csv.\n\n1. Recovery enablers: Identity Directory (A-007, RTO 2 hours), the Backup Platform (A-012) and the management zone.\n2. Clinical communication: Clinical Paging and Secure Messaging (A-014, RTO 2 hours).\n3. The CIS (A-001) and its access path, the Virtual Desktop Service (A-008), both RTO 4 hours.\n4. Systems that need the CIS or serve urgent care: ED Tracking Board (A-002), Pharmacy (A-005) and Laboratory (A-003), each RTO 4 hours.\n5. Bed Management (A-006, RTO 8 hours).\n6. Tier 2 support systems at 24 hours: PACS (A-004), the warehouse (A-010), IT Service Management (A-011) and Email (A-013). Email matters for coordination, so incident teams use the out-of-band channels until it returns.\n7. Tier 3 at 72 hours: Power BI and the Beacon semantic model (A-009) and HR and Payroll (A-015).\n\nThe order is a proposal until the clinical owners and the sponsor sign it. It feeds the RTO and RPO recommendation, the disaster recovery runbooks and the ransomware playbook."
+    },
+    {
+     "heading": "Gaps the BIA exposes",
+     "body": "A good BIA surfaces problems nobody owned. Kestrel's data shows five:\n\n- Pharmacy System (A-005) is tier 1 with no business owner, and its restore has never been tested (CT-004). The BIA cannot be signed until Dr. Helen Marchetti (E-001) names an owner.\n- Clinical Paging and Secure Messaging (A-014) passed its end of support on 2026-06-30 yet has a 2-hour RTO. An unsupported system with the shortest target is a contradiction to resolve.\n- The CIS failed both restore tests: 9.0 hours and 13.5 hours against a 4-hour RTO, last tested 2025-08-14 (risk R-04, issue I-03).\n- The Virtual Desktop Service took 63.42 hours to restore after SEC-004 against a 4-hour RTO.\n- Only one of Kestrel's 8 tier 1 systems, the Identity Directory, has a passing restore test on record (CT-003, 1.5 hours against 2).\n\nEach gap goes to the RAID log (risks, assumptions, issues and decisions) with an owner. For the project manager, the BIA is mostly stakeholder work: getting clinicians, IT and executives to agree ratings and priorities, and recording the decisions. For ITIL, it feeds service continuity management and the warranty of each clinical service. All four ITIL dimensions appear: people to run downtime, information and technology, partners and suppliers such as Meridian and NorthArc, and the value streams and processes of care."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Business impact analysis (BIA)",
+     "definition": "An analysis that identifies critical business functions, how harm grows over time when they stop, what they depend on and how fast they must return. It produces the MTD and the recovery priority."
+    },
+    {
+     "term": "Maximum tolerable downtime (MTD)",
+     "definition": "The longest a function can be unavailable before harm becomes unacceptable. At Kestrel, the longest a clinical service can run on downtime procedures safely. Set by the business."
+    },
+    {
+     "term": "Impact category",
+     "definition": "A type of harm rated over time in the BIA. Kestrel rates patient safety first, then clinical operations, legal and privacy, financial and reputation."
+    },
+    {
+     "term": "Dependency",
+     "definition": "Anything a service needs to run or be recovered: systems, access paths, backups, suppliers and people. Missing a dependency breaks the recovery order."
+    },
+    {
+     "term": "Recovery priority",
+     "definition": "The order in which systems are restored, combining impact with dependencies, so enablers such as the Identity Directory come before the systems that need them."
+    },
+    {
+     "term": "Break-glass account",
+     "definition": "An emergency administrator account that does not rely on the normal identity system, kept sealed and monitored, so recovery can start even if the directory is down."
+    }
+   ],
+   "build": {
+    "goal": "Complete the Business impact analysis: clinical services rated by patient-safety, operational, legal and financial impact over time, mapped to systems and dependencies, with proposed MTDs and a recovery priority order for the clinical owners to sign.",
+    "steps": [
+     "Open Project, Release 3, Business impact analysis, and read How to write it.",
+     "List the clinical services and map each to its systems and business owner from khn_assets.csv; mark A-005's missing owner.",
+     "Rate each service at 1, 4, 8, 24 and 72 hours across the five impact categories, patient safety first, assuming downtime procedures are running.",
+     "Set each service's MTD at or before the first time point rated 5, and label every MTD proposed until its owner agrees it.",
+     "Draw the dependency map from depends_on, then add the hidden dependencies: A-008 as the CIS access path, A-012 for every restore, and break-glass access independent of A-007.",
+     "Write the recovery priority order and the gaps list with an owner for each: A-005 owner, A-014 end of support, CIS restore, A-012 RTO conflict.",
+     "Compare with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "S3 Inpatient care and medication (excerpt). Systems: CIS (A-001), Pharmacy System (A-005), Virtual Desktop Service (A-008) and Identity Directory (A-007). Owner: Dr. Helen Marchetti (E-001); no Pharmacy owner recorded, so she is asked to name one. Ratings with downtime procedures running: 1 hour 3, 4 hours 4, 8 hours 5, 24 hours 5, 72 hours 5. MTD (agreed at the workshop): 8 hours, the first time point rated 5. Current RTO in khn_assets.csv: 4 hours for A-001, A-005 and A-008. Pharmacy restore test: never done (CT-004). Recovery priority: after A-007 and A-001."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management (business continuity requirements): the BIA comes before recovery strategy. If a question asks what to do after scoping and management support, the answer is usually the BIA, and senior management approves its results."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management: the MTD is a business decision. RTO and every recovery design must fit inside it, so a question that lets IT set the MTD is offering a wrong answer."
+    },
+    {
+     "cert": "PMP",
+     "tip": "People task 4, Engage stakeholders: clinical owners must rate the impacts and own the priorities. The project manager facilitates, records decisions and escalates gaps such as a tier 1 system with no owner."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Service continuity supports a service's warranty. Use the four dimensions, Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes, to check the BIA covers more than technology."
+    }
+   ],
+   "pitfalls": [
+    "Starting from the system list instead of clinical services. Clinicians lose services, not servers.",
+    "Trusting depends_on as complete. It omits the Virtual Desktop Service as the CIS access path and the Backup Platform needed for every restore.",
+    "Letting IT set the MTD. Clinical owners decide how long care can run safely on downtime procedures.",
+    "Signing off a BIA while a tier 1 system (A-005) has no business owner."
+   ],
+   "check": [
+    {
+     "q": "Why is the Identity Directory (A-007) first in Kestrel's recovery order even though patients never use it?",
+     "a": "It is listed as a dependency of 12 of Kestrel's 15 systems in khn_assets.csv, including the CIS, Pharmacy and the Backup Platform. Until sign-in works, almost nothing else can be restored or used, so it has a 2-hour RTO and comes first."
+    },
+    {
+     "q": "What dependency does the depends_on column miss for clinicians using the CIS, and why does it matter?",
+     "a": "The Virtual Desktop Service (A-008), how clinicians reach the CIS from shared workstations. A-001 lists only A-007. SEC-004 hit A-008 and normal service took 63.42 hours to return after detection, so a running but unreachable CIS still stops care."
+    },
+    {
+     "q": "Who sets the MTD, and what does it mean at Kestrel?",
+     "a": "The clinical business owners, approved by the sponsor, with continuity and IT staff facilitating. It is the longest a clinical service can run on downtime procedures before harm, patient safety first, becomes unacceptable. RTO and the recovery design must fit inside it."
+    }
+   ]
+  },
+  {
+   "key": "w12-s2",
+   "summary": "Set recovery targets for Kestrel's clinical systems with the rule that RTO plus WRT must not exceed MTD, test them against the real restore results (the CIS failed twice), choose backup types that can meet the RPO, and write a control-testing plan with population, sample and evidence.",
+   "read": [
+    {
+     "heading": "Four numbers and one rule",
+     "body": "- Maximum tolerable downtime (MTD): the business limit from the business impact analysis (BIA).\n- Recovery time objective (RTO): the target time to get the system working again.\n- Work recovery time (WRT): the time after the system is back to check data, enter records kept on paper during downtime, and resume normal work.\n- Recovery point objective (RPO): the most data you can afford to lose, measured backward from the moment of disruption.\n\nThe rule: RTO + WRT must not exceed MTD. If clinicians need two hours after the system returns to catch up safely, the system must be back at least two hours before the MTD runs out.\n\nWork it for the Clinical Information System (CIS, A-001). From khn_assets.csv: RTO 4 hours, RPO 1 hour. Agreed in the BIA workshop: WRT 2 hours and MTD 8 hours (the CIS inherits the 8-hour MTD of emergency care and inpatient care). On paper the design passes: 4 + 2 = 6, within 8.\n\nNow test the design against evidence. The two real CIS restores took 9.0 hours and 13.5 hours. With the 2-hour WRT that is 11 and 15.5 hours, both beyond the 8-hour MTD. The last restore on its own took longer than the MTD. That is not a tuning issue; it is the patient-safety risk R-04, owned by Daniel Osei (E-004).\n\n| System | RTO (data) | Restore test | WRT (agreed) | MTD (agreed) | Result |\n|---|---|---|---|---|---|\n| CIS (A-001) | 4 h | 13.5 h (CT-002) | 2 h | 8 h | Fails |\n| Identity Directory (A-007) | 2 h | 1.5 h (CT-003) | 0.5 h | 4 h | Passes: 1.5 + 0.5 = 2 |\n| Pharmacy System (A-005) | 4 h | Never tested (CT-004) | 2 h | 8 h | Unknown |"
+    },
+    {
+     "heading": "RPO and backup types",
+     "body": "An RPO of 1 hour means changes must be captured at least every hour. The CIS backup job is named BK-A001-DAILY. If that daily job is the only copy, Kestrel could lose up to a day of clinical documentation, far beyond the 1-hour RPO. Confirm with the custodian, Kevin Park (E-009), and NorthArc Cloud (V-02) whether transaction logs are backed up or replicated more often. The same question applies to the Identity Directory (BK-A007-DAILY) and Pharmacy (BK-A005-DAILY), both with a 1-hour RPO.\n\n| Type | What it copies | What a restore needs | Archive bit |\n|---|---|---|---|\n| Full | Everything | The one full backup | Cleared |\n| Incremental | Changes since the last backup of any type | Last full plus every incremental since | Cleared |\n| Differential | Changes since the last full | Last full plus the latest differential | Not cleared |\n\nIncrementals are quick to take and slow to restore. Differentials grow each day until the next full but restore from only two sets. Transaction log backups and snapshots shrink the RPO between full backups. Replication keeps a second copy current within seconds, but it also copies corruption and encryption, so replication is not a backup.\n\nBackup strategy: keep three copies on two different types of storage with one off-site, and make at least one copy immutable or offline so ransomware cannot change it. CT-005 passed on 2026-09-24: the latest CIS backup has an immutable copy at NorthArc in a Canadian region. Keeping data in Canada is a Kestrel contract requirement. Off-site methods you should know: electronic vaulting (backups sent off-site in batches), remote journaling (transaction logs sent off-site in near real time) and database shadowing (live copies kept on remote systems)."
+    },
+    {
+     "heading": "What the restore tests prove",
+     "body": "| Test | System | Date | Result | RTO | Status |\n|---|---|---|---|---|---|\n| CT-001 | CIS (A-001) | 2025-03-20 | 9.0 h; database rebuild step ran long | 4 h | Fail |\n| CT-002 | CIS (A-001) | 2025-08-14 | 13.5 h; restore runbook out of date | 4 h | Fail |\n| CT-003 | Identity Directory (A-007) | 2026-09-10 | 1.5 h | 2 h | Pass |\n| CT-004 | Pharmacy System (A-005) | None | No restore test on record | 4 h | Not tested |\n\nRead the trend, not just the status. The CIS got slower between tests, from 9.0 to 13.5 hours, and the causes recorded are process problems you can fix: a long database rebuild step and an out-of-date runbook. By 2026-10-01, 413 days had passed since the last CIS test. Of Kestrel's 8 tier 1 systems, only the Identity Directory has a passing restore test; A-002, A-003, A-008, A-012 and A-014 have no restore test on record at all.\n\nA successful backup job is not proof of recovery. Only a timed restore shows the data is complete, the runbook works and the target is reachable. Time the test from the moment recovery is declared to the moment the business owner signs that the system is usable, not from when the copy starts.\n\nRecommendation for the CIS: rewrite and rehearse the runbook, work with Meridian Clinical Systems (V-01) to shorten the database rebuild, pre-stage the recovery servers, confirm hourly log backups for the RPO, and retest in schedule task 22, Test CIS restore and downtime procedures: 6 working days, 2026-12-04 to 2026-12-11, on the critical path. If 4 hours still cannot be met, a longer RTO is acceptable only if RTO + WRT still fits inside the MTD, and only as a decision by the sponsor, Dr. Helen Marchetti (E-001), advised by Daniel Osei (E-004)."
+    },
+    {
+     "heading": "The control-testing plan: population, sample, evidence",
+     "body": "A control-testing plan proves controls work. In the table below, MFA means multi-factor authentication. For each key control, state the objective, owner, population, sample, test method, evidence, expected result, pass rule, remediation and retest date.\n\n- Population: every instance the control should cover in the period.\n- Sample: the items you test, chosen so the result represents the population. For a small, high-impact population, test everything.\n- Method, from weakest to strongest evidence: inquiry (asking), observation (watching), inspection (examining records), re-performance (the tester does the control again).\n- Evidence: dated, attributable, kept, such as restore logs with start and end times and the owner's sign-off.\n\n| Control | Population | Sample | Evidence | Expected result and last finding |\n|---|---|---|---|---|\n| Tier 1 restore | 8 tier 1 systems | All 8: the CIS (CT-014) and Pharmacy (CT-015) in task 22, the other five in the 2027 calendar | Timed restore log, owner sign-off | Within RTO; 1 of 8 has a pass on record |\n| Immutable backup copy (CT-005) | Tier 1 backup copies for November 2026 | The configuration once, plus 5 random days | NorthArc Cloud console export | Immutable copy in a Canadian region every day sampled; passed on 2026-09-24 |\n| Privileged MFA | 6 enabled privileged accounts | All 6 | Directory export | 100% enrolled; CT-006 found 4 of 6 |\n| Q3 access reviews | 18 reviews due by 2026-09-30 | All 18 | Review records | 100% with a decision; CT-007 found 12 of 18 |\n| Leaver accounts disabled | Terminated or expired workers | All | HR list against directory | None enabled; CT-008 found 2 |\n| Awareness training | 5 workforce groups | All 5 | Training records | 90% each; CT-009 to CT-013 show 3 groups below |\n\nKeep the tester independent of the operator: Kevin Park (E-009) runs the backups, so the restore test is witnessed by Chloe Dubois (E-016) and signed by the business owner. Across all 13 control tests on file, 4 pass, 8 fail and 1 was never tested."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Recovery time objective (RTO)",
+     "definition": "The target time to restore a system to working order after a disruption. With WRT, it must fit inside the MTD. The CIS RTO is 4 hours."
+    },
+    {
+     "term": "Recovery point objective (RPO)",
+     "definition": "The most data loss the business accepts, measured backward from the disruption. A 1-hour RPO means changes must be captured at least hourly."
+    },
+    {
+     "term": "Work recovery time (WRT)",
+     "definition": "The time after systems return to verify data, enter paper downtime records and resume normal work. RTO plus WRT must not exceed MTD."
+    },
+    {
+     "term": "Incremental backup",
+     "definition": "A backup of changes since the last backup of any type. Fast to take; a restore needs the last full plus every incremental since. Clears the archive bit."
+    },
+    {
+     "term": "Differential backup",
+     "definition": "A backup of changes since the last full backup. It grows daily; a restore needs the last full plus the latest differential. Does not clear the archive bit."
+    },
+    {
+     "term": "Immutable backup",
+     "definition": "A backup copy that cannot be changed or deleted for a set period, even by administrators, so ransomware cannot encrypt or erase it."
+    },
+    {
+     "term": "Population and sample",
+     "definition": "The population is every instance a control should cover in the period; the sample is the items actually tested, chosen so the result represents the population."
+    }
+   ],
+   "build": {
+    "goal": "Write the RTO and RPO recommendation for Kestrel's tier 1 clinical systems and the Control-testing plan that proves recovery and other key controls with population, sample, method and evidence.",
+    "steps": [
+     "Open Project, Release 3, RTO and RPO recommendation and Control-testing plan, and read How to write it for both.",
+     "For each tier 1 system, record RTO and RPO from khn_assets.csv and the MTD and WRT agreed in your BIA, then apply RTO + WRT must not exceed MTD.",
+     "Add the tested restore time from khn_controls.csv and mark each system Pass, Fail or Not tested; show the CIS calculation with 9.0 and 13.5 hours.",
+     "Check each RPO against its backup job and record the BK-A001-DAILY question for Kevin Park (E-009) and NorthArc (V-02).",
+     "Write the CIS recommendation: runbook rewrite, database rebuild fix, retest in task 22, and who decides if 4 hours cannot be met.",
+     "Build the control-testing table for at least six controls with population, sample, method, evidence, expected result and remediation, starting from the 13 tests on file (CT-001 to CT-013) and numbering new tests from CT-014, as the finished example does.",
+     "Compare both documents with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "CIS (A-001): RTO 4 h and RPO 1 h (khn_assets.csv). WRT 2 h and MTD 8 h (agreed in the BIA). Design check: 4 + 2 = 6, within 8. Evidence check: last restore 13.5 h (CT-002, 2025-08-14); 13.5 + 2 = 15.5, nearly double the MTD. Status: not achievable today. Actions: rewrite the runbook, rehearse the database rebuild with Meridian (V-01), confirm hourly log backups for the 1-hour RPO, retest in task 22. R-04 stays open with Daniel Osei (E-004)."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (recovery strategies): RTO + WRT must not exceed MTD. If the MTD is 8 hours and the WRT is 2, the longest acceptable RTO is 6 hours."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations: incremental backups are fastest to take and slowest to restore; differentials grow until the next full but restore from two sets. Full and incremental clear the archive bit; differential does not."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 6, Security Assessment and Testing (security control testing): re-performance gives stronger evidence than inquiry. A backup success message is not evidence of recoverability; a timed restore with owner sign-off is."
+    }
+   ],
+   "pitfalls": [
+    "Confusing RPO with RTO. RPO is how much data you can lose; RTO is how long the system can be down.",
+    "Treating replication as a backup. Replication copies encryption and corruption to the second copy within seconds.",
+    "Timing a restore from when the copy starts instead of from declaration to business owner sign-off.",
+    "Letting the backup operator test their own backups without an independent witness."
+   ],
+   "check": [
+    {
+     "q": "The CIS has a 4-hour RTO, an agreed 2-hour WRT and an agreed 8-hour MTD. Does the design pass, and does the evidence?",
+     "a": "The design passes: 4 + 2 = 6 hours, within the 8-hour MTD. The evidence does not: the last restore took 13.5 hours (CT-002), and 13.5 + 2 = 15.5 hours, well beyond the MTD. Until a retest meets 4 hours, the target is not achievable and R-04 stays open."
+    },
+    {
+     "q": "Why does the CIS 1-hour RPO raise a question about BK-A001-DAILY?",
+     "a": "A 1-hour RPO means Kestrel may lose at most an hour of data, so changes must be captured at least hourly. A job named daily suggests one copy a day, which could lose up to a day of records. Kestrel must confirm whether transaction logs are backed up or replicated more often."
+    },
+    {
+     "q": "In a control-testing plan, what are population and sample, and why test all 8 tier 1 restores?",
+     "a": "The population is every instance the control should cover in the period; the sample is the items actually tested. With only 8 tier 1 systems and patient-safety impact, testing all of them is practical and gives far stronger assurance than a sample."
+    }
+   ]
+  },
+  {
+   "key": "w12-s3",
+   "summary": "Write Kestrel's disaster recovery plan and clinical downtime procedures, choose recovery site options against the recovery targets, learn the five disaster recovery test types in order, and design the tabletop exercise in which ransomware encrypts the CIS at 07:00 on a weekday.",
+   "read": [
+    {
+     "heading": "What a disaster recovery plan contains",
+     "body": "A business continuity plan keeps the organization's work going during a disruption; at Kestrel that means clinical downtime procedures. A disaster recovery (DR) plan restores the IT that work depends on. You need both, and they must agree.\n\nA usable DR plan contains:\n\n- Scope: the systems covered, in the recovery priority order from the business impact analysis (BIA).\n- Activation: what triggers the plan and who declares it. At Kestrel, Marcus Bell (E-002), the Chief Information Officer, declares a disaster, or Daniel Osei (E-004) if Marcus cannot be reached within 15 minutes. Units start downtime procedures at once and do not wait for the declaration.\n- Roles and contacts, held on paper and offline, not only in Email (A-013).\n- A runbook per system: numbered, tested, versioned steps. CT-002 failed partly because the Clinical Information System (CIS) restore runbook was out of date.\n- Dependencies and supplier contacts: Meridian Clinical Systems (V-01) for the CIS, NorthArc Cloud (V-02) for the Backup Platform (A-012).\n- Data validation: business owners confirm restored data before clinicians use it.\n- Communication: who tells staff, executives and the public, and how often.\n- Return to normal: moving back from recovery systems and closing downtime.\n- Maintenance: an owner, a review date and the test schedule.\n\nKeep printed and offline copies. A plan stored only on a file server that ransomware has encrypted is no plan at all."
+    },
+    {
+     "heading": "Clinical downtime procedures",
+     "body": "Downtime procedures let care continue safely while systems are down. Chloe Dubois (E-016) owns them; clinical leads such as Dr. Sarah Whitford (E-007), Aisha Mahmoud (E-010) and Ben Kowalski (E-011) test them on the units.\n\n- Paper processes: downtime forms for orders, medication administration, laboratory and imaging requests, triage and admission. Every unit keeps a downtime kit with forms, printed contact lists, labels and a block of downtime registration numbers.\n- Read-only snapshots: scheduled extracts of the information clinicians need most, such as active medications, allergies, current orders, recent results and the unit census, saved to standalone downtime workstations or printed. They hold Restricted health information, so they are encrypted and kept on devices that do not sign in through the Identity Directory (A-007) and are not on the same network segment as the CIS, or one attack takes out both.\n- Communication: overhead announcements, runners and a phone bridge, with status updates from the communications lead on a fixed rhythm, proposed hourly.\n- Recovery: when the CIS returns, unit clerks and nurses enter the paper records, a second person checks each entry, duplicates are removed, and the downtime log is closed. This back-entry is the work recovery time (WRT).\n\nPlan for long downtime. Both CIS restore tests failed, at 9.0 and 13.5 hours against a 4-hour recovery time objective (RTO), so the procedures must stay safe for more than half a day."
+    },
+    {
+     "heading": "Recovery site options",
+     "body": "| Option | What is ready | Typical recovery speed | Cost |\n|---|---|---|---|\n| Hot site | Hardware, network and current data, running | Minutes to hours | Highest |\n| Warm site | Hardware and network; data must be restored | Hours to days | Medium |\n| Cold site | Space, power and cooling only | Days to weeks | Lowest |\n| Cloud recovery | Infrastructure on demand from prepared images and copies | Minutes to hours, if rehearsed | Pay for use plus standing copies |\n\nOther options include reciprocal agreements with another organization, mobile sites and fully redundant sites. Match the option to the RTO. A cold site cannot meet the 4-hour CIS target. A warm site meets it only if restores are fast, and Kestrel's are not yet. The CIS needs a standby environment or a rehearsed cloud recovery, while tier 3 systems with 72-hour targets, such as Power BI (A-009) and HR and Payroll (A-015), can use slower, cheaper options.\n\nRansomware changes the picture. A hot site that copies data in near real time may receive the encryption too. Recovery from ransomware means restoring immutable backups taken before the infection into a clean, isolated environment, checking them, then reconnecting. Keeping recovery data in Canada is a Kestrel contract requirement, not a legal ban."
+    },
+    {
+     "heading": "DR test types, in order",
+     "body": "Learn the five test types from least to most disruptive:\n\n1. Checklist (read-through): each team reviews the plan for accuracy; contacts and steps are current.\n2. Structured walkthrough, also called a tabletop: the team talks through a scenario step by step in a room. No systems are touched.\n3. Simulation: a realistic scenario is acted out, and recovery staff perform their tasks up to the point of switching to recovery systems, without disrupting production.\n4. Parallel: recovery systems are brought up at the alternate site and process real work while production keeps running.\n5. Full interruption: production is shut down and operations move to the recovery site. It is the most realistic test and the most dangerous, and needs senior management approval.\n\nKestrel will not run a full interruption of clinical systems: switching off the CIS to see what happens would put patients at risk. Beacon uses a checklist review, the tabletop, and a timed technical restore of the CIS in an isolated environment that does not touch production (schedule task 22, 2026-12-04 to 2026-12-11)."
+    },
+    {
+     "heading": "The Beacon tabletop: the CIS encrypted at 07:00",
+     "body": "The scenario: a hypothetical ransomware attack encrypts the CIS (A-001) on a weekday at 07:00, during the nursing shift change. The exercise tests decisions and assumptions, not technology. It sits in schedule task 23, Update incident response plan and run tabletop exercise: 5 working days, 2026-12-04 to 2026-12-10, with 1 day of float. The finished scenario holds the exercise on Wednesday 2026-12-09, 09:00 to 12:00, at KGH, with the attack set on a Tuesday.\n\nPlayers: Dr. Helen Marchetti (E-001), Marcus Bell (E-002), Priya Raman (E-003), Daniel Osei (E-004), Grace Liu (E-005), Dr. Sarah Whitford (E-007), Janelle Cardinal (E-008), Kevin Park (E-009), Aisha Mahmoud (E-010), Ahmed Haddad (E-017), Sam Okafor (E-020) and Raj Patel (E-015) for Meridian. Chloe Dubois (E-016) facilitates; the Programme Manager is scribe and evaluator. Ground rules: no fault, answer as you would on the day, use only the plans that exist. In the injects, KGH is Kestrel General Hospital, ED is emergency department and MTD is maximum tolerable downtime.\n\n| Scenario time | Inject | Decision tested |\n|---|---|---|\n| 07:00 | Aisha Mahmoud reports a ransom note on KGH ED screens; the tracking board (A-002) freezes | Start ED downtime procedures; call the service desk |\n| 07:15 | The security operations centre sees encryption spreading from a server reached through a vendor remote-support session | Isolate the clinical zone, cut vendor access, preserve logs |\n| 07:45 | All four sites report the CIS down; pharmacy cannot see orders | Declare a disaster, name the recovery coordinator, open a P1 major incident |\n| 09:00 | Kevin Park estimates 13 to 14 hours to restore, based on the last test | Accept that the 8-hour MTD will be passed; decide on ambulance diversion and extra staff |\n| 10:30 | The attacker demands payment and claims to hold copied patient records | Do not reply; keep the evidence; executive decision with legal advice and police |\n| 13:00 | Logs confirm records were copied out of the CIS | Health Information Act breach duty: who notifies whom |\n| 21:00 | The CIS is restored from the immutable copy with 1 hour of data lost | Back-entry, medication reconciliation, return to normal |\n\nMeasure the exercise: time to declare, time to start downtime, each decision with an owner, and every gap found. Close with a 20-minute hot wash (a short debrief), then an after-action report to Daniel Osei by 2026-12-16. Its actions update the playbook, the escalation matrix and the DR plan, and go to the RAID log (risks, assumptions, issues and decisions)."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Disaster recovery plan",
+     "definition": "The documented steps, roles, priorities, runbooks and contacts for restoring IT systems after a disruption, kept current, tested and available offline."
+    },
+    {
+     "term": "Downtime procedures",
+     "definition": "Paper processes, read-only snapshots and communication routines that let clinical care continue safely while clinical systems are unavailable."
+    },
+    {
+     "term": "Read-only snapshot",
+     "definition": "A scheduled extract of key patient information, such as medications, allergies and orders, kept on standalone encrypted devices or paper for use during downtime."
+    },
+    {
+     "term": "Hot, warm and cold sites",
+     "definition": "Recovery sites ranked by readiness: hot runs with current data (fastest, costliest), warm has hardware but needs data restored, cold has only space and power."
+    },
+    {
+     "term": "Tabletop exercise",
+     "definition": "A discussion-based test in which participants talk through a scenario and its injects to test decisions, roles and assumptions without touching systems."
+    },
+    {
+     "term": "Full interruption test",
+     "definition": "The most disruptive DR test: production is shut down and operations move to the recovery site. It needs senior approval and is rarely suitable for clinical systems."
+    }
+   ],
+   "build": {
+    "goal": "Write the Disaster-recovery and downtime plan for Kestrel's clinical systems and the Tabletop-exercise scenario in which ransomware encrypts the CIS at 07:00 on a weekday.",
+    "steps": [
+     "Open Project, Release 3, Disaster-recovery and downtime plan and Tabletop-exercise scenario, and read How to write it for both.",
+     "Write the activation criteria, roles, contacts held offline and the recovery order from your BIA, with a CIS runbook outline that fixes the out-of-date steps found in CT-002.",
+     "Write the clinical downtime procedures: forms and kits, protected read-only snapshots, the communication rhythm, and back-entry when the CIS returns.",
+     "Choose a recovery option for each tier, justify it against the RTOs and the restore evidence, and include a clean, isolated environment for ransomware recovery.",
+     "Set the test programme in order (checklist, tabletop, simulation, parallel) and explain why Kestrel does not run a full interruption of clinical systems.",
+     "Write the tabletop: objectives, participants, ground rules, at least six timed injects with the decision each tests, measures, and how gaps become actions.",
+     "Compare both with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "KGH emergency department downtime (excerpt). Trigger: the CIS is unavailable or a ransom note appears; the unit starts at once and does not wait for a declaration. Within 30 minutes (proposed): the charge nurse opens the downtime kit, moves triage and tracking to the paper log and whiteboard, and issues downtime registration numbers. Snapshot: open the latest encrypted snapshot on the standalone downtime workstation for allergies, medications and active orders. Updates: hourly from the communications lead (proposed). Recovery: unit clerks enter the paper records; a nurse checks each entry before the log is closed."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (test disaster recovery plans): know the order from least to most disruptive: checklist, structured walkthrough or tabletop, simulation, parallel, full interruption. A full interruption carries the most risk and needs senior management approval."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (recovery strategies): hot sites are fastest and most expensive, cold sites cheapest and slowest. Pick the site that meets the RTO from the BIA at the lowest cost."
+    },
+    {
+     "cert": "PMP",
+     "tip": "People task 8, Plan and manage communication: a tabletop rehearses who tells whom, when and how. Use its findings to update the communication plan, including the channel to use when email fails."
+    }
+   ],
+   "pitfalls": [
+    "Keeping the only copy of the DR plan on a file server that ransomware will encrypt.",
+    "Storing read-only snapshots on devices that sign in through the Identity Directory or share the CIS network segment, so one attack takes out both.",
+    "Writing a tabletop that tests technical steps instead of decisions. Executives must rehearse declaring, notifying and the payment decision path.",
+    "Assuming a hot site that copies data in near real time is safe from ransomware; it may receive the encryption too."
+   ],
+   "check": [
+    {
+     "q": "Put the five DR test types in order from least to most disruptive.",
+     "a": "Checklist (read-through), structured walkthrough or tabletop, simulation, parallel, full interruption. Each step adds realism and risk; a full interruption shuts down production and moves operations to the recovery site."
+    },
+    {
+     "q": "Why does a ransomware recovery plan need a clean environment even if Kestrel has a hot site?",
+     "a": "A hot site that copies data in near real time can receive the encryption and the attacker's tools along with the data. Recovery must restore immutable backups taken before the infection into an isolated, clean environment, check them, and only then reconnect."
+    },
+    {
+     "q": "What makes the 09:00 inject, Kevin Park estimating 13 to 14 hours to restore, useful?",
+     "a": "It uses Kestrel's real last restore result (13.5 hours, CT-002) and forces leaders to decide what happens when recovery will pass the 4-hour RTO and the agreed 8-hour MTD: longer downtime, ambulance diversion, extra staff, changes to patient flow and more frequent communication."
+    }
+   ]
+  },
+  {
+   "key": "w12-s4",
+   "summary": "Assess Kestrel's suppliers and the software they provide: supply-chain risk, what assurance reports really prove, the contract clauses that carry security and privacy duties, secure development and software assurance for Meridian's CIS, software bills of materials and change control for vendor changes.",
+   "read": [
+    {
+     "heading": "Supply-chain risk management",
+     "body": "Kestrel can outsource a service but not its accountability: under the Health Information Act (HIA), the custodian stays responsible for its affiliates, including contractors and information managers. Supply-chain risk management (SCRM) means knowing each supplier, what it touches and how it could hurt you, and keeping that risk acceptable from selection to exit.\n\nIn the vendor table, CIS is the Clinical Information System and SOC means security operations centre.\n\n| Vendor | Service | Data location | Remote access | Last assurance report | Risk |\n|---|---|---|---|---|---|\n| V-01 Meridian Clinical Systems | CIS software and remote support | Canada | Yes | 2026-03-31 | High |\n| V-02 NorthArc Cloud | Hosting and backup | Canada | Yes | 2026-05-15 | High |\n| V-03 ClearPath Staffing | Agency nurses | Canada | No | None | Medium |\n| V-04 Sentinel SOC Services | Managed security monitoring | United States | Yes | 2025-11-30 | High |\n| V-05 Lumen Analytics Partners | Power BI consulting | Canada | Yes | 2025-06-30 | Medium |\n\nFindings from khn_vendors.csv on 2026-10-01: Sentinel processes data in the United States (risk R-05); ClearPath has no assurance report; Lumen's report is older than 12 months and its contract ends on 2026-11-30, within 90 days (risk R-07); four vendors have remote access. Also, Power BI (A-009) is vendor hosted with no vendor_id, so add its provider to the register.\n\nRate each supplier on data sensitivity, remote and privileged access, criticality, location and the law there, security maturity and concentration. NorthArc hosts four systems: IT Service Management (A-011), the Backup Platform (A-012), Email (A-013) and HR and Payroll (A-015), so one NorthArc failure would hit recovery and communication together."
+    },
+    {
+     "heading": "Assurance reports and what they prove",
+     "body": "You cannot audit every supplier yourself, so you rely on independent reports.\n\n- SOC 2 (System and Organization Controls 2) Type II: an independent auditor's report on controls for security and, if in scope, availability, processing integrity, confidentiality and privacy. Type II tests whether controls operated as designed throughout a period, usually several months.\n- SOC 2 Type I: whether controls were suitably designed at one point in time only. Weaker evidence.\n- SOC 1: controls relevant to customers' financial reporting. It says little about security.\n- ISO/IEC 27001 certificate: the supplier runs a certified information security management system. Check its scope covers the service you buy.\n\nWhen you read a report, check five things:\n\n1. Scope: does it cover the service, systems and data centres Kestrel uses?\n2. Period: when did it end? For months since, ask for a bridge letter.\n3. Exceptions: what did the auditor find that failed?\n4. Complementary user entity controls: the controls the customer must run. Removing a vendor engineer's access when they leave is Kestrel's job, not the vendor's.\n5. Subservice organizations: which of the supplier's own suppliers were excluded?\n\nKestrel expects a report no older than 12 months. ClearPath (V-03) has none, but hosts no Kestrel data; its risk is its people. Its nurses are affiliates with CIS accounts, agency and vendor workers were at 48% awareness completion, and agency nurse Olivia Grant (E-014) is a missed leaver. Its contract needs screening, training and on-time leaver notice. The finished assessment raises ClearPath from Medium in the vendor file to High for that reason."
+    },
+    {
+     "heading": "Contract clauses that carry the controls",
+     "body": "A control you did not write into the contract is a favour, not a duty. Kestrel's clause checklist:\n\n- Remote access through named accounts with multi-factor authentication (MFA), least privilege and an end date no later than the contract end. Meridian's Raj Patel (E-015) has a privileged account with neither MFA nor an end date.\n- Breach notice to Kestrel within 24 hours of any security incident touching Kestrel data (Kestrel standard term, proposed), plus cooperation and evidence preservation, so Kestrel can meet its section 60.1 HIA duty to notify.\n- Right to audit, an annual assurance report and bridge letters.\n- Data location: Kestrel requires Meridian and NorthArc to keep data in Canada. That is a Kestrel contract requirement; no Alberta statute bans storage outside Canada.\n- For Sentinel (V-04) in the United States, the safeguards section 60 of the HIA requires for information used outside Alberta: no health information in forwarded logs, encryption, named analysts, Kestrel approval of subprocessors. The Protection of Privacy Act (POPA) makes it an offence to knowingly disclose personal information in response to an order from a court or body with no jurisdiction in Alberta, so Sentinel must tell Kestrel at once of any such demand.\n- Patch obligations that match Kestrel's policy (Critical 7 days, High 30, Medium 60, Low 90), and early notice of end of support.\n- Delivery of a software bill of materials with each release.\n- Continuity: the supplier's recovery targets, and Meridian's part in CIS restore tests.\n- Subcontractor flow-down and notice of changes.\n- Exit: return and certified destruction of data, transition help, and access removed on the last day.\n\nKestrel practice is to sign an information manager agreement with any vendor that handles health information on its behalf."
+    },
+    {
+     "heading": "Secure development and acquired software",
+     "body": "A secure software development lifecycle (SDLC) builds security into every phase rather than testing it in at the end:\n\n| Phase | Security activity |\n|---|---|\n| Requirements | Security and privacy requirements, abuse cases |\n| Design | Threat modelling, secure design review |\n| Build | Secure coding standards, peer code review, static analysis |\n| Test | Dynamic testing, fuzzing, penetration testing |\n| Release | Hardening, signed releases, change approval |\n| Operate and retire | Patching, monitoring, secure disposal |\n\nThe Software Assurance Maturity Model (SAMM) and the Building Security In Maturity Model (BSIMM) measure how well an organization does this.\n\nKestrel buys software rather than writing it: commercial off-the-shelf products like Meridian's CIS, open-source components inside them, software as a service like Power BI, and managed services like Sentinel. You cannot read Meridian's code, so you assess evidence:\n\n- The vendor's secure development practices: attestations, a SAMM-style self-assessment, a summary of independent penetration tests.\n- A vulnerability disclosure policy and patch record. SEC-012, a High missing patch on the CIS, was due on 2026-09-25 and was still open on 2026-10-01.\n- The support lifecycle: the CIS end of support (2029-03-31) matches Meridian's contract end.\n- Signed updates checked before install, then tested in Kestrel's non-production environment.\n- Source code escrow, so Kestrel can keep the system running if the vendor fails.\n\nSignatures alone are not enough: in the 2020 SolarWinds Orion compromise, attackers put malicious code into a vendor's signed updates. Watch system behaviour after updates too."
+    },
+    {
+     "heading": "SBOMs and change control for vendor software",
+     "body": "A software bill of materials (SBOM) is a formal, machine-readable list of the components inside a product, with versions, suppliers and dependencies. Common formats are SPDX (Software Package Data Exchange) and CycloneDX. When a flaw in a widely used library is announced, as with Log4Shell in Apache Log4j in December 2021, an SBOM answers in minutes whether you run the affected version and where. Ask Meridian for a CIS SBOM with every release and feed it into the vulnerability process.\n\nEvery vendor change to production goes through Kestrel's change control process: a change record, impact and risk assessment, testing, approval, a back-out plan and a scheduled window. Tie each vendor remote session to an approved change or incident record, limit it in time and record it. An unplanned vendor change is an incident.\n\nFor the project manager this is procurement. Match the contract type to the risk: fixed price, like Lumen's (V-05) Release 1 contract, puts cost risk on the seller; cost-reimbursable puts it on the buyer; time and materials suits unclear scope. Put security and exit terms in before signing. Lumen's contract ends 2026-11-30, before the Release 3 dashboards (R-07), so plan knowledge transfer now and spread it beyond Tomás Rivera to avoid deepening R-06."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Supply-chain risk management (SCRM)",
+     "definition": "Identifying suppliers and what they touch, assessing their risk, setting contract controls and assurance, monitoring them and managing exit, so outsourcing does not create unmanaged risk."
+    },
+    {
+     "term": "SOC 2 Type II",
+     "definition": "An independent auditor's report on a service organization's controls for security and other chosen criteria, testing that the controls operated as designed over a period."
+    },
+    {
+     "term": "Complementary user entity controls",
+     "definition": "Controls listed in an assurance report that the customer must run itself, such as removing its users' vendor access, for the supplier's controls to work."
+    },
+    {
+     "term": "Right to audit",
+     "definition": "A contract clause that lets the customer, or an auditor it appoints, examine the supplier's controls and records relevant to the service."
+    },
+    {
+     "term": "Software bill of materials (SBOM)",
+     "definition": "A machine-readable list of the components, versions and suppliers inside a software product, used to find affected products fast when a component flaw is announced."
+    },
+    {
+     "term": "Secure software development lifecycle (SDLC)",
+     "definition": "A development process with security activities in every phase: requirements, design, build, test, release, operation and retirement."
+    },
+    {
+     "term": "Source code escrow",
+     "definition": "An arrangement in which a vendor's source code is held by a third party and released to the customer if the vendor fails or stops supporting the product."
+    }
+   ],
+   "build": {
+    "goal": "Write the Supplier and software risk assessment: each vendor rated on data, access, criticality, location and assurance, the contract clauses Kestrel needs, and the software assurance asks for Meridian's CIS.",
+    "steps": [
+     "Open Project, Release 3, Supplier and software risk assessment, and read How to write it.",
+     "Build the vendor table from khn_vendors.csv and add what each supplier touches from khn_assets.csv, including NorthArc's four hosted systems.",
+     "Record the findings: V-04 data in the United States (R-05), V-03 with no assurance report, V-05's report older than 12 months and contract ending 2026-11-30 (R-07), and Power BI (A-009) missing from the register.",
+     "For each vendor, list what its assurance report must cover, the complementary controls Kestrel must run, and the gaps to close.",
+     "Write the contract clause checklist and mark which clauses each contract lacks or needs at renewal; label data-in-Canada as a Kestrel requirement, not law.",
+     "Write the software assurance section for Meridian's CIS: secure development evidence, SBOM, patch duties (SEC-012), signed and tested updates, escrow, and change control for vendor changes and remote sessions.",
+     "Compare with See the finished example, tick Done when, and answer Check yourself."
+    ],
+    "modelAnswer": "Sentinel SOC Services (V-04). Touches: security logs from the Identity Directory, firewalls, endpoints and email; remote access Yes. Location: United States (R-05). Assurance: last report dated 2025-11-30, 305 days old on 2026-10-01; confirm it is a SOC 2 Type II whose scope covers the monitoring platform, and ask for a bridge letter. Required safeguards: no health information in forwarded logs, encryption in transit and at rest, named analysts only, immediate notice to Kestrel of any foreign legal demand, Kestrel approval of subprocessors. Rating: High until Priya Raman (E-003) closes the privacy review."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management (supply chain risk management): outsourcing does not transfer accountability. The best answer usually adds contract terms, assurance reports and monitoring rather than simply trusting the supplier."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 8, Software Development Security (security impact of acquired software): for commercial software you cannot review the code, so rely on vendor assurance, SBOMs, testing in your own environment, signed updates and contract terms."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Process task 5, Plan and manage procurement: put security, privacy and exit terms in the contract before signing, and match the contract type to the risk. Plan knowledge transfer before a supplier's contract ends."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Partners and Suppliers is one of the four dimensions. Supplier management makes sure supplier performance and risk support the value of the services Kestrel provides."
+    }
+   ],
+   "pitfalls": [
+    "Accepting a SOC 2 report without checking its scope, period, exceptions and the complementary controls Kestrel must run.",
+    "Saying the law requires data to stay in Canada. No Alberta statute bans it; the Canada rule is Kestrel's contract requirement, and the HIA requires safeguards for information used outside Alberta.",
+    "Leaving vendor remote accounts open with no end date or MFA, as with E-015.",
+    "Installing a vendor's signed update in production without testing it in non-production first."
+   ],
+   "check": [
+    {
+     "q": "What does a SOC 2 Type II report tell Kestrel that a Type I does not?",
+     "a": "Type I covers whether controls were suitably designed at one point in time. Type II also tests whether they operated as designed throughout a period, usually several months, and lists exceptions. Kestrel still checks the scope, the gap since the period ended and the controls it must run itself."
+    },
+    {
+     "q": "Why is NorthArc Cloud (V-02) a concentration risk for recovery?",
+     "a": "NorthArc hosts four Kestrel systems in khn_assets.csv: the Backup Platform (A-012) that every restore depends on, plus Email, the IT Service Management Platform and HR and Payroll. A NorthArc outage or compromise could hit recovery and communication at the same time."
+    },
+    {
+     "q": "How does an SBOM help when a new library vulnerability is announced?",
+     "a": "An SBOM lists the components and versions inside a product, so Kestrel can check at once whether the CIS or another product contains the affected library version, and press the vendor for a fix, instead of waiting for each vendor to say whether it is affected."
+    }
+   ]
+  },
+  {
+   "key": "w12-s5",
+   "summary": "Review SEC-004, Kestrel's Critical ransomware precursor on the Virtual Desktop Service: build the timeline from the data, run a blameless root-cause analysis, open problem records, and turn findings into owned improvements with the continual improvement model.",
+   "read": [
+    {
+     "heading": "Two reviews of one incident",
+     "body": "You run two reviews of SEC-004 today, and they ask different questions.\n\n- The post-incident review (PIR) looks at the security event: how it started, why controls did not stop it sooner, the systemic causes, and the corrective actions. It is the last step of incident response and feeds preparation.\n- The major-incident service restoration review looks at the service: how fast it was restored against target, how well people were kept informed, which workarounds were used, how suppliers performed, and how the major incident procedure itself should change.\n\nBoth are blameless and both feed problem management, the RAID log (risks, assumptions, issues and decisions) and the continual improvement register.\n\nTiming matters. Good practice is a short debrief within days, while memories and logs are fresh. Beacon's formal review is schedule task 26, Hold major-incident review: 2 working days, 2026-12-14 to 2026-12-15, on the critical path. That is four months after the event, so build the review on records, not recollection."
+    },
+    {
+     "heading": "The SEC-004 timeline",
+     "body": "From khn_security_events.csv. SEC-004 was a Critical ransomware precursor on the Virtual Desktop Service (A-008), a tier 1 system and the way clinicians reach the Clinical Information System (CIS) from shared workstations.\n\n| Time | Event | Interval |\n|---|---|---|\n| 2026-08-11 02:20 | Malicious activity begins (occurred_at) | Start |\n| 2026-08-11 03:05 | Detected | 45 minutes after it began |\n| 2026-08-11 03:20 | Record opened in the IT Service Management Platform | 15 minutes after detection |\n| 2026-08-11 05:45 | Contained | 2 h 40 min after detection |\n| 2026-08-13 18:30 | Normal service restored | 63 h 25 min (63.42 h) after detection |\n\nCompare with Kestrel's averages and targets. Detection took 0.75 hours against a mean time to detect (MTTD) of 25.29 hours, which is good. Containment took 2.67 hours against a mean time to contain (MTTC) of 1.93 hours, slower than usual. Recovery took 63.42 hours against a mean time to recover (MTTR) of 28.33 hours and a 4-hour recovery time objective (RTO) for A-008. Of the outage after detection, 60.75 hours came after containment. The attack was stopped in under three hours; getting the service back took two and a half more days. Recovery is where the review should look hardest.\n\nRelated records the review must explain:\n\n- SEC-002, Medium malware on A-008, 2026-07-14, and SEC-008, Medium malware on A-008, 2026-09-09: three incidents on one system in three months.\n- SEC-011, a Critical remote code execution weakness on A-008, detected on 2026-08-12 at 06:00, the day after SEC-004, and since remediated. Was it the way in? The data does not say. The review must confirm or reject that from logs.\n\nThe data also does not say what clinicians experienced, which workarounds they used or who was told when. Get those facts from the incident record, the scribe's notes and the people involved. Do not fill gaps with guesses."
+    },
+    {
+     "heading": "Blameless analysis and root cause",
+     "body": "A blameless review asks how the system let the event happen and last, not who to punish. People describe what they saw and why their actions made sense at the time, so you get honest evidence. Blameless does not excuse reckless or malicious acts; it recognizes that most failures come from conditions, not careless individuals.\n\nUse structured techniques:\n\n- Five whys: ask why repeatedly until you reach a cause you can act on.\n- Fishbone (Ishikawa) diagram: sort causes into categories. Use the four ITIL dimensions: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes.\n- Timeline analysis: compare what happened with what the playbook said should happen at each step.\n\nWrite the five whys as questions with the evidence that will answer them, not invented answers:\n\n1. Why did service take 63.42 hours to restore? Compare the rebuild steps in the record with the runbook.\n2. Why did rebuilding take longer than the 4-hour RTO? Was there a tested rebuild runbook or image for A-008?\n3. Why was the A-008 weakness (SEC-011) found only on 2026-08-12? Check the scan schedule and coverage for A-008.\n4. Why did the earlier malware (SEC-002) not lead to a problem record? Check the incident trend reporting.\n5. Why could activity on A-008 threaten the CIS? Check the segmentation between A-008 and CIS servers.\n\nSeparate the root cause, the condition that, if removed, would have prevented or shortened the event, from contributing factors, which made it worse. Write the root cause as condition, cause and effect, and mark it confirmed or to be confirmed."
+    },
+    {
+     "heading": "Problem records and corrective actions",
+     "body": "SEC-004 feeds problem PRB-01, recurring malware on the Virtual Desktop Service (SEC-002, SEC-004, SEC-008). When its cause is confirmed it becomes a known error with a workaround until the fix lands. The second gap, restoration of A-008 far beyond its RTO, is fixed by action PIR-2 and carried in the residual risk register as RR-05 until a timed rebuild passes.\n\n| ID | Action | Owner | Due | Measure |\n|---|---|---|---|---|\n| PIR-1 | Open problem PRB-01 and find the entry route, confirming or rejecting SEC-011 from logs | Sam Okafor (E-020) | 2027-01-15 | Cause recorded and removed |\n| PIR-2 | Write and test an A-008 rebuild procedure against its 4-hour RTO | Ahmed Haddad (E-017), custodian | 2027-02-26 | Timed rebuild within 4 h |\n| PIR-3 | Scan tier 1 systems for Critical weaknesses every week (proposed) | Sam Okafor (E-020) | 2027-01-15 | Weekly scan report |\n| PIR-4 | Add a mandatory privacy assessment field to every security incident and file SEC-004's | Priya Raman (E-003) | 2027-01-15 | Field live; assessment filed |\n| PIR-5 | Hold post-incident reviews within 10 working days | Daniel Osei (E-004) | 2027-01-15 | Next review on time |\n\nRelated work already planned elsewhere: micro-segmenting the virtual desktops from the CIS database (the network design), adding A-008 to the 2027 restore-test calendar (Chloe Dubois, E-016) and getting SEC-008's true timestamps from the security operations centre (Sam Okafor).\n\nEvery action needs an owner, a due date, a measure and a check that it worked. Prefer actions that change the system over actions that ask people to try harder: \"more training\" on its own rarely prevents a repeat. Track actions in the continual improvement register and the RAID log, and close PRB-01 and RR-05 only when the measures show the fix works.\n\nFor the project manager, this is the lessons-learned register in action: record the lesson, assign the owner, apply it to the rest of Beacon, and check it later."
+    },
+    {
+     "heading": "The continual improvement model",
+     "body": "ITIL 4's continual improvement model asks seven questions, and Version 5 refines this model. Apply them to SEC-004:\n\n1. What is the vision? Clinicians can always reach the CIS, even during a cyber event.\n2. Where are we now? SEC-004 took 63.42 hours to restore after detection against a 4-hour RTO; A-008 had three malware incidents in three months; the last CIS restore test took 13.5 hours.\n3. Where do we want to be? Proposed: A-008 restored within its 4-hour RTO, proven by a timed test, by 2027-02-26, and no repeat malware incident on A-008 in the next quarter.\n4. How do we get there? The corrective actions, in priority order.\n5. Take action: deliver them, iteratively, with feedback.\n6. Did we get there? Retest the rebuild, and watch incidents on A-008 and MTTR on the security-operations dashboard.\n7. How do we keep the momentum going? Review progress at each service review and keep the actions in the continual improvement register.\n\nThree guiding principles fit naturally: Start where you are (use the measured baseline), Progress iteratively with feedback (fix, test, adjust), and Focus on value (clinicians reaching the CIS is the point).\n\nThe service restoration review adds its own questions. Was a major incident declared promptly and was the procedure followed? Were roles clear? Did clinicians and executives get timely, accurate updates? Did the workarounds keep care safe? Did suppliers respond as their contracts require? Each answer is a finding with an owner, not just a comment."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Post-incident review (PIR)",
+     "definition": "A structured review after an incident that rebuilds the timeline, finds systemic causes and assigns corrective actions. It is the lessons-learned step of incident response."
+    },
+    {
+     "term": "Major-incident service restoration review",
+     "definition": "An ITIL-style review of how service was restored after a major incident: speed against target, communication, workarounds, supplier support and the procedure itself."
+    },
+    {
+     "term": "Blameless review",
+     "definition": "A review that looks for the conditions that allowed an event, not people to punish, so participants share honest evidence. It does not excuse reckless or malicious acts."
+    },
+    {
+     "term": "Root cause",
+     "definition": "The underlying condition that, if removed, would have prevented the event or limited it, as distinct from contributing factors that made it worse."
+    },
+    {
+     "term": "Five whys",
+     "definition": "A root-cause technique of asking why repeatedly, each answer backed by evidence, until you reach a cause you can act on."
+    },
+    {
+     "term": "Continual improvement model",
+     "definition": "ITIL 4's seven questions, from What is the vision? to How do we keep the momentum going?, which Version 5 refines, used to turn findings into measured improvement."
+    }
+   ],
+   "build": {
+    "goal": "Write the Post-incident review and the Major-incident service restoration review for SEC-004, using the data timeline, a blameless root-cause analysis, problem records and owned improvement actions.",
+    "steps": [
+     "Open Project, Release 3, Post-incident review and Major-incident service restoration review, and read How to write it for both.",
+     "Build the SEC-004 timeline from khn_security_events.csv and compute each interval; compare it with MTTD 25.29 h, MTTC 1.93 h, MTTR 28.33 h and the 4-hour A-008 RTO.",
+     "List the related records (SEC-002, SEC-008, SEC-011) and write the open questions the evidence must answer, without inventing the answers.",
+     "Run a blameless five whys and a fishbone across the four ITIL dimensions, then write a root-cause statement marked confirmed or to be confirmed.",
+     "Open problem PRB-01 and write the corrective actions (PIR-1 to PIR-5 in the finished example) with owner, due date, measure and how you will check each worked.",
+     "In the service restoration review, assess restoration against target, communication, workarounds and supplier support, then apply the seven continual improvement questions.",
+     "Move the actions into the continual improvement register and RAID log, then compare with See the finished example and answer Check yourself."
+    ],
+    "modelAnswer": "Where are we now (SEC-004): detected 45 minutes after it began (mean for all incidents 25.29 h), contained 2 h 40 min after detection, normal service restored 63 h 25 min after detection against a 4-hour RTO for A-008. 60.75 h of that came after containment, so recovery, not the attack, drove the outage. Where do we want to be (proposed): A-008 restored within 4 hours, proven by a timed test, by 2027-02-26, and no repeat malware incident on A-008 next quarter."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "Know the seven continual improvement questions in order, from What is the vision? to How do we keep the momentum going? This is the ITIL 4 model that Version 5 refines. Where are we now? needs a measured baseline, such as SEC-004's 63.42 hours."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "A major incident has its own procedure: a dedicated lead, faster communication and a review afterwards. Restoring the service is incident management; removing the cause is problem management."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (incident management): lessons learned is the last step of incident response and feeds preparation. A blameless review gives more honest evidence than one that hunts for a culprit."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Business Environment task 6, Continuous improvement: lessons go into the lessons-learned register with an owner and a measure, and are applied to the rest of the programme, not just filed."
+    }
+   ],
+   "pitfalls": [
+    "Blaming the person who clicked or the analyst on shift. Find the conditions that let the event happen and last 63 hours.",
+    "Writing a root cause the evidence does not support. Mark hypotheses, such as SEC-011 as the entry point, as to be confirmed.",
+    "Ending with actions that have no owner, date or measure, or only more training.",
+    "Reviewing only the attack and ignoring recovery, where most of SEC-004's outage time went."
+   ],
+   "check": [
+    {
+     "q": "How long did SEC-004 take from detection to recovery, and what does the split tell you?",
+     "a": "63.42 hours (63 h 25 min), from detection at 03:05 on 2026-08-11 to recovery at 18:30 on 2026-08-13. Containment took only 2 h 40 min, so 60.75 hours came after containment. The weak point was recovery, against a 4-hour RTO for A-008."
+    },
+    {
+     "q": "What is the difference between the post-incident review and the major-incident service restoration review?",
+     "a": "The post-incident review examines the security event: how it happened, why controls missed it, root causes and corrective actions. The service restoration review examines how service came back: speed against target, communication, workarounds, supplier support and the major incident procedure itself."
+    },
+    {
+     "q": "List the seven continual improvement questions in order.",
+     "a": "What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? This is the ITIL 4 model, which Version 5 refines."
+    }
+   ]
+  }
+ ]
+}

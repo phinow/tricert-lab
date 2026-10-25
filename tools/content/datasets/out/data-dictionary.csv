@@ -1,0 +1,135 @@
+table,column,description,type,classification,allowed_values
+khn_sites,site_code,Kestrel site code; primary key,text,Public,KGH; ARH; CVH; PGH
+khn_sites,site_name,Site name,text,Public,Kestrel General Hospital; Aspen Ridge Hospital; Coulee Valley Hospital; Prairie Gate Health Centre
+khn_sites,zone,Kestrel zone the site belongs to,text,Public,Central; North; South
+khn_sites,site_type,Type of site,text,Public,Urban referral hospital; Community hospital; Rural health centre
+khn_units,unit_id,Inpatient unit code; primary key,text,Internal,KGH-MED4A; KGH-SUR5B; KGH-ICU; ARH-MED; ARH-SUR; CVH-MED; PGH-MED
+khn_units,site_code,Site of the unit; foreign key to khn_sites.csv,text,Internal,KGH; ARH; CVH; PGH
+khn_units,unit_name,Unit name as used on the bed board,text,Internal,
+khn_units,unit_type,Kind of inpatient unit,text,Internal,Medicine; Surgery; Intensive care
+khn_ed_visits,visit_id,Pseudonymous emergency department visit identifier; primary key; not linked to any person outside the warehouse,text,Confidential,V0001 onward
+khn_ed_visits,site_code,Site of the emergency department,text,Confidential,KGH; ARH; CVH; PGH (upper case)
+khn_ed_visits,arrival_datetime,Arrival and registration time; the start of every ED clock at Kestrel,datetime,Confidential,YYYY-MM-DD HH:MM from 2026-07-01 to 2026-09-30
+khn_ed_visits,ctas_level,Canadian Triage and Acuity Scale (CTAS) level assigned at triage,whole number,Confidential,1 to 5
+khn_ed_visits,triage_datetime,Time triage was completed,datetime,Confidential,YYYY-MM-DD HH:MM; not before arrival
+khn_ed_visits,pia_datetime,Physician initial assessment (PIA) time; blank when the patient left without being seen,datetime,Confidential,YYYY-MM-DD HH:MM; not before triage; blank only for LWBS
+khn_ed_visits,disposition,How the ED visit ended,text,Confidential,Admitted; Discharged; LWBS; Transferred
+khn_ed_visits,departure_datetime,"Time the patient physically left the ED; for admitted patients, when they left the ED for an inpatient bed",datetime,Confidential,YYYY-MM-DD HH:MM; not before arrival
+khn_ed_visits,age_band,"Age group at arrival (bands, not dates of birth, to reduce re-identification risk)",text,Confidential,0-17; 18-64; 65+
+khn_ed_visits,arrival_mode,How the patient arrived,text,Confidential,Ambulance; Walk-in
+khn_bed_census,census_date,Date of the midnight snapshot,date,Confidential,"2026-07-01 to 2026-09-30, one row per unit per day"
+khn_bed_census,unit_id,Inpatient unit; foreign key to khn_units.csv,text,Confidential,KGH-MED4A; KGH-SUR5B; KGH-ICU; ARH-MED; ARH-SUR; CVH-MED; PGH-MED
+khn_bed_census,staffed_beds,"Beds open and staffed at the snapshot; semi-additive (add across units, never across days)",whole number,Confidential,0 or more
+khn_bed_census,occupied_beds,Beds with a patient in them at the snapshot; semi-additive,whole number,Confidential,0 or more; above staffed_beds is possible overcapacity and needs review
+khn_bed_census,alc_patients,Patients in a bed who no longer need acute care and wait for an alternate level of care (ALC); summing across days gives ALC patient-days,whole number,Confidential,0 to occupied_beds
+khn_programme_register,wp_id,Work package identifier; primary key,text,Internal,WP-101 to WP-115
+khn_programme_register,release,Beacon release the work package belongs to,whole number,Internal,1; 2; 3
+khn_programme_register,work_package,Work package name,text,Internal,
+khn_programme_register,owner_id,Accountable owner; foreign key to khn_identity.csv,text,Internal,E-001 to E-020; required
+khn_programme_register,planned_start,Baseline start date from the schedule,date,Internal,YYYY-MM-DD
+khn_programme_register,planned_finish,Baseline finish date from the schedule,date,Internal,YYYY-MM-DD; not before planned_start
+khn_programme_register,budget_cad,"Budget at completion (BAC) for the work package, Canadian dollars",whole number,Internal,0 or more
+khn_programme_register,planned_pct_as_of,"Planned percent complete as of 2026-10-01 (baseline), used for planned value",whole number,Internal,0 to 100
+khn_programme_register,pct_complete,"Actual percent complete as of 2026-10-01, used for earned value",whole number,Internal,0 to 100
+khn_programme_register,actual_cost_cad,"Actual cost to 2026-10-01, Canadian dollars",whole number,Internal,0 or more
+khn_programme_register,status,Work package status,text,Internal,Not started; In progress; Complete; On hold
+khn_programme_register,risk_rating,Overall risk rating,text,Internal,Low; Medium; High
+khn_schedule,ID,Task ID in Microsoft Project import order; row 1 is the programme summary,whole number,Internal,1 to 28
+khn_schedule,Name,Task or milestone name,text,Internal,
+khn_schedule,Duration,Working-day duration; milestones are 0d,text,Internal,Nd
+khn_schedule,Start,"Start date, given only for row 1; every other date comes from the links",date,Internal,"2026-09-01 on row 1, blank elsewhere"
+khn_schedule,Predecessors,"Finish-to-start predecessor IDs, comma separated",text,Internal,IDs from 2 to 27
+khn_schedule,Resource Names,"Role names, semicolon separated",text,Internal,
+khn_schedule,Milestone,Yes for 0d milestones,text,Internal,Yes; No
+khn_schedule,Release,Release or programme level,text,Internal,Programme; Release 1; Release 2; Release 3
+khn_service_desk,ticket_id,Service desk ticket; primary key,text,Internal,SD-10001 onward
+khn_service_desk,ticket_type,Kind of ticket,text,Internal,Incident; Service request; Access request
+khn_service_desk,opened_at,Time the ticket was logged,datetime,Internal,YYYY-MM-DD HH:MM from 2026-08-01 to 2026-09-30
+khn_service_desk,resolved_at,Time the ticket was resolved; blank when still open at the extract (2026-10-01 00:00),datetime,Internal,YYYY-MM-DD HH:MM; not before opened_at
+khn_service_desk,priority,Priority; access and service requests are P3 or P4,text,Internal,P1; P2; P3; P4
+khn_service_desk,category,Ticket category,text,Internal,CIS access; CIS issue; Power BI; Virtual desktop; Printing; Network; Password reset; Hardware
+khn_service_desk,site_code,Site of the requester; foreign key to khn_sites.csv,text,Internal,KGH; ARH; CVH; PGH
+khn_service_desk,assignment_group,Resolver group,text,Internal,Service Desk; Clinical Applications; Analytics Support; End User Computing; Network Services; Identity and Access
+khn_service_desk,channel,How the ticket arrived,text,Internal,Phone; Portal; Walk-up
+khn_service_desk,sla_target_hours,Resolution target in clock hours for the priority,whole number,Internal,P1 4; P2 8; P3 24; P4 72
+khn_service_desk,sla_met,Stored SLA flag; recompute it from the timestamps before use,Y/N,Internal,Y; N; blank while the clock is still running
+khn_service_desk,reopened,Ticket was reopened after resolution,Y/N,Internal,Y; N
+khn_service_desk,csat,Customer satisfaction score from the closure survey,whole number,Internal,1 to 5; blank when no response
+khn_identity,employee_id,Worker identifier; one current row expected per worker,text,Confidential,E-001 onward
+khn_identity,full_name,Worker name (synthetic),text,Confidential,
+khn_identity,job_role,Role used for role-based access control,text,Internal,Registered Nurse; Physician; Unit Clerk; Clinical Analyst; System Administrator; Executive; Agency Nurse; Vendor Support; Service Desk Analyst; Security Analyst; Corporate Staff
+khn_identity,department,Department or unit; vendor workers show their company,text,Internal,
+khn_identity,site_code,Home site; foreign key to khn_sites.csv,text,Internal,KGH; ARH; CVH; PGH
+khn_identity,manager_id,Manager; foreign key to employee_id; blank only for the top of the reporting line,text,Confidential,an existing employee_id
+khn_identity,worker_type,Employment relationship,text,Internal,Employee; Agency; Vendor
+khn_identity,hr_status,Status in the HR and Payroll System (A-015),text,Confidential,Active; Leave; Terminated
+khn_identity,account_status,Status of the account in the Identity Directory (A-007),text,Confidential,Enabled; Disabled
+khn_identity,privileged,Account holds administrative rights,Yes/No,Confidential,Yes; No
+khn_identity,mfa_enrolled,Enrolled in multifactor authentication,Yes/No,Confidential,Yes; No
+khn_identity,effective_from,Start of this assignment row,date,Confidential,YYYY-MM-DD
+khn_identity,effective_to,End of this assignment row; blank while current; required for Agency and Vendor workers,date,Confidential,YYYY-MM-DD or blank
+khn_identity,last_login,Last successful sign-in to the Identity Directory,datetime,Confidential,YYYY-MM-DD HH:MM
+khn_role_permissions,job_role,RBAC role,text,Internal,values of khn_identity.csv job_role
+khn_role_permissions,system_id,System; foreign key to khn_assets.csv,text,Internal,A-001 to A-015
+khn_role_permissions,permission,Permission the role grants on the system,text,Internal,
+khn_user_permissions,employee_id,Worker holding the permission,text,Confidential,an existing employee_id
+khn_user_permissions,system_id,System,text,Confidential,A-001 to A-015
+khn_user_permissions,permission,Permission actually assigned,text,Confidential,
+khn_user_permissions,granted_date,Date the permission was granted,date,Confidential,YYYY-MM-DD
+khn_user_permissions,granted_by,Who granted it; must not be the same person as employee_id,text,Confidential,an existing employee_id
+khn_access_reviews,review_id,Access review item; primary key,text,Confidential,AR-001 onward
+khn_access_reviews,employee_id,Worker whose access is reviewed,text,Confidential,an existing employee_id
+khn_access_reviews,system_id,System reviewed,text,Confidential,A-001 to A-015
+khn_access_reviews,reviewer_id,Manager or owner who must decide; must not review their own access,text,Confidential,an existing employee_id
+khn_access_reviews,assigned_date,Date the item was assigned to the reviewer,date,Confidential,YYYY-MM-DD
+khn_access_reviews,due_date,Date the decision is due,date,Confidential,YYYY-MM-DD
+khn_access_reviews,completed_date,Date the decision was recorded; blank if not done,date,Confidential,"YYYY-MM-DD, not before assigned_date, or blank"
+khn_access_reviews,decision,Reviewer decision,text,Confidential,Keep; Remove; Modify; blank
+khn_access_reviews,exception,Access kept under an approved exception,Y/N,Confidential,Y; N
+khn_security_events,record_id,Security record; primary key,text,Confidential,SEC-001 onward
+khn_security_events,record_type,Incident or vulnerability,text,Confidential,Incident; Vulnerability
+khn_security_events,occurred_at,"Incidents only: start of the malicious or faulty activity, from the investigation timeline",datetime,Confidential,YYYY-MM-DD HH:MM; blank for vulnerabilities
+khn_security_events,opened_at,Time the record was opened in the IT Service Management Platform; may be before or after detection,datetime,Confidential,YYYY-MM-DD HH:MM
+khn_security_events,detected_at,Time the event or weakness was first detected,datetime,Confidential,YYYY-MM-DD HH:MM; not before occurred_at
+khn_security_events,contained_at,Incidents only: time the threat was contained,datetime,Confidential,not before detected_at
+khn_security_events,recovered_at,Incidents only: time normal service was restored,datetime,Confidential,not before contained_at; blank while open
+khn_security_events,severity,Severity,text,Confidential,Critical; High; Medium; Low
+khn_security_events,category,Category,text,Confidential,Incidents: Phishing; Malware; Ransomware precursor; Unauthorized access; Misconfiguration; Lost device. Vulnerabilities: Remote code execution; Missing patch; Weak cipher; Excessive permission; End-of-support software
+khn_security_events,asset_id,Affected system; foreign key to khn_assets.csv,text,Confidential,A-001 to A-015
+khn_security_events,status,Record status,text,Confidential,Incidents: Contained; Closed. Vulnerabilities: Open; Remediated
+khn_security_events,remediation_due,"Vulnerabilities only: due date from detection (Critical 7, High 30, Medium 60, Low 90 days)",date,Confidential,YYYY-MM-DD; blank for incidents
+khn_security_events,cvss_score,Vulnerabilities only: CVSS base score,decimal,Confidential,0.0 to 10.0; blank for incidents
+khn_assets,asset_id,System identifier; primary key,text,Internal,A-001 to A-015
+khn_assets,system_name,System name,text,Internal,
+khn_assets,tier,Criticality tier (1 is most critical),whole number,Internal,1; 2; 3
+khn_assets,business_owner_id,Accountable business owner; required,text,Internal,an existing employee_id
+khn_assets,custodian_id,Technical custodian,text,Internal,an existing employee_id
+khn_assets,classification,Highest classification of data the system holds (Kestrel policy),text,Internal,Public; Internal; Confidential; Restricted
+khn_assets,hosting,Where the system runs,text,Confidential,On premises; NorthArc Cloud; Vendor hosted
+khn_assets,vendor_id,Main vendor; foreign key to khn_vendors.csv,text,Internal,V-01 to V-05 or blank
+khn_assets,depends_on,"Systems this one needs to run, semicolon separated",text,Confidential,asset IDs
+khn_assets,rto_target_hours,Recovery time objective in hours,decimal,Internal,greater than 0
+khn_assets,rpo_target_hours,Recovery point objective in hours,decimal,Internal,greater than 0
+khn_assets,end_of_support_date,Date vendor support ends; blank for evergreen software as a service,date,Confidential,YYYY-MM-DD or blank
+khn_controls,control_test_id,Control test; primary key,text,Confidential,CT-001 onward
+khn_controls,control_name,Control tested,text,Confidential,
+khn_controls,asset_id,System the test covers; blank for people controls,text,Confidential,A-001 to A-015 or blank
+khn_controls,test_date,Date of the test or measurement; blank when never tested,date,Confidential,YYYY-MM-DD or blank
+khn_controls,expected_result,What a pass looks like,text,Confidential,
+khn_controls,actual_result,What the test found,text,Confidential,
+khn_controls,status,Test outcome,text,Confidential,Pass; Fail; Not tested
+khn_controls,backup_job_id,Backup job used for a restore test,text,Confidential,BK-... or blank
+khn_controls,restore_test_date,Date of the restore test,date,Confidential,YYYY-MM-DD or blank
+khn_controls,rto_target_hours,Recovery time objective for the system,decimal,Confidential,greater than 0 or blank
+khn_controls,restore_hours,Measured restore time,decimal,Confidential,greater than 0 or blank
+khn_controls,training_group,Workforce group for awareness training,text,Confidential,Nursing; Physicians; IT staff; Agency and vendor workers; Executives and leaders
+khn_controls,training_due,Training due date,date,Confidential,YYYY-MM-DD or blank
+khn_controls,training_complete_pct,Percent of the group complete,decimal,Confidential,0 to 100 or blank
+khn_vendors,vendor_id,Vendor; primary key,text,Internal,V-01 to V-05
+khn_vendors,vendor_name,Vendor name (fictional),text,Internal,
+khn_vendors,service,Service supplied,text,Internal,
+khn_vendors,data_location,Country where the vendor stores or processes Kestrel data,text,Internal,Canada; United States
+khn_vendors,has_remote_access,Vendor staff can reach Kestrel systems remotely,Yes/No,Internal,Yes; No
+khn_vendors,last_assurance_report,Date of the last SOC 2 Type II or equivalent report; blank if none,date,Confidential,YYYY-MM-DD or blank
+khn_vendors,contract_end,Contract end date,date,Internal,YYYY-MM-DD
+khn_vendors,risk_rating,Third-party risk rating,text,Internal,Low; Medium; High

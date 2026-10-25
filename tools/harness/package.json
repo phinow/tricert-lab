@@ -1,0 +1,24 @@
+{
+  "name": "tricert-lab-harness",
+  "private": true,
+  "description": "Browser checks, screenshots, the hosted artifact build and the logo export for TriCert Lab. Run npm ci in the repository root first.",
+  "type": "module",
+  "scripts": {
+    "build:harness": "node build.mjs after ../..",
+    "flows": "node build.mjs after ../.. && node flows.mjs",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "shots": "node build.mjs after ../.. && node shoot.mjs after",
+    "shots:themes": "node build.mjs after ../.. && node theme-shots.mjs",
+    "shots:final": "node build.mjs after ../.. && node final-shots.mjs",
+    "live": "node live.mjs && node live-reading.mjs",
+    "artifact": "node build-artifact.mjs",
+    "logo": "node export-logo.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.2.1",
+    "esbuild": "0.25.4",
+    "playwright": "1.56.0",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3"
+  }
+}

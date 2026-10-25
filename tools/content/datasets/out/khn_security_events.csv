@@ -1,0 +1,22 @@
+record_id,record_type,occurred_at,opened_at,detected_at,contained_at,recovered_at,severity,category,asset_id,status,remediation_due,cvss_score
+SEC-001,Incident,2026-07-06 08:50,2026-07-06 09:45,2026-07-06 09:32,2026-07-06 11:20,2026-07-07 09:15,High,Phishing,A-013,Closed,,
+SEC-002,Incident,2026-07-14 13:05,2026-07-15 08:05,2026-07-15 07:40,2026-07-15 10:30,2026-07-16 16:00,Medium,Malware,A-008,Closed,,
+SEC-003,Incident,2026-07-29 22:10,2026-08-02 10:40,2026-08-02 10:15,2026-08-02 13:00,2026-08-05 12:00,High,Unauthorized access,A-001,Closed,,
+SEC-004,Incident,2026-08-11 02:20,2026-08-11 03:20,2026-08-11 03:05,2026-08-11 05:45,2026-08-13 18:30,Critical,Ransomware precursor,A-008,Closed,,
+SEC-005,Incident,2026-08-18 17:30,2026-08-19 08:25,2026-08-19 08:10,2026-08-19 09:00,2026-08-19 11:30,Low,Lost device,A-013,Closed,,
+SEC-005,Incident,2026-08-18 17:30,2026-08-19 08:25,2026-08-19 08:10,2026-08-19 09:00,2026-08-19 11:30,Low,Lost device,A-013,Closed,,
+SEC-006,Incident,2026-08-25 10:00,2026-08-28 14:40,2026-08-28 14:20,2026-08-28 15:10,2026-08-29 10:00,Medium,Misconfiguration,A-009,Closed,,
+SEC-007,Incident,2026-09-03 07:55,2026-09-03 08:10,2026-09-03 08:20,2026-09-03 09:40,2026-09-03 15:30,Medium,Phishing,A-013,Closed,,
+SEC-008,Incident,2026-09-09 11:00,2026-09-09 14:45,2026-09-09 14:30,2026-09-09 13:10,2026-09-10 09:00,Medium,Malware,A-008,Closed,,
+SEC-009,Incident,2026-09-17 01:15,2026-09-18 09:20,2026-09-18 09:05,2026-09-18 12:40,,High,Unauthorized access,A-007,Contained,,
+SEC-010,Incident,2026-09-24 10:30,2026-09-24 11:00,2026-09-24 10:45,2026-09-24 11:30,2026-09-24 14:00,Low,Phishing,A-013,Closed,,
+SEC-011,Vulnerability,,2026-08-12 09:10,2026-08-12 06:00,,,Critical,Remote code execution,A-008,Remediated,2026-08-19,9.8
+SEC-012,Vulnerability,,2026-08-26 10:20,2026-08-26 06:00,,,High,Missing patch,A-001,Open,2026-09-25,8.1
+SEC-013,Vulnerability,,2026-09-02 11:00,2026-09-02 06:00,,,Medium,Weak cipher,A-013,Open,2026-11-01,5.9
+SEC-014,Vulnerability,,2026-09-15 13:30,2026-09-15 06:00,,,High,Excessive permission,A-007,Open,2026-10-15,7.5
+SEC-015,Vulnerability,,2026-07-20 09:45,2026-07-20 06:00,,,High,End-of-support software,A-014,Open,2026-08-19,8.6
+SEC-016,Vulnerability,,2026-09-08 10:05,2026-09-08 06:00,,,Medium,Missing patch,A-021,Open,2026-11-07,6.5
+SEC-017,Vulnerability,,2026-09-21 08:50,2026-09-21 06:00,,,Critical,Remote code execution,A-004,Open,2026-09-28,11.5
+SEC-018,Vulnerability,,2026-09-22 14:15,2026-09-22 06:00,,,Low,Weak cipher,A-011,Open,2026-12-21,3.7
+SEC-019,Vulnerability,,2026-08-05 09:30,2026-08-05 06:00,,,hIGH,Missing patch,A-005,Remediated,2026-09-04,7.8
+SEC-020,Vulnerability,,2026-09-29 11:40,2026-09-29 06:00,,,Medium,Excessive permission,A-010,Open,2026-11-28,5.4

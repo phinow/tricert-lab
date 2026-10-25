@@ -1,0 +1,538 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w4-s1",
+   "summary": "You will learn why Power BI models work best as a star schema, how to state the grain of each fact table, and how additive, semi-additive and non-additive numbers behave. You will design Beacon's facts, dimensions, keys and relationship plan.",
+   "read": [
+    {
+     "heading": "Facts, dimensions and the star",
+     "body": "A star schema puts measurements in fact tables and descriptions in dimension tables. Each dimension relates to a fact with a one-to-many relationship, so filters flow from the dimension (the one side) to the fact (the many side).\n\n- Fact tables are long and narrow: one row per event or snapshot, holding keys and numbers.\n- Dimension tables are short and wide: one row per thing (a site, a date, a triage level) with descriptive columns for slicing and grouping.\n\nWhy bother? The Excel extracts Kestrel emails today are flat tables that repeat site names on every row and mix events with snapshots. A star schema gives a smaller model, simpler DAX (Data Analysis Expressions, the model's formula language), predictable filtering and one place to fix a description. Power BI's engine is built around this shape, and PL-300 scenarios assume it.\n\nPower Query can split a flat table: reference the cleaned source, keep the descriptive columns, remove duplicates, and you have a dimension."
+    },
+    {
+     "heading": "Start with the grain",
+     "body": "The grain is what one row of a fact table means. Declare it before you choose columns, because every measure depends on it. The classic order: choose the business process, declare the grain, choose the dimensions, then the numeric facts.\n\n| Fact table | Business process | Grain | Type | Rows |\n|---|---|---|---|---|\n| FactEDVisit | Emergency department (ED) visits | One row per valid ED visit | Transaction | 474 |\n| FactBedCensus | Midnight bed census | One row per inpatient unit per census date | Periodic snapshot | 643 |\n| FactServiceTicket | Service desk work | One row per ticket | Transaction | 219 |\n\nA transaction fact records an event once. A periodic snapshot records a state at regular intervals, so the same beds appear every day. FactEDVisit also looks like an accumulating snapshot, a row whose milestones (arrival, triage, physician initial assessment, departure) fill in as the visit progresses; Beacon loads visits after they end, so it treats them as transactions.\n\nNever mix grains in one table. If someone wants a daily ED total beside the census, write a measure; do not add a column to the census table."
+    },
+    {
+     "heading": "Beacon's dimensions and keys",
+     "body": "| Dimension | Key | Rows | Main attributes |\n|---|---|---|---|\n| DimDate | Date | 365 (2026-01-01 to 2026-12-31) | Year, MonthNumber, MonthName, DayOfWeek |\n| DimSite | SiteCode | 4 | SiteName, Zone, SiteType |\n| DimUnit | UnitID | 7 | SiteCode, UnitName, UnitType |\n| DimCTAS | CTASLevel | 5 | CTASDescription, TargetMinutes |\n\nBeacon uses business keys from the sources (site KGH for Kestrel General Hospital, unit KGH-MED4A, triage levels 1 to 5) because they are stable, short and clean after Power Query. Big warehouses often add integer surrogate keys; Beacon does not need them at this size.\n\nDimCTAS describes the Canadian Triage and Acuity Scale (CTAS): 1 Resuscitation, 2 Emergent, 3 Urgent, 4 Less urgent, 5 Non-urgent. TargetMinutes holds the time-to-physician objectives (0, 15, 30, 60, 120); CTAS calls them objectives, not care standards. Keeping them in a dimension puts the rule in one governed place, and the measure % PIA Within CTAS Target (PIA is physician initial assessment) reads it through RELATED.\n\nIf a fact key has no match in its dimension, Power BI shows those rows under a blank member in visuals, so totals still add up. That is the model's form of rule DQ-10. Your pipeline should leave the blank member empty, and your tests should prove it."
+    },
+    {
+     "heading": "The bus matrix and the snowflake decision",
+     "body": "A bus matrix shows which dimensions each fact uses:\n\n| Fact | DimDate | DimSite | DimUnit | DimCTAS |\n|---|---|---|---|---|\n| FactEDVisit | ArrivalDate | SiteCode | Not used | CTASLevel |\n| FactBedCensus | CensusDate | Through DimUnit | UnitID | Not used |\n| FactServiceTicket | OpenedDate | SiteCode | Not used | Not used |\n\nDimDate and DimSite are conformed dimensions: one table serves every fact, so one site slicer filters ED, bed and ticket visuals together.\n\nThe census reaches DimSite through DimUnit: DimSite[SiteCode] to DimUnit[SiteCode] (one-to-many), then DimUnit[UnitID] to FactBedCensus[UnitID] (one-to-many). That short chain is a snowflake. Beacon accepts it because units truly belong to sites, there is one path, and a site filter still reaches the census, which matters for row-level security by site. The alternative is to copy SiteCode into FactBedCensus. Both work; write down which you chose and why.\n\nEvery Beacon relationship is one-to-many with a single cross-filter direction, dimension to fact. You build them next session."
+    },
+    {
+     "heading": "Additive, semi-additive and non-additive",
+     "body": "How a number may be added decides how you write its measure.\n\n| Kind | Adds across | Beacon example |\n|---|---|---|\n| Additive | Every dimension | ED visits, tickets, alternate level of care (ALC) patient-days |\n| Semi-additive | Some dimensions, not time | Staffed and occupied beds: add across units on one day, never across days |\n| Non-additive | Nothing; recompute from rows | Medians, rates, percentages |\n\nThe semi-additive trap: summing staffed_beds over every census row gives 12,952. That is staffed bed-days. Kestrel had 144 staffed beds on 2026-09-30.\n\nThe non-additive trap: the all-site median time to PIA is 64.0 minutes. The site medians are 80.5, 54.5, 54.0 and 45.5, and their average, 58.6, is wrong. The all-site left without being seen (LWBS) rate is 5.7%, but the average of the four site rates is 5.0%, because Kestrel General Hospital (KGH) has far more visits than Prairie Gate Health Centre (PGH). A table with one pre-computed median per site can never give a correct total. Keep the visit grain and compute in DAX.\n\nALC patient-days are additive on purpose: one ALC patient in a bed for one day is one patient-day, so daily counts sum to 2,075 patient-days."
+    },
+    {
+     "heading": "Columns to keep and columns to leave out",
+     "body": "Every column costs memory and widens what could leak. Keep only what a measure, a slicer or a relationship needs.\n\n- Keep: keys, Disposition, AgeBand, ArrivalMode, and the durations MinutesToPIA and EDLOSMinutes computed in Power Query.\n- Question: TriageDateTime and PIADateTime are needed only for triage-based measures or drill-down; if leaders do not need them, remove them after the durations are computed.\n- Leave out: anything Restricted. The model never holds names, health numbers, birth dates or encounter numbers (security acceptance criterion SAC-02).\n- Reduce cardinality: relate on a date column. A date and time column has thousands of distinct values and compresses poorly.\n\nYour design document records the grain statements, table list, bus matrix, relationship plan, the additivity of each measure and open questions for the owners."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Star schema",
+     "definition": "A model shape with fact tables in the centre and dimension tables around them, joined one-to-many so filters flow from dimensions to facts."
+    },
+    {
+     "term": "Grain",
+     "definition": "The meaning of one row in a fact table, such as one row per inpatient unit per census date. Declare it before choosing columns."
+    },
+    {
+     "term": "Periodic snapshot",
+     "definition": "A fact table that records a state at regular intervals, such as the midnight bed census. Its quantities are usually semi-additive."
+    },
+    {
+     "term": "Conformed dimension",
+     "definition": "A dimension shared by several fact tables, such as DimSite, so one slicer filters all of them consistently."
+    },
+    {
+     "term": "Semi-additive measure",
+     "definition": "A number that adds across some dimensions but not time, such as beds. Summing it across days gives bed-days, not beds."
+    },
+    {
+     "term": "Non-additive measure",
+     "definition": "A number that cannot be added or averaged from parts, such as a median or rate. It must be recomputed from detail rows in every filter context."
+    },
+    {
+     "term": "Snowflake",
+     "definition": "A dimension that links to another dimension instead of directly to the fact, such as DimSite to DimUnit to FactBedCensus. Acceptable when short and single-path."
+    }
+   ],
+   "build": {
+    "goal": "Write the Star schema and relationship design for the Release 1 semantic model: grain statements, table inventory with keys and row counts, bus matrix, relationship plan and the additivity of each planned measure.",
+    "steps": [
+     "Open Project, Release 1, Star schema and relationship design, and read See the finished example.",
+     "Write one grain statement per fact table with its business process, type (transaction or periodic snapshot) and expected row count (474, 643, 219).",
+     "List every table with its key, row count and columns, using the target names in source-to-target.csv, and mark which columns you will drop and why.",
+     "Draw the bus matrix and the relationship plan: from column, to column, one-to-many, single direction.",
+     "Record the snowflake decision for DimSite to DimUnit to FactBedCensus and the alternative you rejected.",
+     "Write the additivity table for every planned measure and the traps: 12,952 bed-days against 144 beds, the 58.6 average of medians against 64.0, and the 5.0% average of rates against 5.7%.",
+     "In Power BI Desktop open Model view, place facts in the centre and dimensions around them, and paste a screenshot of the diagram into the document."
+    ],
+    "modelAnswer": "Grain statement: FactBedCensus holds one row per inpatient unit per census date, taken from the midnight snapshot in the Bed Management System (A-006). Type: periodic snapshot. Rows: 643 (644 expected; ARH-SUR 2026-08-16 missing and reported). Keys: UnitID to DimUnit, CensusDate to DimDate. Numbers: StaffedBeds and OccupiedBeds (semi-additive, never summed across dates), ALCPatients (additive into patient-days). Flag: OverCapacityFlag."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Model the data: when a scenario shows one wide table with repeated descriptions, the recommended fix is to split it into fact and dimension tables. Power Query builds a dimension by referencing the source, keeping descriptive columns and removing duplicates."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Semi-additive measures are named in the skills list. Balances, stock levels and bed counts must not be summed over time; use an average over dates or the value on the last date."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Optimize: removing unnecessary rows and columns and reducing granularity are named skills. Dropping an unused high-cardinality date and time column is a typical correct answer for an oversized model."
+    }
+   ],
+   "pitfalls": [
+    "Declaring the grain after building columns, which ends with a census table that also tries to hold ED totals.",
+    "Averaging site medians or site rates to get an all-site figure.",
+    "Summing beds across days and calling bed-days beds.",
+    "Relating DimDate to a date and time column instead of a date column."
+   ],
+   "check": [
+    {
+     "q": "State the grain of FactBedCensus and explain how it changes the occupancy measure.",
+     "a": "One row per inpatient unit per census date, a midnight snapshot. Because the same beds appear every day, beds are semi-additive: add across units on one day but never across days. Occupancy is computed per day and averaged (87.0% average daily) or taken on the last date (84.0% on 2026-09-30)."
+    },
+    {
+     "q": "A colleague proposes a summary table with one row per site holding the median time to PIA. What goes wrong?",
+     "a": "Medians are non-additive. The all-site median is 64.0 minutes, but the four site medians average 58.6. Any total, and any slice by CTAS level or month, would be wrong or impossible. Keep FactEDVisit at visit grain and compute the median in DAX."
+    },
+    {
+     "q": "Why is the DimSite to DimUnit to FactBedCensus chain acceptable in Beacon?",
+     "a": "Units really belong to sites, there is a single path, and a site filter flows through DimUnit to the census, so site-based security still works. Copying SiteCode into the census is a valid alternative; the design document records which was chosen and why."
+    }
+   ]
+  },
+  {
+   "key": "w4-s2",
+   "summary": "You will build the DimDate table in Power Query for the full year 2026, mark it as the date table, and create every Beacon relationship with the right cardinality and cross-filter direction. You will record them in the star schema design and the date table section of the Data Analysis Expressions (DAX) catalogue.",
+   "read": [
+    {
+     "heading": "Why Beacon needs its own date table",
+     "body": "Power BI can create a hidden date table for every date column (Auto date/time). That suits a quick personal file and is wrong for Beacon: each hidden table filters only its own column, so one month slicer could not filter emergency department (ED) visits, the bed census and tickets together. Turn it off in File, Options and settings, Options, Current file, Data load, Time intelligence, Auto date/time.\n\nBuild one DimDate instead, covering full calendar years without gaps, as Microsoft recommends for date tables. Source-to-target.csv sets it: 2026-01-01 to 2026-12-31, 365 rows, generated in Power Query, containing every ArrivalDate, CensusDate and OpenedDate.\n\n```\nlet\n    StartDate = #date(2026, 1, 1),\n    EndDate = #date(2026, 12, 31),\n    Dates = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),\n    AsTable = Table.FromList(Dates, Splitter.SplitByNothing(), {\"Date\"}),\n    Typed = Table.TransformColumnTypes(AsTable, {{\"Date\", type date}}),\n    AddYear = Table.AddColumn(Typed, \"Year\", each Date.Year([Date]), Int64.Type),\n    AddMonth = Table.AddColumn(AddYear, \"MonthNumber\", each Date.Month([Date]), Int64.Type),\n    AddMonthName = Table.AddColumn(AddMonth, \"MonthName\", each Date.MonthName([Date]), type text),\n    AddDay = Table.AddColumn(AddMonthName, \"DayOfWeek\", each Date.DayOfWeekName([Date]), type text)\nin\n    AddDay\n```\n\nDuration.Days(EndDate - StartDate) is 364; plus 1 gives 365 dates. A DAX calculated table, CALENDAR ( DATE ( 2026, 1, 1 ), DATE ( 2026, 12, 31 ) ), produces the same dates, but Beacon builds DimDate in Power Query as the map says. Beacon's data covers only July to September, so most dates have no rows yet; that is expected, and measures must cope with it."
+    },
+    {
+     "heading": "Mark it as the date table",
+     "body": "Select DimDate, then Table tools, Mark as date table, and choose the Date column. Power BI validates the column: unique values, no nulls, contiguous dates from first to last, and, for a date/time column, the same time on every row.\n\nMarking matters because classic time intelligence functions such as TOTALMTD, DATESYTD and DATEADD need a dedicated, marked date table with complete dates; missing dates between the first and last raise an error. Power BI also offers calendar-based time intelligence, still in preview; Beacon uses the classic approach with a marked table.\n\nTwo finishing touches:\n\n- Select MonthName, then Column tools, Sort by column, MonthNumber, so July sorts before August instead of alphabetically.\n- Hide the fact date columns (ArrivalDate, CensusDate, OpenedDate) from report view, so builders always slice by DimDate."
+    },
+    {
+     "heading": "Cardinality",
+     "body": "Cardinality says how many rows on each side of a relationship can match.\n\n| Cardinality | Meaning | In Beacon |\n|---|---|---|\n| One-to-many (1:*) | Key appears once on the one side, many times on the other | Every relationship |\n| Many-to-one (*:1) | The same relationship seen from the fact side | How the dialog may label it if you start from the fact |\n| One-to-one (1:1) | Key once on both sides | Usually means two tables should be merged |\n| Many-to-many (*:*) | Repeated keys on both sides | Avoid; often hides a missing dimension or a key problem |\n\nBeacon's relationships, all with single cross-filter direction:\n\n| From (one side) | To (many side) |\n|---|---|\n| DimDate[Date] | FactEDVisit[ArrivalDate] |\n| DimDate[Date] | FactBedCensus[CensusDate] |\n| DimDate[Date] | FactServiceTicket[OpenedDate] |\n| DimSite[SiteCode] | FactEDVisit[SiteCode] |\n| DimSite[SiteCode] | FactServiceTicket[SiteCode] |\n| DimSite[SiteCode] | DimUnit[SiteCode] |\n| DimUnit[UnitID] | FactBedCensus[UnitID] |\n| DimCTAS[CTASLevel] | FactEDVisit[CTASLevel] |\n\nBoth columns need the same data type. Relate DimDate[Date] to a date column, never to a date and time: 2026-07-01 10:22 does not equal 2026-07-01, so visits would fall into the blank member."
+    },
+    {
+     "heading": "Cross-filter direction",
+     "body": "Cross-filter direction says which way filters travel. Single means the dimension filters the fact. Both means the fact can also filter the dimension.\n\nKeep every Beacon relationship Single:\n\n- Predictable results. With Both, a census filter could flow up to DimSite and back down into ED visits, which surprises users.\n- No ambiguity. Power BI allows only one active filter path between two tables, and bidirectional relationships make competing paths more likely.\n- Performance. Bidirectional filtering costs more on large models.\n- Security. Row-level security (RLS) on DimSite flows down to the facts with Single. If you ever set Both, the option Apply security filter in both directions decides whether RLS also travels upward.\n\nOften you do not need the reverse direction at all. DISTINCTCOUNT ( FactBedCensus[UnitID] ) counts units reporting on each date: 7 on every census date except 6 on 2026-08-16, the missing ARH-SUR snapshot. If one measure truly needs it, switch it on inside that measure only:\n\n```\nUnits Reporting =\nCALCULATE (\n    COUNTROWS ( DimUnit ),\n    CROSSFILTER ( FactBedCensus[UnitID], DimUnit[UnitID], BOTH )\n)\n```"
+    },
+    {
+     "heading": "Active, inactive and role-playing dates",
+     "body": "Only one relationship between two tables can be active. A second one is inactive (a dashed line) and does nothing until a measure turns it on with USERELATIONSHIP.\n\nThat is how a role-playing dimension works: one DimDate plays several date roles. Today each Beacon fact uses one date. If the service desk later wants tickets by resolved date, add ResolvedDate = DateTime.Date([ResolvedAt]) in Power Query, create an inactive relationship from DimDate[Date] to FactServiceTicket[ResolvedDate], and write:\n\n```\nTickets Resolved =\nCALCULATE (\n    [Tickets],\n    USERELATIONSHIP ( DimDate[Date], FactServiceTicket[ResolvedDate] )\n)\n```\n\nOpenedDate stays the default; ResolvedDate is used only while this measure is evaluated. The alternative, a second copy of the date table, doubles maintenance; choose it only when users need two separate date slicers on one page."
+    },
+    {
+     "heading": "First time-intelligence checks",
+     "body": "With the date table marked, test it with simple measures:\n\n```\nED Visits =\nCOUNTROWS ( FactEDVisit )\n\nED Visits Previous Month =\nCALCULATE ( [ED Visits], PREVIOUSMONTH ( DimDate[Date] ) )\n\nED Visits MTD =\nTOTALMTD ( [ED Visits], DimDate[Date] )\n```\n\nBy month, ED Visits gives July 146, August 169 and September 159, which add to 474. ED Visits Previous Month shows blank for July (June has no visits), 146 for August and 169 for September. DATEADD ( DimDate[Date], -1, MONTH ) gives the same monthly figures; the DAX catalogue uses PREVIOUSMONTH. If the months do not add to 474, or the measure ignores the month, check the relationship to ArrivalDate and that DimDate is marked.\n\nRecord the date table in the DAX catalogue: source (Power Query), range (2026-01-01 to 2026-12-31), rows (365), marked column, sort settings and the fact columns related to it."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Date table",
+     "definition": "A dimension with one row per calendar day and no gaps, here 365 rows for 2026, used to filter every fact by date and to support time intelligence."
+    },
+    {
+     "term": "Mark as date table",
+     "definition": "A table setting that tells Power BI which column holds the dates. It validates uniqueness, no nulls and contiguous dates, and is needed for classic time intelligence functions."
+    },
+    {
+     "term": "Auto date/time",
+     "definition": "A Power BI option that builds a hidden date table for each date column. Turn it off when a model has its own date table."
+    },
+    {
+     "term": "Cardinality",
+     "definition": "How many rows can match on each side of a relationship: one-to-many, one-to-one or many-to-many. Every Beacon relationship is one-to-many."
+    },
+    {
+     "term": "Cross-filter direction",
+     "definition": "Which way a filter travels across a relationship. Single filters the many side from the one side; Both also filters back the other way."
+    },
+    {
+     "term": "Role-playing dimension",
+     "definition": "One dimension used in several roles, such as opened date and resolved date. Power BI keeps one relationship active and switches to an inactive one with USERELATIONSHIP."
+    }
+   ],
+   "build": {
+    "goal": "Create and mark DimDate for 2026, build Beacon's eight relationships with one-to-many cardinality and single direction, and document both in the star schema design and the date table section of the DAX catalogue.",
+    "steps": [
+     "In Power BI Desktop turn off Auto date/time for the current file (File, Options and settings, Options, Current file, Data load).",
+     "Create a blank query named DimDate, paste the M from the lesson, confirm 365 rows from 2026-01-01 to 2026-12-31, then Close and apply.",
+     "Mark DimDate as the date table on Date, set MonthName to sort by MonthNumber, and hide ArrivalDate, CensusDate and OpenedDate.",
+     "In Model view create the eight relationships from the lesson. In each dialog confirm Cardinality One to many and Cross filter direction Single.",
+     "Add ED Visits, ED Visits Previous Month and ED Visits MTD to a table by MonthName and check July 146, August 169, September 159 and the shifted values.",
+     "In Project, update the Star schema and relationship design with the final relationship table, then open the Date table and DAX catalogue and write the date table section: source, range, rows, marked column, sorting, related fact columns."
+    ],
+    "modelAnswer": "Date table section: DimDate is generated in Power Query with List.Dates from 2026-01-01, 365 rows to 2026-12-31, full calendar year. Columns: Date (key, type date), Year, MonthNumber, MonthName (sorted by MonthNumber), DayOfWeek. Marked as the date table on Date. Related to FactEDVisit[ArrivalDate], FactBedCensus[CensusDate] and FactServiceTicket[OpenedDate], one-to-many, single direction. Auto date/time is off. Check: monthly ED Visits 146, 169, 159 = 474."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Model the data, design: role-playing dimensions are in the skills list. Expect order date and ship date: one date table, one active and one inactive relationship, and USERELATIONSHIP inside a measure."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Classic time intelligence needs a marked date table with contiguous dates. If DATESYTD or DATEADD returns wrong or empty results, check that the date table is marked, complete and related on a date column."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Cross-filter direction: Single is the default and usually right. Choose Both only when a scenario truly needs a dimension filtered by a fact, and remember RLS crosses that way only with Apply security filter in both directions."
+    }
+   ],
+   "pitfalls": [
+    "Leaving Auto date/time on, which adds hidden date tables and lets each fact's dates filter separately.",
+    "Relating DimDate to ArrivalDateTime instead of ArrivalDate.",
+    "Setting Both on every relationship to make one visual work, which creates ambiguity and can weaken RLS.",
+    "Forgetting Sort by column, so MonthName sorts August, July, September."
+   ],
+   "check": [
+    {
+     "q": "Why does DimDate cover all of 2026 when the data runs only from July to September?",
+     "a": "A date table should be contiguous and cover full years, so it has 365 rows from 2026-01-01 to 2026-12-31. Later extracts then need no change to the table, and time intelligence works across the year. Measures such as Occupancy % (Average Daily) skip dates with no census rows, so the empty dates do not distort results."
+    },
+    {
+     "q": "A slicer on DimDate[MonthName] filters ED visits but not the bed census. What do you check?",
+     "a": "That the relationship DimDate[Date] to FactBedCensus[CensusDate] exists and is active, that both columns are type date, and that it is one-to-many, single direction. Also check Auto date/time is off and that visuals use DimDate rather than a fact date column."
+    },
+    {
+     "q": "When would Beacon use USERELATIONSHIP?",
+     "a": "When one fact needs a second date role, such as tickets by resolved date. You add ResolvedDate, create an inactive relationship to DimDate, and use USERELATIONSHIP in a measure like Tickets Resolved, while OpenedDate stays the active default."
+    }
+   ]
+  },
+  {
+   "key": "w4-s3",
+   "summary": "You will learn how filter context, row context and CALCULATE work, then write and test Beacon's measures: medians with MEDIANX, the Canadian Triage and Acuity Scale (CTAS) target percentage, the left without being seen (LWBS) rate, semi-additive occupancy and alternate level of care (ALC) days, each matched to truth.json.",
+   "read": [
+    {
+     "heading": "Filter context and row context",
+     "body": "A measure has no fixed answer. It is evaluated in the filter context of each cell: filters from rows, columns, slicers, page and report filters, and row-level security. ED Visits (emergency department visits) returns 474 with no filters, 213 in the Kestrel General Hospital (KGH) row of a table, and 5 in the cell for KGH and CTAS level 1.\n\nRow context is different. It exists when DAX (Data Analysis Expressions) moves through a table one row at a time: in a calculated column or inside an iterator such as SUMX, AVERAGEX, MEDIANX or FILTER. In row context you can read the current row's columns, such as FactEDVisit[MinutesToPIA].\n\nRow context does not filter anything by itself. CALCULATE turns the current row into a filter, which is called context transition. That is why the occupancy measure below wraps its sums in CALCULATE inside AVERAGEX."
+    },
+    {
+     "heading": "CALCULATE changes the filter context",
+     "body": "CALCULATE evaluates an expression in a modified filter context. Each filter argument adds, replaces or removes filters.\n\n```\nLWBS Rate =\nDIVIDE (\n    CALCULATE ( [ED Visits], FactEDVisit[Disposition] = \"LWBS\" ),\n    [ED Visits]\n)\n\n% of All-Site Visits =\nDIVIDE ( [ED Visits], CALCULATE ( [ED Visits], REMOVEFILTERS ( DimSite ) ) )\n```\n\nIn the KGH row, the LWBS numerator keeps the KGH filter and adds Disposition = LWBS, giving 16; the denominator is 213; 16 / 213 = 7.5%. For all sites, 27 / 474 = 5.7%. The second measure removes the site filter from the denominator: KGH has 213 / 474 = 44.9% of visits. DIVIDE returns blank instead of an error when the denominator is 0 or blank, so use it for every ratio."
+    },
+    {
+     "heading": "ED measures: medians and the CTAS target",
+     "body": "Waits are skewed by a few very long stays, so Kestrel reports medians.\n\n```\nMedian Minutes to PIA =\nMEDIANX (\n    FILTER ( FactEDVisit, NOT ISBLANK ( FactEDVisit[MinutesToPIA] ) ),\n    FactEDVisit[MinutesToPIA]\n)\n\n% PIA Within CTAS Target =\nDIVIDE (\n    COUNTROWS (\n        FILTER (\n            FactEDVisit,\n            NOT ISBLANK ( FactEDVisit[MinutesToPIA] )\n                && FactEDVisit[MinutesToPIA] <= RELATED ( DimCTAS[TargetMinutes] )\n        )\n    ),\n    COUNTROWS ( FILTER ( FactEDVisit, NOT ISBLANK ( FactEDVisit[MinutesToPIA] ) ) )\n)\n\nMedian ED LOS Hours =\nDIVIDE (\n    MEDIANX (\n        FILTER ( FactEDVisit, NOT ISBLANK ( FactEDVisit[EDLOSMinutes] ) ),\n        FactEDVisit[EDLOSMinutes]\n    ),\n    60\n)\n```\n\nMEDIANX iterates visits with a valid time to physician initial assessment (PIA): 445 rows, median 64.0 minutes. LWBS visits have no PIA and drop out, as do V0385 and V0421.\n\nThe target measure compares each visit with its own level's objective. FILTER iterates FactEDVisit, giving each row a row context, and RELATED follows the many-to-one relationship to DimCTAS to read TargetMinutes. Result: 126 of 445, 28.3%. CTAS 1 has a target of 0 minutes, so it counts only when assessment happens in the arrival minute: 3 of 7.\n\nFor length of stay (LOS) by disposition, add a filter: Median ED LOS Hours Admitted = CALCULATE ( [Median ED LOS Hours], FactEDVisit[Disposition] = \"Admitted\" ) gives 11.96 hours, against 3.61 for discharged patients, who do not wait for a bed."
+    },
+    {
+     "heading": "Bed measures: semi-additive occupancy and ALC days",
+     "body": "Beds are a snapshot, so occupancy is worked out per day and then averaged:\n\n```\nOccupancy % (Average Daily) =\nAVERAGEX (\n    FILTER (\n        VALUES ( DimDate[Date] ),\n        CALCULATE ( SUM ( FactBedCensus[StaffedBeds] ) ) > 0\n    ),\n    DIVIDE (\n        CALCULATE ( SUM ( FactBedCensus[OccupiedBeds] ) ),\n        CALCULATE ( SUM ( FactBedCensus[StaffedBeds] ) )\n    )\n)\n\nOccupancy % (Last Snapshot) =\nVAR LastCensusDate = MAX ( FactBedCensus[CensusDate] )\nRETURN\n    CALCULATE (\n        DIVIDE ( SUM ( FactBedCensus[OccupiedBeds] ), SUM ( FactBedCensus[StaffedBeds] ) ),\n        DimDate[Date] = LastCensusDate\n    )\n```\n\nVALUES ( DimDate[Date] ) lists the dates in the current filter. FILTER drops dates with no census, which in a 365-day table is most of the year. For each remaining date, CALCULATE turns the date into a filter, so the sums cover the units in scope that day. AVERAGEX averages the daily ratios: 87.0% for all units.\n\nWorked example for the last snapshot at KGH on 2026-09-30: occupied 28 + 23 + 10 = 61 across three units, staffed 32 + 28 + 12 = 72, so 61 / 72 = 84.7%. All units: 121 / 144 = 84.0%.\n\nWhy not LASTDATE ( DimDate[Date] )? It returns the last date in the date table's current filter. With no date filter that is 2026-12-31, which has no census, so the result is blank. If you want a date-table function, use LASTNONBLANK ( DimDate[Date], CALCULATE ( SUM ( FactBedCensus[StaffedBeds] ) ) ), which skips empty dates.\n\nALC Days = SUM ( FactBedCensus[ALCPatients] ) = 2,075. A plain sum is right here: daily counts add up to patient-days. The null for CVH-MED on 2026-07-22 is ignored."
+    },
+    {
+     "heading": "Service desk measures",
+     "body": "The same ideas apply to tickets:\n\n- Tickets = COUNTROWS ( FactServiceTicket ): 219.\n- SLA Met % divides tickets with SLAMet = \"Y\" by tickets with SLAMet in { \"Y\", \"N\" }: 137 of 212, 64.6%. SLA means service level agreement. Blank flags (still inside target, no priority, reversed times) are outside both parts.\n- Median Access Request Days filters TicketType = \"Access request\", takes MEDIANX of ResolutionHours over resolved tickets and divides by 24: 4.26 days from 44 requests.\n\nSet each measure's format in the model (percentage with one decimal, minutes with one decimal) so every report rounds the same way."
+    },
+    {
+     "heading": "Test every measure against truth",
+     "body": "A measure is not done until it matches the approved figure. Open DAX query view (the icon on the left of Power BI Desktop) and run:\n\n```\nEVALUATE\nSUMMARIZECOLUMNS (\n    DimSite[SiteCode],\n    \"Visits\", [ED Visits],\n    \"Median PIA\", [Median Minutes to PIA],\n    \"LWBS\", [LWBS Rate],\n    \"Occ Avg\", [Occupancy % (Average Daily)],\n    \"Occ Last\", [Occupancy % (Last Snapshot)]\n)\nORDER BY DimSite[SiteCode]\n```\n\nExpected results (ARH is Aspen Ridge Hospital, CVH Coulee Valley Hospital, PGH Prairie Gate Health Centre). The query returns the four site rows; the All row is the same measures with no site filter, which you check on cards or with an EVALUATE ROW query:\n\n| Site | Visits | Median PIA | LWBS | Occ avg | Occ last |\n|---|---|---|---|---|---|\n| KGH | 213 | 80.5 | 7.5% | 89.3% | 84.7% |\n| ARH | 105 | 54.5 | 4.8% | 84.8% | 82.5% |\n| CVH | 101 | 54.0 | 4.0% | 87.9% | 86.4% |\n| PGH | 55 | 45.5 | 3.6% | 76.8% | 80.0% |\n| All | 474 | 64.0 | 5.7% | 87.0% | 84.0% |\n\nRound before comparing. When a figure differs, find the rule you applied differently before changing anything. Then record each measure in the DAX catalogue: name, business definition, owner, format, blank behaviour, expected result and evidence. Performance Analyzer, on the Optimize tab, shows how long each visual's query takes; you will use it at the performance gate."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Filter context",
+     "definition": "The set of filters active when a measure is evaluated, coming from visual rows and columns, slicers, page and report filters, and row-level security."
+    },
+    {
+     "term": "Row context",
+     "definition": "The current row while DAX iterates a table in a calculated column or an X function. It lets you read that row's columns but does not filter other tables."
+    },
+    {
+     "term": "Context transition",
+     "definition": "CALCULATE turning the current row context into an equivalent filter context, so aggregations inside it cover only that row's slice, such as one date."
+    },
+    {
+     "term": "CALCULATE",
+     "definition": "The DAX function that evaluates an expression in a modified filter context, adding, replacing or removing filters such as Disposition = LWBS or REMOVEFILTERS(DimSite)."
+    },
+    {
+     "term": "Iterator",
+     "definition": "A DAX function that evaluates an expression row by row over a table and then aggregates, such as MEDIANX, AVERAGEX, SUMX and FILTER."
+    },
+    {
+     "term": "DAX query view",
+     "definition": "A Power BI Desktop view where you write EVALUATE queries to test measures and inspect results without building visuals."
+    }
+   ],
+   "build": {
+    "goal": "Write the Release 1 measures in a measure table, prove each one against truth.json overall and by site, and complete the measure entries in the Date table and DAX catalogue.",
+    "steps": [
+     "In Power BI Desktop create an empty table named _Measures (Home, Enter data) to hold every measure.",
+     "Write the 13 starter measures: ED Visits, Median Minutes to PIA, % PIA Within CTAS Target, LWBS Rate, Median ED LOS Hours and its Admitted and Discharged versions, both occupancy measures, ALC Days, Tickets, SLA Met % and Median Access Request Days. Set each format.",
+     "Open DAX query view and run the SUMMARIZECOLUMNS test by site, then a second test by DimCTAS[CTASLevel] for Median Minutes to PIA and % PIA Within CTAS Target, and compare every value with the expected tables.",
+     "Add a card with the sum of StaffedBeds beside Occupancy % (Last Snapshot), record 12,952 against 144 as the semi-additive trap, then delete the card.",
+     "In Project open Date table and DAX catalogue. For each measure record name, business definition, DAX, owner, format, blank behaviour, expected result and the query result as evidence.",
+     "Note any difference you found, the rule you had applied differently and how you fixed it."
+    ],
+    "modelAnswer": "Catalogue entry: LWBS Rate. Definition: share of valid ED visits that left before a physician initial assessment (disposition LWBS). DAX: DIVIDE ( CALCULATE ( [ED Visits], FactEDVisit[Disposition] = \"LWBS\" ), [ED Visits] ). Owner: Dr. Sarah Whitford (E-007). Format: percentage, one decimal. Blanks: DIVIDE returns blank when there are no visits. Expected: 5.7% all sites; KGH 7.5%, ARH 4.8%, CVH 4.0%, PGH 3.6%. Evidence: DAX query view result, matched."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "CALCULATE is named in the skills list. Its filter arguments replace existing filters on the same column, and REMOVEFILTERS or ALL clear filters for a percentage of total. Expect a question where a ratio shows 100% in every row because the denominator ignores the filter, or the reverse."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Semi-additive measures: for balances and snapshots, average over dates or take the last date with data. LASTDATE on the date table can land on a date with no rows; MAX of the fact date or LASTNONBLANK avoids that."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Optimize: Performance Analyzer and DAX query view are both named for finding poor measures and visuals. DAX query view also tests results by site or level without building a visual."
+    }
+   ],
+   "pitfalls": [
+    "Putting SUM of StaffedBeds on a card, which shows 12,952 bed-days instead of 144 beds.",
+    "Counting LWBS visits in the PIA denominator, which turns 28.3% into 26.7%.",
+    "Using LASTDATE ( DimDate[Date] ) for the last snapshot and getting blank on an unfiltered page.",
+    "Comparing unrounded results with truth and chasing differences in the third decimal."
+   ],
+   "check": [
+    {
+     "q": "Explain step by step how Occupancy % (Average Daily) returns 89.3% for KGH.",
+     "a": "The KGH filter reaches FactBedCensus through DimUnit. VALUES ( DimDate[Date] ) lists the dates; FILTER keeps the 92 with census rows. For each date, CALCULATE turns the date into a filter, so the sums cover KGH's three units that day, and DIVIDE gives that day's occupancy. AVERAGEX averages the 92 daily ratios: 89.3%."
+    },
+    {
+     "q": "Why does % PIA Within CTAS Target use RELATED inside FILTER?",
+     "a": "FILTER iterates FactEDVisit, giving each visit a row context. RELATED follows the many-to-one relationship from that row to DimCTAS and returns the target for the visit's own level, so each visit is compared with its own objective: 126 of 445 visits, 28.3%."
+    },
+    {
+     "q": "Your LWBS Rate shows 5.7% in every site row. What is wrong?",
+     "a": "The site filter is not reaching FactEDVisit, or the measure removes it. Check the DimSite to FactEDVisit relationship (active, one-to-many, single, matching upper-case codes) and that the measure has no ALL or REMOVEFILTERS on DimSite. Correct values are KGH 7.5%, ARH 4.8%, CVH 4.0%, PGH 3.6%."
+    }
+   ]
+  },
+  {
+   "key": "w4-s4",
+   "summary": "You will learn how row-level security (RLS) works in Power BI, who it applies to, and how to prove it with positive and negative tests. You will design a role for each of Kestrel's four sites plus an all-sites role, test Kestrel's small-count rule, and build the RLS test pack.",
+   "read": [
+    {
+     "heading": "What RLS does, and who it applies to",
+     "body": "Row-level security (RLS) filters the rows a user can see in a semantic model. You define roles in Power BI Desktop, each with a DAX (Data Analysis Expressions) filter on one or more tables, and you assign people or groups to roles in the Power BI service. Every report on the model then shows only the allowed rows.\n\nFour facts settle most RLS questions:\n\n- RLS applies to users with the Viewer role in the workspace, and to people who receive the content through an app or a share with read access. Admin, Member and Contributor can edit the content, so RLS does not restrict them.\n- Roles add up. A user in two site roles sees both sites.\n- Once a model has roles, a viewer who belongs to no role sees no data.\n- RLS filters rows. It does not hide tables or columns, and it does not stop someone inferring identity from a small number.\n\nThe first fact is one of Beacon's misuse cases: an analyst given the Member role sees every site. The fix is a workspace rule, not a DAX filter: report readers get Viewer or app access only."
+    },
+    {
+     "heading": "Beacon's site roles",
+     "body": "Kestrel has four sites: Kestrel General Hospital (KGH), Aspen Ridge Hospital (ARH), Coulee Valley Hospital (CVH) and Prairie Gate Health Centre (PGH). Each role filters DimSite, and the filter flows down the single-direction relationships to FactEDVisit, FactServiceTicket and, through DimUnit, FactBedCensus.\n\n| Role | DAX filter on DimSite | Member group (Identity Directory, A-007) | Example member |\n|---|---|---|---|\n| Site KGH | [SiteCode] = \"KGH\" | BCN-RLS-KGH | Dr. Sarah Whitford (E-007) |\n| Site ARH | [SiteCode] = \"ARH\" | BCN-RLS-ARH | Dr. Liam O'Connor (E-012) |\n| Site CVH | [SiteCode] = \"CVH\" | BCN-RLS-CVH | Dr. Ethan Wright (E-029) |\n| Site PGH | [SiteCode] = \"PGH\" | BCN-RLS-PGH | Dr. Victor Leblanc (E-041) |\n| All sites | TRUE () | BCN-RLS-ALL | Janelle Cardinal (E-008) |\n\nTRUE () keeps every row, so the All sites role sees all four sites.\n\nDimDate and DimCTAS are not filtered; dates and triage levels hold no patient data. Members are security groups, not named people, so joiners, movers and leavers change access in one place, the directory. In Desktop choose Modeling, Manage roles, create the role, select DimSite and enter the filter."
+    },
+    {
+     "heading": "Static roles or dynamic RLS with USERPRINCIPALNAME",
+     "body": "Beacon uses static roles because there are only five and membership already lives in directory groups. Know the dynamic pattern too; it scales when access differs person by person.\n\nDynamic RLS uses USERPRINCIPALNAME(), which returns the signed-in user's user principal name (UPN), the sign-in name shaped like an email address. A security table, SiteAccess, maps each UPN to the sites that person may see, and one role serves everyone. Its filter on DimSite:\n\n```\n[SiteCode]\n    IN CALCULATETABLE (\n        VALUES ( SiteAccess[SiteCode] ),\n        SiteAccess[UserPrincipalName] = USERPRINCIPALNAME ()\n    )\n```\n\nFor each DimSite row the filter keeps the row when its code is among the current user's sites. SiteAccess needs no relationship, but it must be protected itself: hide it and maintain it only through the access-request process. Prefer USERPRINCIPALNAME() to USERNAME(), which returns a domain\\user form in Desktop.\n\nA small measure helps every test: Current User = USERPRINCIPALNAME (). Put it on a card on the test page so each screenshot shows whose view it is."
+    },
+    {
+     "heading": "Testing with View as and Test as role",
+     "body": "Test in Desktop first: Modeling, View as, tick one role (or two, to test that roles add up), and for dynamic roles choose Other user and enter a UPN. A banner shows whose view you are seeing. In the service, open the semantic model's Security page, select the role and choose Test as role.\n\nWrite two kinds of test:\n\n- Positive tests prove the right person sees the right data. The KGH role sees 213 emergency department (ED) visits and a median time to physician initial assessment (PIA) of 80.5 minutes.\n- Negative tests prove the wrong data is refused. The KGH role finds no ARH, CVH or PGH row anywhere, including the bed census, tooltips and drillthrough. A test account with Viewer access and no role sees no data. A builder with the Contributor role sees everything, which proves the workspace rule must hold.\n\nExpected results, all from truth.json (LWBS is left without being seen):\n\n| Role | ED visits | Median PIA (min) | LWBS rate | Avg occupancy | Tickets |\n|---|---|---|---|---|---|\n| Site KGH | 213 | 80.5 | 7.5% | 89.3% | 110 |\n| Site ARH | 105 | 54.5 | 4.8% | 84.8% | 43 |\n| Site CVH | 101 | 54.0 | 4.0% | 87.9% | 42 |\n| Site PGH | 55 | 45.5 | 3.6% | 76.8% | 24 |\n| All sites | 474 | 64.0 | 5.7% | 87.0% | 219 |\n\nReal findings belong in the pack too. Kestrel's permission data shows Mei Tanaka (E-013), a clinical analyst, holds an excess grant to view all sites on A-009. She is a Contributor in Beacon Dev only, where she sees every site in the de-identified test views because RLS does not filter builders. In Beacon Prod she uses the app as a Viewer in the Site CVH role, so RLS applies and an all-sites view is refused. RLS-12 records both, and confirms the excess grant has been removed (security acceptance criterion SAC-06)."
+    },
+    {
+     "heading": "PGH and the small-count rule",
+     "body": "RLS decides who sees which site. It does not stop someone working out who a patient is from a tiny number. PGH had 55 valid visits in the quarter, of which 2 left without being seen and 4 were admitted. CVH had 4 LWBS visits. Each count is under 5.\n\nKestrel's reporting rule, a Kestrel policy rather than a law, suppresses counts under 5 in any report shared outside the care team. It supports the Health Information Act's duties to use the highest degree of anonymity and the least amount of information. Risk R-02 tracks it; owner Priya Raman (E-003).\n\nThe same policy blanks any rate whose numerator is under 5, because rates leak counts too: 3.6% of 55 visits reveals 2. Medians are not suppressed by this rule. Two measures for shared pages:\n\n```\nED Visits (Shared) =\nVAR Visits = [ED Visits]\nRETURN\n    IF ( ISBLANK ( Visits ), BLANK (), IF ( Visits < 5, \"<5\", FORMAT ( Visits, \"#,0\" ) ) )\n\nLWBS Rate (Shared) =\nVAR LWBSVisits =\n    CALCULATE ( [ED Visits], FactEDVisit[Disposition] = \"LWBS\" )\nRETURN\n    IF ( LWBSVisits < 5, BLANK (), [LWBS Rate] )\n```\n\nED Visits (Shared) returns text, so use it in tables and cards: a count of 1 to 4 shows \"<5\", and a combination with no visits stays blank instead of filling the visual with empty rows. In a table of dispositions by site, PGH LWBS shows \"<5\" and LWBS Rate (Shared) is blank. Add a visible footnote, Counts under 5 show as <5, so readers know a value was hidden. Test PGH first, then every site, month and CTAS (Canadian Triage and Acuity Scale) level, because small counts appear wherever you slice finely.\n\nTotals leak too. In a matrix of admitted visits by site, PGH shows \"<5\", but the total of 59 minus KGH 31, ARH 15 and CVH 9 gives back 4. The DAX catalogue's third shared measure blanks a total across sites when any site in the filter has 1 to 4 visits:\n\n```\nED Visits (Shared Total) =\nVAR SmallSites =\n    COUNTROWS (\n        FILTER ( VALUES ( DimSite[SiteCode] ), [ED Visits] >= 1 && [ED Visits] <= 4 )\n    )\nRETURN\n    IF (\n        ISINSCOPE ( DimSite[SiteCode] ),\n        [ED Visits (Shared)],\n        IF ( SmallSites > 0, BLANK (), [ED Visits (Shared)] )\n    )\n```\n\nISINSCOPE is true on a site row, so the row shows ED Visits (Shared); on the total row the measure checks each site first. It returns text or blank, like ED Visits (Shared), so it goes in matrices and tables, never charts. Test SUP-07 proves it."
+    },
+    {
+     "heading": "Write the RLS test pack",
+     "body": "The test pack is evidence for the go-live decision. Each test needs an ID, the role or user, the steps, the expected result, the actual result, pass or fail, a screenshot reference, the tester and the date. Organize it in four parts:\n\n1. Role definitions: each role, its filter and its member group.\n2. Positive tests (RLS-01 to RLS-05): one per role, with the expected figures above.\n3. Negative tests (RLS-06 to RLS-12): other sites absent on every page, the bed census and drillthrough; a Viewer in no role sees nothing; missed leavers E-014 and E-027 are in no group; two roles together (Site KGH and Site ARH give 318 visits); builders are unrestricted; the E-013 excess grant.\n4. Small-count tests (SUP-01 to SUP-07): PGH LWBS (2) and PGH admitted (4) show \"<5\"; PGH CTAS 5 (6) shows 6; PGH's busiest day, 2026-07-18, shows 5, because 5 is not under 5; CVH LWBS (4) shows \"<5\"; their rates are blank; PGH CTAS 1 (0) is blank; and in a matrix of admitted visits by site with a total, the total of 59 is blank, because 59 minus KGH 31, ARH 15 and CVH 9 would reveal PGH's 4. The footnote is visible.\n\nThe go-live gate will look for the PGH small-count evidence in this pack, so do not leave it for later. Ask someone other than the builder to run the tests: Sam Okafor (E-020) runs them, and Priya Raman (E-003) witnesses the privacy tests."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Row-level security (RLS)",
+     "definition": "Power BI roles with DAX filters that limit which rows a user sees. It restricts Viewers and app or shared readers, not Admin, Member or Contributor."
+    },
+    {
+     "term": "Static role",
+     "definition": "An RLS role with a fixed filter, such as [SiteCode] = \"KGH\", whose members are assigned in the service, ideally as security groups."
+    },
+    {
+     "term": "Dynamic RLS",
+     "definition": "One role whose filter uses USERPRINCIPALNAME() and a security table to work out each user's allowed rows at query time."
+    },
+    {
+     "term": "USERPRINCIPALNAME",
+     "definition": "A DAX function returning the signed-in user's user principal name, the email-like sign-in name, in both Desktop and the service."
+    },
+    {
+     "term": "Negative test",
+     "definition": "A test that proves access is refused, such as the KGH role finding no ARH row or a user in no role seeing no data."
+    },
+    {
+     "term": "Inference",
+     "definition": "Working out protected facts from data you are allowed to see, such as identifying a patient from a count of 2. Access control alone does not stop it; suppression does."
+    }
+   ],
+   "build": {
+    "goal": "Build the Release 1 RLS test pack: define the five roles in the semantic model, test them with positive, negative and small-count cases, and record expected and actual results as evidence for go-live.",
+    "steps": [
+     "In Power BI Desktop choose Modeling, Manage roles and create Site KGH, Site ARH, Site CVH and Site PGH with a DAX filter on DimSite[SiteCode], and All sites with the filter TRUE ().",
+     "Add the Current User measure and a test page with cards for Current User, ED Visits, Median Minutes to PIA, LWBS Rate, Occupancy % (Average Daily) and Tickets.",
+     "Use View as for each role and record the five positive results against the expected table.",
+     "Run the negative tests: other sites absent on every page and in the bed census, two roles together, and, after publishing, a Viewer test account with no role and a builder with the Contributor role.",
+     "Add ED Visits (Shared), LWBS Rate (Shared), ED Visits (Shared Total) and the footnote to the shared pages, then run SUP-01 to SUP-07: PGH LWBS (2), PGH admitted (4), PGH CTAS 5 (6), the boundary at exactly 5, CVH LWBS (4), a zero, and a total that would reveal a suppressed cell.",
+     "Open Project, Release 1, RLS test pack. Write the role definitions, then one row per test: ID, role or user, steps, expected, actual, result, screenshot, tester, date.",
+     "Add the E-013 excess grant test and the workspace rule (readers are Viewers or app users only), and name Sam Okafor (E-020) as tester and Priya Raman (E-003) as witness for the privacy tests."
+    ],
+    "modelAnswer": "Test RLS-08. Role: none (test account with Viewer access and no role membership). Steps: publish the model, open the Beacon app as the test account. Expected: no data on any page. Actual: no data shown. Result: Pass. Evidence: screenshot RLS-08 with the account name visible. Tester: Sam Okafor (E-020), not the builder. Related criterion: SAC-04 in the security acceptance criteria."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Manage and secure Power BI: RLS restricts only users with Viewer permission and app or shared readers. If a scenario says a Member still sees all data, the answer is to change the workspace role, not the DAX filter."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Know where each step happens: roles and filters are created in Power BI Desktop; members and groups are assigned on the semantic model's Security page in the service; testing uses View as in Desktop and Test as role in the service."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Identity and Access Management (Domain 5): site roles assigned through groups are role-based access control, an authorization mechanism. Security Assessment and Testing (Domain 6) expects negative tests that prove access is refused, not only positive ones."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Architecture and Engineering (Domain 3) covers inference and aggregation in databases. Small-count suppression counters inference; access control alone does not."
+    }
+   ],
+   "pitfalls": [
+    "Testing only that KGH sees KGH. Without negative tests you have not proved anything is refused.",
+    "Giving dashboard readers the Member or Contributor role, which bypasses RLS.",
+    "Assigning named people instead of groups, so leavers keep access until someone remembers.",
+    "Treating RLS as the answer to small counts. A PGH reader still sees a count of 2 unless the shared page suppresses it."
+   ],
+   "check": [
+    {
+     "q": "Janelle Cardinal is in All sites and, by mistake, also in Site PGH. What does she see?",
+     "a": "Everything. Roles add up, so All sites already gives every row. The extra membership changes nothing for her view, but remove it anyway, because access should match the job and be easy to review."
+    },
+    {
+     "q": "A KGH charge nurse with Viewer access sees no data at all. What is the likely cause?",
+     "a": "She is in no role. Once a model has RLS roles, a viewer who belongs to none sees no data. Add her KGH group to the Site KGH role on the semantic model's Security page, then retest with Test as role."
+    },
+    {
+     "q": "Why is the PGH small-count test in the RLS test pack and not only in the report checklist?",
+     "a": "Because RLS and suppression together decide what a reader can learn about patients, and the go-live decision needs that evidence in one place. PGH's LWBS count is 2 and its admitted count is 4, so shared pages must suppress them under Kestrel's under-5 rule; the test shows \"<5\", the footnote and a blank rate, so the count cannot be worked back."
+    }
+   ]
+  },
+  {
+   "key": "w4-s5",
+   "summary": "You will define Beacon's patient-flow analytics as an ITIL service: who it is for, the outcomes it supports, its utility and warranty, and the service levels it promises. You will build the service value proposition and the service catalogue entry with measurable service levels.",
+   "read": [
+    {
+     "heading": "From dashboards to a service",
+     "body": "Dashboards are an output. Leaders want outcomes: shorter waits, fewer patients leaving without being seen, beds freed for the emergency department (ED). In ITIL terms Beacon's analytics is a service: it helps consumers reach outcomes they want without having to manage the specific costs and risks themselves. Janelle Cardinal does not want to run a gateway or reconcile extracts; she wants trusted numbers by 06:00.\n\nValue is co-created. Kestrel's analytics team provides data, models and support; consumers bring their decisions, questions and feedback. If site leaders never open the dashboards, no value is created, however good the model is.\n\nITIL names three consumer roles:\n\n| Role | Meaning | Beacon |\n|---|---|---|\n| Sponsor | Authorizes budget for the service | Dr. Helen Marchetti (E-001), VP Clinical Operations |\n| Customer | Defines requirements and owns the outcomes | Janelle Cardinal (E-008), Director of Patient Flow; Dr. Sarah Whitford (E-007) for ED requirements |\n| User | Uses the service day to day | Site leaders and charge nurses such as Aisha Mahmoud (E-010) |\n\nOne person can hold more than one role."
+    },
+    {
+     "heading": "The value proposition",
+     "body": "A value proposition states, in the consumer's terms, the outcomes a service supports, the costs and risks it removes, and the costs and risks it adds.\n\n| Part | Beacon analytics service |\n|---|---|\n| Outcomes supported | Faster flow decisions at the morning bed meeting; progress toward the agreed targets of a 60-minute median time to physician initial assessment at Kestrel General Hospital (KGH), baseline 80.5, and a 4.5% left without being seen (LWBS) rate, baseline 5.7% |\n| Costs removed | Analysts building and emailing Excel extracts every morning; leaders reconciling numbers that disagree |\n| Risks removed | Patient detail travelling in email; decisions made on unreconciled figures (R-01) |\n| Costs introduced | Power BI licences, the gateway server, service desk time, training |\n| Risks introduced | Dependence on the nightly refresh and the gateway; key-person dependence on Tomás Rivera (R-06) |\n\nBe honest about what the service does not do. Dashboards inform decisions; staffing and bed actions change waits. Write outcomes as supported, not delivered, and measure them three months after go-live as the charter says."
+    },
+    {
+     "heading": "Utility and warranty",
+     "body": "Utility is fitness for purpose: what the service does. Warranty is fitness for use: how well it does it, in availability, capacity, security and continuity. Consumers need both.\n\n| Utility | Warranty |\n|---|---|\n| ED waits by site and Canadian Triage and Acuity Scale (CTAS) level: median time to assessment, % within the CTAS objective, LWBS rate, length of stay | Availability: data refreshed and the app usable by 06:00 each day (agreed) |\n| Bed occupancy, average daily and last snapshot, and alternate level of care (ALC) patient-days by unit | Capacity: every visual renders in 3 seconds or less in Performance Analyzer (agreed, quality gate QG-4) |\n| One governed definition per measure, from the DAX (Data Analysis Expressions) catalogue | Security: row-level security (RLS) by site, Confidential label, counts under 5 suppressed on shared pages |\n| One Beacon app with the last-refresh time on every page | Continuity: A-009 recovery time objective (RTO) 72 hours and recovery point objective (RPO) 24 hours |\n\nThe RTO and RPO come from Kestrel's asset register. They suit a daily refresh: if the service is lost, at most one day of data needs reloading."
+    },
+    {
+     "heading": "The service catalogue entry",
+     "body": "The service catalogue is the published list of services consumers can use, with what they need to request and use each one. Beacon's entry:\n\n| Field | Entry |\n|---|---|\n| Service name | Beacon Patient-Flow Analytics (SVC-BCN-01) |\n| Description | Daily de-identified dashboards of ED flow and bed occupancy for Kestrel's four sites |\n| Consumers | Patient-flow leadership, site and ED leaders, charge nurses |\n| Offerings | The Beacon app; access by site; new measure or page on request; training and knowledge articles |\n| How to request | Service desk portal access request, fulfilled by adding the person's group to a site role |\n| Owners | Service owner Grace Liu (E-005), IT Service Desk Manager; business owner Janelle Cardinal (E-008); technical owner and data steward Tomás Rivera (E-006) |\n| Support | Service desk logs and triages; Analytics Support resolves |\n| Dependencies | Clinical Data Warehouse (A-010), on-premises data gateway, Identity Directory (A-007), Power BI service (A-009) |\n| Classification | Confidential |\n\nThe entry speaks the consumer's language. It names no DAX functions; it tells a charge nurse how to get access and whom to call."
+    },
+    {
+     "heading": "Service levels you can measure",
+     "body": "A service level agreement (SLA) records the levels agreed between provider and customer. Each level needs a measure, a target and a data source. Agreed targets are Beacon decisions; proposed ones await sign-off; baselines are data.\n\n| Measure | Target | Baseline (data) | Source |\n|---|---|---|---|\n| Yesterday's data showing by 06:00 (daily refresh at 05:00) | 95% of days (agreed) | None: extracts were manual | Refresh history of the semantic model |\n| Incidents resolved within Kestrel's priority targets (P1 4 hours, P2 8, P3 24, P4 72) | 90% (agreed) | 66.7% (8 of 12) | IT Service Management Platform (A-011) |\n| Service requests within target | 85% (agreed) | 50.0% (4 of 8) | A-011 |\n| Access to the app within 72 hours | 80% (agreed, charter) | 1 of 6 Power BI access requests; 27.3% for all access requests | A-011 |\n| Satisfaction on Power BI tickets | 4.0 of 5 (proposed) | 3.0 from 9 responses | Closure survey |\n\nDemand already exists: in August and September the desk logged 27 tickets in the Power BI category (13 incidents, 8 service requests, 6 access requests), 21 of them handled by Analytics Support. The baselines above come from those tickets.\n\nWatch for the watermelon effect: every SLA green outside while users are unhappy inside. Add experience measures and talk to consumers in service reviews.\n\nThese levels depend on Power BI settings you control: a daily scheduled refresh of the semantic model at 05:00 (agreed), so data is ready by 06:00; the on-premises data gateway that every refresh from A-010 needs; refresh failure notifications that reach the service desk (Analytics Support) within 1 hour; and certified endorsement so consumers know which model is the trusted one."
+    },
+    {
+     "heading": "The four dimensions and the lifecycle",
+     "body": "Check the service against ITIL's four dimensions so nothing is missed:\n\n| Dimension | Beacon analytics service |\n|---|---|\n| Organizations and People | Named owners; Analytics Support trained; knowledge articles for the desk; a backup for Tomás Rivera (R-06) |\n| Information and Technology | A-010 views, gateway, semantic model, A-007 groups, A-011 tickets, the DAX catalogue |\n| Partners and Suppliers | Power BI as software as a service, with its provider recorded in the vendor register; Lumen Analytics Partners (V-05) until 2026-11-30 (R-07) |\n| Value Streams and Processes | Request access, refresh and reconcile, report an incident, request a change |\n\nThen place the work in the product and service lifecycle. Service levels and the catalogue entry are Design work, done while the semantic model is in Build. Transition work (testing and service desk readiness) follows, and the go-live gate on 2026-10-23 completes Transition into live use. After go-live the service lives in Operate (refresh, gateway and workspaces monitored and maintained), Deliver (access requests handled, the app reaching users each morning, feedback collected) and Support (incidents and problems resolved through the service desk). Feedback from every stage goes into the continual-improvement register you open after go-live."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Service",
+     "definition": "A means of helping consumers achieve outcomes they want without managing the specific costs and risks themselves, such as trusted patient-flow numbers without running the data pipeline."
+    },
+    {
+     "term": "Value co-creation",
+     "definition": "The ITIL idea that value comes from provider and consumer working together; dashboards nobody uses create no value."
+    },
+    {
+     "term": "Value proposition",
+     "definition": "A statement of the outcomes a service supports and the costs and risks it removes and introduces, written in the consumer's terms."
+    },
+    {
+     "term": "Utility",
+     "definition": "Fitness for purpose: what a service does, such as showing the LWBS rate by site from one governed definition."
+    },
+    {
+     "term": "Warranty",
+     "definition": "Fitness for use: how well a service performs in availability, capacity, security and continuity, such as data ready by 06:00 each day."
+    },
+    {
+     "term": "Service catalogue",
+     "definition": "The published list of available services with descriptions, offerings, owners, how to request them and how to get support."
+    },
+    {
+     "term": "Service level agreement (SLA)",
+     "definition": "A documented agreement between provider and customer that sets service levels, each with a measure, a target and a data source."
+    },
+    {
+     "term": "Sponsor, customer and user",
+     "definition": "Sponsor authorizes budget, customer defines requirements and owns outcomes, user uses the service. One person can hold more than one role."
+    }
+   ],
+   "build": {
+    "goal": "Write the service value proposition and the service catalogue entry with service levels for the patient-flow analytics service, so consumers and the service desk know what is offered, by whom and to what standard.",
+    "steps": [
+     "Open Project, Release 1, Service value proposition, and read See the finished example.",
+     "Name the sponsor, customer and users, then write the outcomes supported, the costs and risks removed and the costs and risks introduced, using the charter baselines and agreed targets.",
+     "Write the utility and warranty table, including A-009's RTO of 72 hours and RPO of 24 hours.",
+     "Open Service catalogue entry and service levels and fill the catalogue fields: name, description, consumers, offerings, how to request, owners, support route, dependencies, classification.",
+     "Write the service level table with measure, target marked agreed or proposed, baseline where data exists, and data source.",
+     "Add the Power BI settings that support the levels (05:00 scheduled refresh, gateway, failure notifications within 1 hour, certified endorsement) and the four dimensions check.",
+     "Propose a service review cadence with Grace Liu (E-005) and Janelle Cardinal (E-008), mark it proposed, and tick the Done when checklist."
+    ],
+    "modelAnswer": "Service level row: Yesterday's data showing by 06:00. Measure: the 05:00 scheduled refresh of the semantic model finishes without error before 06:00 Mountain Time, so dashboards show yesterday's data. Target: 95% of days (agreed with Janelle Cardinal, E-008, business owner). Source: refresh history. Breach handling: the refresh failure notification reaches the service desk (Analytics Support) within 1 hour, and the desk logs an incident; the last-refresh time on every page warns users. Reported monthly at the service review with Grace Liu (E-005), service owner."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "Value co-creation: the provider alone cannot create value. A question about consumers not using a service usually wants an answer that involves the consumers and acts on their feedback, not more features."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Utility is fit for purpose and warranty is fit for use. Availability, capacity, security and continuity are warranty. Value needs both, so a correct dashboard that is late every morning fails on warranty."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Sponsor authorizes budget, customer defines requirements, user uses the service. Expect a scenario asking who should agree a service level: the customer, not the users and not the provider alone."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Manage and secure Power BI: know when a gateway is required (refreshing an on-premises source from the service), how to configure scheduled refresh and failure notifications, and that certification marks a semantic model as the trusted one."
+    }
+   ],
+   "pitfalls": [
+    "Writing outputs as outcomes: dashboards delivered is an output; faster bed decisions at the morning meeting is an outcome.",
+    "Promising service levels nobody measures. Every level needs a data source.",
+    "Presenting proposed targets as agreed ones.",
+    "Forgetting the service desk: consumers need one route for help, and the desk needs knowledge articles before go-live."
+   ],
+   "check": [
+    {
+     "q": "Give one utility and one warranty requirement for Beacon and say which each is.",
+     "a": "Utility: show the LWBS rate by site from one governed definition (fit for purpose). Warranty: data refreshed and usable by 06:00 each day (availability, fit for use). Value needs both: a correct measure that arrives late is not usable at the morning meeting."
+    },
+    {
+     "q": "Who are Beacon's sponsor, customer and users?",
+     "a": "Sponsor: Dr. Helen Marchetti (E-001), who authorizes funding. Customer: Janelle Cardinal (E-008), who defines requirements and owns the outcomes, with Dr. Sarah Whitford (E-007) for ED requirements. Users: site leaders and charge nurses such as Aisha Mahmoud (E-010)."
+    },
+    {
+     "q": "Why is data ready by 06:00 a better service level than high uptime of the Power BI service?",
+     "a": "It is measured from the consumer's point of view: the morning decisions need yesterday's numbers by 06:00. Uptime of the cloud service says nothing about whether the data is current. The refresh history gives a clear, testable source for the measure."
+    }
+   ]
+  }
+ ]
+}

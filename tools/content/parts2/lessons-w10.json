@@ -1,0 +1,539 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w10-s1",
+   "summary": "You close Release 2: confirm acceptance on evidence, report benefits so far honestly against the charter measures, and hand the access service to its owners. Then you audit your own PMP application against the eligibility rules, including the 1 December 2026 training-provider rule.",
+   "read": [
+    {
+     "heading": "What closing a release involves",
+     "body": "Manage project closure is Process task 10, and it applies to each release as well as the whole programme. Closing Release 2 means:\n\n1. Confirm the deliverables meet their acceptance criteria and get formal acceptance.\n2. Hand the service to the people who will run it.\n3. Close or confirm supplier obligations.\n4. Release people and budget the release no longer needs.\n5. Record lessons learned while they are fresh.\n6. Hand benefits tracking to named benefit owners.\n7. Archive the records.\n\nThe Release 2 acceptance gate is 2026-11-26 (task 20), straight after pilot and acceptance testing (task 19, 2026-11-23 to 2026-11-26). Both are on the critical path, so the closure report is ready before the gate. The sponsor, Dr. Helen Marchetti (E-001), accepts the release; Grace Liu (E-005) accepts the access service as its owner; Daniel Osei (E-004) confirms the security controls.\n\nIn ITIL terms the service moves through Transition into Operate, Deliver and Support, with a short early life support period while the project team is still on hand."
+    },
+    {
+     "heading": "Acceptance on evidence",
+     "body": "Acceptance is a decision made on evidence against criteria agreed in advance. Release 2 evidence comes from three places.\n\nUser-acceptance test (UAT) scripts: every clinical role tested, including what must be refused. An agency nurse must not reach order entry; a unit clerk who moved must lose the old role's access.\n\nControl tests rerun on the new process. At 2026-10-01 all three failed:\n\n| Control test | Expected result | Result at 2026-10-01 (data) |\n|---|---|---|\n| CT-006 Multi-factor authentication (MFA) for privileged accounts | 100% of enabled privileged accounts | 4 of 6 (66.7%); E-009 and E-015 not enrolled |\n| CT-007 Q3 access review completion | 100% of reviews due completed | 12 of 18 (66.7%); 6 overdue |\n| CT-008 Leaver accounts disabled | No enabled account for a leaver | 2 found: E-014 and E-027 |\n\nA fresh run of each on the new process is the evidence that closes the matching issue. CT-007 can only be rerun at the next quarterly review, and the other reruns may also fall after the gate. Where a rerun has not happened yet, the closure report says so and keeps the issue open with a named owner and a re-test date, as the finished example does (re-tests on 2027-02-26).\n\nIssue closure: I-01 (Kevin Park's three conflicting rights) and I-02 (the missed leavers) are closed only with evidence, such as a passing control re-test, never just marked done.\n\nIf a criterion is not met, you have three honest options: fix it before the gate; accept with a condition that has a named owner and a date, the way D-02 accepted Release 1 with the small-count condition for Prairie Gate Health Centre; or do not accept. You never mark a release accepted to protect a date."
+    },
+    {
+     "heading": "Benefits so far: outputs, outcomes and benefits",
+     "body": "An output is what the release produced: a role matrix, a leaver workflow driven by human resources (HR) events, MFA on privileged accounts. An outcome is what changes for people: a nurse has working access on the first shift. A benefit is the measured improvement the business case promised. Benefits arrive after closure, which is why the charter measures them three months after each release. With Release 2 acceptance planned for 2026-11-26, that is 2027-02-26.\n\n| Measure | Baseline (data) | Target (agreed) | What closure can show |\n|---|---|---|---|\n| Access requests resolved within 72 hours | 27.3% | 80% | Pilot results only |\n| Median days to fulfil an access request | 4.26 | 1 | Pilot results only |\n| Missed leavers | 2 | 0 | CT-008 rerun |\n| Privileged accounts with MFA | 66.7% | 100% | CT-006 rerun |\n| Q3 access reviews completed on time | 66.7% | 100% | CT-007 rerun |\n\nNever report a pilot result as the benefit. A one-unit pilot shows the process can work; the three-month measure shows whether it does across Kestrel.\n\nEach measure needs a benefit owner who reports it after the project team has gone. A sensible proposal: Grace Liu for the two access-request measures, Daniel Osei for MFA and access reviews, and Nora Lindqvist (E-018) for missed leavers, since HR is the source of leaver events. Grace Liu takes all five measurements on 2027-02-26 and reports them on the access-governance dashboard; each benefit owner answers for the result."
+    },
+    {
+     "heading": "Handing over the access service",
+     "body": "A handover is complete when the receiving team can run the service without calling the project. The Release 2 handover pack holds:\n\n- the updated service catalogue entry and service levels for clinician access;\n- the service desk knowledge and escalation model and its articles;\n- runbooks for the HR feed and provisioning jobs, with named owners;\n- the quarterly access review calendar and the access exception process;\n- known errors and workarounds found in the pilot;\n- open risks transferred to named owners, such as R-03 (MFA prompts at shared workstations), which stays with Janelle Cardinal (E-008);\n- supplier arrangements, such as how ClearPath Staffing (V-03) sends contract end dates, so the E-014 case does not happen again.\n\nProgramme risks stay with Beacon and move into the Release 3 plan: R-06 (key-person dependency on Tomás Rivera), R-07 (the Lumen Analytics Partners contract ends 2026-11-30) and R-08 (cost performance).\n\nRecord lessons now, not in December. The gateway conflict already produced one: network changes that touch clinical paths need early change requests."
+    },
+    {
+     "heading": "Your PMP application: eligibility",
+     "body": "Apply the same discipline to your own application: it must be true, complete and provable.\n\nThe experience rule depends on education. The experience must fall within the last 10 years, and overlapping months count once.\n\n| Highest education | Project experience needed |\n|---|---|\n| Secondary school | 60 months |\n| Associate's or post-secondary vocational | 48 months |\n| Bachelor's or equivalent | 36 months |\n| Bachelor's or postgraduate from a PMI GAC-accredited program | 24 months |\n\nPMI is the Project Management Institute and GAC its Global Accreditation Center. Most degree holders use the 36-month row; use the 24-month row only if your program was GAC-accredited and you can prove it.\n\nYou also need 35 contact hours of project management training, unless you are an active CAPM (Certified Associate in Project Management) holder.\n\nCount months on a calendar, not by adding project lengths. Project A ran January to December 2022; project B ran July 2022 to June 2023. Together they cover January 2022 to June 2023: 18 months, not 24. The 10-year window moves with your application date: applying in October 2026, nothing before October 2016 counts.\n\nDescribe each project plainly: objective, your role, what you did and the outcome, with dates to the month."
+    },
+    {
+     "heading": "The 35 hours and the 1 December 2026 rule",
+     "body": "From 1 December 2026, live instructor-led training counts toward the 35 hours only if it was delivered by:\n\n- a PMI Authorized Training Partner;\n- a China Registered Education Provider; or\n- an eligible accredited higher-education program.\n\nWhat to do:\n\n1. List every course you count: provider, title, format (live instructor-led or self-paced), dates, hours, and whether you hold a certificate.\n2. Mark each live instructor-led course whose provider is not one of the three types.\n3. If you need any marked hours to reach 35, the safe plan is to submit your application before 1 December 2026 with every certificate ready. The rule says \"from 1 December 2026\"; do not bet on how it will be read for training you took earlier.\n4. Take any further live training from one of the three provider types.\n5. If you are an active CAPM holder, the 35 hours do not apply.\n\nCount the contact hours shown on each certificate, not the number of days the course ran."
+    },
+    {
+     "heading": "Audit readiness",
+     "body": "Write your application so you could prove every line if asked. Build an evidence folder before you submit:\n\n| Claim | Evidence to hold | Ready when |\n|---|---|---|\n| Education | A copy of your degree or diploma | Name and dates match the application |\n| Each project | A person who can confirm dates, role and work, with current contact details | They have agreed and remember it as you wrote it |\n| Training hours | Certificates showing provider, dates and hours | Hours reach 35 and the provider rule is met |\n| CAPM, if used | Proof it is active | Dates cover your application |\n\nAn honest self-audit catches the common problems:\n\n- overlapping projects counted twice;\n- months outside the 10-year window;\n- a confirming person who has left and cannot be reached;\n- training hours from a provider the 1 December 2026 rule excludes;\n- descriptions that list tasks without saying what you led.\n\nFix each one before you submit. Then the exam is the only thing left to prove."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Formal acceptance",
+     "definition": "The documented decision by the sponsor or customer that deliverables meet their agreed acceptance criteria. It comes first in closure, before handover, lessons and archiving."
+    },
+    {
+     "term": "Output, outcome and benefit",
+     "definition": "An output is what the project produces; an outcome is the change people experience; a benefit is the measured improvement the business case promised, usually confirmed after closure."
+    },
+    {
+     "term": "Benefit owner",
+     "definition": "The named person who tracks and reports a benefit after the project team has gone, such as the service owner reporting access requests resolved within 72 hours."
+    },
+    {
+     "term": "Early life support",
+     "definition": "A short period after go-live when the project team stays available to the operating team, so problems found by real users are fixed fast before full handover."
+    },
+    {
+     "term": "Non-overlapping experience",
+     "definition": "PMP experience counted in calendar months, with months shared by two projects counted once, and only within the last 10 years."
+    },
+    {
+     "term": "Contact hours",
+     "definition": "Hours of project management training counted toward the PMP's 35. From 1 December 2026, live instructor-led hours count only from a PMI Authorized Training Partner, a China Registered Education Provider or an eligible accredited higher-education program."
+    }
+   ],
+   "build": {
+    "goal": "Write the Release 2 closure report: acceptance on evidence, benefits so far against the charter measures, handover of the access service and lessons learned. Then complete a self-audit of your own PMP application.",
+    "steps": [
+     "Open Project, choose Release 2, then Release 2 closure report. Read How to write it and See the finished example.",
+     "Write the acceptance section: criteria, evidence from UAT and the reruns of CT-006, CT-007 and CT-008, closure of I-01 and I-02, and who accepts.",
+     "Write the benefits-so-far table: baseline (data), target (agreed), what closure shows now, the 2027-02-26 measurement and a proposed benefit owner for each measure.",
+     "Write the handover section: pack contents, receiving owners, early life support, transferred risks, and the risks that stay with the programme.",
+     "Add at least two lessons to the lessons-learned register and summarize them in the report.",
+     "Separately, build your PMP self-audit: education row, calendar months of non-overlapping experience in the 10-year window, training list with the 1 December 2026 check, and evidence for each claim.",
+     "Tick Done when, write Explain it in your own words and answer Check yourself."
+    ],
+    "modelAnswer": "Self-audit extract (example). Education: bachelor's degree, program not GAC-accredited, so 36 months needed. Experience: four projects from March 2021 to September 2026, 49 calendar months counted once, all inside the 10-year window. Training: 36 hours; 20 self-paced and 16 live instructor-led from a provider that is not an Authorized Training Partner. Contacts: three of four agreed; one has left. Decision: replace the fourth contact, then submit before 1 December 2026 with every certificate in the folder."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Closure starts with formal acceptance of the deliverables. If a question asks what to do first at the end of a project or phase, look for acceptance before lessons learned, archiving or releasing the team."
+    },
+    {
+     "cert": "PMP",
+     "tip": "A cancelled or terminated project still goes through closure: record what was done and why it stopped, capture lessons, and hand over anything usable."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Benefits are often realized after the project ends. The project hands benefits tracking to a benefit owner; it does not claim benefits it has not measured."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Transition moves a new or changed service into live use in a controlled way. Early life support, with the project team still available, catches the problems real users find first."
+    }
+   ],
+   "pitfalls": [
+    "Reporting a one-unit pilot result as the benefit. The benefit is measured across Kestrel three months after the release.",
+    "Marking I-01 and I-02 closed without evidence such as a rerun control test.",
+    "Counting overlapping project months twice on your PMP application.",
+    "Assuming any live course counts toward the 35 hours after 1 December 2026. The provider must be one of the three allowed types."
+   ],
+   "check": [
+    {
+     "q": "CT-008 found two missed leavers at 2026-10-01. What must the closure report show about it?",
+     "a": "Evidence that E-014 and E-027 were disabled, and either a fresh run of CT-008 on the new HR-driven leaver process showing no enabled account for a terminated or expired worker, which closes I-02, or, if that re-test has not run yet, I-02 kept open with its owner, Nora Lindqvist (E-018), and its re-test date, 2027-02-26. The charter benefit (missed leavers at 0) is confirmed by the measure taken on 2027-02-26."
+    },
+    {
+     "q": "You hold a bachelor's degree from a program that is not GAC-accredited. Your projects ran January 2020 to December 2021 and June 2021 to May 2023. Do you meet the experience rule?",
+     "a": "You need 36 months. Counted on the calendar, the projects cover January 2020 to May 2023 with the overlap counted once: 41 months, all within the last 10 years. So yes, as long as each project's dates and your role can be confirmed."
+    },
+    {
+     "q": "Why does the closure report show pilot results rather than the 80% target for access requests?",
+     "a": "The charter measures benefits three months after each release, so the full Release 2 measure comes on 2027-02-26. At closure only pilot evidence exists, and reporting it as the benefit would overstate success. The report names a benefit owner and the measurement date instead."
+    }
+   ]
+  },
+  {
+   "key": "w10-s2",
+   "summary": "You find your weakest PMP areas from both mocks, repair them with targeted re-teaching and teach-backs written without notes, and retest until each area holds before tomorrow's gate.",
+   "read": [
+    {
+     "heading": "Find your real weak areas",
+     "body": "Repair time is short, so spend it where marks are lost. Use three sources: your two error journals (totalled by domain, task and error type), the judgment score on Progress, and Practice, Review, where anything left is a live gap.\n\nRank by expected marks lost, not by how bad a topic feels: multiply each domain's exam weight by your miss rate there. An example with made-up mock results:\n\n| Domain | Exam weight | Miss rate (example) | Weight x miss rate |\n|---|---|---|---|\n| People | 33% | 18% | 5.9 |\n| Process | 41% | 22% | 9.0 |\n| Business Environment | 26% | 30% | 7.8 |\n\nProcess comes first here even though Business Environment has the higher miss rate, because Process carries far more questions. Then go down to tasks: three misses on Process task 9, Evaluate project status, is a sharper target than \"Process\".\n\nThen read the error types. Knowledge gaps need re-teaching. Traps and misreads need practice with the reading method. Second-guessing and time need exam technique. Choose no more than three targets today."
+    },
+    {
+     "heading": "Teach-back: the repair method",
+     "body": "A teach-back is an explanation written without notes, as if to a colleague who missed the lesson. Pulling an idea from memory strengthens it far more than rereading, and gaps show the moment you try to explain.\n\nFor each target:\n\n1. Close everything. Write four to six sentences: the rule, why it is true, and a Beacon example.\n2. Open the lesson and compare. Mark what you missed or got wrong.\n3. Rewrite the teach-back with the gaps fixed.\n4. Answer five to ten questions on the target in Practice, Scenarios.\n5. Later in the session, write it once more from memory. Spacing the second attempt is what makes it stick.\n\nWrite the final teach-backs in the Explain it in your own words box of the matching document in Project, such as the earned value status report for forecasting. Each one of 80 characters or more counts toward gate check 5, which needs at least six.\n\nMix targets when you retest. A block of one topic feels good but hides whether you can tell which rule a question needs; mixed questions test exactly that."
+    },
+    {
+     "heading": "Repair by error type",
+     "body": "- Knowledge gap: re-teach from the sections below, write the teach-back, retest.\n- Misread: before looking at the options, say in your own words what the last sentence asks, and notice first, next, best, not and except. Retest with ten mixed questions.\n- Trap: write a personal trap list of the option types you keep choosing (escalate, replace, do it yourself, change the baseline, ignore). Before answering, name the trap option.\n- Second-guess: in the retest, change an answer only when you can write the specific reason. Track whether each change helped or hurt.\n- Time: run one Timed set at a strict 70 seconds a question. If you run out, the cure is flag-and-move, not reading faster."
+    },
+    {
+     "heading": "Re-teach: earned value and schedule",
+     "body": "With Beacon's 2026-10-01 numbers:\n\n- Everything starts with earned value (EV), CAD 224,000. Cost compares EV with actual cost (AC, 250,600): cost variance CV = -26,600, cost performance index CPI = 0.89. Schedule compares EV with planned value (PV, 278,900): schedule variance SV = -54,900, schedule performance index SPI = 0.80.\n- Variances subtract, indices divide. Negative and below 1.0 are bad.\n- The estimate at completion (EAC) follows the story. Performance continues: budget at completion over CPI, BAC / CPI = 1,342,500. One-off: AC + (BAC - EV) = 1,226,600. Cost and schedule both bite: AC + (BAC - EV) / (CPI x SPI) = 1,610,113. Estimates were wrong: AC plus a new bottom-up estimate.\n- Estimate to complete ETC = EAC - AC = 1,091,900. Variance at completion VAC = BAC - EAC = -142,500.\n- To-complete performance index TCPI = (BAC - EV) / (BAC - AC) = 1.03. Above 1.0 means the rest must be done more efficiently than planned to hit the budget.\n- Total float = late start minus early start; critical tasks have zero. Task 13 has 14 days, so WP-106's SPI of 0.53 does not yet threaten the gate.\n- Crash adds cost, fast track adds risk, and both work only on the critical path.\n\nTeach-back prompt: explain to Marcus Bell, in five sentences, why the forecast is 1,342,500 and what it means for the management reserve."
+    },
+    {
+     "heading": "Re-teach: risk, change and contracts",
+     "body": "- Risk or issue: a risk is uncertain and gets a response plan; an issue has happened and gets resolved. A missed leaver is an issue (I-02); the chance that MFA (multi-factor authentication) slows clinicians is a risk (R-03).\n- Threat responses: avoid (remove the cause), mitigate (reduce probability or impact), transfer (move the impact to a third party through a contract or insurance), accept (actively with a reserve, or passively), escalate (outside your authority). Opportunities: exploit, enhance, share, accept, escalate.\n- Reserves: contingency reserve is inside the baseline for identified risks; management reserve is outside it for unknown risks and needs sponsor approval. Beacon's CAD 120,000 is management reserve.\n- Change: in predictive work, baseline changes go through integrated change control and the board; in adaptive work the product owner reorders the backlog within the release goal. After approval, update baselines and communicate.\n- Contracts: firm fixed price puts cost risk on the seller and needs clear scope; fixed price with an incentive shares savings or overruns; cost plus fixed fee or incentive fee puts more risk on the buyer and suits unclear scope; time and materials pays rates as used and needs a not-to-exceed limit.\n- Vendor disputes: negotiate first, then use the contract's dispute process.\n\nTeach-back prompt: explain why the fixed-price Lumen Analytics Partners contract protected Release 1's budget, and what it did not protect against (knowledge leaving when the contract ends on 2026-11-30)."
+    },
+    {
+     "heading": "Re-teach: people situations and agile roles",
+     "body": "- Conflict: collaborate when time allows; force only for safety, law or emergency; avoiding is a pause. Talk privately first.\n- Team stages: forming, storming, norming, performing, adjourning. Storming is normal; a team charter and clear roles move a team to norming.\n- Underperformance: private conversation, find the cause, coach or train. Removal is a last resort.\n- Stakeholders: understand concerns before acting; compare current and desired engagement; align expectations early and manage them throughout.\n- Servant leader: removes impediments, facilitates, protects focus; does not assign tasks inside an agile team or make its technical choices.\n- Product owner: orders the backlog by value and accepts work against acceptance criteria. The team estimates and decides how. Velocity is only for the team's own planning.\n- Definition of done covers every item; acceptance criteria cover one item.\n- Knowledge transfer: plan it before people leave, and make it a contract deliverable for vendors.\n\nTeach-back prompt: explain to a new Beacon team member how the Tomás Rivera and Ahmed Haddad conflict was resolved and why forcing would have been wrong."
+    },
+    {
+     "heading": "Retest and decide",
+     "body": "Finish by proving the repair. Run two PMP Timed sets under exam conditions, then open Progress and read gate checks 3, 4 and 5.\n\n- If both timed sets reach 80% or better and Review is empty, the repair held.\n- If one target still produces misses, write one more teach-back on it tonight and retest it first thing tomorrow, before the gate.\n- If several targets still fail, that is information, not a disaster. Tomorrow's gate exists to stop you sitting the exam before you are ready.\n\nSix honest, concrete teach-backs written from memory will do more for you tonight than another hour of rereading."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Teach-back",
+     "definition": "An explanation written or spoken without notes, as if to a colleague. Written in Project at 80 characters or more it counts toward gate check 5, and it exposes gaps rereading hides."
+    },
+    {
+     "term": "Retrieval practice",
+     "definition": "Learning by pulling information out of memory, through teach-backs and practice questions, rather than reading it again. It builds stronger recall than review."
+    },
+    {
+     "term": "Spaced practice",
+     "definition": "Returning to a topic after a gap, such as rewriting a teach-back later in the day. The delay makes the second recall harder and the memory more durable."
+    },
+    {
+     "term": "Interleaving",
+     "definition": "Mixing questions from several topics in one practice set, so you practise choosing which rule applies as well as applying it."
+    },
+    {
+     "term": "Expected marks lost",
+     "definition": "A way to rank weak areas: exam weight multiplied by your miss rate in that area. It sends repair time to where the most marks are at stake."
+    },
+    {
+     "term": "Trap list",
+     "definition": "Your own list of the option types you keep wrongly choosing, such as escalating first or changing a baseline directly. Naming the trap before answering breaks the habit."
+    }
+   ],
+   "build": {
+    "goal": "Turn your mock results into a repair plan, re-teach your top three weak areas, write teach-backs without notes, and retest until each area holds before tomorrow's gate.",
+    "steps": [
+     "Total both error journals by domain, task and error type. Multiply each domain's exam weight by your miss rate and rank the domains.",
+     "Choose no more than three repair targets at task level and note the error type of each.",
+     "For each target: close your notes, write a four-to-six-sentence teach-back, compare it with the re-teach section, and rewrite it.",
+     "Retest each target with five to ten questions in Practice, Scenarios, mixing the targets rather than doing them in blocks.",
+     "Run two PMP Timed sets under exam conditions and record both scores.",
+     "Later in the session, write each teach-back again from memory in the Explain it in your own words box of the matching document in Project, at 80 characters or more.",
+     "Clear Practice, Review, read gate checks 3, 4 and 5 on Progress, write the result into your repair plan and Mark done."
+    ],
+    "modelAnswer": "Repair plan: PMP, week 10 day 2. All values are examples.\n\nDiagnosis from mocks 1 and 2 (example values)\n\n| Domain | Exam weight | Miss rate | Weight x miss rate | Rank |\n|---|---|---|---|---|\n| People | 33% | 18% | 5.9 | 3 |\n| Process | 41% | 22% | 9.0 | 1 |\n| Business Environment | 26% | 30% | 7.8 | 2 |\n\nRepair targets (example)\n\n| Target | Domain and task | Error type | Repair | Retest |\n|---|---|---|---|---|\n| Choosing the EAC formula | Process, task 9 Evaluate project status | Knowledge gap | Re-teach earned value; teach-back to Marcus Bell | 8 mixed Scenarios questions |\n| Issue versus risk responses | Business Environment, task 4 Remove impediments and manage issues | Trap | Trap list; teach-back on I-02 versus R-03 | 8 mixed Scenarios questions |\n| Agile roles and estimating | People, task 3 Lead the project team | Knowledge gap | Re-teach agile roles; teach-back to a new team member | 6 mixed Scenarios questions |\n\nTimetable (example)\n\n| Time | Activity |\n|---|---|\n| 0:00 to 0:20 | Diagnosis and target choice |\n| 0:20 to 1:20 | Three teach-back cycles, 20 minutes each |\n| 1:20 to 1:50 | Mixed retest in Scenarios |\n| 1:50 to 2:20 | Two PMP Timed sets |\n| 2:20 to 3:00 | Second teach-backs from memory, written in Project; clear Review |\n\nTeach-back (example, saved in the earned value status report): \"Beacon's forecast is CAD 1,342,500 because we divide the 1,200,000 budget by our cost performance of 0.89, and nothing suggests the data-quality overrun in WP-103 was a one-off. That is 142,500 over budget and 22,500 above total authorized funding, so the management reserve would not cover it. The sponsor must choose between a bottom-up re-estimate, releasing reserve, or cutting scope through the board.\"\n\nResult (example): timed sets 83% and 80%; Review empty; 7 written explanations in Project. Gate checks 3 and 5 met; check 4 at 112 decisions with 21% wrong. Remaining weak spot: none above two misses in the retest."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Several questions turn on choosing the right EAC formula from the story. Train yourself to find the phrase that says whether past performance will continue or was a one-off."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Issue questions want resolution now; risk questions want a planned response. If the event has already happened, an answer that only updates the risk register is wrong."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Contract questions hinge on who carries cost risk. Fixed price protects the buyer when scope is clear; cost-reimbursable suits unclear scope but needs the buyer to watch costs closely."
+    }
+   ],
+   "pitfalls": [
+    "Repairing what you enjoy rather than what loses the most marks. Rank by weight times miss rate.",
+    "Rereading instead of retrieving. A teach-back from memory is harder and works far better.",
+    "Doing all retest questions on one topic at once. Mix the targets so you practise choosing the rule.",
+    "Taking on more than three targets in one session. Depth beats breadth the day before a gate."
+   ],
+   "check": [
+    {
+     "q": "Your miss rates are People 18%, Process 22% and Business Environment 30%. Which domain do you repair first, and why?",
+     "a": "Process. Weight times miss rate gives People 5.9, Process 9.0 and Business Environment 7.8. Process is 41% of the exam, so even a lower miss rate there costs more marks than Business Environment's higher rate on 26%."
+    },
+    {
+     "q": "Why does a teach-back without notes work better than rereading the lesson?",
+     "a": "Pulling an idea out of memory strengthens it more than reading it again, and trying to explain exposes the exact gaps you could not see while reading. Comparing the teach-back with the lesson then shows precisely what to fix."
+    },
+    {
+     "q": "A missed leaver account is found still enabled. Is it a risk or an issue, and what is the right first response?",
+     "a": "An issue, because it has already happened. Resolve it now by disabling the account and removing permissions, then find out why the leaver event did not reach IT. Logging it as a risk or only adding a lesson learned would leave the exposure open."
+    }
+   ]
+  },
+  {
+   "key": "w10-s3",
+   "summary": "You apply the five gate checks honestly to decide whether to sit the PMP, record the decision with evidence, and learn the day-before and exam-day technique that protects the score you have earned.",
+   "read": [
+    {
+     "heading": "What the PMP gate decides",
+     "body": "An exam gate works like a release gate: you go forward only on evidence. Open Progress. For the next exam gate it shows five checks, and you sit the PMP only when all five are met.\n\n1. Every session before the gate is done: the 47 sessions from week 1, day 1 to week 10, day 2.\n2. Every document in the releases up to the gate is complete. The PMP gate closes Release 2, so that is all 28 Release 1 documents and all 19 Release 2 documents: 47 in total.\n3. Two timed sets for PMP at 80% or better.\n4. At least 24 decisions recorded for PMP, with under 30% of them wrong.\n5. No open wrong answers, and at least 6 written explanations of 80 characters or more.\n\nProgress also shows four readiness scores: coverage (30), documents (35), judgment (25) and recall (10). The scores show overall readiness; the five checks decide the gate.\n\nThe gate protects you from two mistakes: sitting too early and failing, and never sitting because you never feel ready. Five clear checks replace a feeling with evidence."
+    },
+    {
+     "heading": "Reading each check honestly",
+     "body": "| Check | What it proves | If it is not met |\n|---|---|---|\n| 1 Sessions done | You have covered every topic | Finish the missing sessions first |\n| 2 Documents complete | You can apply the ideas, not just recognize them | Work each incomplete document's Done when list |\n| 3 Two timed sets at 80% | You perform under time pressure | Repair the misses, then run more PMP timed sets |\n| 4 24 decisions, under 30% wrong | Your judgment holds across many situations | Answer more PMP questions in Scenarios with the five reading steps |\n| 5 Review empty, 6 explanations | No known gap is open and you can explain your reasoning | Clear Practice, Review; write the missing explanations in Project |\n\nBe strict on two points. A timed set passed on lucky guesses is weaker than it looks, so mark guesses honestly; they stay in Review until you answer them correctly without guessing. And a document is complete when its Done when list is truly met, not when its writing area has text in it.\n\nIf you are one small item short, such as one written explanation, fix it now and recheck. If you are short on check 3 or 4, that is a real gap in exam performance. Do not argue yourself past it."
+    },
+    {
+     "heading": "If the gate says not yet",
+     "body": "A no-go is a planning decision, not a failure. Do three things:\n\n1. Write down exactly which checks failed and by how much.\n2. Plan the shortest path to meeting them: which sessions, documents, timed sets or explanations, and how many days they need.\n3. Move your exam appointment if you need to, and set a new gate date.\n\nThen carry on with Release 3. Week 10, day 4 starts the cyber-resilience release, and its governance, risk and change work keeps your PMP judgment in use while you close the gap.\n\nIf all five checks are met, go. Waiting for total confidence is a trap of its own. Nobody knows every question; the checks show you can handle the ones you do not know."
+    },
+    {
+     "heading": "The day before",
+     "body": "The day before is for keeping what you know, not learning more.\n\n- One short review only: write the earned value formulas from memory, read your trap list and error journal rules, and read the high-yield People, Process and Business Environment lists once.\n- No new topics and no long practice sets. A poor practice score the night before costs confidence and teaches nothing.\n- Prepare the logistics. For a test centre: the route, travel time with a buffer, and the identification your booking confirmation asks for. For an online proctored exam: the room, a cleared desk, and the computer and connection set up as your booking instructions describe.\n- Plan food and water for the day and the two breaks.\n- Sleep. A rested mind reads situational questions far better than a crammed one."
+    },
+    {
+     "heading": "Exam-day technique",
+     "body": "Use the habits you practised in both mocks.\n\n- Arrive or log in early, so the first question finds you calm.\n- If you are given something to write on, jot the formulas once the exam has started.\n- For every question: read the last sentence first, find the approach cues, know your role, remove the traps, then choose.\n- Keep the pace: about 70 seconds a question, question 60 near 70 minutes, question 120 near 140, question 180 near 210.\n- After two minutes on one question, answer, flag and move on.\n- Review flagged questions before each break, in case you cannot return to them afterwards.\n- Take both 10-minute breaks, even if you feel fine.\n- Change an answer only for a specific reason.\n- Expect runs of hard questions. They mean nothing on their own: a run of hard questions can happen by chance, and 10 unscored pretest questions are mixed in. Take one slow breath and read the next question fresh.\n- Answer every question before time ends."
+    },
+    {
+     "heading": "After the exam",
+     "body": "Whatever the result, write down what you learned while it is fresh: which kinds of question felt hardest, whether your pace held, and what you would change. That note will help at the CISSP gate in week 13, which uses the same five checks.\n\nIf you pass, the PMP is maintained with 60 professional development units (PDUs) every 3 years. Much of Release 3 is project leadership, so start a simple learning log now.\n\nIf you do not pass, your error journals and this gate record show where to start: repair, retest and set a new date. The exam measures one day; your Beacon portfolio still shows what you can do.\n\nThen open Today and Mark done. Tomorrow you plan Release 3."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Exam gate",
+     "definition": "A planned decision point where you sit an exam only if all five checks on Progress are met: sessions done, documents complete, two timed sets at 80%, 24 decisions under 30% wrong, and Review empty with six written explanations."
+    },
+    {
+     "term": "Readiness scores",
+     "definition": "Four scores on Progress: coverage (30), documents (35), judgment (25) and recall (10). They show overall readiness; the five checks decide the gate."
+    },
+    {
+     "term": "Go or no-go decision",
+     "definition": "A recorded decision to proceed or not, made against criteria agreed in advance and backed by evidence. A no-go comes with the shortest path to meeting the criteria and a new date."
+    },
+    {
+     "term": "Pretest questions",
+     "definition": "The 10 unscored questions among the PMP's 180, which you cannot identify. A strange question may be one of them, so answer it and keep your pace."
+    },
+    {
+     "term": "Professional development units (PDUs)",
+     "definition": "The units used to maintain the PMP: 60 PDUs every 3 years after you pass."
+    }
+   ],
+   "build": {
+    "goal": "Apply the five PMP gate checks in Progress, record a go or no-go decision with evidence, and, if go, prepare the day-before and exam-day plan.",
+    "steps": [
+     "Open Progress and read each of the five checks for the PMP gate. Write down the evidence for each, not just a tick.",
+     "Fix anything one small step short, such as a missing written explanation or a single Done when item, then recheck.",
+     "Record the gate decision: each check with its evidence, the readiness scores, the decision, remaining risks and their responses.",
+     "If go: write your day-before plan and your exam-day pacing checkpoints at questions 60, 120 and 180.",
+     "If no-go: list the failed checks, the shortest path to meet them, and a new gate date.",
+     "Sit the exam only if all five checks are met. Afterwards, note what felt hardest and how your pace held, then Mark done."
+    ],
+    "modelAnswer": "PMP gate decision record. All evidence values are examples.\n\nExam: PMP. Gate: week 10, day 3. Decided by: you, on the evidence shown in Progress.\n\n| Check | Rule | Evidence (example) | Met? |\n|---|---|---|---|\n| 1 Sessions | All 47 sessions before the gate done | 47 of 47 | Yes |\n| 2 Documents | All 28 Release 1 and 19 Release 2 documents complete | 47 of 47; Release 2 closure report finished on day 1 | Yes |\n| 3 Timed sets | Two PMP timed sets at 80% or better | Four: 83%, 80%, 86%, 81% | Yes |\n| 4 Decisions | At least 24 PMP decisions, under 30% wrong | 112 decisions, 21% wrong | Yes |\n| 5 Review and explanations | No open wrong answers; at least 6 explanations of 80+ characters | Review empty; 9 explanations | Yes |\n\nReadiness scores (example): coverage 30 of 30, documents 35 of 35, judgment 20 of 25, recall 9 of 10.\n\nDecision (example): Go. All five checks are met. Exam booked for the morning, online proctored.\n\nRemaining risks and responses (example):\n- Pace dropped in the third block of mock 2: flag and move after two minutes; check the clock at question 120.\n- Forecast questions are still slow: jot the EAC formulas once the exam starts, if writing material is provided.\n- Fatigue: take both breaks; water and a snack ready.\n\nDay-before plan (example): 30 minutes on formulas, trap list and journal rules; logistics checked; in bed early.\n\nWhat a no-go would have looked like (example): check 3 short by one timed set. One repair session on the misses, two more timed sets, new gate date in three days."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Pace at about 70 seconds a question: question 60 near 70 minutes, 120 near 140 and 180 near 210. That leaves a buffer for flagged questions inside the 240 minutes."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Ten unscored pretest questions sit among the 180. A strange or unfamiliar question may be one of them; answer it, flag it if you like, and keep moving."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Use the reading method you practised on every question. Most lost marks come from misreading the last sentence or choosing an escalation trap, not from missing knowledge."
+    }
+   ],
+   "pitfalls": [
+    "Talking yourself past a failed check because the exam is already booked. Move the date instead.",
+    "Cramming new topics the night before. Review your own rules and sleep.",
+    "Skipping a break because you feel fine. Fatigue shows in the last third, not the first.",
+    "Waiting for total confidence when all five checks are met. The evidence says go."
+   ],
+   "check": [
+    {
+     "q": "Which documents must be complete for check 2 at the PMP gate, and how many is that?",
+     "a": "Every document in the releases up to the gate. The PMP gate closes Release 2, so all 28 Release 1 documents and all 19 Release 2 documents must be complete: 47 in total. Complete means each document's Done when list is truly met."
+    },
+    {
+     "q": "You have 30 PMP decisions recorded and 10 of them are wrong. Is check 4 met?",
+     "a": "No. 30 decisions meets the minimum of 24, but 10 of 30 is 33% wrong, which is not under 30%. You need more correct decisions: 4 more correct answers give 10 wrong out of 34, about 29%, which passes."
+    },
+    {
+     "q": "Halfway through the exam you hit five hard questions in a row. What do you do?",
+     "a": "Nothing different. Runs of hard questions happen by chance, and some may be unscored pretest questions. Answer each with the reading method, flag any you want to revisit, keep to the 70-second pace and take one slow breath before the next question."
+    }
+   ]
+  },
+  {
+   "key": "w10-s4",
+   "summary": "You plan Release 3, the cyber-resilience release: scope, budget, schedule and critical path, the risks carried forward and the delivery approach. Then you learn how to run a business impact analysis, ready for week 12.",
+   "read": [
+    {
+     "heading": "Release 3 on one page",
+     "body": "Release 3 answers the question Kestrel's board asked: could Kestrel keep caring for patients if its clinical systems went down? Nobody has tested a restore of the Clinical Information System (CIS, A-001) in over a year.\n\nScope: the business impact analysis (BIA), recovery targets for clinical systems, downtime procedures, incident response, vulnerability remediation, a security-operations dashboard, the major-incident review and programme closure. Proposed exclusion: replacing clinical systems, although Release 3 may recommend it.\n\nDates: 2026-11-27 to programme acceptance on 2026-12-17, which is 15 working days (your own count). Budget: CAD 320,000.\n\n| Work package | Owner | Budget (CAD) | Planned dates |\n|---|---|---|---|\n| WP-111 Business impact analysis and recovery targets | Chloe Dubois (E-016) | 55,000 | 2026-11-27 to 2026-12-03 |\n| WP-112 CIS restore testing and downtime procedures | Chloe Dubois (E-016) | 85,000 | 2026-12-04 to 2026-12-11 |\n| WP-113 Incident response plan and tabletop exercise | Daniel Osei (E-004) | 60,000 | 2026-12-04 to 2026-12-10 |\n| WP-114 Vulnerability remediation and security operations dashboard | Sam Okafor (E-020) | 80,000 | 2026-11-27 to 2026-12-11 |\n| WP-115 Major-incident review and programme closure | Programme Manager | 40,000 | 2026-12-14 to 2026-12-17 |\n\nWP-113 is -60,000 in the raw register, a confirmed sign error."
+    },
+    {
+     "heading": "Schedule and critical path",
+     "body": "| Task | Name | Dates | Total float |\n|---|---|---|---|\n| 21 | Complete business impact analysis and recovery targets | 2026-11-27 to 2026-12-03 | 0 |\n| 22 | Test CIS restore and downtime procedures | 2026-12-04 to 2026-12-11 | 0 |\n| 23 | Update incident response plan and run tabletop exercise | 2026-12-04 to 2026-12-10 | 1 |\n| 24 | Remediate priority vulnerabilities | 2026-11-27 to 2026-12-07 | 2 |\n| 25 | Build security operations dashboard | 2026-12-08 to 2026-12-11 | 2 |\n| 26 | Hold major-incident review | 2026-12-14 to 2026-12-15 | 0 |\n| 27 | Close programme and record lessons learned | 2026-12-16 to 2026-12-17 | 0 |\n\nThe critical path runs 21, 22, 26, 27 and programme acceptance (task 28). The restore test waits for the BIA, which sets the targets it must prove, so a day lost on the BIA moves programme acceptance.\n\nThe largest float in the release is 2 days. Plan early warning: daily checks on tasks 21 and 22, and a rule that any slip there goes to Marcus Bell (E-002) the same day.\n\nIf Remembrance Day moves the Release 2 gate to 2026-11-27, Release 3 starts a day late unless the day is recovered."
+    },
+    {
+     "heading": "Risks and constraints carried into Release 3",
+     "body": "- R-04 (Daniel Osei): the CIS cannot be restored within its 4-hour recovery time objective. Restore tests CT-001 (9.0 hours) and CT-002 (13.5 hours) failed; the last, on 2025-08-14, was 413 days before 2026-10-01. Issue I-03 records the failures.\n- R-05 (Priya Raman, E-003): Sentinel SOC Services (V-04), the managed security operations centre, processes security logs in the United States and needs privacy review and contract safeguards.\n- R-07 (you): Lumen Analytics Partners' (V-05) contract ends 2026-11-30, but the security operations dashboard (task 25) runs 2026-12-08 to 2026-12-11. Plan for Tomás Rivera (E-006) and Mei Tanaka (E-013) to build it, with knowledge transfer before the contract ends.\n- R-06 (you): key-person dependency on Tomás Rivera, now with Release 3 dashboard work too.\n- R-08 (Marcus Bell): the 2026-10-01 forecast, an estimate at completion of CAD 1,342,500, is above total authorized funding. Plan without assuming reserve.\n\nOther facts the plan uses: three vulnerabilities were past their remediation date at 2026-10-01 (SEC-012, SEC-015, SEC-017); security awareness for agency and vendor workers is 48% against a 90% target; the Pharmacy System (A-005) has no restore test on record (CT-004).\n\nOutside help: Raj Patel (E-015) at Meridian Clinical Systems (V-01) supports the CIS restore, and NorthArc Cloud (V-02) hosts the Backup Platform (A-012)."
+    },
+    {
+     "heading": "Choosing the delivery approach",
+     "body": "Tailor Release 3 by type of work:\n\n- BIA and recovery targets: predictive. Fixed interviews, analysis and owner sign-off, because every later task depends on the targets.\n- Restore testing: predictive, with a strict test plan. The acceptance criterion is the charter measure: the CIS restore passes within its 4-hour target.\n- Tabletop exercise: a rehearsal of decisions. The week 12 scenario is ransomware encrypting the CIS on a weekday at 07:00. It is designed to expose gaps, not to be passed.\n- Security operations dashboard: iterative, like Release 1. Build a page, show Sam Okafor and Daniel Osei, adjust.\n- Vulnerability remediation: a backlog ordered by risk to patient care.\n\nGovernance stays the same: one board, chaired by Marcus Bell, and one sponsor, Dr. Helen Marchetti (E-001). Release 3 adds formal risk acceptance: risk owners accept the residual risks that remain after Beacon.\n\nFor the CISSP this is Security and Risk Management (business continuity requirements) and Security Operations (recovery and disaster recovery tests); for ITIL it is service continuity, part of warranty."
+    },
+    {
+     "heading": "What a business impact analysis is",
+     "body": "A BIA finds which services matter most, how harm grows over time when each one stops, and what each one depends on. It is not a risk assessment: a risk assessment asks how likely a disruption is; a BIA assumes it has happened and asks how bad it gets, and how fast.\n\nIts outputs drive Release 3:\n\n- a ranked list of clinical services and the systems behind them;\n- maximum tolerable downtime (MTD): the longest a service can be down before harm becomes unacceptable;\n- recovery time objective (RTO): the target time to restore a system;\n- work recovery time (WRT): the time after restore to check data, enter paper records and resume normal work. RTO plus WRT must fit inside the MTD;\n- recovery point objective (RPO): the most data loss, measured back in time, the service can tolerate;\n- dependencies, recovery order and the resources recovery needs.\n\nKestrel's asset file already holds RTO and RPO values. The CIS has a 4-hour RTO and 1-hour RPO; the Identity Directory (A-007) has 2 hours and 1 hour. They were set without a BIA, so treat them as current targets. The BIA's figures become agreed targets only when business owners and the sponsor approve them."
+    },
+    {
+     "heading": "How to run the BIA",
+     "body": "The BIA itself happens in week 12. Plan the approach now so interviews can be booked.\n\n1. Confirm scope and sponsor: Dr. Helen Marchetti sponsors, Chloe Dubois runs it.\n2. List the clinical services and map each to its systems: emergency care (A-002 tracking board, A-001 CIS), medication (A-005), laboratory results (A-003), imaging (A-004), bed flow (A-006), clinical messaging (A-014), and clinician access to all of them (A-007 Identity Directory, A-008 Virtual Desktop Service).\n3. Name an owner for every service first; the Pharmacy System has none in the asset file.\n4. Agree impact categories and time points. A proposed set: patient safety, care operations, legal and regulatory (including Health Information Act duties), financial and reputation, scored at 1, 4, 8, 24 and 72 hours.\n5. Interview each owner with the same questions, for example Dr. Sarah Whitford (E-007) for emergency care and Janelle Cardinal (E-008) for bed flow: what happens to patients after 1, 4, 8, 24 and 72 hours; when safety is at risk; which paper downtime procedures exist and when they were last practised; how much data could be rebuilt by hand; what the service depends on; and how long catching up would take after the restore. Record answers in the owner's words and read them back.\n6. Score impact over time, find each MTD, and derive RTO and RPO.\n7. Compare with today: current targets and actual restore results, such as 13.5 hours for the CIS.\n8. Map dependencies into a recovery order. The Identity Directory comes early, because 12 of the 15 systems depend on it (your count).\n9. Validate results with each owner, then get sponsor approval.\n10. Feed the results into the RTO and RPO recommendation, the recovery and downtime plan and the tabletop."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Business impact analysis (BIA)",
+     "definition": "An analysis of which services matter most, how harm grows over time when each stops, and what each depends on. It produces the MTD, RTO and RPO that recovery plans must meet."
+    },
+    {
+     "term": "Maximum tolerable downtime (MTD)",
+     "definition": "The longest a service can be unavailable before harm becomes unacceptable. The RTO plus the work recovery time must fit inside it."
+    },
+    {
+     "term": "Recovery time objective (RTO)",
+     "definition": "The target time to restore a system after a disruption. The CIS's current target is 4 hours; its restore tests took 9.0 and 13.5 hours."
+    },
+    {
+     "term": "Recovery point objective (RPO)",
+     "definition": "The most data loss a service can tolerate, measured back in time from the disruption. A 1-hour RPO means recovery must use data no older than an hour."
+    },
+    {
+     "term": "Work recovery time (WRT)",
+     "definition": "The time after a system is restored to check data, enter records kept on paper during the outage and resume normal work."
+    },
+    {
+     "term": "Release plan",
+     "definition": "The plan for one release: scope and exclusions, work packages, budget, schedule and critical path, risks, delivery approach, governance and acceptance criteria."
+    }
+   ],
+   "build": {
+    "goal": "Write the Release 3 plan: scope, work packages and budget, schedule and critical path, risks carried forward, delivery approach and governance, and the approach for the business impact analysis in week 12.",
+    "steps": [
+     "Open Project, choose Release 3, then Release 3 plan. Read How to write it and See the finished example.",
+     "Write the objective and scope with clear exclusions, and the dates 2026-11-27 to 2026-12-17.",
+     "Build the work package table from the register (WP-111 to WP-115, CAD 320,000, with WP-113 at 60,000), with owners and dates.",
+     "Add the schedule table for tasks 21 to 28 with float, mark the critical path and write the early-warning rule for tasks 21 and 22.",
+     "Write the risk section for R-04, R-05, R-06, R-07 and R-08 with owners and responses, plus issue I-03.",
+     "Write the delivery approach by type of work and the governance route, including formal risk acceptance.",
+     "Write the BIA approach: sponsor and lead, services and systems, impact categories and time points (proposed), questionnaire and approval route.",
+     "Tick Done when, write Explain it in your own words and answer Check yourself."
+    ],
+    "modelAnswer": "Early-warning rule (example): tasks 21 and 22 have zero float, so Chloe Dubois reports progress on both every working day by 16:00. Any slip of half a day or more goes to Marcus Bell the same day with a recovery option, such as adding an interviewer to the BIA or running the restore test over a weekend window approved through change control. Tasks 23, 24 and 25 are reviewed twice a week, because their 1 to 2 days of float can vanish quickly."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 1, Security and Risk Management (1.7 Business Continuity requirements): the BIA comes before choosing recovery strategies. It identifies critical functions and sets MTD, RTO and RPO; strategies and plans follow from it."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (7.10 recovery strategies): RTO plus work recovery time must fit within the maximum tolerable downtime. An answer that sets an RTO longer than the MTD is wrong."
+    },
+    {
+     "cert": "PMP",
+     "tip": "When the remaining work has almost no float, plan early warning and same-day escalation. Reporting slips only at the next status meeting is too late on a zero-float path."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Service continuity is part of warranty. A service that does what users need but cannot be recovered within agreed targets is not fit for use."
+    }
+   ],
+   "pitfalls": [
+    "Treating the RTO values already in khn_assets.csv as agreed. They were set without a BIA; call them current targets until owners approve new ones.",
+    "Starting BIA interviews before every service has a named owner. The Pharmacy System (A-005) needs one first.",
+    "Confusing a BIA with a risk assessment. The BIA asks how bad and how fast; the risk assessment asks how likely.",
+    "Planning Release 3 dashboards as if Lumen Analytics Partners will still be available after 2026-11-30."
+   ],
+   "check": [
+    {
+     "q": "Why does the BIA (task 21) have zero float, and what follows from that?",
+     "a": "The restore test (task 22) needs the recovery targets the BIA sets, and the major-incident review and closure follow in sequence, so any slip in task 21 moves programme acceptance on 2026-12-17. The plan therefore needs daily tracking of task 21 and a same-day escalation rule for any slip."
+    },
+    {
+     "q": "What is the difference between MTD, RTO and WRT?",
+     "a": "MTD is the longest a service can be down before harm becomes unacceptable. RTO is the target time to restore the system. WRT is the time after the restore to check data and catch up on work. RTO plus WRT must fit inside the MTD."
+    },
+    {
+     "q": "The asset file says the CIS RTO is 4 hours. Why does Release 3 still need a BIA for it?",
+     "a": "The 4-hour figure was set without a BIA, and the restore tests took 9.0 and 13.5 hours. The BIA asks clinicians how harm grows over time, which confirms or changes the target, and gives the restore test a business-approved target to prove."
+    }
+   ]
+  },
+  {
+   "key": "w10-s5",
+   "summary": "You profile khn_assets.csv and khn_security_events.csv, find every deliberate data problem by row ID, and build the critical clinical system inventory with tiers, owners, custodians, dependencies, hosting and end of support.",
+   "read": [
+    {
+     "heading": "Why the inventory comes first",
+     "body": "You cannot protect, monitor or recover a system you have not listed. The business impact analysis (BIA), restore tests, vulnerability work and the security operations dashboard all start from this inventory.\n\nThe CISSP calls this Asset Security: identify and classify information and assets (2.1), and manage asset retention, including end of life and end of support (2.5). Keep two roles apart:\n\n- The business owner is accountable: classification, who may use the system, and what risk is acceptable.\n- The custodian runs it day to day: access controls, backups and patches, as the owner decides.\n\nWork as a data analyst first, then as a security analyst: profile both files, fix what the rules allow, flag the rest, and keep every exception as evidence."
+    },
+    {
+     "heading": "Profiling khn_assets.csv",
+     "body": "The file has 16 rows and 12 columns. After removing one exact duplicate there are 15 systems: 8 tier 1, 5 tier 2 and 2 tier 3.\n\n| Row ID | Problem | Handling |\n|---|---|---|\n| A-008 | Exact duplicate row (DQ-01) | Remove the second copy |\n| A-005 | Pharmacy System, tier 1, has no business owner (a required field) | Keep it; escalate to Dr. Helen Marchetti (E-001) to name one |\n| A-014 | Clinical Paging and Secure Messaging, tier 1, support ended 2026-06-30 | Raise a risk, plan replacement, add compensating controls (see SEC-015) |\n| A-009 | Power BI service and Beacon semantic model is vendor-hosted with no vendor_id | Review item: record its provider in the vendor register |\n\nChecks that pass: every owner and custodian exists in khn_identity.csv, and every ID in depends_on is a real asset. A-009's blank end_of_support_date is expected for software as a service. Your own counts: 10 systems run on premises, 4 at NorthArc Cloud (V-02) and 1 is vendor-hosted, and A-014's support ended 93 days before the as-of date, 2026-10-01."
+    },
+    {
+     "heading": "Profiling khn_security_events.csv",
+     "body": "The file has 21 rows and 13 columns. After removing one exact duplicate there are 20 records: 10 incidents and 10 vulnerabilities. Incident times must run forward from occurred_at to recovered_at; opened_at may fall either side of detection, because a person can report before the security operations centre confirms.\n\n| Row ID | Problem | Handling |\n|---|---|---|\n| SEC-005 | Exact duplicate (DQ-01) | Remove the second copy |\n| SEC-008 | contained_at 13:10 before detected_at 14:30 (DQ-06) | Keep in counts, not in time measures; Sam Okafor (E-020) gets the true times |\n| SEC-017 | Common Vulnerability Scoring System (CVSS) score 11.5, above 10.0 (DQ-05) | Invalid until rescored; stays on the open-risk list as a Critical remote code execution |\n| SEC-016 | asset_id A-021 not in khn_assets.csv (DQ-10) | Load against an Unknown asset; the unregistered system is a finding |\n| SEC-019 | Severity 'hIGH' (DQ-03) | Map to High |\n| SEC-007 | Opened before detected | Allowed; no action |\n\nApproved measures, with SEC-008 excluded: mean time to detect (MTTD) 25.29 hours (n = 9), mean time to contain (MTTC) 1.93 hours (n = 9) and mean time to recover (MTTR, recovered minus detected) 28.33 hours (n = 8; SEC-009 has not recovered). Incidents by severity: Critical 1, High 3, Medium 4, Low 2.\n\nEight vulnerabilities are open; three were past due at 2026-10-01 (day counts are your own): SEC-012, a missing patch on the Clinical Information System (CIS), 6 days; SEC-015 on A-014, 43 days; SEC-017 on imaging system A-004, 3 days. Policy deadlines from detection: Critical 7 days, High 30, Medium 60, Low 90."
+    },
+    {
+     "heading": "Power Query steps that keep the evidence",
+     "body": "First build a query named Assets from khn_assets.csv with the same first four steps as the query below (typing tier and end_of_support_date), plus a SupportEnded flag for dates before #date(2026, 10, 1). Then build SecurityEvents:\n\n```\nlet\n    Source = Csv.Document(File.Contents(\"C:\\Beacon\\khn_security_events.csv\"), [Delimiter = \",\", Encoding = 65001]),\n    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),\n    Typed = Table.TransformColumnTypes(Promoted, {{\"occurred_at\", type datetime}, {\"detected_at\", type datetime}, {\"contained_at\", type datetime}, {\"cvss_score\", type number}}),\n    Deduped = Table.Distinct(Typed),\n    Severity = Table.TransformColumns(Deduped, {{\"severity\", each Text.Proper(Text.Trim(_)), type text}}),\n    CvssValid = Table.AddColumn(Severity, \"CVSSValid\", each [cvss_score] = null or ([cvss_score] >= 0 and [cvss_score] <= 10), type logical),\n    SequenceValid = Table.AddColumn(CvssValid, \"SequenceValid\", each [record_type] <> \"Incident\" or ([detected_at] >= [occurred_at] and [contained_at] >= [detected_at]), type logical),\n    Matched = Table.NestedJoin(SequenceValid, {\"asset_id\"}, Assets, {\"asset_id\"}, \"AssetMatch\", JoinKind.LeftOuter),\n    AssetKnown = Table.AddColumn(Matched, \"AssetKnown\", each not Table.IsEmpty([AssetMatch]), type logical),\n    Result = Table.RemoveColumns(AssetKnown, {\"AssetMatch\"})\nin\n    Result\n```\n\nOnly exact duplicates go; flags let measures skip bad rows that stay visible. Reconcile: 15 rows in Assets, 20 in SecurityEvents, and one false value each for AssetKnown (SEC-016), CVSSValid (SEC-017) and SequenceValid (SEC-008)."
+    },
+    {
+     "heading": "The critical clinical system inventory",
+     "body": "| System | Tier | Owner / custodian | Hosting | Depends on | End of support |\n|---|---|---|---|---|---|\n| A-001 Clinical Information System | 1 | E-001 / E-009 | On premises, V-01 | A-007 | 2029-03-31 |\n| A-002 Emergency Department Tracking Board | 1 | E-007 / E-009 | On premises, V-01 | A-001, A-007 | 2029-03-31 |\n| A-003 Laboratory Information System | 1 | E-001 / E-009 | On premises | A-007 | 2028-09-30 |\n| A-004 Picture Archiving and Communication System | 2 | E-001 / E-017 | On premises | A-007 | 2027-12-31 |\n| A-005 Pharmacy System | 1 | None / E-009 | On premises | A-001, A-007 | 2028-06-30 |\n| A-006 Bed Management System | 2 | E-008 / E-009 | On premises | A-001, A-007 | 2028-03-31 |\n| A-007 Identity Directory | 1 | E-002 / E-009 | On premises | None | 2030-01-31 |\n| A-008 Virtual Desktop Service | 1 | E-002 / E-017 | On premises | A-007 | 2027-10-31 |\n| A-009 Power BI and semantic model | 3 | E-008 / E-006 | Vendor hosted | A-007, A-010 | Not applicable |\n| A-010 Clinical Data Warehouse | 2 | E-006 / E-009 | On premises | A-001, A-002, A-006 | 2029-06-30 |\n| A-011 IT Service Management Platform | 2 | E-005 / E-009 | NorthArc Cloud | A-007 | 2028-12-31 |\n| A-012 Backup Platform | 1 | E-002 / E-009 | NorthArc Cloud | A-007 | 2030-06-30 |\n| A-013 Email and Collaboration | 2 | E-002 / E-017 | NorthArc Cloud | A-007 | 2029-12-31 |\n| A-014 Clinical Paging and Secure Messaging | 1 | E-001 / E-017 | On premises | A-007 | 2026-06-30, passed |\n| A-015 HR and Payroll System | 3 | E-018 / E-009 | NorthArc Cloud | None | 2028-12-31 |\n\nHR stands for human resources. The full inventory also carries each system's classification and its current recovery time objective (RTO) and recovery point objective (RPO)."
+    },
+    {
+     "heading": "What the inventory tells you",
+     "body": "Read it as a risk analyst (your own counts are marked):\n\n- The Identity Directory (A-007) is the hub: 12 of the 15 systems depend on it (your count), so it recovers first. Its restore passed in 1.5 hours against 2 (CT-003), but it has an open High excessive-permission finding (SEC-014) and an unrecovered incident (SEC-009).\n- Kevin Park (E-009), the person in segregation-of-duties issue I-01, is custodian of 10 of the 15 systems (your count). Name a second custodian for each tier 1 system.\n- A-014, tier 1 clinical messaging, is out of support with SEC-015 43 days past due: it needs a risk decision, compensating controls such as segmentation and monitoring, and a replacement decision.\n- A-005 has no owner and no restore test (CT-004); A-001 has two failed restore tests and an overdue patch (SEC-012).\n- A-021 is in the security data but not the inventory (SEC-016): find out what it is.\n\nTwo questions for the BIA, not data errors: the Backup Platform (A-012) has an 8-hour RTO, longer than the 4-hour RTO of the CIS it would restore; and clinicians reach the CIS through A-008, which is not in A-001's depends_on list. Ask Chloe Dubois (E-016) and Daniel Osei (E-004) whether recovery dependencies belong in the inventory."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Asset inventory",
+     "definition": "The authoritative list of systems with tier, owner, custodian, classification, hosting, dependencies, recovery targets and support status. Every protection, monitoring and recovery decision starts from it."
+    },
+    {
+     "term": "Business owner",
+     "definition": "The person accountable for a system and its data, who decides classification, acceptable use and acceptable risk. A tier 1 system without one, like A-005, is escalated to the sponsor."
+    },
+    {
+     "term": "Custodian",
+     "definition": "The person who runs a system day to day, applying access controls, backups and patches as the owner decides. Kevin Park (E-009) is custodian of 10 of Kestrel's 15 systems."
+    },
+    {
+     "term": "End of support",
+     "definition": "The date after which a vendor stops providing fixes, including security fixes. An unsupported tier 1 system, like A-014 after 2026-06-30, needs a risk decision, compensating controls and a replacement plan."
+    },
+    {
+     "term": "Unknown member",
+     "definition": "A placeholder row in a dimension, such as an Unknown asset, that unmatched fact rows load against so they stay visible and count in totals while the owner fixes the key."
+    },
+    {
+     "term": "MTTD, MTTC and MTTR",
+     "definition": "Mean time to detect (detected minus occurred), to contain (contained minus detected) and to recover (recovered minus detected). Kestrel's are 25.29, 1.93 and 28.33 hours."
+    },
+    {
+     "term": "CVSS",
+     "definition": "The Common Vulnerability Scoring System, which rates a vulnerability's technical severity from 0.0 to 10.0. A score outside that range, like SEC-017's 11.5, is invalid until rescored."
+    }
+   ],
+   "build": {
+    "goal": "Profile khn_assets.csv and khn_security_events.csv, record every deliberate problem by row ID with its handling, and build the critical clinical system inventory with tiers, owners, custodians, dependencies, hosting, end of support and the findings that follow.",
+    "steps": [
+     "Open Project, choose Release 3, then Critical clinical system inventory. Read How to write it and See the finished example.",
+     "In Practice, Labs or Power BI Desktop, load khn_assets.csv as Assets and khn_security_events.csv as SecurityEvents with this lesson's Power Query steps. Turn on column profiling for the entire data set.",
+     "Record every problem with its row ID and handling: A-008, A-005, A-014, A-009, SEC-005, SEC-008, SEC-017, SEC-016 and SEC-019, plus SEC-007 as allowed.",
+     "Reconcile your counts: 15 systems (8, 5 and 2 by tier), 20 security records, MTTD 25.29, MTTC 1.93 and MTTR 28.33 hours, 8 open vulnerabilities and 3 overdue.",
+     "Build the inventory for all 15 systems: tier, owner, custodian, classification, hosting and vendor, dependencies, current RTO and RPO, and end of support.",
+     "Write the findings: the A-007 hub, the E-009 concentration, A-014 past end of support, A-005 without an owner, A-021 unregistered, and the two dependency questions for the BIA.",
+     "Tick Done when, write Explain it in your own words and answer Check yourself."
+    ]
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Domain 2, Asset Security (2.1 identify and classify information and assets): the owner decides classification and acceptable use; the custodian implements controls. An answer where the custodian decides classification is wrong."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 2, Asset Security (2.5 asset retention, end of life and end of support): an unsupported system gets no security fixes. The answer is an owner's risk decision with compensating controls and a replacement plan, never silent continued use."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Prepare the data: profile with column quality, distribution and profile based on the entire data set, not the first 1,000 rows. Keep bad rows visible with flags or an Unknown member rather than deleting them."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Domain 7, Security Operations (7.2 logging and monitoring): detection, containment and recovery times mean something only when timestamps are in a possible order. Leave impossible sequences out of timing measures and correct the source."
+    }
+   ],
+   "pitfalls": [
+    "Deleting SEC-017 because its CVSS score is invalid. A Critical remote code execution finding stays on the open-risk list until it is rescored.",
+    "Dropping SEC-016 because A-021 does not match. Load it against an Unknown asset; the unregistered system is the finding.",
+    "Leaving A-005 with a blank owner and moving on. A tier 1 system with no owner goes to the sponsor.",
+    "Counting the A-008 and SEC-005 duplicates, which inflates both the inventory and the incident count."
+   ],
+   "check": [
+    {
+     "q": "Why is SEC-008 kept in the incident count but left out of MTTD, MTTC and MTTR?",
+     "a": "The incident happened, so it counts. But its contained_at (13:10) is before its detected_at (14:30), which is impossible, so any duration from those times would be wrong. It stays out of the time measures until Sam Okafor gets the true times from the security operations centre."
+    },
+    {
+     "q": "What makes the Identity Directory (A-007) the first system to recover?",
+     "a": "12 of the 15 systems in the inventory depend on it, including the CIS, so almost nothing else works without it. It shares the shortest RTO, 2 hours, with A-014, and its restore test passed in 1.5 hours, so it is both critical and proven recoverable."
+    },
+    {
+     "q": "A-014's end of support passed on 2026-06-30. What should the inventory and Release 3 plan record?",
+     "a": "That a tier 1 clinical system is unsupported, 93 days past end of support at 2026-10-01, with SEC-015 open 43 days past its remediation date. Raise a risk with an owner, add compensating controls such as segmentation and monitoring, and ask the sponsor for a replacement decision."
+    }
+   ]
+  }
+ ]
+}

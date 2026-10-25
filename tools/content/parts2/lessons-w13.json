@@ -1,0 +1,540 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w13-s1",
+   "summary": "Review all eight CISSP domains with their weights and sub-domain headings, each tied to the Beacon document where you practised it, then learn the high-yield ideas Beacon only touched. You finish by building the residual risk register: what risk remains after Beacon, who owns it and who accepted it.",
+   "read": [
+    {
+     "heading": "How to use this review",
+     "body": "The Certified Information Systems Security Professional (CISSP) outline has eight weighted domains. For each one you get the weight, the sub-domain headings and where you did that work in Beacon. If you can explain a heading from your own document, move on; if not, mark it for Practice tomorrow.\n\nDomain 1, at 16%, is the largest and the lens for the other seven, because the exam wants a risk advisor's answer, not a technician's fix."
+    },
+    {
+     "heading": "Domains 1 and 2: risk, governance and assets",
+     "body": "1 Security and Risk Management (16%): 1.1 professional ethics; 1.2 security concepts; 1.3 security governance principles; 1.4 legal, regulatory, compliance; 1.5 investigation types; 1.6 policy, standards, procedures, guidelines; 1.7 Business Continuity requirements; 1.8 personnel security; 1.9 risk management concepts; 1.10 threat modeling; 1.11 Supply Chain Risk Management; 1.12 security awareness, education and training.\n\nIn Beacon:\n- Privacy impact assessment (1.4): under the Health Information Act, section 64, it goes to the Information and Privacy Commissioner for review and comment, not approval, before implementation.\n- Risks R-01 to R-08 in the RAID (risks, assumptions, issues, decisions) log, each owned (1.9); the business impact analysis, or BIA (1.7).\n- Supplier risk (1.11): V-04 processes logs in the United States; V-03 has no assurance report on file.\n- Awareness (1.12): agency and vendor workers at 48% against a 90% target.\n- CR-01 (1.4): declined under the Health Information Act, sections 57 and 58 (highest degree of anonymity, least amount of information).\n\n2 Asset Security (10%): 2.1 identify and classify information and assets; 2.2 handling requirements; 2.3 provision securely; 2.4 data lifecycle; 2.5 asset retention (end of life, end of support); 2.6 data security controls and compliance requirements.\n\nIn Beacon: the classification register (Public, Internal, Confidential, Restricted): the owner classifies, the custodian protects. The inventory found A-005 (Pharmacy) with no owner and A-014 (Clinical Paging) past end of support since 2026-06-30 (2.5)."
+    },
+    {
+     "heading": "Domains 3 and 4: architecture, models and networks",
+     "body": "3 Security Architecture and Engineering (13%): 3.1 secure design principles; 3.2 security models (Biba, Star Model, Bell-LaPadula); 3.3 select controls from system security requirements; 3.4 security capabilities of information systems (memory protection, Trusted Platform Module, encryption); 3.5 vulnerabilities of architectures, designs, solution elements; 3.6 cryptographic solutions; 3.7 cryptanalytic attacks; 3.8 site and facility design principles; 3.9 site and facility controls; 3.10 information system lifecycle.\n\nIn Beacon: the threat model and architecture, with trust boundaries TB1 to TB4, misuse cases, and Restricted data kept inside warehouse staging.\n\nSecurity models, which Beacon only touched:\n- Bell-LaPadula (confidentiality): no read up (simple security property), no write down (star property). Beacon's de-identified views are a controlled exception: a trusted, owner-approved process downgrades Restricted rows to Confidential aggregates.\n- Biba (integrity): no read down (simple integrity axiom), no write up (star integrity axiom). A dashboard must never write back into the Clinical Information System (CIS).\n- Clark-Wilson (integrity): well-formed transactions and separation of duties; Kevin Park's (E-009) three conflicting rights break it.\n\n4 Communication and Network Security (13%): 4.1 secure design principles in network architectures; 4.2 secure network components; 4.3 secure communication channels.\n\nIn Beacon: the segmentation and logging design: zones, only the flows each system needs, and the logs the managed security operations centre (SOC) must receive."
+    },
+    {
+     "heading": "Domains 5 and 6: identity and testing",
+     "body": "5 Identity and Access Management (13%): 5.1 physical and logical access; 5.2 identification and authentication strategy (people, devices, services); 5.3 federated identity with a third-party service; 5.4 authorization mechanisms; 5.5 identity and access provisioning lifecycle; 5.6 authentication systems.\n\nIn Beacon: Release 2's role-to-permission matrix (5.4), joiner-mover-leaver (5.5), multi-factor authentication (MFA) and single sign-on (5.2, 5.3, 5.6), privileged access and access reviews. Baseline: 2 missed leavers, privileged MFA at 66.7%, 8 excess grants, 1 duty conflict. Name the authorization models: discretionary (the owner decides), mandatory (labels decide), role-based, rule-based, attribute-based.\n\n6 Security Assessment and Testing (12%): 6.1 assessment, test and audit strategies; 6.2 security control testing; 6.3 collect security process data; 6.4 analyze test output and report; 6.5 security audits.\n\nIn Beacon: the row-level security (RLS) test pack, valid only when negative tests pass; user acceptance test (UAT) scripts, including refusals; the control-testing plan; restore tests. The CIS failed twice (9.0 and 13.5 hours against a 4-hour recovery time objective, RTO); of 13 controls, 4 pass, 8 fail, 1 not tested. A successful backup job proves nothing; a timed restore does."
+    },
+    {
+     "heading": "Domains 7 and 8: operations and software",
+     "body": "7 Security Operations (13%): 7.1 investigations; 7.2 logging and monitoring; 7.3 configuration management; 7.4 foundational security operations concepts; 7.5 resource protection; 7.6 incident management; 7.7 detection and preventative measures; 7.8 patch and vulnerability management; 7.9 change management; 7.10 recovery strategies; 7.11 disaster recovery (DR) processes; 7.12 test DR plans; 7.13 business continuity planning and exercises; 7.14 physical security; 7.15 personnel safety and security.\n\nIn Beacon: the incident model, ransomware playbook, notification matrix, vulnerability plan, DR and downtime plan, tabletop and reviews. Baseline: mean time to detect 25.29 hours, to contain 1.93, to recover 28.33; 3 vulnerabilities past due. SEC-004 was detected 45 minutes after it began and contained 2 hours 40 minutes later.\n\n8 Software Development Security (10%): 8.1 security in the software development life cycle; 8.2 controls in software development ecosystems; 8.3 assess software security effectiveness; 8.4 security impact of acquired software; 8.5 secure coding guidelines and standards.\n\nIn Beacon: the supplier and software risk assessment treated the Meridian CIS software (V-01) and the Power BI service as acquired software (8.4); the deployment plan controlled promotion and rollback (8.2); your measures and queries were tested against the approved reconciliation figures (8.3)."
+    },
+    {
+     "heading": "Cryptography basics",
+     "body": "Learn these as facts (3.6, 3.7).\n- Symmetric: one shared key, fast, for bulk data; the Advanced Encryption Standard (AES) is the example. Key distribution is the weakness: n people need n(n-1)/2 keys, so 10 need 45.\n- Asymmetric: a key pair, slower, used for key exchange and signing (RSA). n people need 2n keys. To send Priya a secret, use her public key; to prove a message is yours, sign with your private key.\n- Hybrid: Transport Layer Security (TLS), as on the gateway's link to Power BI, agrees a session key asymmetrically, then encrypts data symmetrically.\n- Hashing: one-way, fixed-length (SHA-256). Integrity, not confidentiality. Salts defeat rainbow tables.\n- Digital signature: a hash signed with the sender's private key: integrity, origin, non-repudiation, never confidentiality.\n- Public key infrastructure (PKI): a certificate authority binds a key to an identity in an X.509 certificate and publishes revocations.\n- Attacks: brute force, ciphertext-only, known and chosen plaintext, birthday attacks on hashes, side channels such as timing."
+    },
+    {
+     "heading": "Risk numbers, evidence and ethics",
+     "body": "Quantitative risk (1.9): single loss expectancy (SLE) = asset value x exposure factor. Annualized loss expectancy (ALE) = SLE x annualized rate of occurrence (ARO). A safeguard pays when ALE before, minus ALE after, minus its annual cost, is above zero. Residual risk is what remains after controls; management, not security, accepts it, with a review date.\n\nWorked example (illustrative numbers, not Kestrel data): a CAD 500,000 system loses 40% in one ransomware event, so SLE = CAD 200,000. Expected once in four years, ARO = 0.25 and ALE = CAD 50,000 a year. A CAD 30,000-a-year control cuts ARO to 0.05, so the new ALE is CAD 10,000. Value: 50,000 minus 10,000 minus 30,000 = CAD 10,000 a year: buy it. Harm to patients is never turned into dollars; qualitative ratings sit beside the numbers.\n\nInvestigations (1.5, 7.1): administrative (internal policy); criminal (beyond a reasonable doubt); civil (a lower standard, often called preponderance of the evidence); regulatory; industry standards. Evidence must be relevant, material and competent (lawfully obtained). Keep a chain of custody, collect the most volatile evidence first (memory before disk), and analyze a hash-verified copy, never the original.\n\nEthics (1.1), the four ISC2 canons:\n1. Protect society, the common good, necessary public trust and confidence, and the infrastructure.\n2. Act honorably, honestly, justly, responsibly, and legally.\n3. Provide diligent and competent service to principals.\n4. Advance and protect the profession."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Residual risk",
+     "definition": "The risk left after controls are applied. Someone with authority must accept it, treat it further, transfer it or avoid it, and record the decision."
+    },
+    {
+     "term": "Risk acceptance",
+     "definition": "A recorded decision by an accountable executive to live with a residual risk, with a review date or trigger. At Kestrel the Chief Information Security Officer advises and the accountable executive decides."
+    },
+    {
+     "term": "Annualized loss expectancy (ALE)",
+     "definition": "The expected yearly loss from one threat: ALE = SLE x ARO, where SLE = asset value x exposure factor and ARO is how many times a year the event is expected."
+    },
+    {
+     "term": "Bell-LaPadula model",
+     "definition": "A confidentiality model. Simple security property: no read up. Star property: no write down. It stops secrets flowing to lower levels."
+    },
+    {
+     "term": "Biba model",
+     "definition": "An integrity model. Simple integrity axiom: no read down. Star integrity axiom: no write up. It stops lower-integrity data corrupting higher-integrity data."
+    },
+    {
+     "term": "Chain of custody",
+     "definition": "The record of who collected, handled, stored and passed on each item of evidence, and when, so its integrity can be shown in an investigation or in court."
+    },
+    {
+     "term": "Digital signature",
+     "definition": "A hash signed with the sender's private key and verified with the sender's public key. It gives integrity, proof of origin and non-repudiation, but not confidentiality."
+    },
+    {
+     "term": "ISC2 Code of Ethics canons",
+     "definition": "Protect society, the common good, necessary public trust and confidence, and the infrastructure; act honorably, honestly, justly, responsibly, and legally; provide diligent and competent service to principals; advance and protect the profession."
+    }
+   ],
+   "build": {
+    "goal": "Build the residual risk register for Project Beacon: every risk that remains after the three releases, with its inherent and residual rating, the controls Beacon applied, a named owner, a decision (accept, treat, transfer or avoid) and who approved it.",
+    "steps": [
+     "Open Project, choose Release 3 and open the Residual risk register. Read How to write it, then See the finished example so you know the target shape.",
+     "List your candidates. Start with risks R-01 to R-08 and issues I-01 to I-03 from the RAID log, then add the Release 3 findings: A-014 past end of support with SEC-015 open, A-005 with no owner and no restore test, SEC-017 on A-004, SEC-016 on the unregistered A-021, V-03 with no assurance report and V-04 processing logs in the United States.",
+     "Sort each candidate: closed by Beacon, handed to an operational owner, or still carrying residual risk. Only the third kind goes in the register; the other two go in the programme closure report on Day 5.",
+     "For each residual risk, write the inherent rating, the Beacon controls that reduced it and the residual rating. Ratings are your assessment, so label them that way; any number in the row must come from the data.",
+     "Name one owner per risk, using the canon owners where they exist (R-04 Daniel Osei, R-05 Priya Raman), and tag each row with its CISSP domain so the register doubles as revision.",
+     "Record the decision with the agreed acceptance authority: Low by the risk owner, Medium by Marcus Bell (E-002), High by Dr. Helen Marchetti (E-001) on the advice of Daniel Osei (E-004), and Very high cannot be accepted. Privacy risks also need Priya Raman (E-003). Give every accepted risk conditions and an expiry date.",
+     "Tick the Done when checklist, write Explain it in your own words, and answer the five Check yourself questions."
+    ],
+    "modelAnswer": "One example row (the rating, decision and dates were agreed at the closure risk workshop; the end-of-support date and SEC-015 are data):\n\n| Risk | Residual | Owner | Decision |\n|---|---|---|---|\n| RR-02 A-014 Clinical Paging past end of support (2026-06-30), SEC-015 open | High | Dr. Helen Marchetti (E-001) | Accepted by E-001 to 2027-03-31, advised by Daniel Osei (E-004). Conditions: A-014 stays in its own network zone with admin access limited and monitored; a replacement plan goes to the executive by 2027-03-31. |\n\nSee the finished example in Project for the full register."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management: when a question asks who accepts residual risk, choose senior management or the asset owner, never the security team or the auditor. Security advises, audit assures, management decides."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Architecture and Engineering: Bell-LaPadula is confidentiality (no read up, no write down); Biba is integrity (no read down, no write up). Clearance and secrecy in the stem point to Bell-LaPadula; corruption and trust in data point to Biba."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Operations: in evidence questions, preserve before you analyze. Capture volatile data first, hash the image, record the chain of custody and work only on the verified copy."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Asset Security: the data owner sets the classification and approves access; the custodian runs the controls, such as backups and encryption. An option that lets IT decide the classification is wrong."
+    }
+   ],
+   "pitfalls": [
+    "Reading the review without testing yourself. If you cannot explain a sub-domain heading from your own Beacon document, it goes on tomorrow's Practice list.",
+    "Mixing up Bell-LaPadula and Biba. Write the four rules from memory before you start Practice, then check them.",
+    "Putting risks that Beacon closed into the residual risk register. The register holds only what remains, each with an owner and a decision.",
+    "Letting the security team accept risk. Daniel Osei advises; the accountable executive signs."
+   ],
+   "check": [
+    {
+     "q": "A system is worth CAD 200,000 and one flood would destroy 25% of it. Floods are expected once every ten years. What are the SLE and ALE?",
+     "a": "SLE = 200,000 x 0.25 = CAD 50,000. ARO = 0.1, so ALE = 50,000 x 0.1 = CAD 5,000 a year. On cost alone, a flood control is worth buying only if it removes more than its own annual cost from that ALE."
+    },
+    {
+     "q": "Which security model stops a process holding Restricted data from writing it into a Confidential report, and through which rule?",
+     "a": "Bell-LaPadula, through its star property: no write down. It protects confidentiality. Kestrel's de-identified views are allowed only because a trusted, owner-approved process de-identifies and aggregates the data first."
+    },
+    {
+     "q": "Why does the CIS restore risk (R-04) stay in the residual risk register even if a restore test passes during Release 3?",
+     "a": "One passing test shows recovery worked once, under test conditions. Runbooks drift, data grows and staff change; CT-002 failed partly because the restore runbook was out of date. Under the agreed condition, the rating falls only after two consecutive CIS restore tests pass within 4 hours. Until then it stays High as RR-01, owned by Daniel Osei (E-004) and accepted by Dr. Helen Marchetti (E-001) to 2027-03-17, with recurring restore tests as the control."
+    }
+   ]
+  },
+  {
+   "key": "w13-s2",
+   "summary": "Learn exactly how the CISSP computerized adaptive test behaves and how to answer as a risk advisor to senior management. Then run adaptive practice in the app, rating your confidence on every answer, and build a calibration log that shows where you are overconfident and which domains to work next.",
+   "read": [
+    {
+     "heading": "How the CISSP CAT works",
+     "body": "English CISSP exams use Computerized Adaptive Testing (CAT). The facts you need:\n- 100 to 150 items.\n- 3 hours.\n- Passing score: 700 out of 1000.\n- You cannot go back to an earlier question.\n\nAdaptive means the test chooses each next item based on how you have answered so far. Answer well and the items tend to get harder; miss items and they tend to get easier. From item 100 onward the test can stop once it is confident about your result; otherwise it runs to item 150 or until time runs out.\n\nThree consequences shape how you practise:\n1. Hard questions are a good sign, not a bad one. Do not judge how you are doing by how difficult the items feel.\n2. There is no review screen at the end. Each answer is final when you submit it, so flagging items to return to is not a strategy. Decide, commit, move on.\n3. Stopping at item 100 tells you nothing about passing or failing. Do not read meaning into the length of your exam.\n\nThe domain weights from Day 1 still set your priorities: Security and Risk Management 16%; Asset Security and Software Development Security 10% each; Security Assessment and Testing 12%; the other four 13% each."
+    },
+    {
+     "heading": "Answer as a risk advisor to senior management",
+     "body": "Most CISSP items describe a situation and ask for the BEST, FIRST, MOST important or PRIMARY action. Often every option is true. The right one is what a senior security advisor would recommend to the people who own the risk. Think in this order:\n1. People first. Human safety beats data, systems and money. In a hospital, keeping patient care going through downtime procedures comes before restoring any dashboard.\n2. Governance before technology. Policy, ownership and approval come before configuration. If no one owns the asset, naming an owner comes before choosing a control.\n3. Understand before you act. FIRST questions usually want you to identify, assess, classify or confirm before you fix, unless people are in immediate danger.\n4. Follow the process. Change management, incident procedures and contracts exist for a reason; an option that skips them is usually wrong even when it is faster.\n5. Business value. A control should cost less than the risk it reduces and should support the mission.\n6. Stay in your role. You advise; senior management decides and accepts risk. You do not personally rebuild servers or discipline staff.\n\nEliminate options that are illegal, unethical, outside your role, or that treat a symptom instead of the cause. Between two survivors, choose the broader one that deals with root cause and governance."
+    },
+    {
+     "heading": "Three Beacon items, worked",
+     "body": "Item 1, Security Operations. At 07:00 ransomware encrypts the Clinical Information System (CIS). What should the incident lead do FIRST? The options: restore from backup, pay, notify the Commissioner, or activate downtime procedures and contain the spread. Thinking: people first. Clinical areas need paper downtime procedures now, and containment stops the spread. Restoring before containment invites reinfection. The privacy assessment starts early, because where there is a risk of harm, section 60.1 of the Health Information Act requires notice to the Commissioner as soon as practicable, and to the Minister responsible under the Act and the affected individuals, but it does not come before keeping patients safe.\n\nItem 2, Identity and Access Management. An audit finds a systems administrator who can provision accounts, approve access and administer audit logs. What is the BEST response? Thinking: this is Kevin Park's (E-009) segregation-of-duties conflict. Separate the duties and move approval to business owners, with any temporary exception approved, time-bound and monitored. A stronger password or more frequent reviews leave the conflict in place.\n\nItem 3, Security and Risk Management. A business owner wants to go live with a known Medium risk because the fix will take two months. What should the security professional do? Thinking: assess and explain the risk, document it, and have the accountable owner formally accept it with a review date. Blocking go-live yourself is out of role; staying silent is negligent.\n\nNotice the pattern: in each case the right option is the one a senior advisor could defend to the board the next morning."
+    },
+    {
+     "heading": "Confidence calibration",
+     "body": "Calibration means your confidence matches your accuracy. A well-calibrated candidate who feels sure is usually right, and one who is guessing knows it. On a test with no going back this matters twice: you cannot rescue a bad answer later, and you should not spend extra time on items you will not improve.\n\nBefore you submit each practice answer, rate it:\n- Sure: you could explain why each of the other three options is wrong.\n- Leaning: you narrowed it to two and picked one.\n- Guess: you could not separate the options.\n\nAfter the round, compare each rating with the result:\n- Sure answers should be right at least 9 times in 10. A wrong Sure answer is the most dangerous result you can get: a firm belief the exam will punish every time it appears. Each one goes into your error journal.\n- Leaning answers should be right more often than not. If they sit near half, your tie-breaking is weak, so rehearse the risk-advisor order.\n- Guess answers should sit near chance, which is 25% with four options. If your guesses are right far more often, you know more than you think: trust your first reasoned choice.\n\nOverconfidence shows as Sure answers that are wrong; fix it with content. Underconfidence shows as Guess answers that are right; fix it with technique and nerve."
+    },
+    {
+     "heading": "Make your practice adaptive",
+     "body": "The app does not adapt like the real exam, so you adapt your practice yourself. After each round:\n1. Count your misses by domain. A miss is a wrong answer or any Guess, even a lucky one.\n2. Divide by the questions you saw in that domain to get a miss rate.\n3. Multiply the miss rate by the domain's exam weight. For example, a 40% miss rate in Security and Risk Management (16) scores 6.4, while a 50% miss rate in Software Development Security (10) scores 5.0. The first gap costs more marks even though the second looks worse.\n4. Spend the next round on the two highest scores, then repeat.\n\nHow Practice supports this:\n- Scenarios holds all questions at your own pace. Use it for learning rounds where you rate confidence and read every explanation.\n- Timed set gives you 15 minutes of questions for the exam you choose, recorded as evidence. Choose CISSP.\n- Review holds your wrong and guessed answers, so a lucky guess still comes back to you. Clear it at the end of every round.\n- Flashcards can be filtered by exam. Filter to CISSP for recall: security models, formulas, evidence order, the ethics canons.\n- Labs hold the Kestrel datasets if you want to recheck a Beacon figure.\n\nProgress shows four readiness scores (coverage 30, documents 35, judgment 25, recall 10). Today works the judgment and recall scores."
+    },
+    {
+     "heading": "Plan for the session",
+     "body": "On Today, choose Start to open focus mode with the timer and this lesson, then work in four blocks.\n1. Recall, 20 minutes: CISSP flashcards. Note every card you hesitate on.\n2. Calibration round, 60 minutes: CISSP questions in Scenarios. Write the domain and your confidence rating before you submit each one. Read every explanation, right or wrong.\n3. Targeted round, 60 minutes: score the calibration round, then practise the two domains with the highest weighted miss score, rating confidence again.\n4. Evidence and review, 40 minutes: one CISSP Timed set, then clear Review and write down, in your own words, why each right answer is right.\n\nKeep the gate in view. Check 3 needs two CISSP timed sets at 80% or better. Check 4 needs at least 24 decisions recorded for CISSP with under 30% wrong. Check 5 needs no open wrong answers and at least 6 written explanations of 80 characters or more. A careless wrong answer today counts against check 4, so give every item the same attention you will give it on exam day.\n\nWhen you choose Mark done, your calibration log should say three things: your accuracy at each confidence level, your two weakest weighted domains, and one rule you will carry into tomorrow's mocks."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Computerized Adaptive Testing (CAT)",
+     "definition": "A test that picks each next item based on your answers so far. English CISSP exams: 100 to 150 items, 3 hours, 700 out of 1000 to pass, and no going back."
+    },
+    {
+     "term": "Confidence calibration",
+     "definition": "How closely your confidence matches your accuracy. You check it by rating each answer Sure, Leaning or Guess before you submit, then comparing the ratings with the results."
+    },
+    {
+     "term": "Overconfidence",
+     "definition": "Being sure and wrong. On the CISSP it signals a misconception that costs marks every time the idea appears, so each case goes into the error journal with the correcting rule."
+    },
+    {
+     "term": "Risk advisor mindset",
+     "definition": "Answering as a senior advisor to the people who own risk: people first, governance before technology, understand before acting, follow the process, weigh business value, stay in your role."
+    },
+    {
+     "term": "Qualifier words",
+     "definition": "Words such as FIRST, BEST, MOST, PRIMARY and NOT that decide which of several true options is correct. Missing one is a reading error, not a knowledge gap."
+    },
+    {
+     "term": "Weighted miss score",
+     "definition": "A domain's miss rate multiplied by its exam weight. It ranks the domains where your next practice minutes will recover the most marks."
+    }
+   ],
+   "build": {
+    "goal": "Run a full round of adaptive CISSP practice with a confidence rating on every answer, and produce a calibration log showing your accuracy at each confidence level, your weighted miss score by domain, and the two domains you will work on next.",
+    "steps": [
+     "Open Practice, choose Flashcards and filter to CISSP. Spend 20 minutes on recall and note any card you hesitate on.",
+     "Open Scenarios and answer CISSP questions for 60 minutes. Before you submit each one, write its domain and your rating: Sure, Leaning or Guess.",
+     "Score the round: count right and wrong answers at each confidence level, work out the accuracy for each level, and the overall wrong rate.",
+     "Count misses (wrong answers plus all guesses) by domain, divide by the questions seen in that domain, and multiply by the domain weight to get the weighted miss score.",
+     "Practise the two highest-scoring domains for 60 minutes, rating confidence again so you can see whether calibration improves.",
+     "Take one CISSP Timed set, then clear Review: rework each wrong or guessed item and write in your own words why the right answer is right.",
+     "Finish the calibration log with the rule you will carry into tomorrow's mocks, then choose Mark done."
+    ],
+    "modelAnswer": "CISSP calibration log (example values; yours will differ)\n\nRound 1: Scenarios, 60 minutes, 40 questions (example)\n\n| Confidence | Answered | Right | Accuracy | What it means |\n|---|---|---|---|---|\n| Sure | 18 | 15 | 83% | Below the 90% bar: 3 firm misconceptions |\n| Leaning | 14 | 8 | 57% | Weak tie-breaking between two options |\n| Guess | 8 | 3 | 38% | Above 25% chance: some hidden knowledge |\n\nTotal right 26 of 40; wrong 14 of 40 (35%). That is above the 30% limit in gate check 4, so more practice before the gate.\n\nWrong Sure answers (example):\n- Security Operations: chose restore from backup before containment. Rule: contain first, or the restored system can be reinfected.\n- Security Architecture and Engineering: swapped Biba and Bell-LaPadula. Rule: Biba is integrity; its star axiom is no write up.\n- Security and Risk Management: picked the Chief Information Security Officer to accept risk. Rule: the accountable executive accepts; security advises.\n\nWeighted miss score by domain (misses = wrong answers plus all guesses; example)\n\n| Domain | Seen | Misses | Miss rate | Weight | Score |\n|---|---|---|---|---|---|\n| 1 Security and Risk Management | 8 | 3 | 37.5% | 16 | 6.0 |\n| 2 Asset Security | 4 | 1 | 25% | 10 | 2.5 |\n| 3 Security Architecture and Engineering | 5 | 3 | 60% | 13 | 7.8 |\n| 4 Communication and Network Security | 5 | 2 | 40% | 13 | 5.2 |\n| 5 Identity and Access Management | 5 | 1 | 20% | 13 | 2.6 |\n| 6 Security Assessment and Testing | 4 | 2 | 50% | 12 | 6.0 |\n| 7 Security Operations | 5 | 3 | 60% | 13 | 7.8 |\n| 8 Software Development Security | 4 | 2 | 50% | 10 | 5.0 |\n\nNext round: Domains 3 and 7.\n\nRound 2: targeted, 60 minutes (example): Sure accuracy up to 92%; Leaning 64%.\n\nTimed set: CISSP, 15 minutes, 80% (example). Review cleared: yes. Explanations written: 4.\n\nRule for tomorrow: if I cannot say why the other three options are wrong, I am not Sure. Apply people, governance, understand, process, value, role before choosing."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management: an option that protects people's lives or safety beats every option that protects only data or money. In Kestrel terms, downtime procedures that keep patients cared for come before restoring any system."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Operations: in incident items, keep the lifecycle order: detect and confirm, contain, eradicate, recover, then learn. An option that restores before containing, or rebuilds before preserving evidence, is usually the trap."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Identity and Access Management: when one person controls a whole sensitive process, the answer is separation of duties, not stronger authentication. Authentication proves who someone is; it does not limit what they can do."
+    }
+   ],
+   "pitfalls": [
+    "Flagging items to come back to. The CISSP CAT does not let you go back, so practise committing to an answer within your time budget.",
+    "Judging your performance by how hard the questions feel. In an adaptive test, harder items usually mean you are doing well.",
+    "Rating confidence after you see the result. The rating must be written before you submit, or the log measures nothing.",
+    "Choosing the technically perfect answer when the stem asks what an advisor or manager should do."
+   ],
+   "check": [
+    {
+     "q": "Your exam stops at item 100. What does that tell you?",
+     "a": "Nothing reliable. A CAT exam can stop anywhere from item 100 to 150 once it is confident about the result, whether that result is a pass or a fail. Put it out of mind and keep the same approach to the last item."
+    },
+    {
+     "q": "In your calibration log, 4 of your 20 Sure answers were wrong. Why is that more serious than 4 wrong Guess answers?",
+     "a": "Wrong Sure answers are firm misconceptions: you will repeat the mistake confidently every time that idea appears, and you cannot go back to fix it. Wrong guesses are expected. Each wrong Sure answer goes into the error journal with the rule that corrects it."
+    },
+    {
+     "q": "An unregistered system (A-021) is found with an open vulnerability. Two options look right: block its traffic with a new firewall rule, or confirm with the business who owns it and how its data is classified. The stem asks what to do FIRST. Which do you choose?",
+     "a": "Confirm ownership and classification first. Without an owner and a classification you cannot judge the risk or get a control approved, and blocking traffic to an unknown system could stop a clinical service. Governance and understanding come before the technical fix unless people are in immediate danger."
+    }
+   ]
+  },
+  {
+   "key": "w13-s3",
+   "summary": "Sit two CISSP mocks under exam conditions, keep a pace of 72 seconds per item, and review every wrong and guessed answer with the error journal method, so the second mock tests whether your fixes held and tomorrow's gate decision rests on evidence.",
+   "read": [
+    {
+     "heading": "Why two mocks, and what they prove",
+     "body": "A single mock tells you your score on one day. Two mocks with a structured review between them tell you something more useful: whether your mistakes are random or a pattern, and whether you can fix a pattern in a few hours. That is what tomorrow's gate needs to know.\n\nMock 1 finds your errors. The error journal turns them into rules. Mock 2 tests the rules. If Mock 2 repeats the same error types, the gate decision tomorrow should be to defer and repair. If the error types change or shrink, your preparation is working.\n\nToday's mocks are shorter than the real exam. The Certified Information Systems Security Professional (CISSP) exam uses Computerized Adaptive Testing (CAT) and runs up to 3 hours and 150 items, with no going back; today each mock is 75 minutes. What you are testing is decision quality, pacing and the discipline of never returning to an item. Stamina comes from running both mocks in one sitting, with only the review between them.\n\nRun both mocks without notes, without flashcards and without checking your Beacon documents. Anything you check during a mock turns it back into study, and its score stops being evidence."
+    },
+    {
+     "heading": "Pacing: 72 seconds an item",
+     "body": "The CISSP gives you 3 hours for up to 150 items. Three hours is 10,800 seconds, and 10,800 divided by 150 is 72 seconds per item. You cannot know whether your exam will stop at 100 items, so pace for 150.\n\n| Items answered | Time used at 72 seconds each |\n|---|---|\n| 25 | 30 minutes |\n| 50 | 60 minutes |\n| 75 | 90 minutes |\n| 100 | 120 minutes |\n| 125 | 150 minutes |\n| 150 | 180 minutes |\n\nThe easy checkpoint to remember: 50 items an hour.\n\nSeventy-two seconds is an average, not a limit. A short definition item may take 30 seconds; a long scenario may take two minutes. What hurts is a run of long items, because you cannot bank time by skipping and coming back.\n\nA routine for every item:\n1. Read the last line first, so you know what is being asked: FIRST, BEST, MOST, NOT.\n2. Read the stem once and fix the facts: who you are, what has happened, what is at risk.\n3. Eliminate the clearly wrong options.\n4. If two remain after about a minute, apply the risk-advisor order (people, governance, understand, process, value, role), choose, and move on.\n\nIn the app, a Timed set lasts 15 minutes. After each set, divide the seconds you used by the number of items you answered, and compare the result with 72."
+    },
+    {
+     "heading": "Running the mocks in the app",
+     "body": "Practice has no single three-hour mock, so you build each mock from CISSP Timed sets. The session is 240 minutes:\n- Mock 1, 75 minutes: five CISSP Timed sets back to back. Pause between sets only long enough to start the next one.\n- Review 1, 45 minutes: score, journal, find the pattern.\n- Mock 2, 75 minutes: five more CISSP Timed sets, same rules.\n- Review 2, 45 minutes: journal, compare, write the readiness statement.\n\nRules for both mocks:\n- Treat every answer as final. Once you move on, you do not go back, exactly as in the real exam.\n- Rate each answer S (Sure), L (Leaning) or G (Guess) on scrap paper as you go. One letter costs no time.\n- Write the clock time at the end of each set so you can check pacing afterwards.\n\nEvery Timed set is recorded as evidence. Gate check 3 needs two CISSP timed sets at 80% or better, so these ten sets are your best honest chance to meet it. If a question repeats from earlier practice, answer it, but mark it R in your journal: a remembered answer is not evidence of judgment, and a score built on repeats overstates your readiness."
+    },
+    {
+     "heading": "The error journal method",
+     "body": "Every wrong answer and every guess gets one journal line, including guesses that turned out right. Each line has six parts:\n1. Reference: mock, set and item number, for example M1-S2-4.\n2. Domain and sub-domain heading, from the outline you reviewed on Day 1.\n3. Your answer and the right answer.\n4. Error type, one of the six below.\n5. The rule: one sentence of at least 80 characters that explains why the right answer is right, written so it would help you on a different question about the same idea.\n6. The fix: what you will do, and when you will retest it.\n\nThe six error types:\n- Knowledge gap: you did not know the fact or concept.\n- Misread: you missed a qualifier such as FIRST, NOT or BEST, or a key fact in the stem.\n- Wrong role: you chose a technician's fix when the stem wanted an advisor's or manager's decision.\n- Added facts: you assumed something the stem did not say.\n- Wrong priority: you knew the steps but put them in the wrong order, such as restoring before containing.\n- Time pressure: you rushed because you were behind your checkpoint.\n\nThe type matters more than the topic. A knowledge gap is fixed with content. A misread is fixed with technique: read the last line first. A wrong role is fixed by rehearsing the risk-advisor order. You cannot fix a misread by studying more cryptography."
+    },
+    {
+     "heading": "Between and after the mocks",
+     "body": "After Mock 1, use the 45 minutes in this order:\n1. Score each set and note its seconds per item.\n2. Write the journal line for every wrong and guessed item.\n3. Count lines by error type and by domain. The biggest count is your pattern.\n4. Choose one rule for the top error type and say it out loud before Mock 2, for example: put the steps in lifecycle order before reading the options.\n5. Clear Review for the items you have journaled, so gate check 5 has no open wrong answers.\n\nAfter Mock 2, compare the mocks side by side: score per set, average, seconds per item, Sure accuracy, and counts by error type. Three outcomes are possible:\n- Scores up and the top error type shrank: your fixes work.\n- Scores flat but a different error type now leads: you are improving, and the new pattern needs one more round.\n- The same error type leads both mocks: the fix did not take. That is the clearest signal for tomorrow's gate that you should wait and repair.\n\nFinish with a one-line readiness statement that a gatekeeper could check: which error type is fixed, which persists, how many sets reached 80%, and what you will do before the gate."
+    },
+    {
+     "heading": "Use Beacon to close knowledge gaps fast",
+     "body": "When a journal line says knowledge gap, go back to the place you learned the idea in context. It sticks faster than a definition. Each document is in Project with its finished example.\n\n| If the gap is about | Reopen |\n|---|---|\n| Risk acceptance, continuity, privacy duties | Business impact analysis, privacy impact assessment, residual risk register |\n| Classification, owners, custodians, retention | Health information classification register, critical clinical system inventory |\n| Trust boundaries, security models | Threat model and architecture |\n| Zones, allowed flows, logging | Network segmentation and logging design |\n| Access models, provisioning, MFA | Role-to-permission matrix, joiner-mover-leaver workflow, MFA and SSO recommendation |\n| Test types, evidence that controls work | RLS test pack, control-testing plan |\n| Incident order, recovery | Ransomware response playbook, disaster-recovery and downtime plan |\n| Acquired software, supplier controls | Supplier and software risk assessment |\n\nMFA is multi-factor authentication, SSO is single sign-on and RLS is row-level security.\n\nRead only the section you need, then do five CISSP flashcards on the same idea and write the rule again from memory. If you can state it without looking, the gap is closed; if not, it stays open in your journal for tomorrow morning."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Mock exam",
+     "definition": "A practice exam under real conditions: timed, no notes, every answer final. It measures decision quality and pacing as well as knowledge."
+    },
+    {
+     "term": "Pacing budget",
+     "definition": "The average time per item you can afford. For the CISSP it is 72 seconds: 3 hours is 10,800 seconds, divided by 150 items."
+    },
+    {
+     "term": "Checkpoint",
+     "definition": "A planned moment to compare items answered with time used. At 72 seconds an item you should reach item 50 after one hour and item 100 after two."
+    },
+    {
+     "term": "Error journal",
+     "definition": "A written record of every wrong or guessed answer with its domain, error type, rule and fix. It turns mistakes into patterns you can repair."
+    },
+    {
+     "term": "Error type",
+     "definition": "The reason behind a wrong answer: knowledge gap, misread, wrong role, added facts, wrong priority or time pressure. Each type needs a different fix."
+    },
+    {
+     "term": "Repeat item",
+     "definition": "A practice question you have seen before. Answer it, but mark it, because remembering an answer is not evidence of judgment."
+    }
+   ],
+   "build": {
+    "goal": "Sit two 75-minute CISSP mocks built from Timed sets, keep to a 72-second pace, and produce a mock error journal that records every wrong and guessed answer, the error patterns across both mocks, and what they mean for tomorrow's gate.",
+    "steps": [
+     "Prepare: clear the desk, open Today and choose Start so the focus timer runs, and have scrap paper ready for confidence letters and set end times.",
+     "Mock 1: take five CISSP Timed sets in Practice back to back. Treat every answer as final, rate each one S, L or G, and write the clock time at the end of each set.",
+     "Score each set and work out seconds per item. Then write one journal line for every wrong and every guessed item: reference, domain, answers, error type, a rule of at least 80 characters, and the fix.",
+     "Count the journal lines by error type and by domain. Choose one rule for the top error type and say it out loud before you start again.",
+     "Mock 2: take five more CISSP Timed sets under the same rules.",
+     "Journal Mock 2 the same way, then clear Review so no wrong answers stay open.",
+     "Write the comparison: scores, pacing, Sure accuracy and error types side by side, and a one-line readiness statement for tomorrow's gate."
+    ],
+    "modelAnswer": "CISSP mock error journal (example values; yours will differ)\n\nMock 1: five Timed sets, 75 minutes (example)\n\n| Set | Score | Seconds per item |\n|---|---|---|\n| 1 | 70% | 81 |\n| 2 | 75% | 78 |\n| 3 | 80% | 74 |\n| 4 | 70% | 69 |\n| 5 | 85% | 70 |\n\nAverage 76%. Sets 1 and 2 ran slow; the pace recovered after set 3.\n\nJournal lines (3 of 14 shown, example)\n\n| Ref | Domain | Mine / right | Type | Rule | Fix |\n|---|---|---|---|---|---|\n| M1-S2-4 | 7 Security Operations (7.6) | A / C | Wrong priority | Contain the ransomware before restoring anything, or the clean restore can be reinfected through the same path. | Reread the playbook's containment section; retest in Mock 2 |\n| M1-S3-7 | 1 Security and Risk Management (1.9) | B / D | Wrong role | The accountable executive accepts residual risk; the security officer assesses and advises but never accepts it. | Say the rule before every risk item |\n| M1-S4-2 | 5 Identity and Access Management (5.5) | D / A | Misread | The stem asked what to do FIRST about a leaver still enabled: disable the account, then review what it did after leaving. | Read the last line first |\n\nMock 1 pattern (example): wrong priority 5, wrong role 4, misread 3, knowledge gap 2. Rule for Mock 2: put the steps in lifecycle order before reading the options.\n\nMock 2: five Timed sets, 75 minutes (example): 80%, 85%, 75%, 85%, 80%. Average 81%. 71 seconds per item. Wrong priority down to 1; misread still 3; wrong role 2.\n\nReadiness statement (example): Wrong priority is fixed; misreads persist. Six sets across both mocks reached 80% or better, which meets gate check 3. Before the gate: two more sets practising read-the-last-line-first, and clear Review."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Security Assessment and Testing: when asked for the best evidence that a control works, choose a test of the control operating, such as a timed restore against the recovery time objective, over a report that a job ran. Kestrel's backup jobs ran, yet the Clinical Information System restore failed twice."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Software Development Security: for acquired software, the answer usually assesses the supplier and builds security into the contract before deployment, because you cannot review code you do not own. That is what you did for Meridian Clinical Systems (V-01)."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Communication and Network Security: when a stem describes a flat network and an attacker moving from a desktop to a clinical server, segmentation into zones with controlled flows is the design answer, not a stronger perimeter alone."
+    }
+   ],
+   "pitfalls": [
+    "Journaling only wrong answers. Right guesses hide gaps that will surface on the real exam.",
+    "Writing rules that fit only one question. A good rule helps you answer a different question about the same idea.",
+    "Checking notes between sets. It turns the mock into study and makes its score worthless as evidence.",
+    "Starting Mock 2 straight after Mock 1 without the review. The second mock only tests your fixes if you made some."
+   ],
+   "check": [
+    {
+     "q": "You have answered 40 items after one hour. Are you on pace for the CISSP?",
+     "a": "No. At 72 seconds an item you should be at about 50 items after one hour. You are 10 items behind, which is 12 minutes. Speed up by committing after about a minute when two options remain, rather than rereading the stem."
+    },
+    {
+     "q": "In both mocks your top error type was wrong role. What does that tell you, and what is the fix?",
+     "a": "It is a pattern, not bad luck, and it is about technique rather than content: you are choosing a technician's fix where the stem wants an advisor's decision. Rehearse the risk-advisor order before each item (people, governance, understand, process, value, role). If it still leads, defer the gate and repair."
+    },
+    {
+     "q": "Why should a guessed answer that turned out right go into the error journal?",
+     "a": "Because you did not know why it was right. On the real exam the same idea may come with different options and the luck will not repeat. Writing the rule turns a lucky guess into knowledge you can use again."
+    }
+   ]
+  },
+  {
+   "key": "w13-s4",
+   "summary": "Decide on evidence whether you are ready to sit the CISSP. Work through the five gate checks in Progress, confirm the experience rule and your route (full certification or Associate of ISC2) and your endorser, and record a clear decision to sit or to defer with a dated repair plan.",
+   "read": [
+    {
+     "heading": "What the gate is for",
+     "body": "A gate is a decision point backed by evidence, the same idea as the Release 1 go-live gate on 2026-10-23 and the Release 2 acceptance gate on 2026-11-26. You did not let Release 1 go live on hope: Dr. Helen Marchetti approved it with a written condition (D-02). Treat yourself the same way. The question today is not whether you feel ready. It is whether the evidence says you are.\n\nThe rule in the app: sit the exam only when all five checks in Progress are met. If one fails, the decision is to defer, repair and recheck. Deferring is not failing. Sitting without the evidence and losing the attempt costs far more time than one more repair cycle.\n\nThe exam you are deciding on: the Certified Information Systems Security Professional (CISSP). English exams use Computerized Adaptive Testing (CAT): 100 to 150 items, 3 hours, passing score 700 out of 1000, and you cannot go back to earlier questions.\n\nToday's session is 180 minutes. Spend the first hour on the five checks and any quick repairs, the second on your experience route and the decision record, and the last on rehearsing the exam-day plan, or on the repair plan if the decision is to defer."
+    },
+    {
+     "heading": "The five gate checks",
+     "body": "Progress shows four readiness scores (coverage 30, documents 35, judgment 25, recall 10) and, for the next exam gate, five checks:\n1. Every session before the gate is done. For the CISSP gate that includes Day 1 to Day 3 of this week.\n2. Every document in the releases up to the gate is complete. Progress shows which documents count; finish any that is incomplete, including its Done when checklist.\n3. Two timed sets for the CISSP at 80% or better.\n4. At least 24 decisions recorded for the CISSP with under 30% wrong.\n5. No open wrong answers, and at least 6 written explanations of 80 characters or more.\n\nWhat each check protects you from:\n\n| Check | The risk it controls |\n|---|---|\n| 1 Sessions done | Gaps in coverage you never studied |\n| 2 Documents complete | Knowing terms without having applied them |\n| 3 Two timed sets at 80% | Knowing the material but not under time pressure |\n| 4 24 decisions, under 30% wrong | A good score from too few questions |\n| 5 Review clear, 6 explanations | Unrepaired errors and answers you cannot explain |\n\nLook hard at check 4. Twenty-four decisions is a minimum sample: 90% on ten questions is weaker evidence than 80% on forty. And check 5 is about explaining, not recognizing. The exam rewards reasons, so the gate asks for them."
+    },
+    {
+     "heading": "If a check fails: the repair plan",
+     "body": "Do not argue with a failed check. Repair it, then recheck.\n- Check 1 fails: do the missing session now. If it is from an earlier week, do its lesson and Practice first and its document second.\n- Check 2 fails: open the document in Project, work through its Done when checklist and finish it. Most incomplete documents need one section, not a rewrite.\n- Check 3 fails: take CISSP Timed sets until two reach 80%. Between sets, work from your error journal rather than new material.\n- Check 4 fails: if the count is short, answer more CISSP questions in Scenarios. If the wrong rate is 30% or more, stop adding volume and use the weighted miss score from Day 2: the top two domains first.\n- Check 5 fails: clear Review item by item and write the explanations. Eighty characters is one solid sentence: why the right answer is right, and why the tempting one is wrong.\n\nThen set a recheck date. Your decision record states which check failed, the repair, the owner (you) and the recheck date, which is exactly how a Beacon issue was logged in the RAID (risks, assumptions, issues, decisions) log. A gate you defer with a dated plan is a controlled decision; a gate you skip is an unmanaged risk."
+    },
+    {
+     "heading": "The experience rule and your route",
+     "body": "Passing the exam is one requirement. Certification has others, and you should know your route before you sit.\n- Experience: at least five years cumulative, full-time, paid work in two or more of the eight domains.\n- Waiver: one year can be waived with a four-year degree (or regional equivalent) or an approved credential. With the waiver, you need four years.\n- Without the experience: passing earns Associate of ISC2, and you then have six years to gain the required experience.\n- Endorsement: after passing, an ISC2-certified professional in good standing must endorse you.\n- Maintenance once certified: 120 continuing professional education (CPE) credits per three-year cycle (40 a year) and an annual maintenance fee.\n\nHow to map your experience: list each job with its dates, and whether it was full-time and paid. Next to each, name the CISSP domains the work used. The rule counts cumulative experience, so several jobs can add up. Some typical mappings:\n- Account provisioning, access requests and access reviews: Identity and Access Management.\n- Incident handling, monitoring, patching and backup checks: Security Operations.\n- Privacy, compliance, policy and risk work: Security and Risk Management.\n- Asset inventories, data classification and retention: Asset Security.\n\nBeacon is study, not employment, so it does not count as experience. Its value is that you can now describe your real work in the language of the domains, which helps both the exam and the endorsement."
+    },
+    {
+     "heading": "Exam-day approach",
+     "body": "If all five checks are met and your route is clear, sit with a plan you have already rehearsed:\n- Pace: 72 seconds an item on average, which is 50 items an hour and item 100 at two hours.\n- Each item: read the last line first, read the stem once, eliminate, apply the risk-advisor order (people, governance, understand, process, value, role), commit.\n- No going back: once you submit, let it go. A bad item does not predict the next one.\n- Do not read meaning into difficulty or length. Hard items are normal in an adaptive test, and stopping at item 100 tells you nothing.\n- Carry one rule from your error journal: the error type that cost you most in yesterday's mocks.\n\nThe day before, stop studying early. Light recall in the morning is fine: CISSP flashcards for the security models, the annualized loss expectancy formula, evidence order and the ethics canons. New material is not.\n\nRemember what the exam is testing. Every item is a small version of a Beacon decision: who owns this, what is the risk, what is the first sound step, and who must decide. You have made those decisions for thirteen weeks."
+    },
+    {
+     "heading": "After the exam",
+     "body": "If you pass:\n- Apply for endorsement by an ISC2-certified professional in good standing.\n- If you have the experience (five years, or four with the waiver), you are on the full CISSP route.\n- If you do not, you hold Associate of ISC2 and have six years to gain it. Plan which domains your next roles will build, and keep a dated record of that work.\n- Start your CPE record now: 40 credits a year keeps you on track for 120 per cycle.\n\nIf you do not pass:\n- Write a follow-up in your gate decision record the same day: which domains felt weakest and which error types you noticed during the exam, while the memory is fresh.\n- Rebuild the plan with the weighted miss score and the error journal, as you did on Day 2 and Day 3, and set a new gate date only when the five checks are met again.\n\nEither way, tomorrow you close Beacon. The programme closure report and the portfolio are worth finishing whatever the result, because they show you can do the work the exam describes, and that is what employers and endorsers want to see."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Exam gate",
+     "definition": "A decision point where you sit an exam only if the evidence shows readiness. In the app, all five checks in Progress must be met."
+    },
+    {
+     "term": "CISSP experience requirement",
+     "definition": "At least five years cumulative, full-time, paid work in two or more of the eight CISSP domains."
+    },
+    {
+     "term": "Experience waiver",
+     "definition": "One year of the five can be waived with a four-year degree (or regional equivalent) or an approved credential, leaving four years to show."
+    },
+    {
+     "term": "Associate of ISC2",
+     "definition": "What you earn by passing the CISSP without the required experience. You then have six years to gain the experience."
+    },
+    {
+     "term": "Endorsement",
+     "definition": "The step after passing in which an ISC2-certified professional in good standing endorses you for the certification."
+    },
+    {
+     "term": "Continuing professional education (CPE) credits",
+     "definition": "Learning credits that keep the certification current: 120 per three-year cycle (40 a year), alongside an annual maintenance fee."
+    }
+   ],
+   "build": {
+    "goal": "Make the CISSP gate decision on evidence and record it: the status of all five Progress checks, your experience route, your endorsement plan, and a clear decision to sit or to defer with a dated repair plan.",
+    "steps": [
+     "Open Progress and read the five checks for the CISSP gate. Record each one's status as shown, with the number behind it, such as how many timed sets reached 80%.",
+     "For any check not met, write the repair action, the time it needs and a recheck date. Do the repair now if it fits in this session, then recheck.",
+     "Map your experience: each job with its dates, full-time and paid status, and the CISSP domains it used. Total the years and decide whether the one-year waiver applies.",
+     "State your route: full CISSP after endorsement, or Associate of ISC2 with six years to gain the experience.",
+     "Name a possible endorser: someone ISC2-certified and in good standing who knows your work.",
+     "Write the decision, sit or defer, and add your exam-day rule from the error journal and your two pace checkpoints.",
+     "If the decision is sit, rehearse the exam-day plan once out loud: pace, item routine, no going back. If it is defer, start the first repair now."
+    ],
+    "modelAnswer": "CISSP gate decision record (example values; yours will differ)\n\nGate: CISSP, week 13, Day 4. Exam: CAT, 100 to 150 items, 3 hours, pass 700 out of 1000, no going back.\n\n| Check | Required | Status (example) | Met? |\n|---|---|---|---|\n| 1 Sessions | Every session before the gate done | All done through week 13, Day 3 | Yes |\n| 2 Documents | Every document in the releases up to the gate complete | Residual risk register lacked review dates; completed today | Yes |\n| 3 Timed sets | Two CISSP timed sets at 80% or better | Six sets at 80% or better | Yes |\n| 4 Decisions | At least 24 CISSP decisions, under 30% wrong | 96 decisions, 22% wrong | Yes |\n| 5 Review | No open wrong answers; at least 6 explanations of 80+ characters | Review clear; 11 explanations | Yes |\n\nExperience map (example)\n\n| Role | Length | Full-time, paid | Domains used |\n|---|---|---|---|\n| Service desk analyst | 3 years | Yes | Identity and Access Management; Security Operations |\n| Systems administrator | 1 year | Yes | Security Operations; Asset Security |\n\nTotal: 4 years across three domains. Waiver: four-year degree, one year. Requirement met with the waiver.\n\nRoute: full CISSP after endorsement.\nEndorser (example): a former manager who holds the CISSP and is in good standing.\nExam-day rule: read the last line first (misread was my top error type in Mock 2).\nPace checks: item 50 at 60 minutes, item 100 at 120 minutes.\n\nDecision: Sit.\n\nIf a check had failed (example): Defer. Check 4 at 31% wrong. Repair: two targeted rounds on Domains 3 and 7, then one Timed set. Owner: me. Recheck: tomorrow evening."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management: in ethics items, the first canon is about protecting society, the common good and public trust. An option that serves an employer or client by misleading patients, regulators or the public is never right."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Identity and Access Management: identification claims an identity, authentication proves it, authorization decides what it may do, and accounting records what it did. Many items hinge on which of these four steps failed."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Operations: know the plan test types from least to most disruptive: checklist or read-through, structured walk-through or tabletop, simulation, parallel, full interruption. Beacon's week 12 tabletop was a walk-through, not a recovery test."
+    }
+   ],
+   "pitfalls": [
+    "Sitting because the date is booked, not because the checks are met. Move the date; a lost attempt costs more.",
+    "Counting study, or the Beacon case, as work experience. Only full-time, paid work in two or more domains counts.",
+    "Forgetting endorsement. Passing alone does not make you certified: an ISC2-certified professional in good standing must endorse you.",
+    "Treating Associate of ISC2 as a failure. It is a recognized route, with six years to gain the experience."
+   ],
+   "check": [
+    {
+     "q": "Progress shows two CISSP timed sets at 85% and 90%, 20 CISSP decisions with 15% wrong, and Review clear. Can you sit?",
+     "a": "Not yet. Check 4 needs at least 24 CISSP decisions; 20 is short even though the wrong rate is good. Answer at least four more CISSP questions, confirm the six written explanations and the other checks, then decide."
+    },
+    {
+     "q": "You have three years of full-time, paid security work across two domains and a four-year degree. If you pass, which route are you on?",
+     "a": "Associate of ISC2. With the one-year waiver you need four years, and you have three. You then have six years to gain the required experience, and you still need endorsement by an ISC2-certified professional in good standing."
+    },
+    {
+     "q": "Why does the gate ask for at least 24 decisions as well as two timed sets at 80%?",
+     "a": "Two good timed sets could come from a small or lucky sample. Twenty-four or more decisions with under 30% wrong shows your judgment holds across a wider spread of questions, so the evidence is much harder to reach by chance."
+    }
+   ]
+  },
+  {
+   "key": "w13-s5",
+   "summary": "Close Project Beacon properly: secure final acceptance, report outcomes against the business case and the nine success measures, hand every service and risk to an operational owner, record lessons learned, and publish your portfolio from Progress > Portfolio with a clear synthetic-data disclosure.",
+   "read": [
+    {
+     "heading": "What closing a programme means",
+     "body": "Closure is a decision with evidence, not the day the work stops. In PMP terms it is the Process task Manage project closure. In ITIL terms, the services Beacon built now live in the Operate, Deliver and Support stages, owned by the people who run them. Beacon's closure task (task 27) runs 2026-12-16 to 2026-12-17 and ends at programme acceptance on 2026-12-17, the last milestone on the critical path.\n\nThe programme closure report covers five parts:\n1. Final acceptance: Dr. Helen Marchetti (E-001), the executive sponsor, confirms that the agreed scope was delivered and accepted, release by release.\n2. Outcomes: what Beacon delivered, compared with the business case and the charter's success measures.\n3. Money and time: final cost against budget, use of the management reserve, and the schedule.\n4. Handovers: every service, risk and open action has an operational owner who has agreed to take it.\n5. Lessons learned: what Kestrel should repeat or change next time.\n\nAdministrative closure follows: archive the documents, close the RAID (risks, assumptions, issues, decisions) log, release the team, remove project access and close contracts. Lumen Analytics Partners' (V-05) contract ended on 2026-11-30: confirm its deliverables were accepted and that its build access to the Power BI workspace (flow F7 in the architecture) was removed."
+    },
+    {
+     "heading": "Outcomes against the success measures",
+     "body": "The business case justified Beacon with measurable benefits, and the charter turned them into nine success measures. Each has a baseline from Kestrel's data and a target agreed with the sponsor, measured three months after each release. That timing matters: at closure on 2026-12-17, no target can be declared met. All nine are measured after the programme.\n\n| Measure | Baseline (data) | Target (agreed) | Measured on | Benefit owner |\n|---|---|---|---|---|\n| Median minutes from arrival to physician initial assessment, Kestrel General Hospital (KGH) | 80.5 | 60 | 2027-01-25 | Dr. Sarah Whitford (E-007) |\n| Left without being seen (LWBS) rate, all sites | 5.7% | 4.5% | 2027-01-25 | Dr. Sarah Whitford (E-007) |\n| Access requests resolved within 72 hours | 27.3% | 80% | 2027-02-26 | Grace Liu (E-005) |\n| Median days to fulfil an access request | 4.26 | 1 | 2027-02-26 | Grace Liu (E-005) |\n| Missed leavers | 2 | 0 | 2027-02-26 | Nora Lindqvist (E-018) |\n| Privileged accounts with multi-factor authentication (MFA) | 66.7% | 100% | 2027-02-26 | Daniel Osei (E-004) |\n| Q3 access reviews completed on time | 66.7% | 100% | 2027-02-26 | Daniel Osei (E-004) |\n| Clinical Information System (CIS) restore within its 4-hour recovery time objective (RTO) | Failed (9.0 h and 13.5 h; last test 2025-08-14) | Pass | 2027-03-17 | Chloe Dubois (E-016) |\n| Security awareness, agency and vendor workers | 48% | 90% | 2027-03-17 | Daniel Osei (E-004) |\n\nThe dates are three months after Release 1 go-live (2026-10-23), Release 2 acceptance (2026-11-26) and programme acceptance (2026-12-17). Three months after go-live is Saturday 2027-01-23, so Release 1 is measured on Monday 2027-01-25. For each measure, the report states the baseline, the target, who will measure it, when, and where the result will be reported. Evidence produced inside the programme, such as the CIS restore test in December (task 22) or the Release 2 acceptance tests, goes in as early evidence, labelled as a test result, not as the benefit."
+    },
+    {
+     "heading": "Money and schedule at closure",
+     "body": "Kestrel's data stops at the 2026-10-01 status point, so the final figures come from finance at closure. What the data already tells you, and what the report must explain:\n- Budget at completion (BAC): CAD 1,200,000. Management reserve held by the sponsor: CAD 120,000. Total authorized: CAD 1,320,000.\n- At 2026-10-01: cost performance index (CPI) 0.89, schedule performance index (SPI) 0.80, estimate at completion (EAC) CAD 1,342,500, variance at completion (VAC) CAD -142,500.\n- If that CPI had held, the forecast overrun of CAD 142,500 would have exceeded the whole reserve, putting the EAC CAD 22,500 above total authorized funding. That is risk R-08, owned by Marcus Bell (E-002).\n\nThe closure report states the final actual cost from finance, every draw on the management reserve with its approver, and the variance against BAC with the reasons. If the forecast was beaten, say what changed; if not, say who approved the extra funding. Never close with an unexplained number.\n\nThe schedule: 78 working days, 2026-09-01 to 2026-12-17, with gates on 2026-10-23, 2026-11-26 and 2026-12-17. Report each gate as planned against actual. One lesson comes from the plan itself: it used a Monday to Friday calendar with no holidays, so Thanksgiving (2026-10-12) and Remembrance Day (2026-11-11) may need to be added to Kestrel's project calendar."
+    },
+    {
+     "heading": "Handovers to operations",
+     "body": "A service is not handed over until the receiving owner has agreed, in writing, to run it. For each Beacon output, name the owner and what they receive.\n\n| Beacon output | Operational owner | What is handed over |\n|---|---|---|\n| Patient-flow analytics service (Release 1) | Janelle Cardinal (E-008), business owner; Grace Liu (E-005), service owner; Tomás Rivera (E-006), data steward | Semantic model, reports, refresh and gateway runbook, knowledge articles, service levels, continual-improvement register |\n| Clinician access service (Release 2) | Grace Liu (E-005), requests; Nora Lindqvist (E-018), human resources (HR) events; Daniel Osei (E-004), reviews and privileged access | Access-request value stream, joiner-mover-leaver workflow, role-to-permission matrix, review calendar, exception process |\n| Cyber resilience (Release 3) | Daniel Osei (E-004); Chloe Dubois (E-016), continuity; Sam Okafor (E-020), managed security operations centre | Playbooks, escalation matrix, disaster-recovery and downtime plan, restore test schedule, vulnerability plan, security-operations dashboard |\n| Residual risk register | Daniel Osei (E-004), with each risk's owner | Every remaining risk, its decision and review date |\n| Benefits measurement | Each measure's business owner | The nine measures, baselines and measurement dates |\n\nTwo handovers need special care. The Programme Manager's risks (R-06, R-07) need new owners or a closing note, because that role ends at closure; for R-06, name a second person who can refresh and change the semantic model. The finished residual risk register transfers R-06 to Janelle Cardinal (E-008), with Mei Tanaka (E-013) cross-trained. And open issues, such as any missed leaver still being worked (I-02), move to a named owner's queue with a date."
+    },
+    {
+     "heading": "Lessons learned",
+     "body": "A lesson is worth recording only if it would change what someone does next time. Write each as: what happened, the evidence, and the action for the next programme.\n- Test privacy controls before the gate. Release 1 went live with a condition: small-count suppression for Prairie Gate Health Centre (PGH) verified in the row-level security (RLS) test pack (D-02). Next time, prove suppression before the gate, not as a condition of it.\n- Say no with an alternative. CR-01 declined a patient-level alternate level of care (ALC) list because the Health Information Act requires the least amount of information and the highest degree of anonymity, and approved unit-level counts instead, for 3 days of model work and no change to the Release 2 gate. Refuse the risk; meet the need.\n- Book change windows early. In week 9, Tomás Rivera and Ahmed Haddad disagreed about when to make the firewall change the gateway needed; a facilitated session and an agreed change window resolved it. Next time, put infrastructure change windows in the release plan.\n- Track cost from week one. CPI was already 0.89 at 2026-10-01, one month in. Earned value reporting from the first week would have shown the trend sooner.\n- Test recovery, not backups. At the baseline the CIS had gone 413 days without a restore test, and both earlier tests failed. Recurring restore tests belong in the operational calendar.\n\nRecord each lesson in the closure report and in the lessons-learned register, so the next programme manager can find it."
+    },
+    {
+     "heading": "Publish your portfolio",
+     "body": "The portfolio turns thirteen weeks of work into evidence an employer or interviewer can see. Open Progress > Portfolio and work through its fourteen checklist items: executive case study; architecture diagram; Power BI screenshots (executive, operations, identity and access, security operations); data model; Data Analysis Expressions (DAX) catalogue; project-management package; security package; ITIL service-management package; data dictionary and mapping; testing evidence; decisions and trade-offs; a three-to-five-minute demo script; a GitHub README; and the synthetic-data disclosure.\n\nBuild each item from the Beacon documents you already wrote. The case study is one page: problem, approach, outcomes, leadership decisions. The demo script covers the problem, four decisions where the exams meet, the evidence, the outcome and what you learned.\n\nThe disclosure is not optional. Put it at the top of the case study and the README, in words like these:\n\nProject Beacon and Kestrel Health Network are fictional, created for study. All data in this portfolio is synthetic: no record belongs to a real patient, staff member, organization or vendor, and patients are never named. Every figure describes the synthetic data only.\n\nNever present Kestrel as a real health authority or compare it to one, and do not add realistic patient detail to make screenshots look authentic."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Final acceptance",
+     "definition": "The sponsor's formal confirmation that the agreed scope was delivered and meets its acceptance criteria. For Beacon, Dr. Helen Marchetti signs at programme acceptance on 2026-12-17."
+    },
+    {
+     "term": "Benefits measurement after closure",
+     "definition": "Checking outcomes when they can show up, not when the project ends. Beacon's success measures fall due three months after each release, so all nine need owners after closure."
+    },
+    {
+     "term": "Operational handover",
+     "definition": "The transfer of a service, risk or action to an owner who agrees in writing to run it, together with the runbooks, knowledge and measures they need."
+    },
+    {
+     "term": "Administrative closure",
+     "definition": "The housekeeping of closing: archive documents, close the RAID log, release people, remove project access and close contracts once deliverables are accepted."
+    },
+    {
+     "term": "Lessons learned",
+     "definition": "A record of what happened, the evidence and the action for next time. A lesson that would not change anyone's behaviour is a story, not a lesson."
+    },
+    {
+     "term": "Synthetic-data disclosure",
+     "definition": "A plain statement that the organization and all data in a portfolio are fictional and generated for study, placed where every reader sees it first."
+    }
+   ],
+   "build": {
+    "goal": "Write the programme closure report for Project Beacon: final acceptance, outcomes against the business case and the nine success measures, final cost and schedule, handovers to operations, lessons learned and remaining risks, then publish your portfolio with its synthetic-data disclosure.",
+    "steps": [
+     "Open Project, choose Release 3 and open the Programme closure report. Read How to write it and See the finished example.",
+     "Write the acceptance section: what each release delivered, when it was accepted and by whom, including the Release 1 condition (D-02) and how it was closed.",
+     "Build the outcomes table: each of the nine success measures with its baseline from the data, its agreed target, when it is first measured and who measures it. State plainly that all nine are measured after the programme.",
+     "Write the money and schedule section from finance's final figures: actual cost against the CAD 1,200,000 BAC, each management reserve draw and its approver, and each gate planned against actual.",
+     "Fill the handover table and confirm each receiving owner has agreed. Reassign R-06 and R-07, and point to the residual risk register for the remaining risks.",
+     "Write at least five lessons, each with its evidence and the action for next time, and copy them into the lessons-learned register.",
+     "Request the sponsor's sign-off, then open Progress > Portfolio, complete the checklist and publish with the synthetic-data disclosure at the top."
+    ],
+    "modelAnswer": "Example opening of the closure report:\n\nProject Beacon delivered its three releases: the patient-flow analytics service (go-live approved 2026-10-23 with condition D-02), clinician identity and access (acceptance gate 2026-11-26) and cyber resilience. All nine success measures are measured after the programme, the first two on 2027-01-25. Every handover has an owner who has accepted it. Programme acceptance is requested from Dr. Helen Marchetti (E-001) on 2026-12-17."
+   },
+   "examTips": [
+    {
+     "cert": "PMP",
+     "tip": "Process task 10, Manage project closure: closure items usually want formal acceptance, handover to operations, closed contracts and archived lessons. An option that skips sponsor acceptance, or leaves risks without owners, is wrong even if the work is finished."
+    },
+    {
+     "cert": "PMP",
+     "tip": "People task 7, Help ensure knowledge transfer: when one person holds critical knowledge, as Tomás Rivera does for the semantic model, the best answer builds transfer into the plan, through pairing and documentation, before the person or the project leaves."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Value is co-created in use, so it does not end at go-live or closure. The continual-improvement register passes to the service owner, and the service carries on through Operate, Deliver and Support. Options that treat project closure as the end of value thinking are wrong."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management: at closure, every residual risk needs an owner and documented acceptance by management. Closing with unowned risks, or letting the project team accept them, fails due care."
+    }
+   ],
+   "pitfalls": [
+    "Declaring benefits met at closure. Beacon's targets are measured three months after each release, so on 2026-12-17 you can report baselines, targets, early test evidence and owners, not results.",
+    "Leaving risks with the Programme Manager. That role ends at closure, so R-06 and R-07 need new owners or a closing note.",
+    "Handing over by email without agreement. A handover is complete only when the receiving owner accepts it.",
+    "Publishing the portfolio without the synthetic-data disclosure, or with screenshots that look like real patient records."
+   ],
+   "check": [
+    {
+     "q": "At closure, the sponsor asks whether the LWBS target was met. What do you say?",
+     "a": "It cannot be measured yet. The baseline is 5.7% and the agreed target is 4.5%, measured three months after Release 1 went live: on 2027-01-25, because 2027-01-23 is a Saturday. Dr. Sarah Whitford (E-007) owns the measure, and the closure report says where the result will be reported."
+    },
+    {
+     "q": "Why must R-06 be dealt with in the closure report?",
+     "a": "R-06, the key-person dependency on Tomás Rivera for the semantic model, is owned by the Programme Manager, a role that ends at closure. It must move to an operational owner, with a named second person able to refresh and change the model, or it becomes an unowned risk."
+    },
+    {
+     "q": "At 2026-10-01 the EAC was CAD 1,342,500. Why does that matter to the closure report even if the final cost came in lower?",
+     "a": "It shows the forecast once exceeded total authorized funding of CAD 1,320,000 by CAD 22,500. The report must explain what changed, list every management reserve draw with its approver, and give the final variance against the CAD 1,200,000 BAC using finance's figures."
+    }
+   ]
+  }
+ ]
+}

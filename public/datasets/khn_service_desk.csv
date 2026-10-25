@@ -1,0 +1,221 @@
+ticket_id,ticket_type,opened_at,resolved_at,priority,category,site_code,assignment_group,channel,sla_target_hours,sla_met,reopened,csat
+SD-10001,Incident,2026-08-01 14:50,2026-08-01 19:10,P3,Virtual desktop,KGH,End User Computing,Portal,24,Y,N,
+SD-10002,Incident,2026-08-01 15:03,2026-08-03 08:44,P4,Virtual desktop,KGH,End User Computing,Portal,72,Y,N,
+SD-10003,Incident,2026-08-02 14:25,2026-08-04 10:01,P4,Network,ARH,Network Services,Portal,72,Y,N,
+SD-10004,Access request,2026-08-03 07:03,2026-08-07 10:55,P3,CIS access,KGH,Identity and Access,Phone,24,N,N,
+SD-10005,Service request,2026-08-03 08:36,2026-08-03 09:47,P3,Password reset,CVH,Service Desk,Phone,24,Y,N,5
+SD-10006,Access request,2026-08-03 10:40,2026-08-09 03:10,P4,CIS access,KGH,Identity and Access,Portal,72,N,N,2
+SD-10007,Incident,2026-08-03 15:04,2026-08-05 10:03,P4,Hardware,CVH,End User Computing,Portal,72,Y,N,4
+SD-10008,Incident,2026-08-03 20:17,2026-08-04 05:57,P3,CIS issue,KGH,Clinical Applications,Portal,24,Y,N,3
+SD-10009,Incident,2026-08-03 20:24,2026-08-05 15:44,P4,CIS issue,CVH,Clinical Applications,Phone,72,Y,N,4
+SD-10010,Service request,2026-08-04 11:54,2026-08-05 04:18,P4,Power BI,CVH,Analytics Support,Portal,72,Y,N,4
+SD-10011,Access request,2026-08-04 14:08,2026-08-07 19:27,P4,Virtual desktop,KGH,Identity and Access,Portal,72,Y,N,5
+SD-10012,Service request,2026-08-05 12:42,2026-08-05 13:43,P4,Password reset,KGH,Service Desk,Phone,72,Y,Y,
+SD-10013,Incident,2026-08-05 12:49,2026-08-06 01:42,P3,CIS issue,KGH,Clinical Applications,Portal,24,Y,N,
+SD-10014,Service request,2026-08-05 16:35,2026-08-05 17:08,P3,Password reset,PGH,Service Desk,Phone,24,Y,N,5
+SD-10015,Incident,2026-08-05 19:11,2026-08-06 02:51,P2,CIS issue,PGH,Clinical Applications,Portal,8,Y,N,
+SD-10016,Incident,2026-08-06 11:52,2026-08-06 16:45,P2,Printing,KGH,End User Computing,Portal,8,Y,N,
+SD-10017,Incident,2026-08-06 14:49,2026-08-06 23:20,P3,Power BI,CVH,Analytics Support,Portal,24,Y,N,
+SD-10018,Incident,2026-08-07 15:21,2026-08-08 15:34,P4,Printing,KGH,End User Computing,Portal,72,Y,N,
+SD-10019,Incident,2026-08-08 12:35,2026-08-09 07:43,P3,Printing,CVH,End User Computing,Portal,24,Y,N,4
+SD-10020,Access request,2026-08-08 13:48,2026-08-11 08:03,P4,Power BI,KGH,Identity and Access,Phone,72,Y,N,4
+SD-10021,Incident,2026-08-08 15:40,2026-08-09 09:43,P4,Power BI,KGH,Analytics Support,Phone,72,Y,N,
+SD-10022,Incident,2026-08-08 16:06,2026-08-09 05:42,P2,Virtual desktop,KGH,End User Computing,Portal,8,N,N,2
+SD-10023,Service request,2026-08-08 17:52,2026-08-09 04:44,P3,Hardware,KGH,End User Computing,Walk-up,24,Y,N,
+SD-10024,Access request,2026-08-09 07:43,2026-08-11 13:18,P4,CIS access,KGH,Identity and Access,Phone,72,Y,N,
+SD-10025,Incident,2026-08-10 08:00,2026-08-11 00:23,P3,Virtual desktop,KGH,End User Computing,Phone,24,Y,Y,1
+SD-10026,Incident,2026-08-10 09:57,2026-08-12 06:36,P4,Printing,KGH,End User Computing,Portal,72,Y,N,
+SD-10027,Access request,2026-08-10 13:16,2026-08-13 03:03,P3,CIS access,ARH,Identity and Access,Phone,24,N,N,2
+SD-10028,Service request,2026-08-11 08:26,2026-08-11 09:31,P4,Password reset,ARH,Service Desk,Phone,72,Y,N,5
+SD-10029,Incident,2026-08-11 08:34,2026-08-12 15:23,P3,Virtual desktop,CVH,End User Computing,Portal,24,N,N,1
+SD-10030,Incident,2026-08-11 12:10,2026-08-12 15:00,P4,Virtual desktop,CVH,End User Computing,Phone,72,Y,N,5
+SD-10031,Service request,2026-08-11 13:10,2026-08-11 18:27,P3,Hardware,CVH,End User Computing,Portal,24,Y,N,5
+SD-10032,Access request,2026-08-11 13:59,2026-08-14 12:18,P3,CIS access,KGH,Identity and Access,Portal,24,N,N,
+SD-10033,Access request,2026-08-11 14:29,2026-08-19 04:26,P4,CIS access,CVH,Identity and Access,Phone,72,N,N,
+SD-10034,Service request,2026-08-11 18:37,2026-08-13 13:38,P4,Power BI,CVH,Analytics Support,Phone,72,Y,N,1
+SD-10035,Access request,2026-08-12 07:45,2026-08-16 15:52,P4,Power BI,KGH,Identity and Access,Phone,72,N,N,
+SD-10036,Incident,2026-08-12 09:26,2026-08-12 14:51,P2,CIS issue,KGH,Clinical Applications,Portal,8,Y,Y,
+SD-10037,Incident,2026-08-12 09:50,2026-08-13 14:03,P3,CIS issue,ARH,Clinical Applications,Walk-up,24,N,N,
+SD-10038,Access request,2026-08-12 10:07,2026-08-17 20:18,P4,CIS access,KGH,Identity and Access,Portal,72,N,N,
+SD-10039,Access request,2026-08-12 12:28,2026-08-25 21:59,P4,CIS access,KGH,Identity and Access,Phone,72,N,N,3
+SD-10040,Service request,2026-08-12 13:03,2026-08-12 14:02,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,5
+SD-10041,Incident,2026-08-12 15:59,2026-08-13 01:05,P3,Hardware,KGH,End User Computing,Phone,24,Y,N,
+SD-10042,Access request,2026-08-12 16:32,2026-08-21 11:50,P3,CIS access,ARH,Identity and Access,Portal,24,N,N,
+SD-10043,Access request,2026-08-13 09:14,2026-08-15 23:27,P4,Virtual desktop,KGH,Identity and Access,Phone,72,Y,N,
+SD-10044,Service request,2026-08-13 09:20,2026-08-13 10:10,P4,Password reset,KGH,Service Desk,Portal,72,Y,N,
+SD-10045,Access request,2026-08-13 09:59,2026-08-17 14:34,P3,Virtual desktop,KGH,Identity and Access,Phone,24,N,N,
+SD-10046,Service request,2026-08-13 12:26,2026-08-16 06:27,P4,Printing,KGH,End User Computing,Phone,72,Y,N,5
+SD-10047,Incident,2026-08-13 13:37,2026-08-15 08:18,P4,Printing,ARH,End User Computing,Walk-up,72,Y,N,
+SD-10048,Incident,2026-08-13 14:07,2026-08-14 01:55,P3,Hardware,ARH,End User Computing,Portal,24,Y,N,
+SD-10049,Incident,2026-08-13 17:46,2026-08-15 07:17,P4,Virtual desktop,PGH,End User Computing,Phone,72,Y,N,4
+SD-10050,Incident,2026-08-14 11:12,2026-08-16 07:11,P3,CIS issue,KGH,Clinical Applications,Phone,24,N,N,
+SD-10051,Service request,2026-08-14 11:38,2026-08-14 13:59,P3,Password reset,ARH,Service Desk,Phone,24,Y,N,4
+SD-10052,Incident,2026-08-14 20:53,2026-08-15 04:09,P3,CIS issue,CVH,Clinical Applications,Portal,24,Y,N,4
+SD-10053,Incident,2026-08-15 12:21,2026-08-15 21:53,P2,CIS issue,KGH,Clinical Applications,Portal,8,N,N,
+SD-10054,Incident,2026-08-15 13:54,2026-08-16 13:34,P3,Printing,KGH,End User Computing,Portal,24,Y,Y,5
+SD-10055,Incident,2026-08-17 10:13,2026-08-18 09:56,P3,Virtual desktop,KGH,End User Computing,Portal,24,Y,N,3
+SD-10056,Incident,2026-08-17 12:29,2026-08-17 18:29,P2,CIS issue,PGH,Clinical Applications,Portal,8,Y,N,4
+SD-10057,Service request,2026-08-17 13:51,2026-08-20 04:32,,Hardware,KGH,End User Computing,Walk-up,,,N,5
+SD-10058,Access request,2026-08-17 14:12,2026-08-24 01:11,P4,CIS access,ARH,Identity and Access,Walk-up,72,N,N,3
+SD-10059,Access request,2026-08-17 14:40,2026-08-20 16:39,P4,Power BI,KGH,Identity and Access,Portal,72,N,N,
+SD-10060,Access request,2026-08-17 21:08,2026-08-21 15:55,P3,CIS access,ARH,Identity and Access,Portal,24,N,N,
+SD-10061,Incident,2026-08-18 08:26,2026-08-18 22:22,P3,Network,CVH,Network Services,Phone,24,Y,N,
+SD-10062,Incident,2026-08-18 11:03,2026-08-18 16:43,P2,CIS issue,CVH,Clinical Applications,Phone,8,Y,N,
+SD-10063,Incident,2026-08-18 15:04,2026-08-19 00:06,P2,CIS issue,ARH,Clinical Applications,Phone,8,N,N,
+SD-10064,Service request,2026-08-18 15:14,2026-08-19 08:28,P3,Printing,ARH,End User Computing,Portal,24,Y,N,
+SD-10065,Service request,2026-08-19 10:22,2026-08-19 10:42,P4,Password reset,ARH,Service Desk,Phone,72,Y,N,
+SD-10066,Incident,2026-08-19 10:32,2026-08-21 09:13,P4,CIS issue,CVH,Clinical Applications,Portal,72,Y,N,4
+SD-10067,Incident,2026-08-19 10:49,2026-08-19 22:06,P2,Network,KGH,Network Services,Phone,8,N,N,2
+SD-10068,Service request,2026-08-19 14:58,2026-08-28 00:10,P4,Power BI,CVH,Analytics Support,Walk-up,72,N,N,
+SD-10069,Incident,2026-08-19 15:16,2026-08-21 02:36,P3,Power BI,KGH,Analytics Support,Portal,24,N,N,
+SD-10070,Incident,2026-08-19 15:52,2026-08-19 20:42,P2,Printing,KGH,End User Computing,Phone,8,Y,N,
+SD-10071,Incident,2026-08-19 21:17,2026-08-21 05:52,P3,CIS issue,PGH,Clinical Applications,Walk-up,24,N,N,2
+SD-10072,Incident,2026-08-20 09:44,2026-08-20 15:04,P2,Printing,KGH,End User Computing,Portal,8,Y,N,4
+SD-10073,Incident,2026-08-20 10:47,2026-08-20 23:25,P3,Network,ARH,Network Services,Portal,24,Y,N,
+SD-10074,Incident,2026-08-20 11:29,2026-08-22 01:24,P3,Printing,PGH,End User Computing,Portal,24,N,N,3
+SD-10075,Service request,2026-08-20 14:25,2026-08-23 06:03,P4,Printing,ARH,End User Computing,Walk-up,72,Y,N,
+SD-10076,Service request,2026-08-20 14:50,2026-08-21 22:19,P4,Power BI,ARH,Analytics Support,Phone,72,Y,N,
+SD-10077,Incident,2026-08-20 22:19,2026-08-21 07:39,P3,Virtual desktop,KGH,End User Computing,Portal,24,Y,N,
+SD-10078,Incident,2026-08-21 08:46,2026-08-21 11:41,P2,Hardware,ARH,End User Computing,Portal,8,Y,N,2
+SD-10079,Incident,2026-08-21 08:57,2026-08-22 14:31,P3,Virtual desktop,CVH,End User Computing,Walk-up,24,N,N,
+SD-10080,Access request,2026-08-21 10:20,2026-08-23 13:09,P3,CIS access,KGH,Identity and Access,Phone,24,N,N,2
+SD-10081,Incident,2026-08-22 09:10,2026-08-23 12:54,P3,Printing,PGH,End User Computing,Phone,24,N,Y,
+SD-10082,Incident,2026-08-22 23:36,2026-08-26 16:43,P4,Printing,CVH,End User Computing,Phone,72,N,N,
+SD-10083,Access request,2026-08-22 23:44,2026-08-28 04:53,P4,Power BI,KGH,Identity and Access,Portal,72,N,N,2
+SD-10084,Incident,2026-08-23 17:38,2026-08-24 08:05,P3,Printing,KGH,End User Computing,Phone,24,Y,N,2
+SD-10085,Incident,2026-08-23 18:54,2026-08-24 03:36,P3,Power BI,KGH,Analytics Support,Walk-up,24,Y,N,
+SD-10086,Service request,2026-08-25 09:54,2026-08-26 21:52,P4,Hardware,CVH,End User Computing,Portal,72,Y,N,
+SD-10087,Service request,2026-08-25 14:58,2026-08-25 15:11,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,
+SD-10088,Incident,2026-08-25 16:57,2026-08-28 06:55,P4,Printing,ARH,End User Computing,Portal,72,Y,N,1
+SD-10089,Incident,2026-08-26 09:42,2026-08-25 19:09,P2,CIS issue,KGH,Clinical Applications,Portal,8,N,N,
+SD-10090,Service request,2026-08-26 09:49,2026-08-30 08:07,P3,Hardware,KGH,End User Computing,Portal,24,N,N,3
+SD-10091,Service request,2026-08-26 11:28,2026-08-26 12:45,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,
+SD-10092,Access request,2026-08-26 12:39,2026-08-30 04:49,P4,CIS access,KGH,Identity and Access,Portal,72,N,N,
+SD-10093,Service request,2026-08-26 12:57,2026-08-30 03:30,P4,Power BI,ARH,Analytics Support,Portal,72,N,N,
+SD-10094,Incident,2026-08-26 15:37,2026-08-26 17:47,P1,Virtual desktop,KGH,End User Computing,Walk-up,4,Y,N,
+SD-10095,Service request,2026-08-27 08:01,2026-08-27 08:34,P3,Password reset,PGH,Service Desk,Walk-up,24,Y,N,
+SD-10096,Incident,2026-08-27 13:47,2026-08-28 01:40,P2,CIS issue,CVH,Clinical Applications,Walk-up,8,N,N,2
+SD-10097,Service request,2026-08-27 14:37,2026-08-27 15:13,P3,Password reset,KGH,Service Desk,Phone,24,Y,N,3
+SD-10098,Incident,2026-08-27 15:11,2026-09-03 07:03,P4,Power BI,KGH,Analytics Support,Portal,72,N,N,
+SD-10099,Service request,2026-08-27 21:08,2026-08-29 11:10,P4,Printing,PGH,End User Computing,Portal,72,Y,N,5
+SD-10100,Service request,2026-08-28 08:21,2026-08-28 08:42,P3,Password reset,KGH,Service Desk,Phone,24,Y,N,
+SD-10101,Incident,2026-08-28 09:17,2026-08-31 18:41,P4,Virtual desktop,KGH,End User Computing,Phone,72,N,N,4
+SD-10102,Incident,2026-08-28 14:18,2026-08-28 18:22,P2,CIS issue,KGH,Clinical Applications,Portal,8,Y,N,
+SD-10103,Incident,2026-08-28 17:18,2026-08-31 07:11,P4,Virtual desktop,KGH,End User Computing,Phone,72,Y,Y,
+SD-10104,Service request,2026-08-29 09:28,2026-08-29 13:25,P3,Hardware,KGH,End User Computing,Phone,24,Y,N,
+SD-10105,Incident,2026-08-29 13:53,2026-08-30 04:34,P3,CIS issue,KGH,Clinical Applications,Portal,24,Y,N,
+SD-10106,Access request,2026-08-31 16:59,2026-09-02 14:48,P3,CIS access,KGH,Identity and Access,Walk-up,24,N,Y,
+SD-10107,Incident,2026-08-31 19:06,2026-09-01 07:06,P3,Power BI,ARH,Analytics Support,Portal,24,Y,N,
+SD-10108,Access request,2026-08-31 20:41,2026-09-02 00:46,P4,CIS access,KGH,Identity and Access,Phone,72,Y,N,5
+SD-10109,Access request,2026-09-01 10:30,2026-09-11 19:52,P4,CIS access,KGH,Identity and Access,Phone,72,N,Y,
+SD-10110,Access request,2026-09-02 09:10,2026-09-07 19:50,P4,CIS access,KGH,Identity and Access,Phone,72,N,N,
+SD-10111,Incident,2026-09-02 10:40,2026-09-03 04:07,P3,Power BI,ARH,Analytics Support,Portal,24,Y,N,
+SD-10112,Incident,2026-09-02 15:08,2026-09-04 04:25,P3,Virtual desktop,CVH,End User Computing,Portal,24,N,N,2
+SD-10113,Service request,2026-09-03 00:35,2026-09-03 01:04,P4,Password reset,PGH,Service Desk,Phone,72,Y,N,5
+SD-10114,Service request,2026-09-03 00:53,2026-09-04 12:39,P4,Hardware,KGH,End User Computing,Walk-up,72,Y,N,2
+SD-10115,Access request,2026-09-03 07:31,2026-09-08 21:44,P4,Virtual desktop,CVH,Identity and Access,Portal,72,N,N,
+SD-10116,Access request,2026-09-03 17:19,2026-09-16 13:55,P4,CIS access,ARH,Identity and Access,Phone,72,N,N,2
+SD-10117,Service request,2026-09-04 10:35,2026-09-06 17:16,P4,Hardware,KGH,End User Computing,Phone,72,Y,N,
+SD-10118,Incident,2026-09-04 13:19,2026-09-05 11:04,P3,CIS issue,KGH,Clinical Applications,Walk-up,24,Y,N,
+SD-10119,Service request,2026-09-04 14:21,2026-09-04 15:02,P3,Password reset,ARH,Service Desk,Walk-up,24,Y,N,5
+SD-10120,Incident,2026-09-04 14:51,2026-09-05 20:11,P4,CIS issue,ARH,Clinical Applications,Phone,72,Y,N,
+SD-10121,Incident,2026-09-05 09:13,2026-09-05 14:23,P2,CIS issue,KGH,Clinical Applications,Walk-up,8,Y,N,
+SD-10122,Service request,2026-09-05 09:30,2026-09-05 10:13,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,
+SD-10123,Access request,2026-09-05 18:29,2026-09-13 05:31,P4,Virtual desktop,PGH,Identity and Access,Phone,72,N,N,1
+SD-10124,Incident,2026-09-06 09:24,2026-09-07 20:37,P3,Power BI,KGH,Analytics Support,Portal,24,N,N,
+SD-10125,Incident,2026-09-07 11:00,2026-09-07 21:07,P2,Virtual desktop,KGH,End User Computing,Phone,8,N,N,
+SD-10126,Incident,2026-09-07 12:31,2026-09-08 07:21,P3,Virtual desktop,KGH,End User Computing,Portal,24,Y,N,4
+SD-10127,Incident,2026-09-07 15:59,2026-09-07 23:34,P3,Power BI,CVH,Analytics Support,Portal,24,Y,N,5
+SD-10128,Access request,2026-09-08 09:39,2026-09-09 14:46,P4,CIS access,KGH,Identity and Access,Phone,72,Y,N,4
+SD-10129,Access request,2026-09-08 11:01,2026-09-14 19:55,P4,Power BI,KGH,Identity and Access,Portal,72,N,N,1
+SD-10130,Incident,2026-09-08 12:29,2026-09-08 19:57,P2,CIS issue,ARH,Clinical Applications,Phone,8,Y,N,
+SD-10131,Access request,2026-09-08 13:54,2026-09-16 01:06,P3,CIS access,CVH,Identity and Access,Phone,24,N,N,
+SD-10132,Access request,2026-09-08 14:29,2026-09-13 11:29,P4,CIS access,PGH,Identity and Access,Portal,72,N,N,
+SD-10133,Incident,2026-09-08 15:31,2026-09-09 14:01,P3,Hardware,KGH,End User Computing,Walk-up,24,Y,N,
+SD-10134,Incident,2026-09-08 17:50,2026-09-09 06:48,P3,Virtual desktop,CVH,End User Computing,Phone,24,Y,N,
+SD-10135,Incident,2026-09-08 22:48,2026-09-11 01:12,P4,Printing,ARH,End User Computing,Portal,72,Y,N,5
+SD-10136,Incident,2026-09-09 07:13,2026-09-09 09:44,P1,Virtual desktop,CVH,End User Computing,Portal,4,Y,N,
+SD-10137,Incident,2026-09-09 08:42,2026-09-09 23:31,P3,Virtual desktop,CVH,End User Computing,Walk-up,24,Y,N,
+SD-10138,Incident,2026-09-09 14:06,2026-09-17 11:58,P4,Printing,CVH,End User Computing,Walk-up,72,N,N,4
+SD-10139,Incident,2026-09-10 09:32,2026-09-11 16:00,P3,Hardware,KGH,End User Computing,Portal,24,N,N,
+SD-10140,Access request,2026-09-10 15:39,2026-09-13 17:48,P4,CIS access,PGH,Identity and Access,Phone,72,N,N,
+SD-10141,Service request,2026-09-10 18:02,2026-09-10 18:44,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,
+SD-10142,Incident,2026-09-10 18:07,2026-09-13 05:21,P4,Printing,PGH,End User Computing,Portal,72,Y,N,
+SD-10143,Service request,2026-09-11 07:44,2026-09-13 06:00,P4,Hardware,KGH,End User Computing,Phone,72,Y,N,
+SD-10144,Incident,2026-09-11 10:24,2026-09-12 05:10,P3,CIS issue,KGH,Clinical Applications,Portal,24,Y,N,
+SD-10145,Incident,2026-09-11 10:51,2026-09-12 04:38,P4,Printing,CVH,End User Computing,Portal,72,Y,N,4
+SD-10146,Access request,2026-09-11 18:07,2026-09-17 23:02,P3,CIS access,KGH,Identity and Access,Portal,24,N,N,
+SD-10147,Incident,2026-09-12 14:22,2026-09-12 21:00,P2,Power BI,CVH,Analytics Support,Portal,8,Y,N,
+SD-10148,Incident,2026-09-12 15:53,2026-09-12 20:42,P3,Virtual desktop,KGH,End User Computing,Phone,24,Y,N,
+SD-10149,Access request,2026-09-13 08:30,2026-09-14 21:20,P4,CIS access,ARH,Identity and Access,Phone,72,Y,N,5
+SD-10150,Incident,2026-09-13 12:33,2026-09-14 03:16,P3,Hardware,KGH,End User Computing,Walk-up,24,Y,N,
+SD-10151,Access request,2026-09-14 08:29,2026-09-21 10:16,P3,Virtual desktop,KGH,Identity and Access,Walk-up,24,N,N,
+SD-10152,Incident,2026-09-14 12:39,2026-09-15 16:27,P3,Virtual desktop,KGH,End User Computing,Walk-up,24,N,N,3
+SD-10153,Access request,2026-09-14 16:44,2026-09-24 17:59,P4,CIS access,ARH,Identity and Access,Portal,72,N,N,5
+SD-10154,Access request,2026-09-14 23:43,2026-09-18 18:12,P4,CIS access,PGH,Identity and Access,Phone,72,N,N,2
+SD-10155,Incident,2026-09-15 08:49,2026-09-17 07:12,P4,Hardware,KGH,End User Computing,Portal,72,Y,N,3
+SD-10156,Service request,2026-09-15 17:36,2026-09-16 19:15,P3,Hardware,CVH,End User Computing,Portal,24,N,N,2
+SD-10157,Incident,2026-09-16 09:31,2026-09-16 14:52,P2,Virtual desktop,ARH,End User Computing,Walk-up,8,Y,N,
+SD-10158,Service request,2026-09-16 11:22,2026-09-18 06:45,P3,Power BI,ARH,Analytics Support,Phone,24,N,N,4
+SD-10159,Service request,2026-09-16 14:21,2026-09-16 17:13,P3,Password reset,ARH,Service Desk,Phone,24,Y,N,
+SD-10160,Service request,2026-09-17 12:03,2026-09-17 12:43,P3,Password reset,KGH,Service Desk,Portal,24,Y,N,
+SD-10161,Incident,2026-09-17 14:20,2026-09-17 15:38,P1,Virtual desktop,KGH,End User Computing,Phone,4,Y,N,
+SD-10162,Service request,2026-09-17 14:54,2026-09-21 21:10,P4,Power BI,PGH,Analytics Support,Walk-up,72,N,N,3
+SD-10163,Service request,2026-09-17 20:17,2026-09-19 14:20,P4,Hardware,CVH,End User Computing,Portal,72,Y,N,
+SD-10164,Service request,2026-09-18 08:13,2026-09-20 05:20,P4,Hardware,KGH,End User Computing,Phone,72,Y,N,5
+SD-10165,Access request,2026-09-18 08:39,2026-09-21 06:42,P3,CIS access,KGH,Identity and Access,Phone,24,N,N,3
+SD-10166,Access request,2026-09-18 13:58,2026-09-22 18:05,P3,Virtual desktop,ARH,Identity and Access,Phone,24,N,N,
+SD-10167,Incident,2026-09-18 15:44,2026-09-18 19:48,P3,CIS issue,PGH,Clinical Applications,Portal,24,Y,Y,
+SD-10168,Incident,2026-09-18 16:07,2026-09-18 18:20,P2,CIS issue,ARH,Clinical Applications,Phone,8,Y,N,
+SD-10169,Service request,2026-09-18 17:26,2026-09-22 07:18,P4,Printing,KGH,End User Computing,Phone,72,N,N,
+SD-10170,Service request,2026-09-19 12:26,2026-09-20 22:37,P3,Hardware,KGH,End User Computing,Phone,24,N,N,2
+SD-10171,Incident,2026-09-19 19:46,2026-09-20 18:44,P3,Network,ARH,Network Services,Walk-up,24,Y,N,
+SD-10172,Incident,2026-09-21 06:50,2026-09-21 15:36,P3,Virtual desktop,KGH,End User Computing,Phone,24,Y,N,
+SD-10173,Service request,2026-09-21 08:47,2026-09-21 09:09,P3,Password reset,KGH,Service Desk,Phone,24,Y,N,
+SD-10174,Access request,2026-09-21 10:54,2026-09-28 19:06,P4,CIS access,PGH,Identity and Access,Portal,72,N,N,
+SD-10175,Incident,2026-09-21 11:25,2026-09-21 15:27,P3,Virtual desktop,ARH,End User Computing,Portal,24,Y,N,
+SD-10176,Access request,2026-09-21 13:15,2026-09-26 00:09,P3,Power BI,KGH,Identity and Access,Walk-up,24,N,Y,3
+SD-10177,Incident,2026-09-21 14:03,2026-09-21 18:41,P3,Hardware,CVH,End User Computing,Portal,24,Y,N,2
+SD-10178,Incident,2026-09-22 11:11,2026-09-22 15:51,P3,Printing,CVH,End User Computing,Phone,24,Y,N,
+SD-10179,Incident,2026-09-22 13:43,2026-09-23 02:14,P3,CIS issue,KGH,Clinical Applications,Walk-up,24,Y,N,5
+SD-10180,Service request,2026-09-22 14:31,2026-09-22 15:13,P3,Password reset,PGH,Service Desk,Walk-up,24,Y,N,
+SD-10181,Service request,2026-09-22 16:15,2026-09-22 17:13,P3,Password reset,CVH,Service Desk,Phone,24,Y,N,3
+SD-10182,Service request,2026-09-23 10:23,2026-09-29 07:33,P4,Printing,KGH,End User Computing,Walk-up,72,N,N,4
+SD-10183,Incident,2026-09-23 11:58,2026-09-25 09:10,P3,Virtual desktop,CVH,End User Computing,Portal,24,N,N,
+SD-10184,Access request,2026-09-24 09:16,2026-09-29 00:54,P4,CIS access,KGH,Identity and Access,Walk-up,72,N,N,
+SD-10185,Incident,2026-09-24 13:17,2026-09-25 16:35,P4,Hardware,ARH,End User Computing,Portal,72,Y,N,5
+SD-10186,Incident,2026-09-24 13:58,2026-09-25 00:54,P3,Network,ARH,Network Services,Portal,24,Y,Y,
+SD-10187,Incident,2026-09-24 14:08,2026-09-25 00:16,P3,Network,KGH,Network Services,Phone,24,Y,N,
+SD-10188,Service request,2026-09-24 22:15,2026-09-26 12:53,P4,Printing,ARH,End User Computing,Phone,72,Y,N,
+SD-10189,Service request,2026-09-24 23:27,2026-09-25 00:11,P3,Password reset,KGH,Service Desk,Phone,24,Y,N,5
+SD-10190,Incident,2026-09-25 08:52,2026-09-27 01:06,P3,Printing,KGH,End User Computing,Portal,24,N,N,4
+SD-10191,Access request,2026-09-25 10:28,2026-09-28 14:26,P4,CIS access,KGH,Identity and Access,Phone,72,N,N,4
+SD-10192,Incident,2026-09-25 13:28,2026-09-26 04:04,P3,Virtual desktop,PGH,End User Computing,Phone,24,Y,N,5
+SD-10193,Service request,2026-09-25 14:08,2026-09-26 02:47,P3,Hardware,CVH,End User Computing,Portal,24,Y,N,4
+SD-10194,Service request,2026-09-25 17:52,,P4,Printing,KGH,End User Computing,Phone,72,N,Y,
+SD-10195,Incident,2026-09-26 09:58,,P4,Power BI,PGH,Analytics Support,Walk-up,72,N,N,
+SD-10196,Incident,2026-09-26 18:00,2026-09-27 07:57,P3,Virtual desktop,CVH,End User Computing,Portal,24,Y,N,4
+SD-10197,Incident,2026-09-27 08:38,2026-09-28 14:53,P3,Virtual desktop,ARH,End User Computing,Phone,24,N,N,4
+SD-10198,Incident,2026-09-27 09:38,2026-09-29 01:02,P4,Network,KGH,Network Services,Walk-up,72,Y,N,
+SD-10199,Incident,2026-09-27 11:38,2026-09-27 14:32,P1,Virtual desktop,KGH,End User Computing,Portal,4,Y,N,
+SD-10200,Service request,2026-09-27 12:41,2026-09-27 13:33,P3,Password reset,ARH,Service Desk,Phone,24,Y,N,5
+SD-10201,Access request,2026-09-28 00:50,,P4,CIS access,KGH,Identity and Access,Walk-up,72,,N,
+SD-10202,Service request,2026-09-28 07:18,2026-09-30 12:30,P4,Power BI,PGH,Analytics Support,Phone,72,Y,N,
+SD-10203,Service request,2026-09-28 12:38,2026-09-28 13:57,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,
+SD-10204,Access request,2026-09-28 13:36,,P4,CIS access,CVH,Identity and Access,Walk-up,72,,N,
+SD-10205,Access request,2026-09-28 15:59,2026-09-30 16:55,P4,CIS access,PGH,Identity and Access,Phone,72,Y,N,
+SD-10206,Access request,2026-09-28 16:02,,P3,CIS access,KGH,Identity and Access,Portal,24,N,N,
+SD-10207,Service request,2026-09-28 16:33,2026-09-28 16:50,P4,Password reset,ARH,Service Desk,Phone,72,Y,N,
+SD-10208,Incident,2026-09-29 08:04,2026-09-29 11:39,P2,CIS issue,CVH,Clinical Applications,Portal,8,Y,N,
+SD-10209,Incident,2026-09-29 11:28,2026-09-29 15:55,P2,Network,CVH,Network Services,Phone,8,Y,N,5
+SD-10210,Incident,2026-09-29 12:03,2026-09-30 04:04,P4,CIS issue,KGH,Clinical Applications,Walk-up,72,Y,Y,1
+SD-10210,Incident,2026-09-29 12:03,2026-09-30 04:04,P4,CIS issue,KGH,Clinical Applications,Walk-up,72,Y,Y,1
+SD-10211,Incident,2026-09-29 17:12,2026-09-29 19:47,P2,CIS issue,PGH,Clinical Applications,Phone,8,Y,N,
+SD-10212,Access request,2026-09-29 19:38,,P3,CIS access,KGH,Identity and Access,Phone,24,N,N,
+SD-10213,Incident,2026-09-29 19:42,2026-09-30 03:11,P2,Virtual desktop,KGH,End User Computing,Portal,8,Y,N,2
+SD-10214,Incident,2026-09-30 08:15,2026-09-30 10:56,P2,Power BI,ARH,Analytics Support,Phone,8,Y,N,
+SD-10215,Incident,2026-09-30 09:32,2026-09-30 14:13,P3,Hardware,CVH,End User Computing,Phone,24,Y,N,5
+SD-10216,Service request,2026-09-30 10:17,2026-09-30 11:17,P4,Password reset,KGH,Service Desk,Phone,72,Y,N,4
+SD-10217,Access request,2026-09-30 13:57,,P3,CIS access,KGH,Identity and Access,Phone,24,,N,
+SD-10218,Incident,2026-09-30 14:06,,P4,CIS issue,ARH,Clinical Applications,Portal,72,,N,
+SD-10219,Incident,2026-09-30 15:56,,P3,Power BI,KGH,Analytics Support,Portal,24,,N,

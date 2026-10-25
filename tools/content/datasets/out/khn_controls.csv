@@ -1,0 +1,14 @@
+control_test_id,control_name,asset_id,test_date,expected_result,actual_result,status,backup_job_id,restore_test_date,rto_target_hours,restore_hours,training_group,training_due,training_complete_pct
+CT-001,CIS restore test,A-001,2025-03-20,Full CIS restore completes within the 4-hour RTO,Restore completed in 9.0 hours; database rebuild step ran long,Fail,BK-A001-DAILY,2025-03-20,4,9.0,,,
+CT-002,CIS restore test,A-001,2025-08-14,Full CIS restore completes within the 4-hour RTO,Restore completed in 13.5 hours; restore runbook out of date,Fail,BK-A001-DAILY,2025-08-14,4,13.5,,,
+CT-003,Identity Directory restore test,A-007,2026-09-10,Directory restore completes within the 2-hour RTO,Restore completed in 1.5 hours,Pass,BK-A007-DAILY,2026-09-10,2,1.5,,,
+CT-004,Pharmacy System restore test,A-005,,Pharmacy restore completes within the 4-hour RTO,No restore test on record,Not tested,BK-A005-DAILY,,4,,,,
+CT-005,Immutable backup copy check,A-012,2026-09-24,Latest CIS backup has an immutable copy held in Canada,"Immutable copy confirmed at NorthArc Cloud, Canadian region",Pass,,,,,,,
+CT-006,MFA enrolment for privileged accounts,A-007,2026-10-01,100% of enabled privileged accounts enrolled in MFA,"4 of 6 enrolled (66.7%); not enrolled: E-009, E-015",Fail,,,,,,,
+CT-007,Q3 access review completion,A-007,2026-10-01,100% of reviews due by 2026-09-30 completed with a decision,12 of 18 completed (66.7%); 6 overdue,Fail,,,,,,,
+CT-008,Leaver accounts disabled,A-007,2026-10-01,No enabled account for a terminated or expired worker,"2 found: E-014, E-027",Fail,,,,,,,
+CT-009,Privacy and security awareness training,,2026-10-01,At least 90% of the group complete by the due date,86% complete,Fail,,,,,Nursing,2026-09-30,86
+CT-010,Privacy and security awareness training,,2026-10-01,At least 90% of the group complete by the due date,71% complete,Fail,,,,,Physicians,2026-09-30,71
+CT-011,Privacy and security awareness training,,2026-10-01,At least 90% of the group complete by the due date,96% complete,Pass,,,,,IT staff,2026-09-30,96
+CT-012,Privacy and security awareness training,,2026-10-01,At least 90% of the group complete by the due date,48% complete,Fail,,,,,Agency and vendor workers,2026-09-30,48
+CT-013,Privacy and security awareness training,,2026-10-01,At least 90% of the group complete by the due date,100% complete,Pass,,,,,Executives and leaders,2026-09-30,100

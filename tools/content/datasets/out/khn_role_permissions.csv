@@ -1,0 +1,40 @@
+job_role,system_id,permission
+Registered Nurse,A-001,view chart
+Registered Nurse,A-001,document care
+Registered Nurse,A-002,view tracking board
+Registered Nurse,A-008,virtual desktop access
+Registered Nurse,A-013,email
+Agency Nurse,A-001,view chart
+Agency Nurse,A-001,document care
+Agency Nurse,A-008,virtual desktop access
+Physician,A-001,view chart
+Physician,A-001,document care
+Physician,A-001,order entry
+Physician,A-002,view tracking board
+Physician,A-008,virtual desktop access
+Physician,A-009,view site dashboards
+Physician,A-013,email
+Unit Clerk,A-001,view chart
+Unit Clerk,A-006,update bed status
+Unit Clerk,A-008,virtual desktop access
+Unit Clerk,A-013,email
+Clinical Analyst,A-009,view site dashboards
+Clinical Analyst,A-009,build
+Clinical Analyst,A-010,query de-identified data
+Clinical Analyst,A-013,email
+Executive,A-009,view all sites
+Executive,A-007,approve access
+Executive,A-013,email
+System Administrator,A-007,provision accounts
+System Administrator,A-008,administer virtual desktops
+System Administrator,A-013,email
+Service Desk Analyst,A-011,manage tickets
+Service Desk Analyst,A-007,reset passwords
+Service Desk Analyst,A-013,email
+Security Analyst,A-007,administer audit logs
+Security Analyst,A-011,manage tickets
+Security Analyst,A-013,email
+Vendor Support,A-001,remote support
+Vendor Support,A-012,remote support
+Corporate Staff,A-013,email
+Corporate Staff,A-011,submit tickets

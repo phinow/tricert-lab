@@ -1,0 +1,44 @@
+employee_id,full_name,job_role,department,site_code,manager_id,worker_type,hr_status,account_status,privileged,mfa_enrolled,effective_from,effective_to,last_login
+E-001,Dr. Helen Marchetti,Executive,Clinical Operations,KGH,,Employee,Active,Enabled,No,Yes,2019-04-01,,2026-09-23 10:58
+E-002,Marcus Bell,Executive,Information Technology,KGH,,Employee,Active,Enabled,No,Yes,2021-01-11,,2026-09-24 09:40
+E-003,Priya Raman,Executive,Privacy Office,KGH,,Employee,Active,Enabled,No,Yes,2020-06-15,,2026-09-26 16:33
+E-004,Daniel Osei,Executive,Information Security,KGH,E-002,Employee,Active,Enabled,No,Yes,2022-02-07,,2026-09-26 11:15
+E-005,Grace Liu,Service Desk Analyst,IT Service Desk,KGH,E-002,Employee,Active,Enabled,No,Yes,2018-09-04,,2026-09-25 16:21
+E-006,Tomás Rivera,Clinical Analyst,Clinical Analytics,KGH,E-001,Employee,Active,Enabled,No,Yes,2020-10-19,,2026-09-25 09:10
+E-007,Dr. Sarah Whitford,Physician,Emergency Department,KGH,E-001,Employee,Active,Enabled,No,No,2017-07-01,,2026-09-21 06:41
+E-008,Janelle Cardinal,Executive,Patient Flow,KGH,E-001,Employee,Active,Enabled,No,Yes,2021-05-03,,2026-09-29 07:03
+E-009,Kevin Park,System Administrator,Information Technology,KGH,E-002,Employee,Active,Enabled,Yes,No,2016-03-14,,2026-09-25 16:08
+E-010,Aisha Mahmoud,Registered Nurse,Emergency Department,KGH,E-021,Employee,Active,Enabled,No,No,2019-11-25,,2026-09-24 18:12
+E-011,Ben Kowalski,Unit Clerk,Medicine 4A,KGH,E-022,Employee,Active,Enabled,No,No,2023-01-09,,2026-09-27 19:50
+E-012,Dr. Liam O'Connor,Physician,Emergency Department,ARH,E-007,Employee,Active,Enabled,No,No,2022-08-29,,2026-09-29 06:12
+E-013,Mei Tanaka,Clinical Analyst,Clinical Analytics,CVH,E-006,Employee,Active,Enabled,No,Yes,2024-04-15,,2026-09-24 19:33
+E-014,Olivia Grant,Agency Nurse,Emergency Department,KGH,E-021,Agency,Active,Enabled,No,No,2026-06-01,2026-08-31,2026-08-29 14:02
+E-015,Raj Patel,Vendor Support,Vendor: Meridian Clinical Systems,KGH,E-009,Vendor,Active,Enabled,Yes,No,2025-02-03,,2026-09-26 21:40
+E-016,Chloe Dubois,Corporate Staff,Business Continuity,KGH,E-004,Employee,Active,Enabled,No,Yes,2023-06-12,,2026-09-29 06:38
+E-017,Ahmed Haddad,System Administrator,Infrastructure,KGH,E-002,Employee,Active,Enabled,Yes,Yes,2019-02-18,,2026-09-28 11:48
+E-018,Nora Lindqvist,Corporate Staff,Human Resources,KGH,E-026,Employee,Active,Enabled,No,Yes,2021-09-07,,2026-09-22 08:14
+E-019,Programme Manager,Corporate Staff,Project Beacon Programme Office,KGH,E-002,Employee,Active,Enabled,No,Yes,2026-08-24,,2026-09-26 06:32
+E-020,Sam Okafor,Security Analyst,Information Security,KGH,E-004,Employee,Active,Enabled,Yes,Yes,2022-11-14,,2026-09-22 06:15
+E-021,Hannah Brooks,Registered Nurse,Emergency Department,KGH,E-001,Employee,Active,Enabled,No,No,2015-05-04,,2026-09-29 06:59
+E-022,Marc Tremblay,Registered Nurse,Medicine 4A,KGH,E-001,Employee,Active,Enabled,No,No,2018-01-15,,2026-09-27 16:32
+E-023,Fatima Noorani,Registered Nurse,Nursing Administration,ARH,E-001,Employee,Active,Enabled,No,No,2017-10-02,,2026-09-28 19:36
+E-024,Gareth Lewis,Registered Nurse,Nursing Administration,CVH,E-001,Employee,Active,Enabled,No,No,2016-04-11,,2026-09-26 12:39
+E-025,Rosa Delgado,Registered Nurse,Nursing Administration,PGH,E-001,Employee,Active,Enabled,No,No,2020-03-02,,2026-09-23 06:17
+E-026,Owen MacLeod,Executive,Human Resources,KGH,,Employee,Active,Enabled,No,Yes,2019-08-19,,2026-09-21 14:24
+E-027,Jason Kim,Registered Nurse,Emergency Department,KGH,E-021,Employee,Terminated,Enabled,No,No,2021-03-29,2026-08-14,2026-08-13 19:20
+E-028,Chantal Roy,Unit Clerk,ARH Medicine,ARH,E-023,Employee,Active,Enabled,No,No,2022-03-14,,2026-09-29 10:04
+E-028,Chantal Roy,Clinical Analyst,Clinical Analytics,KGH,E-006,Employee,Active,Enabled,No,No,2026-08-17,,2026-09-29 10:04
+E-029,Dr. Ethan Wright,Physician,Emergency Department,CVH,E-007,Employee,Active,Enabled,No,No,2023-07-04,,2026-09-23 16:01
+E-030,Isabel Ferreira,Registered Nurse,CVH Medicine,CVH,E-024,Employee,Active,Enabled,No,No,2022-05-30,,2026-09-24 11:25
+E-031,Noah Bergstrom,Service Desk Analyst,IT Service Desk,KGH,E-005,Employee,Active,Enabled,Maybe,No,2024-09-03,,2026-09-25 11:50
+E-032,Zainab Yusuf,Service Desk Analyst,IT Service Desk,KGH,E-005,Employee,Active,Enabled,No,Yes,2023-02-27,,2026-09-25 14:36
+E-033,Lucas Girard,System Administrator,Infrastructure,KGH,E-002,Employee,Active,Enabled,Yes,Yes,2020-07-13,,2026-09-24 20:57
+E-034,Maya Singh,Registered Nurse,PGH Medicine,PGH,E-025,Employee,Active,Enabled,No,No,2021-11-08,,2026-09-27 07:59
+E-035,Connor Walsh,Agency Nurse,Emergency Department,CVH,E-024,Agency,Active,Enabled,No,No,2026-07-06,2026-12-31,2026-09-26 17:01
+E-036,Dr. Elena Petrova,Physician,Medicine,KGH,E-001,Employee,Active,Enabled,No,No,2018-06-25,,2026-09-29 15:02
+E-037,Tyler Bouchard,Unit Clerk,Surgery 5B,KGH,E-099,Employee,Active,Enabled,No,No,2024-02-12,,2026-09-24 15:57
+E-038,Julia Novak,Registered Nurse,ARH Surgery,ARH,E-023,Employee,Active,Enabled,No,No,2019-09-16,,2026-09-24 13:43
+E-039,Arjun Mehta,Vendor Support,Vendor: NorthArc Cloud,KGH,E-033,Vendor,Active,Enabled,Yes,Yes,2026-01-05,2026-12-31,2026-09-22 12:24
+E-040,Sienna Clarke,Registered Nurse,KGH ICU,KGH,E-022,Employee,Leave,Disabled,No,No,2020-02-03,,2026-07-31 15:10
+E-041,Dr. Victor Leblanc,Physician,Emergency Department,PGH,E-007,Employee,Active,Enabled,No,No,2021-04-19,,2026-09-22 11:16
+E-042,Rebecca Stone,Registered Nurse,Emergency Department,KGH,E-021,Employee,Terminated,Disabled,No,No,2017-03-06,2026-06-30,2026-06-30 16:45

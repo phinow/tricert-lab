@@ -1,0 +1,17 @@
+wp_id,release,work_package,owner_id,planned_start,planned_finish,budget_cad,planned_pct_as_of,pct_complete,actual_cost_cad,status,risk_rating
+WP-101,1,Programme mobilization and charter,E-019,2026-09-01,2026-09-08,40000,100,110,41200,Complete,Low
+WP-102,1,Privacy impact assessment and threat model,E-003,2026-09-09,2026-09-24,70000,100,90,68500,In progress,Medium
+WP-103,1,"Source profiling, data quality and warehouse staging",E-013,2026-09-09,2026-10-06,130000,78,60,92300,in progress,High
+WP-104,1,"Semantic model, dashboards and row-level security",E-006,2026-10-07,2026-10-23,140000,0,5,9000,In progress,high
+WP-104,1,"Semantic model, dashboards and row-level security",E-006,2026-10-07,2026-10-23,140000,0,5,9000,In progress,high
+WP-105,1,Service transition and service desk readiness,E-005,2026-10-16,2026-10-21,40000,0,0,0,Not started,Medium
+WP-106,2,Role catalogue and RBAC design,E-004,2026-09-18,2026-10-05,90000,75,40,39600,In progress,Medium
+WP-107,2,Joiner-mover-leaver integration with HR,E-018,2026-10-26,2026-11-10,110000,0,0,0,Not started,High
+WP-108,2,MFA and single sign-on rollout,,2026-10-26,2026-11-06,130000,0,0,0,Not started,High
+WP-109,2,Privileged access and segregation of duties,E-004,2026-10-26,2026-11-31,70000,0,0,0,Not started,High
+WP-110,2,Access-request value stream and access reviews,E-005,2026-11-09,2026-11-26,60000,0,0,0,NOT STARTED,Medium
+WP-111,3,Business impact analysis and recovery targets,E-016,2026-11-27,2026-12-03,55000,0,0,0,Not started,Medium
+WP-112,3,CIS restore testing and downtime procedures,E-016,2026-12-04,2026-12-11,85000,0,0,0,Not started,HIGH
+WP-113,3,Incident response plan and tabletop exercise,E-004,2026-12-04,2026-12-10,-60000,0,0,0,Not started,Medium
+WP-114,3,Vulnerability remediation and security operations dashboard,E-020,2026-11-27,2026-12-11,80000,0,0,0,Not started,High
+WP-115,3,Major-incident review and programme closure,E-019,2026-12-14,2026-12-17,40000,0,0,0,Not started,Low

@@ -1,0 +1,529 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "w3-s1",
+   "summary": "You will learn how Kestrel classifies information, who owns, holds and looks after each data set, and what the Health Information Act expects from a privacy impact assessment. You will build Beacon's health information classification register and its privacy impact assessment.",
+   "read": [
+    {
+     "heading": "Classification decides handling",
+     "body": "Classification is the first security decision you make about data: you cannot choose encryption, access rules or retention until you know how much harm a leak would cause. Beacon moves emergency department (ED) and bed data from clinical systems into dashboards, so you classify every step.\n\nKestrel uses four levels. This scheme is Kestrel policy, not law.\n\n| Level | Meaning at Kestrel | Beacon example | Core handling |\n|---|---|---|---|\n| Public | Approved for anyone | Site list (khn_sites.csv) | Keep it accurate |\n| Internal | Kestrel workers; little harm if leaked | Service desk tickets, unit list | Kestrel accounts only |\n| Confidential | De-identified or aggregated health data; staff identity data | ED extract with pseudonymous IDs, bed census, Beacon semantic model and dashboards | Named groups, row-level security (RLS), Confidential label |\n| Restricted | Individually identifying health information | Clinical Information System (A-001), ED Tracking Board (A-002), Bed Management System (A-006), warehouse staging (A-010) | Never enters the Power BI cloud service |\n\nThree rules make the scheme work:\n\n- The data owner sets the level, not whoever holds the data.\n- A data set takes the level of its most sensitive element: one health number column makes a table Restricted.\n- Combining data can raise the level: arrival time plus age band plus a small site can point to one person.\n\nThis week's pipeline is where data moves from Restricted to Confidential, so that step needs the strongest evidence."
+    },
+    {
+     "heading": "Owner, custodian, steward",
+     "body": "CISSP, and Kestrel, separate three roles for every data set.\n\n| Role | Accountable for | Beacon example |\n|---|---|---|\n| Data owner | Classification, access, acceptable use, risk decisions | Dr. Sarah Whitford (E-007) for ED data; Janelle Cardinal (E-008) for bed data |\n| Data custodian | Running the controls the owner chooses | Kevin Park (E-009) for sources and warehouse; Tomás Rivera (E-006) for Power BI (A-009) |\n| Data steward | Definitions, quality rules, metadata | Tomás Rivera (E-006), who applies rules DQ-01 to DQ-14 |\n\nThe owner is a senior business person, not IT. When a question asks who decides classification or approves access, the answer is the owner; the custodian carries out the owner's decisions. A system owner is different again: Tomás Rivera owns the warehouse system (A-010), but the ED rows in it belong to Dr. Whitford.\n\nOne trap is real in Alberta. In the Health Information Act, a custodian is a body or health professional the Act makes responsible for the health information it holds: here, Kestrel. Its employees, contractors (such as Lumen Analytics Partners' consultants, V-05) and information managers are affiliates, who must follow the Act and Kestrel's privacy management program; Kestrel stays responsible for them. Define both meanings of custodian in your register."
+    },
+    {
+     "heading": "Data states, retention and disposal",
+     "body": "Data exists in three states, and each needs its own control.\n\n| State | Where it is in Beacon | Main controls |\n|---|---|---|\n| At rest | Source databases, warehouse, backups (A-012), the semantic model in the cloud | Encryption, access control |\n| In transit | Each hop from source to warehouse to gateway to Power BI to a screen | Transport Layer Security (TLS) |\n| In use | Rows in memory during refresh, numbers on a screen | RLS, least privilege, screen locking |\n\nEvery data set has a lifecycle: create, store, use, share, archive, destroy. Retention sets how long each stage lasts; disposal sets how it ends. Retention periods are Kestrel policy, agreed for Beacon. The register states them, and Priya Raman (E-003) and Daniel Osei (E-004) approve it:\n\n- Warehouse staging (Restricted): 30 days after each load reconciles, then a logged purge job.\n- Exception table of quarantined rows: kept for the life of the service as quality evidence (rule DQ-13), reviewed yearly.\n- Emailed Excel extracts: stopped at go-live on 2026-10-23, with mailbox and shared copies deleted within 30 days.\n\nThe NIST SP 800-88 media sanitization guideline names three methods: clear (overwrite so ordinary tools cannot recover data), purge (recovery infeasible even with laboratory techniques, for example cryptographic erase) and destroy (physically destroy the media so it cannot be used again). In a cloud service you rely on cryptographic erase and contract terms. The Act's safeguards duty (section 60) includes proper disposal."
+    },
+    {
+     "heading": "The privacy impact assessment under the Health Information Act",
+     "body": "Under the Health Information Act (section 64), each custodian must prepare a privacy impact assessment describing how a proposed administrative practice or information system relating to the collection, use or disclosure of individually identifying health information may affect privacy, and must submit it to the Information and Privacy Commissioner for review and comment before implementing it. Changes to existing practices or systems also need one.\n\nDoes Beacon need one? Yes. The dashboards hold only de-identified data, but the pipeline reads individually identifying health information from A-002 and A-006 into staging: a new information system using Restricted data.\n\nThree facts are easy to get wrong:\n\n- The Commissioner reviews and comments; it does not approve or accept. Since October 1, 2024 the office issues a closing letter with comments and recommendations.\n- Inside Kestrel, Priya Raman (E-003) approves the assessment before submission. That is Kestrel's own governance.\n- Submission comes before implementation. Schedule task 4, Complete privacy impact assessment, runs 2026-09-09 to 2026-09-24 with zero float; task 6, Build warehouse staging and de-identified views, starts 2026-09-25.\n\nSince the 2026 amendments, an assessment is also needed before becoming a sharing custodian, joining a common or integrated program or service, or performing data matching. Release 1 does none of these; say so, so a reviewer sees you checked."
+    },
+    {
+     "heading": "Least amount, highest anonymity, safeguards, breaches",
+     "body": "Name each duty of the Act and the design choice that meets it.\n\n| Duty in the Act | What it asks | How Beacon meets it |\n|---|---|---|\n| Highest degree of anonymity (section 57) | Most anonymous form possible; first consider whether aggregate data is enough | Aggregates by site, unit, day and Canadian Triage and Acuity Scale (CTAS) level |\n| Least amount (section 58) | Only the health information essential for the purpose | No names, health numbers or birth dates leave staging; age bands; pseudonymous IDs |\n| Safeguards (section 60) | Administrative, technical and physical safeguards, including outside Alberta | RLS, label, TLS, encryption at rest, access reviews, logging |\n| Breach notification (section 60.1) | If there is a risk of harm, notify the Commissioner as soon as practicable, and also the Minister responsible under the Act and the affected individuals | Incidents route to the Chief Privacy Officer, who applies the risk-of-harm test |\n\nDe-identification takes Beacon from Restricted to Confidential: remove direct identifiers, use a pseudonymous key that means nothing outside the warehouse, and generalize details such as age. It is not enough for small groups. Prairie Gate Health Centre (PGH) had 55 valid visits in the quarter; 2 left without being seen and 4 were admitted. Kestrel policy, not law, suppresses counts under 5 in reports shared outside the care team. Risk R-02 in the RAID (risks, assumptions, issues, decisions) log tracks it; owner Priya Raman (E-003).\n\nLocation belongs here too. Sentinel SOC Services (V-04) processes security logs in the United States. No Alberta statute bans storing health information outside Canada; the Act requires safeguards. Keeping NorthArc Cloud data in Canada is a Kestrel contract term. Risk R-05 covers V-04."
+    },
+    {
+     "heading": "What Beacon's assessment contains",
+     "body": "Write it so a reviewer new to Beacon can follow the data. The finished assessment has seven sections:\n\n1. Project description and need for an assessment: the system, where identifying information sits, and why section 64 applies.\n2. Information flow and data elements: number each step from source to user. The step where staging creates the pseudonymous visit_id and age band, and the views drop the source identifiers, is where Restricted becomes Confidential. List every data element with where it is held and why. No reason, no element.\n3. Authority, purpose and minimization: sections 57 and 58, plus Kestrel's small-count rule labelled as policy.\n4. Safeguards: administrative, technical and physical, each with an owner (section 60), including any storage or use outside Alberta.\n5. Privacy risks and mitigations: numbered P-01 onward and linked to the RAID log, such as R-02, R-05 and retiring the extracts.\n6. Breach response: who is told, by whom, on what test (section 60.1).\n7. Approval, submission and updates, and where the closing letter is filed.\n\nRetention and disposal live in the classification register, not here. On the PMP side this is compliance work: Plan and manage project compliance is a Business Environment task. You meet it by scheduling the assessment, giving it an owner and tracking its risks."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Data owner",
+     "definition": "The senior business person accountable for a data set. The owner sets its classification, decides who may have access and accepts risk. For Beacon's ED data this is Dr. Sarah Whitford (E-007)."
+    },
+    {
+     "term": "Data custodian (CISSP)",
+     "definition": "The person or team that runs the controls the owner chooses, such as storage, backup and permissions. Kevin Park (E-009) is custodian for Beacon's source systems and warehouse."
+    },
+    {
+     "term": "Custodian (Health Information Act)",
+     "definition": "A body or health professional that the Act makes responsible for the health information it holds. Kestrel is the custodian; its employees, contractors and information managers are affiliates who must follow the Act."
+    },
+    {
+     "term": "Data steward",
+     "definition": "The role responsible for what data means and how good it is: definitions, quality rules and metadata. Tomás Rivera (E-006) is Beacon's steward."
+    },
+    {
+     "term": "Privacy impact assessment",
+     "definition": "A document describing how a proposed practice or system affects privacy and how risks are reduced. Under section 64 of the Health Information Act it is submitted to the Commissioner for review and comment before implementation."
+    },
+    {
+     "term": "De-identification",
+     "definition": "Removing or replacing identifiers so a record no longer points to a person: no names or health numbers, pseudonymous visit IDs, age bands instead of birth dates."
+    },
+    {
+     "term": "Small-count suppression",
+     "definition": "Hiding counts small enough to identify someone. Kestrel policy suppresses counts under 5 in reports shared outside the care team; it is a Kestrel rule, not a statute."
+    }
+   ],
+   "build": {
+    "goal": "Finish two Release 1 documents: a classification register that gives the class, owner, custodian, handling rules and retention for every store of Beacon data, and a privacy impact assessment ready for Chief Privacy Officer approval and submission.",
+    "steps": [
+     "Open Project, then Release 1, then Health information classification register. Read How to write it and See the finished example before you type.",
+     "List one row per store of data: visit data in A-002, the bed census in A-006, the patient record in A-001, A-010 staging, the A-010 de-identified views (khn_ed_visits, khn_bed_census), the semantic model (A-009), service desk tickets (A-011), the data-quality exception table, sign-in and site group membership in the Identity Directory (A-007), and the legacy Excel extracts in Email and Collaboration (A-013).",
+     "Give each row an ID (IA-01 onward), the system, class, owner and custodian. Start from khn_assets.csv and the classification column of data-dictionary.csv in Practice, Labs, then classify each store by what it actually holds: the legacy extracts carry patient detail, so they are Restricted even though A-013 is Confidential. Add the reports and outputs table, handling rules by class, and retention and disposal for each asset.",
+     "In the owners, stewards and custodians section, separate custodian in the Health Information Act (Kestrel) from the system custodian in CISSP terms (Kevin Park's technical role).",
+     "Open the Privacy impact assessment. Write the project description and why an assessment is needed, then number the information flow, marking the step where staging becomes de-identified views as the point where Restricted becomes Confidential, and list every data element with where it is held and why.",
+     "Write the authority, purpose and minimization section (sections 57 and 58, with the small-count rule as Kestrel policy), the safeguards table (section 60), the privacy risks P-01 to P-07 linked to R-02, R-05 and I-02, and the breach response under section 60.1.",
+     "Write the approval and submission section: Priya Raman (E-003) approves; Kestrel submits to the Information and Privacy Commissioner for review and comment before task 6 starts on 2026-09-25; the closing letter is filed with the document.",
+     "Tick the Done when checklist, then complete Explain it in your own words and Check yourself."
+    ],
+    "modelAnswer": "Register row IA-04: staging extracts in the Clinical Data Warehouse (A-010). Class: Restricted, because it holds individually identifying health information from A-002 and A-006. Owner: Tomás Rivera (E-006), the system owner; the ED rows still belong to Dr. Sarah Whitford (E-007) and the bed rows to Janelle Cardinal (E-008). Custodian: Kevin Park (E-009). Handling: stays in staging and never enters the Power BI service. Retention (Kestrel policy, agreed): 30 days after each load reconciles, then a logged purge job run by E-009."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Asset Security (Domain 2): when a question asks who classifies data or approves access to it, choose the data owner. The custodian implements the owner's decisions. Classification follows the most sensitive element and must be reviewed when data sets are combined."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management (Domain 1): a privacy impact assessment is a compliance and risk tool completed before a system goes live. An answer that runs the assessment after implementation, or treats a regulator's review as approval, is wrong."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Business Environment task 2, Plan and manage project compliance: treat a legal requirement as a scheduled, owned deliverable with its risks in the register. The best answer builds compliance into the plan early rather than escalating at the end."
+    }
+   ],
+   "pitfalls": [
+    "Abbreviating privacy impact assessment. At Kestrel the three-letter short form belongs to physician initial assessment, so always write the full name.",
+    "Saying the Commissioner approved the assessment. The Commissioner reviews and comments and sends a closing letter; Kestrel's Chief Privacy Officer approves it internally.",
+    "Classifying by system instead of by data: staging is Restricted even though the views built from it are Confidential.",
+    "Presenting the under-5 rule as law. It is Kestrel policy; the law is the duty of highest anonymity and least amount."
+   ],
+   "check": [
+    {
+     "q": "Who sets the classification of Beacon's ED visit data, and who applies the controls?",
+     "a": "Dr. Sarah Whitford (E-007), the data owner, sets the classification and decides access. Kevin Park (E-009), the custodian for the source system and warehouse, runs the controls she chooses. Tomás Rivera (E-006) is the steward for definitions and quality."
+    },
+    {
+     "q": "Beacon's dashboards hold only de-identified data. Why does it still need a privacy impact assessment under the Health Information Act?",
+     "a": "Because the pipeline is a new information system that collects and uses individually identifying health information: it reads Restricted data from A-002 and A-006 into warehouse staging. Section 64 covers such systems, and the assessment must be submitted to the Commissioner for review and comment before implementation."
+    },
+    {
+     "q": "PGH had 2 visits that left without being seen in the quarter. What should a shared report show, and is that rule a law?",
+     "a": "The count is suppressed, and PGH's LWBS rate is blank, because Kestrel's reporting rule hides counts under 5 and any rate whose numerator is under 5 in reports shared outside the care team. The rule is Kestrel policy. It supports the Act's duties of highest degree of anonymity (section 57) and least amount (section 58), but the threshold of 5 is not in the Act."
+    }
+   ]
+  },
+  {
+   "key": "w3-s2",
+   "summary": "You will learn to profile data before you change it: row counts, blanks, distinct values, ranges and cross-field checks. You will profile the emergency department, bed census and service desk files in Power Query and log every finding in the data-quality workbook.",
+   "read": [
+    {
+     "heading": "Profile before you clean",
+     "body": "Profiling measures what the data really looks like before you decide what to do with it. You compare what you find with the data dictionary and Kestrel's data-quality rules DQ-01 to DQ-14, log every finding with its evidence, and only then clean.\n\nWhy this order? If you clean first, you lose the evidence. Suppose a leader asks why Kestrel General Hospital (KGH) shows 213 emergency department (ED) visits when the raw file has 216 KGH rows (214 written KGH and 2 written kgh). The answer is a logged trail: one duplicate (V0318) and two quarantined rows (V0070, V0075). Risk R-01 in the RAID log (risks, assumptions, issues and decisions), owned by Tomás Rivera (E-006), is exactly this: poor data quality undermines trust in the dashboards.\n\nProfile at three levels:\n\n- Table: row count, exact duplicate rows, repeated business keys.\n- Column: blanks, distinct values, minimum and maximum, values outside the governed list.\n- Across columns and tables: timestamps in a possible order, fields that contradict each other, keys that match a reference table.\n\nKestrel's ED definitions guide the cross-field checks. The clock starts at arrival. Time to physician initial assessment (PIA) runs from arrival to PIA. A left without being seen (LWBS) visit has no PIA time."
+    },
+    {
+     "heading": "Power Query's profiling tools",
+     "body": "In Power BI Desktop choose Transform data to open the Power Query Editor. On the View tab turn on:\n\n- Column quality: the share of each column that is Valid, Error or Empty.\n- Column distribution: distinct values (how many different values) and unique values (values that appear exactly once).\n- Column profile: for the selected column, count, error, empty, distinct, unique, minimum and maximum, plus a value distribution chart.\n\nBy default these tools read only the top 1,000 rows; the status bar says Column profiling based on top 1000 rows. Click it and choose Column profiling based on entire data set. The lab files are small, but warehouse tables are not.\n\nProfile twice. First the raw text, so you see values exactly as they arrived (kgh and KGH are two values). Then set data types and profile again, so values that cannot convert appear as errors (2026-09-31 becomes an Error cell).\n\nYou can save a profile as a query so it refreshes as evidence. SourceFolder is a text parameter holding the folder path (Home, Manage parameters, New parameter):\n\n```\nlet\n    Source = Csv.Document(File.Contents(SourceFolder & \"khn_ed_visits.csv\"),\n        [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),\n    BlanksToNull = Table.ReplaceValue(Promoted, \"\", null, Replacer.ReplaceValue,\n        Table.ColumnNames(Promoted)),\n    Profile = Table.Profile(BlanksToNull)\nin\n    Profile\n```\n\nTable.Profile returns one row per column with Min, Max, Average, StandardDeviation, Count, NullCount and DistinctCount. A text file gives empty text, not null, for a blank cell, so replace empty text with null first or NullCount shows 0."
+    },
+    {
+     "heading": "What the ED file shows",
+     "body": "Site codes stand for Kestrel General Hospital (KGH), Aspen Ridge Hospital (ARH), Coulee Valley Hospital (CVH) and Prairie Gate Health Centre (PGH). CTAS is the Canadian Triage and Acuity Scale, levels 1 to 5. Profile khn_ed_visits.csv (10 columns) and you find this:\n\n| Check | Profile result | Finding and rule |\n|---|---|---|\n| Rows and keys | 480 rows; visit_id has 478 distinct values | V0315 and V0318 repeat; the copies are identical, so exact duplicates from overlapping August and September extracts (DQ-01) |\n| site_code | KGH 214, ARH 107, CVH 102, PGH 55, kgh 2 | V0140 and V0309 in lower case (DQ-03) |\n| ctas_level | 7 distinct values, minimum 0, maximum 6 | V0222 (0) and V0070 (6) outside 1 to 5 (DQ-05) |\n| arrival_datetime | 1 error after typing as date/time | V0476 has 2026-09-31, which does not exist (DQ-04) |\n| pia_datetime | 27 empty | disposition shows 28 LWBS, so one LWBS row has a PIA time: V0075 (DQ-07) |\n| departure_datetime | 1 empty | V0268 is Discharged with no departure (DQ-06) |\n| Timestamp order | Needs a custom check column | V0385 PIA before triage; V0421 PIA before arrival (DQ-06) |\n\nNotice the cross-field check in the PIA row. Neither column alone looks wrong: 27 blanks is plausible and 28 LWBS is plausible. Only comparing them shows the contradiction."
+    },
+    {
+     "heading": "What the bed census and service desk files show",
+     "body": "khn_bed_census.csv is a midnight snapshot, one row per unit per day:\n\n| Check | Profile result | Finding and rule |\n|---|---|---|\n| Rows | 644, which equals 7 units times 92 days | Looks complete, but two problems cancel out |\n| unit_id distribution | KGH-ICU 93 rows, ARH-SUR 91, the other five 92 | KGH-ICU 2026-07-15 duplicated (DQ-01); ARH-SUR 2026-08-16 missing (DQ-09) |\n| alc_patients | minimum -1 | CVH-MED 2026-07-22 (DQ-05) |\n| occupied versus staffed | custom column [occupied_beds] > [staffed_beds] | KGH-MED4A 2026-09-08, 34 occupied of 32 staffed: possible surge, a review item (DQ-11) |\n\nkhn_service_desk.csv has one row per ticket:\n\n| Check | Profile result | Finding and rule |\n|---|---|---|\n| Rows and keys | 220 rows; ticket_id 219 distinct | SD-10210 exact duplicate (DQ-01) |\n| resolved_at | 9 empty | Open at the extract (2026-10-01 00:00); normal |\n| priority | 1 empty, and sla_target_hours 1 empty | SD-10057 has no priority, so no target (DQ-02) |\n| Time order | custom column [resolved_at] < [opened_at] | SD-10089 resolved before opened (DQ-06) |\n| Stored service level agreement (SLA) flag | recompute sla_met from the times | SD-10011 stored Y, but 77.3 hours against a 72-hour target: N (DQ-08) |\n| csat | 131 empty in the raw file | No survey response; leave blank, never 0 |"
+    },
+    {
+     "heading": "Check keys and references with Group By and merges",
+     "body": "Two checks need a little M, Power Query's formula language.\n\nRepeated keys. Create a blank query (Home, New source, Blank query), name it DuplicateKeys, open Advanced editor, group by the key and keep groups with more than one row:\n\n```\nlet\n    Grouped = Table.Group(Raw_EDVisits, {\"visit_id\"},\n        {{\"Rows\", each Table.RowCount(_), Int64.Type}}),\n    DuplicateKeys = Table.SelectRows(Grouped, each [Rows] > 1)\nin\n    DuplicateKeys\n```\n\nThis returns V0315 and V0318 with 2 rows each. Then Table.RowCount(Table.Distinct(Raw_EDVisits)) returns 478: removing exact duplicates also removes the repeated keys. Had it stayed at 480, you would have the same key with different content, and rule DQ-02 says quarantine both rows and ask the owner.\n\nReference checks. A Left Anti merge keeps rows in the first table with no match in the second. In the editor: Home, Merge queries, pick the reference table and key columns, Join kind Left Anti. Written as a blank query named UnmatchedSites:\n\n```\nlet\n    UnmatchedSites = Table.NestedJoin(Raw_EDVisits, {\"site_code\"},\n        Raw_Sites, {\"site_code\"}, \"Site\", JoinKind.LeftAnti)\nin\n    UnmatchedSites\n```\n\nOn the raw file this returns V0140 and V0309, because Power Query merges are case-sensitive and kgh does not equal KGH. Run the same check for unit_id in the bed census against khn_units.csv and for site_code in the service desk file; both return 0 rows. Rule DQ-10 says an unmatched key loads against an Unknown member and goes to the owner; it never disappears silently."
+    },
+    {
+     "heading": "Write the issue log",
+     "body": "Each problem becomes one row in the issue log of the Power Query data-quality workbook. The profile figure that revealed it goes in the profiling summary just above, so every row traces to evidence. Use the same columns every time:\n\n| ID | Rows | Problem | Rule | Handling |\n|---|---|---|---|---|\n| ED-01 | V0315, V0318 | Exact duplicates (480 rows, 478 distinct visit_id) | DQ-01 | Remove the second copy of each |\n| ED-03 | V0070 (6), V0222 (0) | ctas_level outside 1 to 5 | DQ-05 | Quarantine; Dr. Sarah Whitford (E-007) corrects from the triage record |\n| BC-02 | ARH-SUR 2026-08-16 | Missing unit-day (ARH-SUR has 91 rows) | DQ-09 | Report to Janelle Cardinal (E-008); request the snapshot from A-006; do not impute |\n| TK-04 | SD-10011 | sla_met Y at 77.3 hours, target 72 | DQ-08 | Recompute every flag; this one becomes N |\n\nNumber emergency department rows ED-01 to ED-07, bed census rows BC-01 to BC-04 and service desk rows TK-01 to TK-04. Name the owner who must correct each source in the workbook's sign-off and open actions.\n\nThree habits make the log trustworthy:\n\n- Never fix the source file by hand. Every fix is a recorded step, so the next refresh repeats it.\n- Name the owner who can confirm the true value. Analysts flag; owners decide.\n- Record normal conditions too, such as the 9 open tickets and blank survey scores, so nobody logs them as errors next month."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Data profiling",
+     "definition": "Measuring row counts, blanks, distinct values, ranges and cross-field rules before cleaning, so every later change rests on logged evidence."
+    },
+    {
+     "term": "Column quality",
+     "definition": "A Power Query View option that shows the percentage of Valid, Error and Empty values in each column."
+    },
+    {
+     "term": "Distinct versus unique",
+     "definition": "Distinct counts how many different values a column has. Unique counts values that appear exactly once. For a key column, unique should equal the row count."
+    },
+    {
+     "term": "Exact duplicate",
+     "definition": "A row identical to another in every column (rule DQ-01). Remove the second copy and log the count. Different from a repeated key with different content, which rule DQ-02 quarantines."
+    },
+    {
+     "term": "Cross-field check",
+     "definition": "A test that compares columns, such as an LWBS visit that has a PIA time. Each column can look fine alone while the pair contradicts."
+    },
+    {
+     "term": "Left Anti merge",
+     "definition": "A Power Query join that keeps only rows from the first table with no match in the second. It finds keys that will not relate to a reference table."
+    }
+   ],
+   "build": {
+    "goal": "Profile khn_ed_visits.csv, khn_bed_census.csv and khn_service_desk.csv in Power Query, then record the profiling summary and every problem, with its rows, rule and handling, in the issue log of the Power Query data-quality workbook.",
+    "steps": [
+     "In Practice, open Labs and save khn_ed_visits.csv, khn_bed_census.csv, khn_service_desk.csv, khn_sites.csv and khn_units.csv to one folder. In Power BI Desktop create a text parameter SourceFolder (Home, Manage parameters) holding that folder path, ending with a backslash.",
+     "Get data, Text/CSV, for each file and choose Transform data. Rename the queries Raw_EDVisits, Raw_BedCensus, Raw_ServiceDesk, Raw_Sites and Raw_Units, and delete the automatic Changed Type step so the raw queries stay as text.",
+     "On the View tab turn on Column quality, Column distribution and Column profile, then switch the status bar to Column profiling based on entire data set.",
+     "For every column record rows, empty, distinct, minimum and maximum. Add temporary custom columns for the cross-field checks: LWBS with a PIA time, PIA before triage or arrival, occupied above staffed, resolved before opened.",
+     "Add the DuplicateKeys and UnmatchedSites queries from the lesson for each file, and an unmatched unit check for the bed census against Raw_Units.",
+     "Open Project, Release 1, Power Query data-quality workbook. Write the sources and rules, the profiling summary for each file (including normal conditions such as 9 open tickets and blank csat), then the issue log: one row per problem with ID, rows, problem, rule and handling.",
+     "Compare your log with See the finished example: all eight ED problem types (seven rows, because ED-04 holds both timestamp-order problems), four bed problems and four service desk problems should appear with the right rule."
+    ],
+    "modelAnswer": "Issue log row ED-07. Rows: V0075. Problem: left without being seen (LWBS) with a physician initial assessment (PIA) time. Rule: DQ-07. Handling: quarantine, because either the disposition or the PIA time is wrong and the data cannot tell which. Evidence in the profiling summary: 28 LWBS dispositions but only 27 empty pia_datetime values; V0075 is LWBS with a PIA at 2026-07-16 17:05. Open action: Tomás Rivera (E-006), as data steward, checks V0075 against the ED Tracking Board (A-002), and Dr. Sarah Whitford (E-007) decides the clinical meaning: left without being seen, or assessed."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Prepare the data, profile and clean: know the three View tab tools. Column quality shows Valid, Error and Empty percentages; Column distribution shows distinct and unique counts; Column profile shows statistics and a value distribution. Profiling defaults to the top 1,000 rows."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Distinct versus unique is a common trap. Distinct counts different values; unique counts values that occur exactly once. A key column is safe for a relationship only when unique equals the row count."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Merge queries with Join kind Left Anti returns rows that have no match. It is the quickest way to find keys that would not relate in the model, and remember that Power Query merges are case-sensitive."
+    }
+   ],
+   "pitfalls": [
+    "Profiling only the top 1,000 rows. Switch the status bar to the entire data set before you trust a count.",
+    "Trusting a matching row count. The bed census has the expected 644 rows only because one duplicate and one missing day cancel out.",
+    "Logging open tickets or blank survey scores as errors. A blank resolved_at at the extract and a blank csat are normal states.",
+    "Fixing values in the source file by hand, which destroys the evidence and is undone at the next refresh."
+   ],
+   "check": [
+    {
+     "q": "The bed census has 644 rows, exactly 7 units times 92 days. Why is that not proof it is complete?",
+     "a": "Because errors can cancel out. The unit_id distribution shows KGH-ICU with 93 rows (2026-07-15 duplicated) and ARH-SUR with 91 (2026-08-16 missing). After removing the duplicate there are 643 rows against 644 expected unit-days, and the gap is reported, not filled."
+    },
+    {
+     "q": "How do you tell an exact duplicate from a repeated key with different content, and why does it matter?",
+     "a": "Group by the key to find repeats, then compare the row count after Table.Distinct. In the ED file both repeats (V0315, V0318) disappear, so they are exact duplicates and DQ-01 removes one copy. If rows shared a key but differed, DQ-02 says quarantine both and ask the owner, because you cannot tell which is right."
+    },
+    {
+     "q": "A Left Anti merge of the raw ED rows against the site list returns two rows. What are they, and what does that teach you?",
+     "a": "V0140 and V0309, whose site_code is kgh. Power Query merges are case-sensitive, so kgh does not match KGH. Rule DQ-03 says trim and upper-case codes before matching; after that the check returns 0 rows and both visits count for KGH."
+    }
+   ]
+  },
+  {
+   "key": "w3-s3",
+   "summary": "You will build Beacon's repeatable cleaning pipeline in Power Query: standardize codes, remove exact duplicates, set types and catch bad values with try, and send bad rows to an exception table made with Reference. Your output must reconcile to 474 valid visits, 643 census rows and 219 tickets.",
+   "read": [
+    {
+     "heading": "Design the layers first",
+     "body": "A pipeline is a chain of queries, each with one job. Beacon uses three layers:\n\n1. Raw: the file exactly as it arrived, all text, load disabled (Raw_EDVisits from the last session).\n2. Staged: stg_EDVisit removes exact duplicates, turns blanks into null, standardizes codes, sets types and adds a DQRule column naming the rule a row breaks. Load disabled, so it is connection only.\n3. Outputs: the clean fact table FactEDVisit (loaded) and the exception table ex_EDVisit, which keeps the bad rows as evidence (rule DQ-13).\n\nBuild each output with Reference, not Duplicate. Right-click stg_EDVisit and choose Reference: the new query starts from stg_EDVisit's output, so it inherits every staged step, and a rule fixed once reaches both outputs. Duplicate copies the steps into an independent query; the copies drift and the two tables stop adding up.\n\nClear Enable load (right-click the query) on raw and staged queries so they stay out of the model."
+    },
+    {
+     "heading": "stg_EDVisit: deduplicate, standardize, type, flag",
+     "body": "Right-click Raw_EDVisits, choose Reference, name the new query stg_EDVisit and open Advanced editor:\n\n```\nlet\n    Source = Raw_EDVisits,\n    Deduped = Table.Distinct(Source),\n    Blanks = Table.ReplaceValue(Deduped, \"\", null, Replacer.ReplaceValue,\n        {\"pia_datetime\", \"departure_datetime\"}),\n    Upper = Table.TransformColumns(Blanks,\n        {{\"site_code\", each Text.Upper(Text.Trim(_)), type text}}),\n    Raw = Table.AddColumn(Upper, \"RawArrival\", each [arrival_datetime], type text),\n    Typed = Table.TransformColumnTypes(Raw, {\n        {\"arrival_datetime\", type datetime}, {\"triage_datetime\", type datetime},\n        {\"pia_datetime\", type datetime}, {\"departure_datetime\", type datetime},\n        {\"ctas_level\", Int64.Type}}),\n    Flagged = Table.AddColumn(Typed, \"DQRule\", each\n        if (try [arrival_datetime])[HasError] then \"DQ-04\"\n        else if [ctas_level] < 1 or [ctas_level] > 5 then \"DQ-05\"\n        else if [disposition] = \"LWBS\" and [pia_datetime] <> null then \"DQ-07\"\n        else null, type nullable text)\nin\n    Flagged\n```\n\n- Table.Distinct with no column list removes rows identical in every column (DQ-01): 480 to 478.\n- Table.ReplaceValue turns empty text into null, so a blank PIA or departure time is a true null.\n- Text.Upper(Text.Trim(_)) turns kgh into KGH, the code for Kestrel General Hospital (DQ-03).\n- RawArrival copies the arrival text before the type change, so the original value survives whatever happens to the typed column.\n- The type change turns 2026-09-31 on V0476 into an Error cell. Leave it there: Remove Errors would delete the evidence.\n- try [arrival_datetime] catches that error instead of failing. It returns a record whose HasError field is true for V0476, so the row is flagged. When you want a fallback value instead, the short form is try ... otherwise, for example try x otherwise null.\n- DQRule names the first rule each row breaks: DQ-04 invalid date, DQ-05 CTAS (Canadian Triage and Acuity Scale) level outside 1 to 5, DQ-07 a left without being seen (LWBS) visit with a physician initial assessment (PIA) time.\n\nThe finished example in the workbook starts stg_EDVisit straight from the file through the SourceFolder parameter; referencing Raw_EDVisits gives the same rows."
+    },
+    {
+     "heading": "FactEDVisit and ex_EDVisit",
+     "body": "Reference stg_EDVisit twice. FactEDVisit keeps valid rows, adds the durations and renames to the target names in source-to-target.csv:\n\n```\nlet\n    Source = stg_EDVisit,\n    Valid = Table.SelectRows(Source, each [DQRule] = null),\n    Ordered = Table.AddColumn(Valid, \"OrderOK\", each\n        [triage_datetime] >= [arrival_datetime]\n        and ([pia_datetime] = null or [pia_datetime] >= [triage_datetime])\n        and ([departure_datetime] = null or [departure_datetime] >=\n            (if [pia_datetime] = null then [triage_datetime] else [pia_datetime])),\n        type logical),\n    PIA = Table.AddColumn(Ordered, \"MinutesToPIA\", each\n        if [OrderOK] and [pia_datetime] <> null\n        then Number.Round(Duration.TotalMinutes([pia_datetime] - [arrival_datetime]))\n        else null, Int64.Type),\n    LOS = Table.AddColumn(PIA, \"EDLOSMinutes\", each\n        if [OrderOK] and [departure_datetime] <> null\n        then Number.Round(Duration.TotalMinutes([departure_datetime] - [arrival_datetime]))\n        else null, Int64.Type),\n    ArrDate = Table.AddColumn(LOS, \"ArrivalDate\", each DateTime.Date([arrival_datetime]), type date),\n    Renamed = Table.RenameColumns(ArrDate, {\n        {\"visit_id\", \"VisitID\"}, {\"site_code\", \"SiteCode\"},\n        {\"arrival_datetime\", \"ArrivalDateTime\"}, {\"ctas_level\", \"CTASLevel\"},\n        {\"triage_datetime\", \"TriageDateTime\"}, {\"pia_datetime\", \"PIADateTime\"},\n        {\"disposition\", \"Disposition\"}, {\"departure_datetime\", \"DepartureDateTime\"},\n        {\"age_band\", \"AgeBand\"}, {\"arrival_mode\", \"ArrivalMode\"}}),\n    Result = Table.RemoveColumns(Renamed, {\"DQRule\", \"OrderOK\", \"RawArrival\"})\nin\n    Result\n```\n\nOrderOK checks the whole sequence: triage at or after arrival, PIA at or after triage, and departure at or after the PIA (or triage, when there is no PIA). A PIA before arrival is always a PIA before triage, so V0385 and V0421 both fail it. ex_EDVisit is the exception table:\n\n```\nlet\n    Source = stg_EDVisit,\n    Quarantined = Table.SelectRows(Source, each [DQRule] <> null),\n    Loadable = Table.ReplaceErrorValues(Quarantined, {{\"arrival_datetime\", null}})\nin\n    Loadable\n```\n\nTable.ReplaceErrorValues blanks V0476's impossible typed arrival so the table can load. The row keeps its rule ID, and RawArrival still shows the original text, 2026-09-31 10:41, so the evidence travels with the exception table.\n\nExpected results (ARH, CVH and PGH are Aspen Ridge Hospital, Coulee Valley Hospital and Prairie Gate Health Centre):\n\n| Query | Rows | Detail |\n|---|---|---|\n| FactEDVisit | 474 | KGH 213, ARH 105, CVH 101, PGH 55 |\n| MinutesToPIA not null | 445 | 27 LWBS visits have no PIA; V0385 and V0421 are out of order (DQ-06) |\n| EDLOSMinutes not null | 471 | V0385, V0421 and V0268 (no departure) |\n| ex_EDVisit | 4 | V0476 DQ-04; V0070 and V0222 DQ-05; V0075 DQ-07 |\n\n474 loaded + 4 quarantined + 2 duplicates = 480 source rows. Out-of-order visits stay in the counts and the LWBS rate; only their durations are null. Kestrel timestamps are whole minutes, so Number.Round only guards against rounding noise."
+    },
+    {
+     "heading": "Bed census and service desk",
+     "body": "FactBedCensus follows the same pattern: Table.Distinct (644 to 643), then Table.TransformColumnTypes for census_date (date) and the three counts (Int64.Type), then two rule steps:\n\n```\n    WithALC = Table.AddColumn(Typed, \"ALCPatients\", each\n        if [alc_patients] < 0 then null else [alc_patients], Int64.Type),\n    WithFlag = Table.AddColumn(WithALC, \"OverCapacityFlag\", each\n        [occupied_beds] > [staffed_beds], type logical)\n```\n\nThen remove alc_patients and rename to the target names. Expected: 643 rows; ALCPatients null only for CVH-MED 2026-07-22; OverCapacityFlag true only for KGH-MED4A 2026-09-08, kept as a review item (DQ-11).\n\nFor FactServiceTicket the key step recomputes the service level agreement (SLA) flag from the timestamps (DQ-08):\n\n```\n    ExtractAt = #datetime(2026, 10, 1, 0, 0, 0),\n    WithHours = Table.AddColumn(Typed, \"ResolutionHours\", each\n        if [resolved_at] = null or [resolved_at] < [opened_at] then null\n        else Duration.TotalHours([resolved_at] - [opened_at]), type nullable number),\n    WithSLA = Table.AddColumn(WithHours, \"SLAMet\", each\n        if [priority] = null or ([resolved_at] <> null and [resolved_at] < [opened_at]) then null\n        else if [resolved_at] = null then\n            (if Duration.TotalHours(ExtractAt - [opened_at]) > [sla_target_hours] then \"N\" else null)\n        else if [ResolutionHours] <= [sla_target_hours] then \"Y\" else \"N\",\n        type nullable text)\n```\n\nBefore it: Table.Distinct, blanks to null, types. Expected: 219 tickets; SLAMet Y 137, N 75, blank 7 (5 still inside target, SD-10089, SD-10057); SD-10011 changes from Y to N. Then rename and add OpenedDate = DateTime.Date([OpenedAt])."
+    },
+    {
+     "heading": "Append, merge and reference checks",
+     "body": "Table.Combine appends tables that share columns. If Kestrel sends one emergency department (ED) extract per month:\n\n```\nCombined = Table.Combine({ED_Extract_August, ED_Extract_September})\n```\n\nThat is how V0315 and V0318 arrived twice: both are 31 August visits present in both extracts. Always follow an append with Table.Distinct.\n\nA merge (Table.NestedJoin) joins another table by key. Beacon uses merges for checks, not to flatten dimensions into facts. Left Anti merges of FactEDVisit to DimSite and FactBedCensus to DimUnit return 0 rows. The missing-snapshot check compares every expected unit-day with the census:\n\n```\nlet\n    Dates = List.Dates(#date(2026, 7, 1), 92, #duration(1, 0, 0, 0)),\n    Expected = Table.ExpandListColumn(\n        Table.AddColumn(DimUnit, \"CensusDate\", each Dates), \"CensusDate\"),\n    Missing = Table.NestedJoin(Expected, {\"UnitID\", \"CensusDate\"},\n        FactBedCensus, {\"UnitID\", \"CensusDate\"}, \"Match\", JoinKind.LeftAnti),\n    Result = Table.SelectColumns(Missing, {\"UnitID\", \"CensusDate\"})\nin\n    Result\n```\n\nExpected holds 644 unit-days (7 units by 92 days); Result is one row, ARH-SUR 2026-08-16, which goes to Janelle Cardinal (E-008)."
+    },
+    {
+     "heading": "Query folding",
+     "body": "Query folding means Power Query translates your steps into the source's own language, usually SQL (Structured Query Language), so the source does the work and returns only the result. It drives refresh time, and in DirectQuery it decides whether a query can run at all.\n\n- Text files cannot fold; Power Query runs every step itself.\n- In production Beacon reads the de-identified views in the Clinical Data Warehouse (A-010). Choosing columns, filtering rows, renaming and simple type changes usually fold there.\n- Custom columns that use try often stop folding, and every later step then runs locally.\n\nPut foldable steps first and custom logic last. To check, right-click a step: if View Native Query is available, that step folds; if it is greyed out, it probably does not. Power Query Online shows a folding indicator beside each step."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Reference query",
+     "definition": "A new query whose source is the output of an existing query. Changes upstream flow into every referencing query, so clean and exception outputs share one set of rules."
+    },
+    {
+     "term": "Duplicate query",
+     "definition": "An independent copy of a query's steps. Later edits to the original do not reach the copy, so the two drift apart."
+    },
+    {
+     "term": "try expression",
+     "definition": "M's way to catch an error. try x returns a record whose HasError field says whether x failed; try x otherwise y returns y instead of the error. Beacon uses (try [arrival_datetime])[HasError] to flag V0476's impossible date without deleting the row."
+    },
+    {
+     "term": "Exception table",
+     "definition": "A query, ex_EDVisit in Beacon, that keeps rows breaking a quarantine rule, with the rule ID, as evidence for the data owner. Kestrel rule DQ-13 forbids deleting them."
+    },
+    {
+     "term": "Query folding",
+     "definition": "Power Query's translation of steps into the source's native query, so the source filters and shapes data before sending it. Non-folding steps after a folding break run locally."
+    },
+    {
+     "term": "Enable load",
+     "definition": "A query setting that decides whether the query's output loads into the semantic model. Clear it for raw and staging queries."
+    }
+   ],
+   "build": {
+    "goal": "Build the raw, staged, fact and exception queries for all three sources in Power Query, prove they reconcile to the approved figures, and document each step in the Power Query data-quality workbook.",
+    "steps": [
+     "In the Power BI Desktop file from the last session, clear Enable load on Raw_EDVisits, Raw_BedCensus and Raw_ServiceDesk.",
+     "Right-click Raw_EDVisits, choose Reference, rename the new query stg_EDVisit, open Advanced editor and enter the staged code. Clear Enable load so it is connection only.",
+     "Reference stg_EDVisit twice to make FactEDVisit (the clean code) and ex_EDVisit (DQRule not null). Confirm 474 and 4 rows after Close and apply.",
+     "Build FactBedCensus and FactServiceTicket the same way, rename the service desk columns to the target names in source-to-target.csv, and add OpenedDate with DateTime.Date([OpenedAt]).",
+     "Create DimSite and DimUnit from the site and unit files with trimmed, upper-case codes, then run the Left Anti checks and the missing unit-day query.",
+     "In the workbook's reconciliation section record: ED 480 source, 2 duplicates, 4 quarantined, 474 loaded; beds 644 source, 1 duplicate, 643 loaded, 1 missing unit-day; tickets 220 source, 1 duplicate, 219 loaded, SLAMet 137 Y and 75 N.",
+     "In the workbook's cleaning queries and exception table sections, write each query's purpose, rules applied, row count and owner, then compare with See the finished example."
+    ],
+    "modelAnswer": "Pipeline summary for ED: Raw_EDVisits (text, not loaded) to stg_EDVisit (Table.Distinct 480 to 478, blanks to null, site codes upper-cased, types set, DQRule with a try test on arrival; connection only) to FactEDVisit (474 rows; MinutesToPIA 445 not null; EDLOSMinutes 471 not null) and ex_EDVisit (4 rows: V0476 DQ-04, V0070 and V0222 DQ-05, V0075 DQ-07). Check: 474 + 4 + 2 = 480."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Prepare the data, transform and load: Reference reuses another query's output, Duplicate copies its steps. When two outputs must come from the same cleaned base, the answer is Reference, with Enable load cleared on the base."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Resolve import errors: a type change turns unconvertible values into Error cells. Remove Errors deletes those rows, Replace Errors substitutes a value, and a try expression in a custom column keeps and flags the row. When a scenario mentions auditing, keep the evidence."
+    },
+    {
+     "cert": "PL-300",
+     "tip": "Query folding: if refresh slows after a custom step, move filters and column selection before the non-foldable step and confirm with View Native Query. Text and CSV files never fold."
+    }
+   ],
+   "pitfalls": [
+    "Using Remove Errors on the whole table: V0476 disappears without a record and 474 + 4 + 2 no longer equals 480.",
+    "Building the exception table with Duplicate instead of Reference, so a later rule change reaches only one of the two queries.",
+    "Upper-casing site codes after the reference check, so V0140 and V0309 look like orphans.",
+    "Setting LWBS durations to 0 instead of null, which pulls the median time to PIA down."
+   ],
+   "check": [
+    {
+     "q": "Your FactEDVisit has 476 rows. Name two mistakes that each produce exactly that number.",
+     "a": "Skipping Table.Distinct gives 480 minus 4 quarantined = 476, with V0315 and V0318 counted twice. Missing the CTAS range rule gives 478 minus 2 = 476, with V0070 and V0222 kept. Check the quarantine count (should be 4) and that distinct VisitID equals the row count."
+    },
+    {
+     "q": "Why do V0385 and V0421 stay in FactEDVisit when their timestamps are wrong?",
+     "a": "Rule DQ-06: the visits happened, so they count in visits and the LWBS rate. Only the durations that depend on the bad timestamps are unreliable, so MinutesToPIA and EDLOSMinutes are null. That keeps 474 visits while the median time to PIA uses 445 rows."
+    },
+    {
+     "q": "When is Duplicate the right choice instead of Reference?",
+     "a": "When you want an independent starting point that must not change when the original changes, such as trying a different approach without touching the live query. Beacon's clean and exception outputs use Reference because both must apply exactly the same staged rules."
+    }
+   ]
+  },
+  {
+   "key": "w3-s4",
+   "summary": "You will turn the cleaning rules into source-to-target rules, control totals and quality gates that prove Beacon's numbers before anyone sees them, and you will run the SQL (Structured Query Language) lab to test referential integrity. You will build the Release 1 quality plan.",
+   "read": [
+    {
+     "heading": "Quality is planned, not inspected in",
+     "body": "A quality plan says what good looks like, how you will test it, who signs, and what happens when a test fails. For Beacon it covers data, the semantic model, reports, performance, accessibility and security.\n\nThree project management ideas shape it:\n\n- Plan quality before the work: standards and tests first. In the July 2026 PMP outline this is the Process task Plan and optimize quality of products/deliverables.\n- Manage quality makes defects unlikely (clear rules, peer review of queries). Control quality tests outputs against the standards (reconciliation, measure checks).\n- Cost of quality: money spent on prevention and appraisal avoids failure costs.\n\n| Cost of quality | Beacon example |\n|---|---|\n| Prevention | Source-to-target rules; training builders on rules DQ-01 to DQ-14 |\n| Appraisal | Reconciliation queries, measure tests, RLS (row-level security) tests, accessibility checks |\n| Internal failure | Rework when a measure does not match truth before go-live |\n| External failure | A site leader acts on a wrong left without being seen (LWBS) rate and stops trusting Beacon (risk R-01) |\n\nExternal failure is the most expensive, because in a hospital it can change staffing decisions. The plan therefore puts its effort into prevention and appraisal."
+    },
+    {
+     "heading": "Source-to-target rules",
+     "body": "The sites are Kestrel General Hospital (KGH), Aspen Ridge Hospital (ARH), Coulee Valley Hospital (CVH) and Prairie Gate Health Centre (PGH). A source-to-target map documents, for every target column, its source, the rule that transforms it and the check that proves the rule worked. Beacon's map, source-to-target.csv, has 53 rows and six columns: source_file, source_column, target_table, target_column, rule and reconciliation_check.\n\n| Source column | Target | Rule | Reconciliation check |\n|---|---|---|---|\n| visit_id | FactEDVisit[VisitID] | Unique after DQ-01; quarantine rows failing DQ-04, DQ-05 or DQ-07 | 474 loaded; 4 quarantined |\n| site_code | FactEDVisit[SiteCode] | Trim and upper case; relate to DimSite | KGH 213; ARH 105; CVH 101; PGH 55; 0 unmatched |\n| pia_datetime | FactEDVisit[MinutesToPIA] | Whole minutes from arrival; null when blank or out of order | 445 not null; median 64.0 |\n| staffed_beds | FactBedCensus[StaffedBeds] | Semi-additive: add across units, never across dates | 87.0% average daily occupancy; 144 staffed beds on the last date |\n| sla_met | FactServiceTicket[SLAMet] | Recompute from timestamps (DQ-08) | 64.6% (137 of 212) |\n\nMinutesToPIA is the time to physician initial assessment (PIA).\n\nEvery rule must be testable. Clean the dates cannot be tested. A value that does not parse quarantines the row, expected result V0476, can."
+    },
+    {
+     "heading": "Control totals and reconciliation",
+     "body": "A control total is a figure computed independently at two points that must agree. Reconciliation of emergency department (ED) visits, bed census rows and service desk tickets with their service level agreement (SLA) flags proves every source row is accounted for: loaded, quarantined or removed as a duplicate.\n\n| Source | Source rows | Duplicates | Quarantined | Loaded | Check |\n|---|---|---|---|---|---|\n| ED visits | 480 | 2 | 4 | 474 | 474 + 4 + 2 = 480 |\n| Bed census | 644 | 1 | 0 | 643 | 643 + 1 missing = 644 unit-days |\n| Service desk | 220 | 1 | 0 | 219 | 113 + 57 + 49 = 219 by type |\n\nThen cross-foot the breakdowns. ED visits by site (213 + 105 + 101 + 55), by Canadian Triage and Acuity Scale (CTAS) level (7 + 46 + 192 + 158 + 71) and by disposition (59 + 363 + 27 + 25) must each give 474. Time measures have their own denominators: 445 visits with a valid time to PIA (474 less 27 LWBS less 2 out of order) and 471 with a valid length of stay (474 less 3). Tickets: 137 met plus 75 missed gives 212 with a known outcome; add 5 still inside target and the 2 excluded tickets (SD-10089, SD-10057) to return to 219.\n\nTest the known traps too. Summing staffed_beds over every row gives 12,952, which is bed-days, not beds; the right figure on 2026-09-30 is 144. Using the stored sla_met flags gives 138 of 213, 64.8%, instead of the approved 64.6%. Listing the wrong answers beside the right ones helps reviewers spot them."
+    },
+    {
+     "heading": "Quality gates",
+     "body": "A quality gate is a checkpoint with pass criteria. Work moves on only when the gate passes or the owner records a decision. Beacon's quality plan has six:\n\n| Gate | Area | Pass criteria | Evidence |\n|---|---|---|---|\n| QG-1 | Data | Row balance holds for every file; every issue has a rule and an owner | Data-quality workbook (BCN-R1-15) |\n| QG-2 | Model | Star schema as designed; DimDate marked; single-direction one-to-many relationships; 0 unmatched keys | Star schema design (BCN-R1-19) |\n| QG-3 | Accuracy | Every catalogue measure matches its expected result overall, by site and by triage level (474; 64.0; 28.3%; 5.7%; 87.0%; 84.0%; 2,075; 64.6%; 4.26 and the rest) | DAX (Data Analysis Expressions) catalogue test log (BCN-R1-20) |\n| QG-4 | Performance | Every visual renders in 3 seconds or less in Performance Analyzer in the service (agreed target) | Performance Analyzer export |\n| QG-5 | Accessibility | Kestrel's standard, Web Content Accessibility Guidelines (WCAG) 2.1 level AA: text contrast at least 4.5:1, alt text on every visual, tab order set, meaning never by colour alone, usable by keyboard and screen reader | Accessibility checklist |\n| QG-6 | Security | RLS positive and negative tests pass; small counts suppressed; Confidential label applied; workspace roles as designed | RLS test pack (BCN-R1-21); security acceptance criteria (BCN-R1-18) |\n\nRoles: Tomás Rivera (E-006) and Mei Tanaka (E-013) run the data and model tests and check each other: E-013 tests the measures E-006 wrote, and E-006 reviews the queries E-013 built. Sam Okafor (E-020) runs the security and access tests, with privacy tests witnessed by Priya Raman (E-003). Janelle Cardinal (E-008) and Dr. Sarah Whitford (E-007) accept the results.\n\nTwo design points matter. The builder is never the only checker; that is segregation of duties applied to quality. And a failed gate produces a decision record, not a quiet fix."
+    },
+    {
+     "heading": "The SQL lab: referential integrity",
+     "body": "The same checks run in SQL (Structured Query Language) against a warehouse. Practise them in Labs with khn_lab.sql, a SQLite file with five tables: sites 4 rows, staff 42, assets 15, security_events 20 and service_tickets 30. Its foreign keys are deliberately not enforced, so you can find orphans: rows whose key points to nothing.\n\nThe pattern is a LEFT JOIN, which keeps every row on the left, then a filter for rows with no match on the right:\n\n```\nSELECT t.ticket_id, t.site_code\nFROM service_tickets AS t\nLEFT JOIN sites AS s ON s.site_code = t.site_code\nWHERE s.site_code IS NULL\nORDER BY t.ticket_id;\n```\n\n| Query | Finds | Expected |\n|---|---|---|\n| Q1 | Staff whose manager_id has no staff row | E-037 with E-099 |\n| Q2 | Security events whose asset_id has no asset | SEC-016 with A-021 |\n| Q3 | Tickets whose site_code has no site | SD-10113 with PGC |\n| Q4 | Tickets per site with an Unknown member | ARH 6, CVH 8, KGH 13, PGH 2, Unknown 1 |\n\nQ1 adds WHERE s.manager_id IS NOT NULL, so people at the top of a reporting line are not reported as orphans. Q4 shows why inner joins are dangerous in reporting:\n\n```\nSELECT COALESCE(s.site_code, 'Unknown') AS site, COUNT(*) AS tickets\nFROM service_tickets AS t\nLEFT JOIN sites AS s ON s.site_code = t.site_code\nGROUP BY COALESCE(s.site_code, 'Unknown')\nORDER BY site;\n```\n\nThe five rows add to 30, the table total. An inner join returns 29 and loses SD-10113 (PGC, a typing error for PGH in the lab copy) without warning. That is rule DQ-10 in SQL: keep the row visible under Unknown."
+    },
+    {
+     "heading": "Integrity is a security property",
+     "body": "In CISSP terms this whole plan protects integrity: data is complete, accurate and changed only by authorized processes. Classic application controls map straight onto Beacon:\n\n- Input controls: type, range and format checks (CTAS 1 to 5, real calendar dates).\n- Processing controls: record counts and control totals at each step (480 to 478 to 474). A hash total, a sum of a field with no business meaning, works the same way.\n- Output controls: reconciliation of published figures to approved ones, reviewed by someone other than the builder.\n\nQuality evidence is also security evidence. Gate QG-6 links to the security acceptance criteria you write next session, and the go-live decision will ask to see both."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Quality plan",
+     "definition": "The document that sets quality standards, tests, gates, roles and failure handling for a deliverable before the work is done."
+    },
+    {
+     "term": "Source-to-target map",
+     "definition": "A table that gives, for each target column, its source column, the transformation rule and the check that proves the rule worked."
+    },
+    {
+     "term": "Control total",
+     "definition": "A count or sum computed independently at two points in a process that must agree, such as 480 source rows against 474 loaded plus 4 quarantined plus 2 duplicates."
+    },
+    {
+     "term": "Reconciliation",
+     "definition": "Proving that every source row and value is accounted for in the output, and that breakdowns add back to the total."
+    },
+    {
+     "term": "Quality gate",
+     "definition": "A checkpoint with written pass criteria and a named signer. Work passes only on evidence or a recorded owner decision."
+    },
+    {
+     "term": "Cost of quality",
+     "definition": "Prevention and appraisal costs spent to avoid internal and external failure costs. External failure, a wrong figure reaching leaders, costs the most."
+    },
+    {
+     "term": "Orphan record",
+     "definition": "A row whose foreign key matches nothing in the reference table, such as ticket SD-10113 with site code PGC. Keep it under an Unknown member so totals still add up."
+    }
+   ],
+   "build": {
+    "goal": "Write the Release 1 quality plan: measurable standards, roles that keep builder and tester apart, six quality gates with evidence, source-to-target rules and reconciliation controls, test methods and defect thresholds, after practising the integrity checks in the SQL lab.",
+    "steps": [
+     "Open Project, Release 1, Quality plan, and read How to write it and See the finished example.",
+     "In Quality objectives and standards, write the measurable standards: figures match the approved reconciliation figures, one definition per measure, no identifying data in the model with counts under 5 suppressed on shared pages, WCAG 2.1 level AA, and every visual in 3 seconds or less (agreed target). Then name the roles so nobody signs off their own work.",
+     "Copy the FactEDVisit, FactBedCensus and FactServiceTicket rows from source-to-target.csv in Practice, Labs into the source-to-target and reconciliation controls section, and rewrite any rule that has no expected result.",
+     "Build the reconciliation table for all three sources and the cross-foot checks by site, CTAS level, disposition, ticket type and SLA outcome, with the known wrong answers beside the right ones.",
+     "Write gates QG-1 to QG-6 with area, pass criteria and evidence; label the 3-second performance target as agreed.",
+     "In Labs, load khn_lab.sql into SQLite and run Q1 to Q4 against the expected answers at the end of the file. Use what you learn to write the keys control: 0 unmatched SiteCode, UnitID or CTASLevel, and every fact date found in DimDate.",
+     "Add the test methods and evidence, including the DAX query view test by site, and the defect severities with how many are allowed at go-live: none for a wrong figure or a privacy or security failure. Say what happens when a gate fails and where the decision is recorded (the RAID log of risks, assumptions, issues and decisions)."
+    ],
+    "modelAnswer": "QG-1 Data gate. Test: run the pipeline and the reconciliation checks. Pass: ED 480 = 474 loaded + 4 quarantined + 2 duplicates; sites, CTAS levels and dispositions each sum to 474; beds 643 loaded with ARH-SUR 2026-08-16 reported to Janelle Cardinal (E-008); tickets 219 with SLAMet 137 Y and 75 N. Tested by Tomás Rivera (E-006), who reviews the queries Mei Tanaka (E-013) built. If it fails: the steward logs the difference, the data owner decides, and risk R-01 is updated."
+   },
+   "examTips": [
+    {
+     "cert": "PL-300",
+     "tip": "Prepare the data, keys for relationships: rows on the many side whose key has no match show under a blank member in visuals. Find them before load with a Left Anti merge, just as the SQL lab finds them with a LEFT JOIN and IS NULL."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Assessment and Testing (Domain 6): reconciliation, record counts, control totals and hash totals are tests that integrity controls work. Expect them as processing controls in questions about application or database integrity."
+    },
+    {
+     "cert": "PMP",
+     "tip": "Process task 7, Plan and optimize quality of products/deliverables: prefer prevention and planned appraisal over inspection at the end. When one option builds the check into the process and another inspects every output before release, the first is usually better."
+    }
+   ],
+   "pitfalls": [
+    "Writing rules that cannot be tested, such as clean the dates. Every rule needs an expected result.",
+    "Reconciling the grand total only. A correct 474 can hide a wrong split by site; cross-foot every breakdown.",
+    "Using an inner join in a reconciliation query, which silently hides orphans such as SD-10113.",
+    "Letting the builder sign off their own gate."
+   ],
+   "check": [
+    {
+     "q": "Show that every ED source row is accounted for.",
+     "a": "480 source rows = 474 loaded + 4 quarantined (V0476, V0070, V0222, V0075) + 2 exact duplicates removed (V0315, V0318). Then cross-foot: by site 213 + 105 + 101 + 55 = 474, and the CTAS and disposition breakdowns also give 474."
+    },
+    {
+     "q": "Your SLA Met % uses the stored sla_met column and shows 64.8%. What is wrong?",
+     "a": "The stored flags are not trusted (DQ-08). SD-10011 is stored Y but took 77.3 hours against 72, so it is N. SD-10089 is stored N but its times are reversed, so it is blank and outside the measure (DQ-06). Recomputed from the timestamps, the approved result is 137 of 212, 64.6%."
+    },
+    {
+     "q": "Why does Q4 use LEFT JOIN with COALESCE rather than an inner join?",
+     "a": "The rows must add back to the table total. Q4 returns ARH 6, CVH 8, KGH 13, PGH 2 and Unknown 1, which is 30. An inner join drops SD-10113 (site code PGC) and returns 29, so a ticket vanishes without warning. COALESCE keeps it visible under Unknown, as rule DQ-10 requires."
+    }
+   ]
+  },
+  {
+   "key": "w3-s5",
+   "summary": "You will threat-model Beacon's analytics data flow with STRIDE, place its trust boundaries and choose encryption, logging and backup controls. You will build the threat model and architecture, then turn the controls into security acceptance criteria that can be tested before go-live.",
+   "read": [
+    {
+     "heading": "Four questions and STRIDE",
+     "body": "Threat modelling asks four questions about a design: What are we building? What can go wrong? What are we going to do about it? Did we do a good enough job? You answer the first with a data flow diagram, the second with a method such as STRIDE, the third with controls and the fourth with tests.\n\nSTRIDE names six kinds of threat, each attacking one security property:\n\n| Letter | Threat | Property attacked | Beacon example |\n|---|---|---|---|\n| S | Spoofing | Authentication | A stolen gateway credential used to connect to the warehouse |\n| T | Tampering | Integrity | Someone edits a warehouse view so a site's left without being seen (LWBS) count falls |\n| R | Repudiation | Non-repudiation | A user denies exporting visit rows and no log proves it |\n| I | Information disclosure | Confidentiality | A count of 1 to 4 at Prairie Gate Health Centre (PGH) points to a patient |\n| D | Denial of service | Availability | A refresh fails silently and leaders act on stale numbers |\n| E | Elevation of privilege | Authorization | A Lumen Analytics Partners consultant keeps workspace rights after the contract ends |\n\nOther methods include PASTA (Process for Attack Simulation and Threat Analysis) and attack trees. Whatever the method, model threats early in design, when changes are cheap. Schedule task 7 has 14 days of total float but no free float: any slip delays task 13, the role catalogue design, and using the float up removes the chance to change the design."
+    },
+    {
+     "heading": "Draw the flow and the trust boundaries",
+     "body": "A trust boundary is a line where the level of trust changes, so data crossing it must be checked or protected. The security architecture worksheet in Labs lists Beacon's flows (ED means emergency department):\n\n| Flow | From and to | Data | Class |\n|---|---|---|---|\n| F1 | ED Tracking Board (A-002) to warehouse staging (A-010) | Visit timestamps, triage level, disposition | Restricted |\n| F2 | Bed Management System (A-006) to staging | Daily bed census by unit | Restricted |\n| F3 | Staging to de-identified views | Pseudonymous visit IDs, age bands | Confidential |\n| F4 | Views to gateway to Power BI service | Scheduled refresh | Confidential |\n| F5 | Power BI service to users | Dashboards filtered by row-level security (RLS) | Confidential |\n| F6 | Identity Directory (A-007) to Power BI | Sign-in and group membership | Confidential |\n| F7 | Lumen Analytics Partners (V-05) to workspace | Build access in Release 1 | Confidential |\n\nThere are four boundaries:\n\n- TB1: clinical systems zone to analytics zone (F1, F2).\n- TB2: Kestrel's network to the Power BI cloud service (F4, F6).\n- TB3: the service to user devices, inside or outside the network (F5).\n- TB4: Kestrel to third parties (F7, and Sentinel SOC Services, V-04, which monitors logs in the United States).\n\nThe central design rule: Restricted data never crosses TB2. Only the de-identified views face the gateway, and the gateway account cannot read staging."
+    },
+    {
+     "heading": "Encryption, logging and backup",
+     "body": "Encryption in transit. Every flow uses Transport Layer Security (TLS). The on-premises data gateway makes outbound connections only, so no inbound port opens from the internet to Kestrel. Ahmed Haddad (E-017) owns that firewall rule.\n\nEncryption at rest. The warehouse database and its backups are encrypted. The Power BI service encrypts stored data by default. Backups go to the Backup Platform (A-012) at NorthArc Cloud (V-02); keeping them in Canada is a Kestrel contract requirement, and control test CT-005 confirmed an immutable copy in the Canadian region on 2026-09-24.\n\nLogging. Collect the Power BI activity log (who viewed, exported or shared what), gateway logs and warehouse access logs, and send them to the managed security operations centre (SOC). Logs defeat repudiation: without them nobody can prove who exported a page. Because Sentinel SOC Services processes logs in the United States, that flow needs the privacy review in risk R-05 before it starts.\n\nBackup and recovery. From Kestrel's asset register, the warehouse (A-010) has a recovery time objective (RTO) of 24 hours and a recovery point objective (RPO) of 24 hours; the Power BI service and semantic model (A-009) have an RTO of 72 hours and an RPO of 24 hours. Keep the Power BI Desktop file under version control so the model can be republished and refreshed, and test the restore. Kestrel knows why: the Clinical Information System failed both restore tests on record."
+    },
+    {
+     "heading": "From threats to controls",
+     "body": "Each misuse case gets a STRIDE category, a control and the concern that remains. The worksheet gives seven; the finished model adds a tampering case and a repudiation case so every STRIDE category is considered.\n\n| Misuse case | STRIDE | Control | Residual concern |\n|---|---|---|---|\n| A Member-role analyst sees every site, because RLS does not filter people who can edit | Information disclosure | Only named builders hold Admin, Member or Contributor; readers get Viewer or app access | Mei Tanaka (E-013) holds an excess \"view all sites\" grant; remove it |\n| A user exports visit-level rows and emails them | Information disclosure | Export limited to a group; Confidential label; no names in the model | Screenshots remain possible |\n| Someone identifies a patient from a count of 1 to 4 at PGH | Information disclosure | Suppress counts under 5 on shared pages (Kestrel policy); age bands | Must be proven before go-live in the RLS test pack |\n| A stolen gateway credential reads staging | Spoofing | No staging rights for that account; log review | Low |\n| A missed leaver opens the app: E-014 and E-027 are still enabled (I-02) | Spoofing | App audience is named groups; disable both | Leaver automation arrives in Release 2 |\n| V-05 keeps access after its contract ends on 2026-11-30 | Elevation of privilege | Guest accounts expire 2026-11-30; exit checklist (R-07) | Low |\n| A view is changed to expose an identifier | Tampering | Change control and peer review of views | Low |\n| A measure change cannot be traced to a person | Repudiation | Activity log; version history | Low |\n| A refresh fails silently and leaders act on stale numbers | Denial of service | Alerts to Tomás Rivera (E-006) and the service desk within 1 hour; data-as-of time on each page | Medium until monitoring is automated |\n\nEvery control has an owner in the controls table: Tomás Rivera (E-006) for de-identification, suppression, RLS and workspace roles; Kevin Park (E-009) for the read-only gateway account; Sam Okafor (E-020) for weekly log review; Grace Liu (E-005) for the quarterly review of workspace and RLS membership; Chloe Dubois (E-016) for restore from backup.\n\nUse defence in depth: the PGH case is covered by de-identification, aggregation, suppression and RLS together. Record what is left in the residual risk register with a decision (accept, treat, transfer or avoid). Residual risk above Kestrel's appetite needs the accountable executive's decision, advised by Daniel Osei (E-004), and by Priya Raman (E-003) for privacy."
+    },
+    {
+     "heading": "Security acceptance criteria",
+     "body": "A security acceptance criterion is a statement that is true or false when tested, written before build so the team builds to it. Each names the condition, how it is checked and the owner. Beacon's fourteen are grouped as privacy (SAC-01 to SAC-03), access (SAC-04 to SAC-08), data protection and platform (SAC-09 to SAC-11), and monitoring and recovery (SAC-12 to SAC-14):\n\n| ID | Criterion | How checked |\n|---|---|---|\n| SAC-01 | Privacy impact assessment approved by Priya Raman (E-003) and submitted to the Commissioner for review and comment before go-live | Submission record dated 2026-09-24 |\n| SAC-02 | The model holds no name, health number, birth date or encounter number | Model column list compared with source-to-target.csv |\n| SAC-03 | Counts under 5 show as \"<5\", and rates whose numerator is under 5 show blank, on shared pages | PGH tests: LWBS 2 and admitted 4 suppressed; CVH LWBS 4 suppressed; both LWBS rates blank; a total that would reveal PGH admitted by subtraction suppressed (SUP-07) |\n| SAC-04 | Each site role sees only its own site | RLS positive and negative tests |\n| SAC-05 | Only named builders hold Admin, Member or Contributor; readers are Viewers or app users | Workspace access list reviewed |\n| SAC-06 | No excess grant on A-009: E-013's \"view all sites\" removed; she is a Contributor in Beacon Dev only and a Viewer in Site CVH in the Beacon Prod app | User permission export; RLS-12 |\n| SAC-07 | No terminated or expired worker (E-014, E-027) in the app audience or RLS groups | Groups compared with the HR and Payroll System (A-015) |\n| SAC-08 | V-05 guest accounts expire on 2026-11-30 | Account settings |\n| SAC-09 | Confidential label on the model, reports and app | Label shown in the workspace |\n| SAC-10 | Export to Excel only for the approved group; export to comma-separated values (CSV) turned off, because labels are not applied to CSV files | Export by a non-member is refused; CSV export is not offered |\n| SAC-11 | The gateway account reads the views but is refused on staging | A query on a staging table returns access denied |\n| SAC-12 | Activity and audit logs reviewed weekly by Sam Okafor (E-020) | First weekly review on file |\n| SAC-13 | A failed refresh alerts Tomás Rivera (E-006) and the service desk within 1 hour; every page shows a data-as-of time | Forced refresh failure in the test workspace |\n| SAC-14 | The model can be republished and refreshed within the 72-hour RTO for A-009 | Restore test from the saved source file |\n\nWeak criteria use words like adequate or secure. Strong criteria can fail, and some prove that access is refused. Someone other than the builder checks each one, and together they feed quality gate QG-6 before go-live. Go-live needs every criterion met, or a condition or exception the sponsor accepts. Multi-factor authentication for every dashboard user, for example, is Release 2 scope, so it is recorded as an exception accepted by Dr. Helen Marchetti (E-001), advised by Daniel Osei (E-004), until the Release 2 gate on 2026-11-26."
+    },
+    {
+     "heading": "Warranty: the ITIL view of security",
+     "body": "ITIL describes the value of a service in two parts. Utility is fitness for purpose: what the service does, such as showing ED waits by site. Warranty is fitness for use: how well it does it, usually expressed as availability, capacity, security and continuity. A dashboard with perfect numbers that leaks patient detail, or is stale every Monday, has utility but no warranty, and consumers get no value from it.\n\nSecurity acceptance criteria are warranty requirements. You agree them in the Design stage of the product and service lifecycle and prove them in Transition, before the service moves into Operate, Deliver and Support. The guiding principle Think and work holistically applies: security depends on all four dimensions, including Partners and Suppliers such as Lumen Analytics Partners (V-05) and Sentinel SOC Services (V-04), not only on technology."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Threat modelling",
+     "definition": "A structured way to find what can go wrong in a design before it is built: model the system, identify threats, choose controls, then check the result."
+    },
+    {
+     "term": "STRIDE",
+     "definition": "A threat list: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege. Each attacks authentication, integrity, non-repudiation, confidentiality, availability or authorization."
+    },
+    {
+     "term": "Trust boundary",
+     "definition": "A line in a data flow where trust changes, such as Kestrel's network to the Power BI cloud service. Data crossing it must be authenticated, encrypted or checked."
+    },
+    {
+     "term": "Defence in depth",
+     "definition": "Layering independent controls so one failure does not expose the asset. Beacon protects PGH small counts with de-identification, aggregation, suppression and RLS."
+    },
+    {
+     "term": "Security acceptance criterion",
+     "definition": "A testable, owned statement of a security condition that must be true before go-live, with the test and evidence that prove it."
+    },
+    {
+     "term": "Warranty (ITIL)",
+     "definition": "Assurance that a service is fit for use: availability, capacity, security and continuity. Utility is fitness for purpose. Value needs both."
+    }
+   ],
+   "build": {
+    "goal": "Complete the threat model and architecture (components, flows, trust boundaries, controls, STRIDE misuse cases and residual risk) and the security acceptance criteria that feed quality gate QG-6 before Release 1 goes live.",
+    "steps": [
+     "Open the security architecture worksheet (security-architecture-template.md) in Practice, Labs beside Project, Release 1, Threat model and architecture.",
+     "Draw the data flow diagram with the components, flows F1 to F7 and boundaries TB1 to TB4, and mark F3 as the point where Restricted becomes Confidential.",
+     "Fill the protection-in-transit column for each flow and the what-must-be-true column for each boundary.",
+     "Take the worksheet's seven misuse cases, add a tampering case and a repudiation case so every STRIDE category is considered, and write the STRIDE category, control and residual concern for each.",
+     "Write the classification-by-zone section and the controls table (preventive, detective and corrective, each with where it sits and an owner), covering encryption in transit, log review, refresh alerts and restore from backup. Note the RTO and RPO for A-009 and A-010, and that no logs go to V-04 until the R-05 privacy review is done.",
+     "Fill at least three rows of the residual risk register with a decision (accept, treat, transfer, avoid) and who approves it, then record sign-off: security review by Daniel Osei (E-004), privacy review by Priya Raman (E-003) and business owner acceptance by Janelle Cardinal (E-008).",
+     "Open Security acceptance criteria and write SAC-01 to SAC-14 in four groups (privacy, access, data protection and platform, monitoring and recovery), each with how it is checked and an owner, then the exceptions the sponsor accepts. They feed quality gate QG-6."
+    ],
+    "modelAnswer": "Misuse case: a Member-role analyst sees every site, because RLS does not filter people who can edit. STRIDE: Information disclosure. Control: only named builders hold Admin, Member or Contributor; report readers get Viewer or app access only; workspace and RLS membership reviewed quarterly by Grace Liu (E-005). Residual concern: Mei Tanaka (E-013) holds an excess \"view all sites\" grant on A-009, so remove it and prove it with SAC-06. Builders still see every site, which is why the builder list stays short and named."
+   },
+   "examTips": [
+    {
+     "cert": "CISSP",
+     "tip": "Security and Risk Management (Domain 1) includes threat modelling. Map each STRIDE letter to its property: spoofing to authentication, tampering to integrity, repudiation to non-repudiation, information disclosure to confidentiality, denial of service to availability, elevation of privilege to authorization."
+    },
+    {
+     "cert": "CISSP",
+     "tip": "Security Architecture and Engineering (Domain 3): the best answer builds security into design, applies least privilege and defence in depth, and protects data in transit and at rest with encryption. Threat modelling first done during testing is too late."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Utility is fit for purpose and warranty is fit for use. Availability, capacity, security and continuity are warranty. A question about a service that gives correct results but is often unavailable or insecure describes a warranty problem."
+    }
+   ],
+   "pitfalls": [
+    "Drawing one boundary around Kestrel only. The cloud service, user devices and third parties each sit behind their own boundary.",
+    "Writing criteria that cannot fail, such as the data is secure.",
+    "Forgetting that RLS does not restrict Admin, Member or Contributor, so a workspace role becomes a disclosure.",
+    "Treating the United States log flow as a technical choice only. It needs the privacy review in R-05 first."
+   ],
+   "check": [
+    {
+     "q": "Which STRIDE category is a refresh that fails and leaves stale numbers, and what are the controls?",
+     "a": "Denial of service, because availability of current data is lost even though nothing was attacked. Controls: refresh failure alerts to the owner and the service desk within 1 hour, the last-refresh time on every page, and a tested recovery path within A-009's 72-hour RTO."
+    },
+    {
+     "q": "Why must Restricted data never cross trust boundary TB2?",
+     "a": "TB2 separates Kestrel's network from the Power BI cloud service. Leaders need only de-identified, aggregated data, so under the Health Information Act's least-amount and highest-anonymity duties nothing identifying should leave. Keeping it in staging limits the harm if the cloud side is misconfigured."
+    },
+    {
+     "q": "Rewrite the dashboards are secure as a security acceptance criterion.",
+     "a": "For example: a Viewer in the Kestrel General Hospital (KGH) site role sees only KGH rows, with ED Visits showing 213 and no other site anywhere; a user in no role sees no data. Evidence: RLS test pack screenshots. Owner: Tomás Rivera (E-006). It names the condition, test, expected result and owner, so it can fail."
+    }
+   ]
+  }
+ ]
+}
