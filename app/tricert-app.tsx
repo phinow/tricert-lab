@@ -1,6 +1,6 @@
 'use client';
 
-import { CSSProperties, FormEvent, ReactNode, useEffect, useId, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import {
   coverageRows,
   flashcards,
@@ -75,7 +75,7 @@ type Notice = { text: string; kind: 'success' | 'error' } | null;
 type Timer = { key: string; startedAt: number; pausedAt: number | null; pausedTotal: number };
 type Theme = 'system' | 'light' | 'dark';
 type Accent = 'beacon' | 'rose' | 'canola' | 'glacier';
-type UiPrefs = { project?: string; artifact?: string; timer?: Timer | null; rubric?: Record<string, number[]>; theme?: Theme; accent?: Accent };
+type UiPrefs = { v?: number; project?: string; artifact?: string; timer?: Timer | null; rubric?: Record<string, number[]>; theme?: Theme; accent?: Accent };
 type Lab = (typeof labCards)[number];
 type WorkLink = { kind: 'artifact'; item: Deliverable } | { kind: 'lab'; lab: Lab } | { kind: 'practice' };
 type ScoreParts = { coverage: number; evidence: number; judgment: number; recall: number; total: number };
@@ -110,25 +110,25 @@ const certs: Array<{ cert: Certification; label: string; field: keyof Profile; c
   { cert: 'CISSP', label: 'CISSP', field: 'cissp_target', color: 'var(--cissp)', ink: 'var(--cissp-ink)', name: 'Information security' },
   { cert: 'ITIL', label: 'ITIL V5', field: 'itil_target', color: 'var(--itil)', ink: 'var(--itil-ink)', name: 'Service management' },
 ];
-const certColor = (cert: string) => certs.find((item) => item.cert === cert)?.color || 'var(--text-2)';
 const certVars = (cert: string) => {
   const found = certs.find((item) => item.cert === cert || (cert === 'ITIL V5' && item.cert === 'ITIL'));
   return { '--c': found?.color || 'var(--text-2)', '--ci': found?.ink || 'var(--text-2)' } as CSSProperties;
 };
 
-/* Personal colour choices, named for Alberta. */
+/* Personal colour choices, named for Alberta. One is used at a time. */
 const accents: Array<[Accent, string, string]> = [
-  ['beacon', 'Beacon', '#ff6a1f'],
-  ['rose', 'Wild rose', '#d6336c'],
-  ['canola', 'Canola', '#f5c400'],
-  ['glacier', 'Glacier', '#2ec4cf'],
+  ['beacon', 'Beacon', '#ff7a33'],
+  ['rose', 'Wild rose', '#ff5c8f'],
+  ['canola', 'Canola', '#f2cc3d'],
+  ['glacier', 'Glacier', '#3fd0db'],
 ];
 
+/* Five places. Project documents live in Learn, next to the lessons that
+   teach them. */
 const navItems: Array<[View, string]> = [
   ['today', 'Today'],
   ['plan', 'Plan'],
   ['learn', 'Learn'],
-  ['projects', 'Project'],
   ['practice', 'Practice'],
   ['progress', 'Progress'],
 ];
@@ -203,7 +203,7 @@ export default function TriCertApp() {
   const [learnTab, setLearnTab] = useState<LearnTab>('lessons');
   const [learnItem, setLearnItem] = useState<string | null>(null);
   const [flashCert, setFlashCert] = useState<Certification | 'All'>('All');
-  const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'system' : readPrefs().theme || 'system'));
+  const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : savedTheme(readPrefs())));
   const [accent, setAccent] = useState<Accent>(() => (typeof window === 'undefined' ? 'beacon' : readPrefs().accent || 'beacon'));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const reading = useReading();
@@ -226,7 +226,7 @@ export default function TriCertApp() {
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to load your study plan.');
-        if (route) { setView(route.view); if (route.tab) setProgressTab(route.tab); }
+        if (route) { setView(route.view); if (route.tab) setProgressTab(route.tab); if (route.learnTab) setLearnTab(route.learnTab); }
         setSelectedProject(restoredProject.key);
         setSelectedArtifact(restoredArtifact.key);
         if (prefs.timer && allTasks.some((task) => task.key === prefs.timer?.key)) setTimer(prefs.timer);
@@ -248,14 +248,14 @@ export default function TriCertApp() {
 
     const onHashChange = () => {
       const next = routeFromHash();
-      if (next) { setView(next.view); if (next.tab) setProgressTab(next.tab); }
+      if (next) { setView(next.view); if (next.tab) setProgressTab(next.tab); if (next.learnTab) { setLearnTab(next.learnTab); setLearnItem(null); } }
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   useEffect(() => {
-    if (!loading) writePrefs({ project: selectedProject, artifact: selectedArtifact, timer, rubric: rubricChecks, theme, accent });
+    if (!loading) writePrefs({ v: prefsVersion, project: selectedProject, artifact: selectedArtifact, timer, rubric: rubricChecks, theme, accent });
   }, [loading, selectedProject, selectedArtifact, timer, rubricChecks, theme, accent]);
 
   useEffect(() => {
@@ -336,12 +336,17 @@ export default function TriCertApp() {
   function say(text: string) { setNotice({ text, kind: 'success' }); }
 
   function go(next: View) {
+    if (next === 'projects') { openDocuments(); return; }
     setView(next);
-    if (next === 'projects') setDocOpen(false);
     if (next === 'practice' && practiceScreen !== 'run') setPracticeScreen('hub');
     const hash = next === 'progress' && progressTab === 'portfolio' ? 'portfolio' : next;
     if (window.location.hash !== `#${hash}`) window.history.pushState(null, '', `#${hash}`);
     window.scrollTo({ top: 0, behavior: scrollBehavior() });
+  }
+
+  function openDocuments() {
+    setDocOpen(false);
+    openLearn('documents');
   }
 
   function openLearn(tab: LearnTab, item: string | null = null) {
@@ -598,7 +603,7 @@ export default function TriCertApp() {
   }
 
   if (loading) {
-    return <main className="boot" aria-live="polite"><BrandMark size={64} /><p>Lighting your beacons</p></main>;
+    return <main className="boot" aria-live="polite"><BrandMark size={44} /><p>Loading your plan</p></main>;
   }
 
   if (!state.profile) {
@@ -630,10 +635,46 @@ export default function TriCertApp() {
   const standing = programmeDone === allTasks.length
     ? 'All 65 sessions are done. Finish the handover package on Progress.'
     : `Week ${currentWeek} of 13. ${toGate === 0 ? `Your ${nextPhase.gate.label} gate is next.` : `${countWord(toGate)} ${toGate === 1 ? 'session' : 'sessions'}, then your ${nextPhase.gate.label} gate.`}`;
+  const navActive: View = view === 'projects' ? 'learn' : view;
+  const gatesMet = gates.filter((gate) => gate.met).length;
 
   const waiting: Array<{ title: string; detail: string; go: () => void }> = [];
   if (reviewQueue.length) waiting.push({ title: `Review ${reviewQueue.length} ${reviewQueue.length === 1 ? 'answer' : 'answers'}`, detail: 'Wrong or guessed', go: () => { setPracticeScreen('review'); setView('practice'); window.history.pushState(null, '', '#practice'); } });
   draftArtifacts.slice(0, 2).forEach((item) => waiting.push({ title: item.title, detail: `Draft, ${docNumberFor(item)}`, go: () => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); } }));
+
+  const documentsPanel = (
+    <div className="projects">
+      <div className="releases" role="tablist" aria-label="Releases">
+        {projects.map((item, index) => {
+          const done = projectDone(item.key);
+          return (
+            <button key={item.key} role="tab" aria-selected={item.key === project.key} className={item.key === project.key ? 'release active' : 'release'} onClick={() => chooseProject(item.key)}>
+              <span className="release-no">Release {index + 1}</span>
+              <strong>{item.title}</strong>
+              <span className="release-meter"><Meter value={done / item.deliverables.length} /><span>{done}/{item.deliverables.length}</span></span>
+            </button>
+          );
+        })}
+      </div>
+      <h2 className="release-title">{project.title}</h2>
+      <p className="release-story">{project.narrative}</p>
+      <ul className="list doc-list" aria-label={`${project.title} documents`}>
+        {project.deliverables.map((item, index) => {
+          const status = artifactStatus(item.key);
+          return (
+            <li key={item.key}>
+              <button onClick={() => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}>
+                <span className="doc-no">{docNumber(project.key, index)}</span>
+                <span className="doc-title"><strong>{item.title}</strong><small>{item.summary}</small></span>
+                <span className={`status status-${status || 'none'}`}>{statusLabel(status)}</span>
+                <Chevron dir="right" />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 
   return (
     <div className="app">
@@ -641,7 +682,7 @@ export default function TriCertApp() {
         <a className="brand" href="#today" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark /><span className="brand-name">TriCert Lab</span></a>
         <nav className="nav" aria-label="Main navigation">
           {navItems.map(([key, label]) => (
-            <button key={key} className={view === key ? 'active' : ''} aria-current={view === key ? 'page' : undefined} onClick={() => go(key)}>
+            <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} onClick={() => go(key)}>
               <NavIcon name={key} />
               <span className="nav-label">{label}</span>
               {key === 'practice' && reviewQueue.length > 0 && <span className="nav-badge" aria-label={`${reviewQueue.length} to review`}>{reviewQueue.length}</span>}
@@ -657,7 +698,7 @@ export default function TriCertApp() {
         <div className="rail-foot">
           {nextExam && <p className="rail-exam"><strong>{nextExam.days}</strong> {nextExam.days === 1 ? 'day' : 'days'} to {nextExam.label}</p>}
           <button className="me" onClick={() => setSettingsOpen(true)}>
-            <span className="avatar" aria-hidden="true">{initials || <Flame size={18} />}</span>
+            <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
             <span className="me-text"><strong>{firstName || 'You'}</strong><small>Make it yours</small></span>
           </button>
         </div>
@@ -671,20 +712,15 @@ export default function TriCertApp() {
             <header className="hello">
               <div className="hello-text">
                 <h1>{greeting}</h1>
-                <p className="lede">{standing}</p>
+                <p className="lede">{keepTogether(standing)}</p>
                 {profile.motivation
                   ? <p className="why">{profile.motivation}</p>
                   : <button className="text-link why-add" onClick={() => setSettingsOpen(true)}>Add why you are doing this</button>}
               </div>
               <button className="avatar-button" onClick={() => setSettingsOpen(true)} aria-label="Make it yours: your name, why, colour and appearance">
-                <span className="avatar" aria-hidden="true">{initials || <Flame size={20} />}</span>
+                <span className="avatar" aria-hidden="true">{initials || <Flame size={18} />}</span>
               </button>
             </header>
-
-            <Ridge weeks={weeksDone} selected={selectedWeek} onSelect={(week) => showWeek(week)}>
-              <span><strong>{programmeDone} of {allTasks.length}</strong> sessions done</span>
-              {nextExam && <span>{nextExam.label} exam in {nextExam.days} {nextExam.days === 1 ? 'day' : 'days'}</span>}
-            </Ridge>
 
             <section className="hero-session" aria-labelledby="session-title">
               <div className="hero-top">
@@ -692,7 +728,7 @@ export default function TriCertApp() {
                 <span className="hero-certs">{activeTask.certifications.map((cert) => <span key={cert} className="cert-dot" style={certVars(cert)}>{cert === 'ITIL' ? 'ITIL V5' : cert}</span>)}</span>
               </div>
               <h2 id="session-title">{activeTask.title}</h2>
-              <p className="hero-sub">{formatMinutes(taskMinutes(activeTask.meta))}. {taskOutput(activeTask.meta)}.</p>
+              <p className="hero-sub"><span>{formatMinutes(taskMinutes(activeTask.meta))}</span><span>{taskOutput(activeTask.meta)}</span></p>
               <div className="hero-actions">
                 {completed.has(activeTask.key) ? (
                   <>
@@ -734,24 +770,34 @@ export default function TriCertApp() {
               </div>
             </section>
 
-            {waiting.length > 0 && (
-              <section className="waiting" aria-labelledby="waiting-title">
-                <h2 id="waiting-title">Waiting on you</h2>
-                <ul>{waiting.map((item) => <li key={item.title}><button onClick={item.go}><span><strong>{item.title}</strong><small>{item.detail}</small></span><Chevron dir="right" /></button></li>)}</ul>
-              </section>
-            )}
-
-            <details id="reflection" className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
-              <summary><span>Week {selectedWeek} reflection</span><small>{retroSaved ? 'Saved' : 'Not written'}</small></summary>
-              <div className="reflect-body">
-                <label className="field" htmlFor="retro">What can you now defend, what still needs notes, and what will you change?</label>
-                <textarea id="retro" value={retroText} onChange={(event) => setRetroText(event.target.value)} />
-                <div className="row">
-                  <button className="primary" onClick={saveRetrospective} disabled={saving || retroText.trim().length < 100}>Save reflection</button>
-                  <span className="hint">{retroText.trim().length < 100 ? `${100 - retroText.trim().length} more characters` : 'Ready'}</span>
-                </div>
+            <section className="overview" aria-label="Your 13 weeks">
+              <div className="stats">
+                <p className="stat"><strong>{programmeDone}<span>/{allTasks.length}</span></strong><small>sessions done</small></p>
+                {nextExam && <p className="stat"><strong>{nextExam.days}</strong><small>{nextExam.days === 1 ? 'day' : 'days'} to {nextExam.label}</small></p>}
               </div>
-            </details>
+              <WeekTrack weeks={weeksDone} selected={selectedWeek} current={currentWeek} onSelect={(week) => showWeek(week)} />
+              <WeekTrack weeks={weeksDone} selected={selectedWeek} current={currentWeek} />
+            </section>
+
+            <section className="waiting" aria-labelledby="waiting-title">
+              <h2 id="waiting-title" className="section-title">Waiting on you</h2>
+              <ul className="list">
+                {waiting.map((item) => <li key={item.title}><button className="row" onClick={item.go}><span className="row-text"><strong>{item.title}</strong><small>{item.detail}</small></span><Chevron dir="right" /></button></li>)}
+                <li>
+                  <details id="reflection" className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
+                    <summary className="row"><span className="row-text"><strong>Week {selectedWeek} reflection</strong><small>{retroSaved ? 'Saved' : 'Not written yet'}</small></span><span className="fold-mark" aria-hidden="true" /></summary>
+                    <div className="reflect-body">
+                      <label className="field" htmlFor="retro">What can you now defend, what still needs notes, and what will you change?</label>
+                      <textarea id="retro" value={retroText} onChange={(event) => setRetroText(event.target.value)} />
+                      <div className="row-actions">
+                        <button className="primary" onClick={saveRetrospective} disabled={saving || retroText.trim().length < 100}>Save reflection</button>
+                        <span className="hint">{retroText.trim().length < 100 ? `${100 - retroText.trim().length} more characters` : 'Ready'}</span>
+                      </div>
+                    </div>
+                  </details>
+                </li>
+              </ul>
+            </section>
           </div>
         )}
 
@@ -761,27 +807,32 @@ export default function TriCertApp() {
               <h1>Plan</h1>
               <p className="lede">{programmeDone} of {allTasks.length} sessions done. Three releases of Project Beacon, each ending at an exam gate.</p>
             </header>
-            <Ridge weeks={weeksDone} selected={expandedWeek || undefined} onSelect={(week) => { setExpandedWeek(week); window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' }), 30); }} />
+            <section className="overview" aria-label="Your 13 weeks">
+              <WeekTrack weeks={weeksDone} selected={expandedWeek || undefined} current={currentWeek} onSelect={(week) => { setExpandedWeek(week); window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' }), 30); }} />
+              <WeekTrack weeks={weeksDone} selected={expandedWeek || undefined} current={currentWeek} />
+            </section>
             {phases.map((phase, phaseIndex) => {
               const phaseProject = projects.find((item) => item.key === phase.project) || projects[0];
               const weeks = studyWeeks.filter((week) => phaseFor(sessionIndex(week.number, 1)) === phase);
               const gateWeek = Math.floor(phase.gate.at / 5) + 1;
               const gateDay = (phase.gate.at % 5) + 1;
+              const gateDates = phase.gate.certs.map((cert) => exams.find((exam) => exam.cert === cert)).filter((exam) => exam?.date).map((exam) => `${exam?.label} ${formatDate(exam?.date || '')}`).join(', ');
               return (
                 <section className="phase" key={phase.project} aria-labelledby={`phase-${phase.project}`}>
                   <header className="phase-head">
-                    <span className="phase-no">Release {phaseIndex + 1}</span>
+                    <span className="eyebrow"><span>Release {phaseIndex + 1}</span><span>Weeks {weeks[0].number} to {weeks[weeks.length - 1].number}</span></span>
                     <h2 id={`phase-${phase.project}`}>{phaseProject.title}</h2>
                   </header>
-                  <ul className="weeks">
+                  <ul className="list weeks">
                     {weeks.map((week) => {
                       const done = week.tasks.filter((task) => completed.has(task.key)).length;
                       const open = expandedWeek === week.number;
                       return (
                         <li key={week.number} id={`week-${week.number}`} className={week.number === currentWeek ? 'is-current' : ''}>
                           <button className="week-row" aria-expanded={open} onClick={() => setExpandedWeek(open ? 0 : week.number)}>
-                            <Embers done={done} />
                             <span className="week-text"><small>Week {week.number}{week.number === currentWeek ? ', this week' : ''}</small><strong>{week.theme}</strong></span>
+                            <Pips done={done} />
+                            <span className="sr-only">, {done} of 5 done</span>
                             <Chevron dir={open ? 'up' : 'down'} />
                           </button>
                           {open && (
@@ -795,7 +846,7 @@ export default function TriCertApp() {
                                       <button onClick={() => openSession(idx)}>
                                         <span className={completed.has(task.key) ? 'tick is-done' : gateAt.has(idx) ? 'tick is-gate' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
                                         <span className="wd-title">{task.title}</span>
-                                        <span className="wd-time">{taskMinutes(task.meta)} min</span>
+                                        <span className="wd-time">{formatMinutes(taskMinutes(task.meta))}</span>
                                       </button>
                                     </li>
                                   );
@@ -806,22 +857,19 @@ export default function TriCertApp() {
                         </li>
                       );
                     })}
+                    <li className="gate-row">
+                      <span className="gate-mark" aria-hidden="true" />
+                      <span className="gate-text"><small>Exam gate, week {gateWeek}, day {gateDay}</small><strong>{phase.gate.label}</strong></span>
+                      <span className="gate-when">{gateDates || 'No date set'}</span>
+                    </li>
                   </ul>
-                  <div className="gate-card">
-                    <Flame size={34} />
-                    <div>
-                      <small>Exam gate, week {gateWeek}, day {gateDay}</small>
-                      <strong>{phase.gate.label}</strong>
-                    </div>
-                    <span className="gate-when">{phase.gate.certs.map((cert) => exams.find((exam) => exam.cert === cert)).filter((exam) => exam?.date).map((exam) => `${exam?.label} ${formatDate(exam?.date || '')}`).join(', ') || 'No date set'}</span>
-                  </div>
                 </section>
               );
             })}
-            <details className="reference">
-              <summary>How the four certifications connect</summary>
+            <details className="fold reference">
+              <summary className="row"><span className="row-text"><strong>How the four certifications connect</strong></span><span className="fold-mark" aria-hidden="true" /></summary>
               <div className="reference-body">
-                <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name} style={certVars(name)}><span>{name === 'ITIL' ? 'ITIL V5' : name}</span><strong>{title}</strong><p>{copy}</p></div>)}</div>
+                <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name} style={certVars(name)}><span className="cert-dot">{name === 'ITIL' ? 'ITIL V5' : name}</span><strong>{title}</strong><p>{copy}</p></div>)}</div>
                 <div className="table-scroll"><table><thead><tr><th>Activity</th><th>PMP</th><th>PL-300</th><th>CISSP</th><th>ITIL V5</th></tr></thead><tbody>{coverageRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
                 <p className="hint">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
               </div>
@@ -829,86 +877,54 @@ export default function TriCertApp() {
           </div>
         )}
 
-        {view === 'learn' && (
+        {(view === 'learn' || (view === 'projects' && !docOpen)) && (
           <LearnView
-            tab={learnTab}
-            item={learnItem}
-            onTab={(tab) => { setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
+            tab={view === 'projects' ? 'documents' : learnTab}
+            item={view === 'projects' ? null : learnItem}
+            onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
             onItem={(item) => { setLearnItem(item); window.scrollTo({ top: 0 }); }}
             completed={completed}
             currentIndex={currentIndex}
-            artifactStatus={artifactStatus}
+            documents={documentsPanel}
             onStart={(task) => { showWeek(Math.floor(allTasks.indexOf(task) / 5) + 1, allTasks.indexOf(task) % 5); startSession(task); }}
             onOpenDoc={(item) => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}
           />
         )}
 
-        {view === 'projects' && !docOpen && (
-          <div className="projects">
-            <header className="screen-head">
-              <h1>Project Beacon</h1>
-              <p className="lede">Your programme at Kestrel Health Network, a fictional Alberta health network. Every document you write here is part of it.</p>
-            </header>
-            <div className="project-cards" role="tablist" aria-label="Releases">
-              {projects.map((item, index) => {
-                const done = projectDone(item.key);
-                return (
-                  <button key={item.key} role="tab" aria-selected={item.key === project.key} className={item.key === project.key ? 'project-card active' : 'project-card'} onClick={() => chooseProject(item.key)}>
-                    <span><small>Release {index + 1}</small><strong>{item.title}</strong></span>
-                    <span className="project-meter"><Meter value={done / item.deliverables.length} /><small>{done} of {item.deliverables.length} documents</small></span>
-                  </button>
-                );
-              })}
-            </div>
-            <p className="lede">{project.narrative}</p>
-            <ul className="doc-list" aria-label={`${project.title} documents`}>
-              {project.deliverables.map((item, index) => {
-                const status = artifactStatus(item.key);
-                return (
-                  <li key={item.key}>
-                    <button onClick={() => openArtifact(item)}>
-                      <span className="doc-no">{docNumber(project.key, index)}</span>
-                      <span className="doc-title"><strong>{item.title}</strong><small>{item.summary}</small></span>
-                      <span className={`status status-${status || 'none'}`}>{statusLabel(status)}</span>
-                      <Chevron dir="right" />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
         {view === 'projects' && docOpen && (
           <article className="doc" aria-labelledby="doc-title">
-            <button className="back" onClick={() => setDocOpen(false)}><Chevron dir="left" /> {project.title}</button>
+            <button className="back" onClick={openDocuments}><Chevron dir="left" /> Documents</button>
             <header className="doc-head">
-              <p className="eyebrow-date">{docNumber(project.key, deliverableIndex)}, {statusLabel(deliverableStatus).toLowerCase()}</p>
+              <p className="eyebrow"><span>{docNumber(project.key, deliverableIndex)}</span><span className={`status status-${deliverableStatus || 'none'}`}>{statusLabel(deliverableStatus)}</span></p>
               <h1 id="doc-title">{deliverable.title}</h1>
               <p className="lede">{deliverable.summary}</p>
             </header>
-            {reading?.docGuides[deliverable.key] ? (
-              <>
-                <details className="brief guide-fold" open={!deliverableStatus}>
-                  <summary><span>How to write it</span><small>{reading.docGuides[deliverable.key].sections.length} sections</small></summary>
-                  <GuideBody guide={reading.docGuides[deliverable.key]} showModel={false} />
-                </details>
-                <details className="brief guide-fold finished-fold">
-                  <summary><span>See the finished example</span><small>Kestrel model</small></summary>
-                  <div className="lesson"><RichText text={reading.docGuides[deliverable.key].modelDocument} /></div>
-                </details>
-              </>
-            ) : guideIndex[deliverable.key] ? <p className="hint loading-note">Loading the writing guide</p> : null}
-            <details className="brief done-when">
-              <summary><span>Done when</span><small>{ticked.size} of {deliverable.rubric.length} checked</small></summary>
-              <ul className="rubric">
-                {deliverable.rubric.map((item, index) => (
-                  <li key={item}><label><input type="checkbox" checked={ticked.has(index)} onChange={() => toggleRubric(index)} /><span className="box" aria-hidden="true"><Check /></span><span>{item}</span></label></li>
-                ))}
-              </ul>
-              <p className="hint">{deliverable.why}</p>
-              <div className="ideas">{deliverable.concepts.map((concept) => <details key={concept}><summary>{concept}</summary><p>{conceptGlossary[concept] || 'A core idea that connects this document to the exams.'}</p></details>)}</div>
-            </details>
+            <div className="folds">
+              {reading?.docGuides[deliverable.key] ? (
+                <>
+                  <details className="brief guide-fold" open={!deliverableStatus}>
+                    <summary className="row"><span className="row-text"><strong>How to write it</strong><small>{reading.docGuides[deliverable.key].sections.length} sections</small></span><span className="fold-mark" aria-hidden="true" /></summary>
+                    <GuideBody guide={reading.docGuides[deliverable.key]} showModel={false} />
+                  </details>
+                  <details className="brief guide-fold finished-fold">
+                    <summary className="row"><span className="row-text"><strong>See the finished example</strong><small>The Kestrel version</small></span><span className="fold-mark" aria-hidden="true" /></summary>
+                    <div className="lesson"><RichText text={reading.docGuides[deliverable.key].modelDocument} /></div>
+                  </details>
+                </>
+              ) : guideIndex[deliverable.key] ? <p className="hint loading-note">Loading the writing guide</p> : null}
+              <details className="brief done-when">
+                <summary className="row"><span className="row-text"><strong>Done when</strong><small>{ticked.size} of {deliverable.rubric.length} checked</small></span><span className="fold-mark" aria-hidden="true" /></summary>
+                <div className="brief-body">
+                  <ul className="rubric">
+                    {deliverable.rubric.map((item, index) => (
+                      <li key={item}><label><input type="checkbox" checked={ticked.has(index)} onChange={() => toggleRubric(index)} /><span className="box" aria-hidden="true"><Check /></span><span>{item}</span></label></li>
+                    ))}
+                  </ul>
+                  <p className="hint">{deliverable.why}</p>
+                  <div className="ideas">{deliverable.concepts.map((concept) => <details key={concept}><summary>{concept}</summary><p>{conceptGlossary[concept] || 'A core idea that connects this document to the exams.'}</p></details>)}</div>
+                </div>
+              </details>
+            </div>
             <label className="field" htmlFor="work">Your work</label>
             <textarea id="work" className="writing" value={artifactText} onChange={(event) => setArtifactText(event.target.value)} />
             <label className="field" htmlFor="explain">Explain it in your own words</label>
@@ -919,8 +935,8 @@ export default function TriCertApp() {
               <button className="secondary" onClick={() => saveArtifact('draft')} disabled={saving}>Save draft</button>
               <button className="primary" onClick={() => saveArtifact('complete')} disabled={saving || completeBlockers.length > 0}>Mark complete</button>
             </div>
-            <button className="check-yourself" onClick={startArtifactCheck}>
-              <span><strong>Check yourself</strong><small>Five decisions about this document</small></span>
+            <button className="row check-yourself" onClick={startArtifactCheck}>
+              <span className="row-text"><strong>Check yourself</strong><small>Five decisions about this document</small></span>
               <Chevron dir="right" />
             </button>
           </article>
@@ -934,30 +950,48 @@ export default function TriCertApp() {
             </header>
             <div className="tiles">
               <button className="tile tile-scenarios" onClick={startScenarios}>
-                <TileArt kind="scenarios" />
-                <span className="tile-text"><strong>Scenarios</strong><small>{practiceBank.length} decisions, at your pace</small></span>
+                <span className="tile-text">
+                  <span className="eyebrow">Scenarios</span>
+                  <strong>Make the next decision</strong>
+                  <small>{practiceBank.length} decisions across all four exams, at your pace</small>
+                </span>
+                <span className="tile-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start</span>
               </button>
-              <div className="tile tile-timed">
-                <TileArt kind="timed" />
-                <span className="tile-text"><strong>Timed set</strong><small>{timedQuestions(mockCert).length} {mockCert} questions, 15 minutes</small></span>
-                <div className="tile-controls">
-                  <label className="sr-only" htmlFor="lens">Exam lens</label>
-                  <select id="lens" value={mockCert} onChange={(event) => setMockCert(event.target.value as Certification)}><option>PMP</option><option>PL-300</option><option>CISSP</option><option>ITIL</option></select>
-                  <button className="primary" onClick={startTimed}>Start</button>
-                </div>
-              </div>
-              <button className="tile tile-review" onClick={() => setPracticeScreen('review')}>
-                <TileArt kind="review" />
-                <span className="tile-text"><strong>Review</strong><small>{reviewQueue.length ? `${reviewQueue.length} waiting` : 'All clear'}</small></span>
-              </button>
-              <button className="tile tile-cards" onClick={() => { setFlashRevealed(false); setPracticeScreen('flashcards'); }}>
-                <TileArt kind="cards" />
-                <span className="tile-text"><strong>Flashcards</strong><small>{allFlashcards.length} cards</small></span>
-              </button>
-              <button className="tile tile-labs" onClick={() => setPracticeScreen('labs')}>
-                <TileArt kind="labs" />
-                <span className="tile-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done, with datasets</small></span>
-              </button>
+              <ul className="list practice-list">
+                <li>
+                  <div className="row tile tile-timed">
+                    <Glyph name="timed" />
+                    <span className="row-text"><strong>Timed set</strong><small>{timedQuestions(mockCert).length} {mockCert === 'ITIL' ? 'ITIL V5' : mockCert} questions, 15 minutes</small></span>
+                    <span className="tile-controls">
+                      <label className="sr-only" htmlFor="lens">Exam lens</label>
+                      <select id="lens" value={mockCert} onChange={(event) => setMockCert(event.target.value as Certification)}><option value="PMP">PMP</option><option value="PL-300">PL-300</option><option value="CISSP">CISSP</option><option value="ITIL">ITIL V5</option></select>
+                      <button className="secondary start" onClick={startTimed}>Start</button>
+                    </span>
+                  </div>
+                </li>
+                <li>
+                  <button className="row tile tile-review" onClick={() => setPracticeScreen('review')}>
+                    <Glyph name="review" />
+                    <span className="row-text"><strong>Review</strong><small>{reviewQueue.length ? 'Wrong or guessed answers to go over' : 'All clear'}</small></span>
+                    {reviewQueue.length > 0 && <span className="count" aria-hidden="true">{reviewQueue.length}</span>}
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+                <li>
+                  <button className="row tile tile-cards" onClick={() => { setFlashRevealed(false); setPracticeScreen('flashcards'); }}>
+                    <Glyph name="cards" />
+                    <span className="row-text"><strong>Flashcards</strong><small>{allFlashcards.length} cards</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+                <li>
+                  <button className="row tile tile-labs" onClick={() => setPracticeScreen('labs')}>
+                    <Glyph name="labs" />
+                    <span className="row-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done, with datasets</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         )}
@@ -982,18 +1016,21 @@ export default function TriCertApp() {
           return (
             <div className="flash">
               <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
+              <header className="screen-head"><h1>Flashcards</h1></header>
               <div className="pills" role="group" aria-label="Deck">
                 {(['All', 'PMP', 'PL-300', 'CISSP', 'ITIL'] as const).map((cert) => (
                   <button key={cert} className={flashCert === cert ? 'pill active' : 'pill'} aria-pressed={flashCert === cert} style={cert === 'All' ? undefined : certVars(cert)} onClick={() => { setFlashCert(cert); setFlashIndex(0); setFlashRevealed(false); }}>{cert === 'ITIL' ? 'ITIL V5' : cert}</button>
                 ))}
               </div>
-              <div className="flash-progress" aria-hidden="true"><span style={{ width: `${((index + 1) / deck.length) * 100}%` }} /></div>
               <button className={flashRevealed ? 'flash-card revealed' : 'flash-card'} onClick={() => setFlashRevealed(!flashRevealed)} style={certVars(card[0])} aria-label={flashRevealed ? 'Hide answer' : 'Show answer'}>
-                <span className="flash-cert">{card[0] === 'Intersection' ? 'All four' : card[0]}, card {index + 1} of {deck.length}</span>
+                <span className="flash-top">
+                  <span className="flash-cert">{card[0] === 'Intersection' ? 'All four' : card[0]}, card {index + 1} of {deck.length}</span>
+                  <span className="flash-progress" aria-hidden="true"><span style={{ width: `${((index + 1) / deck.length) * 100}%` }} /></span>
+                </span>
                 <span className="flash-q">{card[1]}</span>
-                {flashRevealed ? <span className="flash-a">{card[2]}</span> : <span className="flash-hint">Tap to reveal</span>}
+                {flashRevealed ? <span className="flash-a">{card[2]}</span> : <span className="flash-hint">Tap to reveal the answer</span>}
               </button>
-              <div className="row spread">
+              <div className="row-actions spread">
                 <button className="secondary" onClick={() => move(-1)}>Previous</button>
                 <button className="primary" onClick={() => move(1)}>Next card</button>
               </div>
@@ -1004,10 +1041,10 @@ export default function TriCertApp() {
         {view === 'practice' && practiceScreen === 'labs' && (
           <div className="labs-screen">
             <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-            <header className="screen-head"><h1>Labs</h1></header>
+            <header className="screen-head"><h1>Labs</h1><p className="lede">{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done. Each lab uses the synthetic Kestrel data below.</p></header>
             <div className="labs">
               {labCards.map((lab) => (
-                <section className="lab" key={lab.key} id={`lab-${lab.key}`} aria-labelledby={`lab-title-${lab.key}`}>
+                <section className="card lab" key={lab.key} id={`lab-${lab.key}`} aria-labelledby={`lab-title-${lab.key}`}>
                   <div className="lab-top">
                     <span className="lab-certs">{lab.certification.split(' · ').map((cert) => <span key={cert} className="cert-dot" style={certVars(cert === 'ITIL V5' ? 'ITIL' : cert)}>{cert}</span>)}</span>
                     {completed.has(lab.key) && <span className="hero-done small"><Check /> Done</span>}
@@ -1015,9 +1052,9 @@ export default function TriCertApp() {
                   <h2 id={`lab-title-${lab.key}`}>{lab.title}</h2>
                   <p className="hint">{lab.brief}</p>
                   <ol className="steps">{lab.steps.map((step) => <li key={step}>{step}</li>)}</ol>
-                  <div className="row">
+                  <div className="row-actions">
                     <a className="secondary" href={lab.download} download>Download file</a>
-                    <button className={completed.has(lab.key) ? 'ghost' : 'primary'} onClick={() => toggleProgress(lab.key)} disabled={saving}>{completed.has(lab.key) ? 'Mark as not done' : 'Mark done'}</button>
+                    <button className="ghost" onClick={() => toggleProgress(lab.key)} disabled={saving}>{completed.has(lab.key) ? 'Mark as not done' : <><Check /> Mark done</>}</button>
                   </div>
                 </section>
               ))}
@@ -1041,7 +1078,7 @@ export default function TriCertApp() {
           <div className="progress">
             <header className="screen-head">
               <h1>Progress</h1>
-              <p className="lede">Each exam has 100 points of evidence: coverage (30), documents (35), judgment (25) and recall (10). It guides you; it does not predict a pass.</p>
+              <p className="lede">Each exam score adds up evidence out of 100. It guides you; it does not predict a pass.</p>
             </header>
             <div className="segmented" role="tablist" aria-label="Progress sections">
               <button role="tab" aria-selected={progressTab === 'readiness'} className={progressTab === 'readiness' ? 'active' : ''} onClick={() => { setProgressTab('readiness'); window.history.replaceState(null, '', '#progress'); }}>Readiness</button>
@@ -1056,38 +1093,38 @@ export default function TriCertApp() {
                     return (
                       <li key={exam.cert} style={certVars(exam.cert)}>
                         <div className="cs-head">
-                          <span><strong>{exam.label}</strong><small>{exam.name}</small></span>
-                          <span className="cs-total">{score.total}<small>/100</small></span>
+                          <span className="cert-dot">{exam.label}</span>
+                          <span className="cs-date">{exam.date ? `${formatDate(exam.date)}${exam.days !== null && exam.days >= 0 ? `, in ${exam.days} days` : ''}` : 'No date set'}</span>
                         </div>
-                        <Meter value={score.total / 100} label={`${exam.label} readiness ${score.total} of 100`} />
-                        <div className="parts">
-                          <Part label="Coverage" value={score.coverage} max={30} />
-                          <Part label="Documents" value={score.evidence} max={35} />
-                          <Part label="Judgment" value={score.judgment} max={25} />
-                          <Part label="Recall" value={score.recall} max={10} />
-                        </div>
-                        <p className="cs-date">{exam.date ? `Exam ${formatDate(exam.date)}${exam.days !== null && exam.days >= 0 ? `, in ${exam.days} days` : ''}` : 'No exam date set'}</p>
+                        <p className="cs-total"><strong>{score.total}</strong><small>/100</small></p>
+                        <p className="cs-name">{exam.name}</p>
+                        <ReadinessParts score={score} />
                       </li>
                     );
                   })}
                 </ul>
-                <section className="card-block" aria-labelledby="gates-title">
-                  <h2 id="gates-title">Before you book {nextPhase.gate.label}</h2>
-                  <p className="hint">{gates.filter((gate) => gate.met).length} of {gates.length} checks met. Completion alone does not make you ready.</p>
+                <section className="card gate-checks" aria-labelledby="gates-title">
+                  <div className="card-head">
+                    <h2 id="gates-title">Before you book {nextPhase.gate.label}</h2>
+                    <span className="count-chip">{gatesMet}/{gates.length}</span>
+                  </div>
+                  <p className="hint">{gatesMet} of {gates.length} checks met. Completion alone does not make you ready.</p>
                   <ul className="checklist">{gates.map((gate) => <li key={gate.title}><span className={gate.met ? 'tick is-done' : 'tick'} aria-hidden="true">{gate.met && <Check />}</span><span><strong>{gate.title}</strong><small>{gate.detail}</small></span></li>)}</ul>
                 </section>
-                <details className="card-block fold" >
-                  <summary><span>Eligibility</span><small>PMI and ISC2 decide</small></summary>
-                  <ul className="checklist">
-                    <li><span className={pmpEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{pmpEligible && <Check />}</span><span><strong>PMP</strong><small>{pmpEligible ? 'Baseline appears satisfied. Verify application evidence.' : `${profile.pm_months} of ${pmpNeeded} leadership months, ${profile.pm_training_hours} of 35 training hours`}</small></span></li>
-                    <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>PL-300</strong><small>No experience requirement.</small></span></li>
-                    <li><span className={cisspEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{cisspEligible && <Check />}</span><span><strong>CISSP</strong><small>{cisspEligible ? 'Baseline appears satisfied. Verify domain evidence.' : `${profile.cyber_months} of ${cisspNeeded} months${cisspNeeded === 48 ? ' (degree waiver applied)' : ''}, ${profileDomains.length} of 2 domains. The Associate of ISC2 route remains open.`}</small></span></li>
-                    <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5</strong><small>Entry credential: 40 questions, 60 minutes, 65% to pass.</small></span></li>
-                  </ul>
-                  <div className="inline-form">
-                    <div><label className="field" htmlFor="itil-level">ITIL V5 level</label><select id="itil-level" value={itilLevelDraft} onChange={(event) => setItilLevelDraft(event.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
-                    <div><label className="field" htmlFor="itil-date">ITIL V5 exam date</label><input id="itil-date" type="date" value={itilTargetDraft} onChange={(event) => setItilTargetDraft(event.target.value)} /></div>
-                    <button className="secondary" disabled={saving} onClick={saveItilBaseline}>Update</button>
+                <details className="fold">
+                  <summary className="row"><span className="row-text"><strong>Eligibility</strong><small>PMI and ISC2 decide</small></span><span className="fold-mark" aria-hidden="true" /></summary>
+                  <div className="fold-body">
+                    <ul className="checklist">
+                      <li><span className={pmpEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{pmpEligible && <Check />}</span><span><strong>PMP</strong><small>{pmpEligible ? 'Baseline appears satisfied. Verify application evidence.' : `${profile.pm_months} of ${pmpNeeded} leadership months, ${profile.pm_training_hours} of 35 training hours`}</small></span></li>
+                      <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>PL-300</strong><small>No experience requirement.</small></span></li>
+                      <li><span className={cisspEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{cisspEligible && <Check />}</span><span><strong>CISSP</strong><small>{cisspEligible ? 'Baseline appears satisfied. Verify domain evidence.' : `${profile.cyber_months} of ${cisspNeeded} months${cisspNeeded === 48 ? ' (degree waiver applied)' : ''}, ${profileDomains.length} of 2 domains. The Associate of ISC2 route remains open.`}</small></span></li>
+                      <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5</strong><small>Entry credential: 40 questions, 60 minutes, 65% to pass.</small></span></li>
+                    </ul>
+                    <div className="inline-form">
+                      <div><label className="field" htmlFor="itil-level">ITIL V5 level</label><select id="itil-level" value={itilLevelDraft} onChange={(event) => setItilLevelDraft(event.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
+                      <div><label className="field" htmlFor="itil-date">ITIL V5 exam date</label><input id="itil-date" type="date" value={itilTargetDraft} onChange={(event) => setItilTargetDraft(event.target.value)} /></div>
+                      <button className="secondary" disabled={saving} onClick={saveItilBaseline}>Update</button>
+                    </div>
                   </div>
                 </details>
               </>
@@ -1095,8 +1132,11 @@ export default function TriCertApp() {
 
             {progressTab === 'portfolio' && (
               <>
-                <section className="card-block" aria-labelledby="package-title">
-                  <h2 id="package-title">Handover package</h2>
+                <section className="card" aria-labelledby="package-title">
+                  <div className="card-head">
+                    <h2 id="package-title">Handover package</h2>
+                    <span className="count-chip">{portfolioChecklist.filter(([key]) => completed.has(key)).length}/{portfolioChecklist.length}</span>
+                  </div>
                   <p className="hint">{portfolioChecklist.filter(([key]) => completed.has(key)).length} of {portfolioChecklist.length} ready. Tap an item when it is done.</p>
                   <ul className="checklist interactive">
                     {portfolioChecklist.map(([key, title, detail]) => (
@@ -1104,17 +1144,17 @@ export default function TriCertApp() {
                     ))}
                   </ul>
                 </section>
-                <section className="card-block" aria-labelledby="demo-title">
+                <section className="card" aria-labelledby="demo-title">
                   <h2 id="demo-title">Demo script, 3 to 5 minutes</h2>
                   <ol className="steps"><li>State the disconnected-reporting problem.</li><li>Show the governed data model and quality evidence.</li><li>Explain one IAM and one resilience decision.</li><li>Demonstrate role-aware reporting and tests.</li><li>Close with value, trade-offs, and next action.</li></ol>
                   <button className="secondary" onClick={() => downloadFile('tricert-demo-script.md', demoScript, 'text/markdown')}>Download script</button>
                 </section>
-                <section className="card-block" aria-labelledby="disclosure-title">
+                <section className="card" aria-labelledby="disclosure-title">
                   <h2 id="disclosure-title">Required disclosure</h2>
                   <blockquote>{disclosure}</blockquote>
                   <button className="secondary" onClick={() => navigator.clipboard.writeText(disclosure).then(() => say('Disclosure copied.'), () => setNotice({ text: 'Copy is blocked here. Select the text and copy it instead.', kind: 'error' }))}>Copy disclosure</button>
                 </section>
-                <section className="card-block logo-block" aria-labelledby="logo-title">
+                <section className="card logo-block" aria-labelledby="logo-title">
                   <h2 id="logo-title">Logo</h2>
                   <div className="logo-preview"><img src="/tricert-lab-logo.png" alt="TriCert Lab logo" /></div>
                   <a className="secondary" href="/tricert-lab-logo.png" download="tricert-lab-logo.png">Download PNG</a>
@@ -1146,12 +1186,12 @@ export default function TriCertApp() {
       {celebration && (
         <div className="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title">
           <div className="celebrate-inner">
-            <Flame size={150} burning className="rise" />
-            <h2 id="celebrate-title">{celebration.weekDone === 5 ? `Week ${celebration.week} beacon lit` : 'Session complete'}</h2>
+            <span className="celebrate-badge" aria-hidden="true"><Check /></span>
+            <h2 id="celebrate-title">{celebration.weekDone === 5 ? `Week ${celebration.week} complete` : 'Session complete'}</h2>
             <p>Week {celebration.week}, {celebration.task.day}: {celebration.task.title}</p>
             <dl className="celebrate-stats">
               <div><dt>Studied</dt><dd>{celebration.minutes ? formatMinutes(celebration.minutes) : 'Not timed'}</dd></div>
-              <div><dt>This week</dt><dd>{celebration.weekDone} of 5</dd><Embers done={celebration.weekDone} /></div>
+              <div><dt>This week</dt><dd>{celebration.weekDone} of 5</dd><Pips done={celebration.weekDone} /></div>
               <div><dt>Programme</dt><dd>{programmeDone} of {allTasks.length}</dd></div>
             </dl>
             <button className="primary wide" onClick={() => setCelebration(null)} autoFocus>Done</button>
@@ -1180,20 +1220,19 @@ export default function TriCertApp() {
    Learn: everything to read, inside the app.
    ========================================================================== */
 
-const learnTabs: Array<[LearnTab, string]> = [['lessons', 'Lessons'], ['exams', 'Exams'], ['documents', 'Documents'], ['glossary', 'Glossary']];
+const learnTabs: Array<[LearnTab, string]> = [['lessons', 'Lessons'], ['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
 
-function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifactStatus, onStart, onOpenDoc }: {
+function LearnView({ tab, item, onTab, onItem, completed, currentIndex, documents, onStart, onOpenDoc }: {
   tab: LearnTab; item: string | null; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
-  completed: Set<string>; currentIndex: number; artifactStatus: (key: string) => string | undefined;
+  completed: Set<string>; currentIndex: number; documents: ReactNode;
   onStart: (task: StudyTask) => void; onOpenDoc: (item: Deliverable) => void;
 }) {
   const [query, setQuery] = useState('');
   const [termCert, setTermCert] = useState<Certification | 'General' | 'All'>('All');
   const reading = useReading();
   const lessons = reading?.lessons;
-  const docGuides = reading?.docGuides;
-  if (item && (tab === 'lessons' || tab === 'documents') && !reading) {
-    return <div className="reader"><button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> {tab === 'lessons' ? 'Lessons' : 'Documents'}</button><p className="hint loading-note">Opening the reading</p></div>;
+  if (item && tab === 'lessons' && !reading) {
+    return <div className="reader"><button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> Lessons</button><p className="hint loading-note">Opening the reading</p></div>;
   }
 
   if (tab === 'lessons' && item && lessons?.[item]) {
@@ -1206,9 +1245,9 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
       <article className="reader" aria-labelledby="reader-title" style={certVars(task.certifications[0])}>
         <button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> Lessons</button>
         <header className="reader-head">
-          <p className="eyebrow-date">Week {week}, {task.day}{completed.has(task.key) ? ', done' : ''}</p>
+          <p className="eyebrow">Week {week}, {task.day}{completed.has(task.key) ? ', done' : ''}</p>
           <h1 id="reader-title">{task.title}</h1>
-          <p className="reader-meta">{task.certifications.map((cert) => <span key={cert} className="cert-dot" style={certVars(cert)}>{cert === 'ITIL' ? 'ITIL V5' : cert}</span>)}<span>{formatMinutes(taskMinutes(task.meta))}</span></p>
+          <p className="reader-meta">{task.certifications.map((cert) => <span key={cert} className="cert-dot" style={certVars(cert)}>{cert === 'ITIL' ? 'ITIL V5' : cert}</span>)}<span className="meta-time">{formatMinutes(taskMinutes(task.meta))}</span></p>
         </header>
         <LessonBody lesson={lessons[item]} task={task} onOpenDoc={onOpenDoc} />
         <div className="reader-actions">
@@ -1235,27 +1274,10 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
     }
   }
 
-  if (tab === 'documents' && item && docGuides?.[item]) {
-    const deliverable = allDeliverables.find((entry) => entry.key === item);
-    if (deliverable) {
-      return (
-        <article className="reader" aria-labelledby="reader-title">
-          <button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> Documents</button>
-          <header className="reader-head">
-            <p className="eyebrow-date">{docNumberFor(deliverable)}, {statusLabel(artifactStatus(deliverable.key)).toLowerCase()}</p>
-            <h1 id="reader-title">{deliverable.title}</h1>
-            <p className="lede">{deliverable.summary}</p>
-          </header>
-          <GuideBody guide={docGuides[item]} />
-          <div className="reader-actions"><button className="primary" onClick={() => onOpenDoc(deliverable)}>Write this document</button></div>
-        </article>
-      );
-    }
-  }
-
   const needle = query.trim().toLowerCase();
   const terms = glossary.filter((term) => (termCert === 'All' || term.cert === termCert) && (!needle || term.term.toLowerCase().includes(needle) || term.definition.toLowerCase().includes(needle)));
   const lessonCount = Object.keys(lessonIndex).length;
+  const thisWeek = Math.floor(currentIndex / 5) + 1;
 
   return (
     <div className="learn">
@@ -1263,22 +1285,25 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
         <h1>Learn</h1>
         <p className="lede">{lessonCount} lessons, {Object.keys(guideIndex).length} documents with finished examples and {glossary.length} terms. Everything you need is here.</p>
       </header>
-      <div className="segmented four" role="tablist" aria-label="Learn sections">
+      <div className="segmented" role="tablist" aria-label="Learn sections">
         {learnTabs.map(([key, label]) => <button key={key} role="tab" aria-selected={tab === key} className={tab === key ? 'active' : ''} onClick={() => onTab(key)}>{label}</button>)}
       </div>
 
       {tab === 'lessons' && (
         <div className="lesson-weeks">
           {studyWeeks.map((week) => (
-            <details key={week.number} className={Math.floor(currentIndex / 5) + 1 === week.number ? 'lesson-week lw-fold is-current' : 'lesson-week lw-fold'} open={Math.floor(currentIndex / 5) + 1 === week.number}>
-              <summary><h2><small>Week {week.number}{Math.floor(currentIndex / 5) + 1 === week.number ? ', this week' : ''}</small>{week.theme}</h2><span className="lw-count">{week.tasks.filter((task) => completed.has(task.key)).length} of 5</span></summary>
+            <details key={week.number} className={thisWeek === week.number ? 'lesson-week lw-fold is-current' : 'lesson-week lw-fold'} open={thisWeek === week.number}>
+              <summary className="row">
+                <span className="row-text"><small>Week {week.number}{thisWeek === week.number ? ', this week' : ''}</small><strong>{week.theme}</strong></span>
+                <span className="lw-count">{week.tasks.filter((task) => completed.has(task.key)).length}/5</span>
+                <span className="fold-mark" aria-hidden="true" />
+              </summary>
               <ol>
                 {week.tasks.map((task) => (
                   <li key={task.key}>
                     <button onClick={() => onItem(task.key)} disabled={!lessonIndex[task.key]}>
                       <span className={completed.has(task.key) ? 'tick is-done' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
                       <span className="lw-title"><strong>{task.title}</strong><small>{lessonIndex[task.key] || 'Lesson coming'}</small></span>
-                      <span className="lw-certs" aria-hidden="true">{task.certifications.map((cert) => <i key={cert} style={{ background: certColor(cert) }} />)}</span>
                       <Chevron dir="right" />
                     </button>
                   </li>
@@ -1288,6 +1313,8 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
           ))}
         </div>
       )}
+
+      {tab === 'documents' && documents}
 
       {tab === 'exams' && (
         <div className="exam-cards">
@@ -1302,24 +1329,6 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
         </div>
       )}
 
-      {tab === 'documents' && projects.map((project) => (
-        <details key={project.key} className="lesson-week lw-fold" open={phaseFor(currentIndex).project === project.key}>
-          <summary><h2><small>Release {project.number}</small>{project.title}</h2><span className="lw-count">{project.deliverables.filter((deliverable) => artifactStatus(deliverable.key) === 'complete').length} of {project.deliverables.length}</span></summary>
-          <ol>
-            {project.deliverables.map((deliverable, index) => (
-              <li key={deliverable.key}>
-                <button onClick={() => onItem(deliverable.key)} disabled={!guideIndex[deliverable.key]}>
-                  <span className="doc-no">{docNumber(project.key, index)}</span>
-                  <span className="lw-title"><strong>{deliverable.title}</strong><small>{guideIndex[deliverable.key] || deliverable.summary}</small></span>
-                  <span className={`status status-${artifactStatus(deliverable.key) || 'none'}`}>{statusLabel(artifactStatus(deliverable.key))}</span>
-                  <Chevron dir="right" />
-                </button>
-              </li>
-            ))}
-          </ol>
-        </details>
-      ))}
-
       {tab === 'glossary' && (
         <div className="glossary">
           <label className="sr-only" htmlFor="term-search">Search terms</label>
@@ -1330,10 +1339,10 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, artifact
             ))}
           </div>
           <p className="hint" aria-live="polite">{terms.length} {terms.length === 1 ? 'term' : 'terms'}</p>
-          <dl className="terms">
+          <dl className="list terms">
             {terms.map((term) => (
               <div key={`${term.cert}-${term.term}`} style={certVars(term.cert)}>
-                <dt>{term.term}<span>{term.cert === 'ITIL' ? 'ITIL V5' : term.cert}</span></dt>
+                <dt>{term.term}<span className="cert-dot">{term.cert === 'ITIL' ? 'ITIL V5' : term.cert}</span></dt>
                 <dd>{term.definition}</dd>
               </div>
             ))}
@@ -1349,7 +1358,7 @@ function LessonBody({ lesson, task, onOpenDoc }: { lesson: Lesson; task: StudyTa
   const docGuides = useReading()?.docGuides || {};
   return (
     <div className="lesson">
-      <p className="lesson-summary">{lesson.summary}</p>
+      <p className="lesson-summary">{keepTogether(lesson.summary)}</p>
       {lesson.read.map((section) => (
         <section key={section.heading} className="read">
           <h2 className="read-heading">{section.heading}</h2>
@@ -1380,7 +1389,7 @@ function LessonBody({ lesson, task, onOpenDoc }: { lesson: Lesson; task: StudyTa
       </section>
       <section aria-label="On the exam">
         <h3>On the exam</h3>
-        <ul className="tips">{lesson.examTips.map((tip) => <li key={tip.tip} style={certVars(tip.cert)}><span className="cert-dot" style={certVars(tip.cert)}>{tip.cert === 'ITIL' ? 'ITIL V5' : tip.cert}</span><p>{tip.tip}</p></li>)}</ul>
+        <ul className="tips">{lesson.examTips.map((tip) => <li key={tip.tip} style={certVars(tip.cert)}><span className="cert-dot">{tip.cert === 'ITIL' ? 'ITIL V5' : tip.cert}</span><p>{tip.tip}</p></li>)}</ul>
       </section>
       <section aria-label="Watch out for">
         <h3>Watch out for</h3>
@@ -1430,7 +1439,7 @@ function RichText({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
   let index = 0;
   let paragraph: string[] = [];
-  const flush = () => { if (paragraph.length) { blocks.push(<p key={`p${blocks.length}`}>{paragraph.join(' ')}</p>); paragraph = []; } };
+  const flush = () => { if (paragraph.length) { blocks.push(<p key={`p${blocks.length}`}>{keepTogether(paragraph.join(' '))}</p>); paragraph = []; } };
   while (index < lines.length) {
     const line = lines[index];
     const trimmed = line.trim();
@@ -1473,7 +1482,7 @@ function RichText({ text }: { text: string }) {
       const items: string[] = [];
       while (index < lines.length && (ordered ? numbered : bullet).test(lines[index].trim())) { items.push(lines[index].trim().replace(ordered ? numbered : bullet, '')); index += 1; }
       const List = ordered ? 'ol' : 'ul';
-      blocks.push(<List key={`l${blocks.length}`}>{items.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}</List>);
+      blocks.push(<List key={`l${blocks.length}`}>{items.map((item, itemIndex) => <li key={itemIndex}>{keepTogether(item)}</li>)}</List>);
       continue;
     }
     paragraph.push(trimmed);
@@ -1487,7 +1496,7 @@ function ExamGuideBody({ guide }: { guide: ExamGuide }) {
   return (
     <>
       <header className="reader-head">
-        <p className="eyebrow-date">{guide.credential}</p>
+        <p className="eyebrow">{guide.credential}</p>
         <h1 id="reader-title">{guide.name}</h1>
         <p className="lede">{guide.summary}</p>
       </header>
@@ -1495,7 +1504,7 @@ function ExamGuideBody({ guide }: { guide: ExamGuide }) {
       <section className="lesson" aria-label="What it covers">
         <h3>What it covers</h3>
         <p className="hint">{guide.areasNote}</p>
-        <div className="areas">
+        <div className="list areas">
           {guide.areas.map((area) => {
             const top = area.weight ? Number(area.weight.split(/[–%]/).filter(Boolean).pop()) : 0;
             return (
@@ -1524,11 +1533,11 @@ function ExamGuideBody({ guide }: { guide: ExamGuide }) {
 }
 
 function BookIcon() {
-  return <svg className="book-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" /></svg>;
+  return <svg className="book-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" /></svg>;
 }
 
 /* ==========================================================================
-   Focus session: full-screen, one thing to do.
+   Focus session: full screen, one thing to do.
    ========================================================================== */
 
 function FocusSession({ task, index, timer, elapsed, links, artifactStatus, saving, onPause, onMinimise, onFinish, onDiscard, onOpenWork, lesson }: {
@@ -1551,7 +1560,7 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
           <span className={timer.pausedAt ? 'focus-mini paused' : 'focus-mini'}><span className="live-dot" aria-hidden="true" /><Digits value={formatClock(elapsed)} /></span>
         </header>
         <div className="focus-read">
-          <p className="eyebrow-date">Week {Math.floor(index / 5) + 1}, {task.day} lesson</p>
+          <p className="eyebrow">Week {Math.floor(index / 5) + 1}, {task.day} lesson</p>
           <h2 id="focus-lesson-title">{task.title}</h2>
           <LessonBody lesson={lesson} task={task} onOpenDoc={(item) => onOpenWork({ kind: 'artifact', item })} />
           <button className="primary wide" onClick={() => setReading(false)}>Back to the timer</button>
@@ -1560,23 +1569,25 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
     );
   }
   return (
-    <div className="focus" role="dialog" aria-modal="true" aria-labelledby="focus-title" style={certVars(task.certifications[0])}>
+    <div className={timer.pausedAt ? 'focus is-paused' : 'focus'} role="dialog" aria-modal="true" aria-labelledby="focus-title" style={certVars(task.certifications[0])}>
       <header className="focus-bar">
-        <span>Week {Math.floor(index / 5) + 1}, {task.day}</span>
+        <span className="focus-where"><span className="live-dot" aria-hidden="true" />Week {Math.floor(index / 5) + 1}, {task.day}</span>
         <button className="ghost" onClick={onMinimise}>Minimise</button>
       </header>
       <div className="focus-body">
         <div className="focus-top">
-          <Flame size={128} burning={!timer.pausedAt} className={timer.pausedAt ? 'is-paused' : ''} />
+          <p className="focus-state">{timer.pausedAt ? 'Paused' : 'In session'}</p>
           <div className="focus-clock">
             <span className="clock"><Digits value={formatClock(elapsed)} /></span>
+          </div>
+          <div className="focus-meter">
+            <Meter value={fraction} label={`${Math.round(fraction * 100)}% of the planned time`} />
             <span className="of">of {formatMinutes(planned / 60)}</span>
           </div>
-          <Meter value={fraction} label={`${Math.round(fraction * 100)}% of the planned time`} />
         </div>
         <h2 id="focus-title">{task.title}</h2>
-        <p className="focus-explain">{lesson?.summary || plainTaskExplanation(task.title)}</p>
-        <p className="focus-output">Finish with: {taskOutput(task.meta).toLowerCase()}</p>
+        <p className="focus-explain">{keepTogether(lesson?.summary || plainTaskExplanation(task.title))}</p>
+        <p className="focus-output"><span>Finish with</span> {taskOutput(task.meta).toLowerCase()}</p>
         {lesson && <button className="focus-lesson" onClick={() => setReading(true)}><BookIcon /> Read the lesson</button>}
         {links.length > 0 && (
           <ul className="focus-work">
@@ -1605,7 +1616,8 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
 }
 
 /* ==========================================================================
-   Quiz run: one question per screen, feedback sheet from the bottom.
+   Quiz run: one question per screen. The verdict appears under the answers
+   and the next step stays in reach at the bottom.
    ========================================================================== */
 
 function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
@@ -1620,6 +1632,11 @@ function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
     if (!choice || submitted || saving) return;
     if (await onAnswer(question, choice, confidence)) setSubmitted(true);
   }
+  useEffect(() => {
+    if (!submitted) return;
+    const handle = window.setTimeout(() => document.getElementById('verdict')?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' }), 40);
+    return () => window.clearTimeout(handle);
+  }, [submitted]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
@@ -1641,8 +1658,8 @@ function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
         {seconds !== null ? <span className={seconds < 60 ? 'quiz-time low' : 'quiz-time'}><Digits value={formatClock(seconds)} /></span> : <span className="quiz-count">{run.index + 1}/{run.questions.length}</span>}
       </header>
       <div className="quiz-body">
-        <p className="quiz-meta"><span className="cert-dot" style={certVars(question.certification)}>{question.certification === 'Intersection' ? 'All four' : question.certification}</span>{question.domain}</p>
-        <h1 className="quiz-q">{question.prompt}</h1>
+        <p className="quiz-meta"><span className="cert-dot" style={certVars(question.certification)}>{question.certification === 'Intersection' ? 'All four' : question.certification === 'ITIL' ? 'ITIL V5' : question.certification}</span><span>{question.domain}</span></p>
+        <h1 className="quiz-q">{keepTogether(question.prompt)}</h1>
         <div className="answers" role="radiogroup" aria-label="Answers">
           {question.options.map(([key, text]) => {
             const state = submitted ? (key === question.correct ? 'is-right' : key === choice ? 'is-wrong' : 'is-muted') : choice === key ? 'is-picked' : '';
@@ -1650,7 +1667,7 @@ function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
               <label key={key} className={`answer ${state}`}>
                 <input type="radio" name={`q-${question.id}`} value={key} checked={choice === key} disabled={submitted} onChange={() => setChoice(key)} />
                 <span className="answer-key" aria-hidden="true">{key}</span>
-                <span>{text}</span>
+                <span>{keepTogether(text)}</span>
               </label>
             );
           })}
@@ -1658,22 +1675,24 @@ function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
         {!submitted && (
           <fieldset className="sure">
             <legend>How sure are you?</legend>
-            {(['low', 'medium', 'high'] as const).map((level) => <label key={level} className={confidence === level ? 'active' : ''}><input type="radio" name={`c-${question.id}`} value={level} checked={confidence === level} onChange={() => setConfidence(level)} />{level === 'low' ? 'Guessing' : level === 'medium' ? 'Fairly sure' : 'Certain'}</label>)}
+            <div className="sure-options">
+              {(['low', 'medium', 'high'] as const).map((level) => <label key={level} className={confidence === level ? 'active' : ''}><input type="radio" name={`c-${question.id}`} value={level} checked={confidence === level} onChange={() => setConfidence(level)} />{level === 'low' ? 'Guessing' : level === 'medium' ? 'Fairly sure' : 'Certain'}</label>)}
+            </div>
           </fieldset>
         )}
-      </div>
-      {!submitted ? (
-        <footer className="quiz-foot"><button className="primary wide" onClick={check} disabled={!choice || saving}>Check</button></footer>
-      ) : (
-        <footer className={correct ? 'sheet is-right' : 'sheet is-wrong'} role="status">
-          <div className="sheet-inner">
-            <strong className="sheet-title">{correct ? 'Sound decision' : `The best answer is ${question.correct}`}</strong>
-            <p>{correct ? question.explanation : `${question.incorrect[choice] || 'This option does not address the governing issue.'} ${question.explanation}`}</p>
+        {submitted && (
+          <section id="verdict" className={correct ? 'sheet is-right' : 'sheet is-wrong'} role="status">
+            <strong className="sheet-title"><span className="sheet-icon" aria-hidden="true">{correct ? <Check /> : '×'}</span>{correct ? 'Sound decision' : `The best answer is ${question.correct}`}</strong>
+            <p>{keepTogether(correct ? question.explanation : `${question.incorrect[choice] || 'This option does not address the governing issue.'} ${question.explanation}`)}</p>
             <p className="sheet-link">Taught in: {allDeliverables.find((item) => item.key === question.artifactKey)?.title || 'Integrated decision record'}</p>
-            <button className="sheet-next" onClick={onNext} autoFocus>{run.index < run.questions.length - 1 ? 'Continue' : 'Finish'}</button>
-          </div>
-        </footer>
-      )}
+          </section>
+        )}
+      </div>
+      <footer className="quiz-foot">
+        {!submitted
+          ? <button className="primary wide" onClick={check} disabled={!choice || saving}>Check</button>
+          : <button className="primary wide sheet-next" onClick={onNext} autoFocus>{run.index < run.questions.length - 1 ? 'Continue' : 'Finish'}</button>}
+      </footer>
     </div>
   );
 }
@@ -1705,27 +1724,31 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
         <label className="field" htmlFor="yours-why">Why you are doing this</label>
         <textarea id="yours-why" className="short" value={draftWhy} maxLength={140} onChange={(event) => setDraftWhy(event.target.value)} placeholder="One line you will see on Today" />
         <p className="hint">{140 - draftWhy.length} characters left</p>
-        <fieldset className="swatches">
-          <legend className="field">Your colour</legend>
-          {accents.map(([key, label, swatch]) => (
-            <label key={key} className={accent === key ? 'swatch active' : 'swatch'}>
-              <input type="radio" name="accent" value={key} checked={accent === key} onChange={() => onAccent(key)} />
-              <span className="swatch-dot" style={{ background: swatch }} aria-hidden="true" />
-              <span>{label}</span>
-            </label>
-          ))}
-        </fieldset>
         <fieldset className="appearance">
           <legend className="field">Appearance</legend>
-          {([['system', 'Match this device'], ['light', 'Light'], ['dark', 'Night']] as Array<[Theme, string]>).map(([key, label]) => (
-            <label key={key} className={theme === key ? 'chip-option active' : 'chip-option'}>
-              <input type="radio" name="theme" value={key} checked={theme === key} onChange={() => onTheme(key)} />
-              {label}
-            </label>
-          ))}
+          <div className="options">
+            {([['dark', 'Night'], ['light', 'Light'], ['system', 'Match this device']] as Array<[Theme, string]>).map(([key, label]) => (
+              <label key={key} className={theme === key ? 'chip-option active' : 'chip-option'}>
+                <input type="radio" name="theme" value={key} checked={theme === key} onChange={() => onTheme(key)} />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="swatches">
+          <legend className="field">Your colour</legend>
+          <div className="options">
+            {accents.map(([key, label, swatch]) => (
+              <label key={key} className={accent === key ? 'swatch active' : 'swatch'}>
+                <input type="radio" name="accent" value={key} checked={accent === key} onChange={() => onAccent(key)} />
+                <span className="swatch-dot" style={{ background: swatch }} aria-hidden="true" />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
         </fieldset>
         <p className="hint">Colour and appearance change straight away and stay on this device. Your name and why are saved with your plan.</p>
-        <div className="row form-actions">
+        <div className="row-actions form-actions">
           <button type="button" className="ghost" onClick={onClose}>Close</button>
           <button className="primary wide" disabled={saving} type="submit">{saving ? 'Saving' : 'Save name and why'}</button>
         </div>
@@ -1747,14 +1770,16 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
     <main className="onboard">
       <section className="onboard-intro">
         <div className="brand"><BrandMark /><span className="brand-name">TriCert Lab</span></div>
-        <h1>Four certifications. Thirteen weeks. One beacon at a time.</h1>
-        <Ridge weeks={[5, 5, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]} />
-        <p className="onboard-note">Every session you finish feeds that week’s beacon. Five sessions light it. The tall towers are your exam gates.</p>
-        <ul className="onboard-certs">{certs.map((item) => <li key={item.cert} style={certVars(item.cert)}><strong>{item.label}</strong><span>{item.name}</span></li>)}</ul>
+        <div className="onboard-pitch">
+          <h1>Four certifications. Thirteen weeks. One session at a time.</h1>
+          <p className="onboard-note">You build one fictional programme, Project Beacon, and every session teaches the exams through it. Each bar below is a week of five sessions. The marked weeks are your exam gates.</p>
+          <WeekTrack weeks={[5, 5, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]} current={4} />
+          <ul className="onboard-certs">{certs.map((item) => <li key={item.cert} style={certVars(item.cert)}><span className="cert-dot">{item.label}</span><span>{item.name}</span></li>)}</ul>
+        </div>
       </section>
       <section className="onboard-form" aria-labelledby="setup-title">
         <div className="steps-bar" aria-hidden="true">{onboardingSteps.map((name, index) => <span key={name} className={index <= step ? 'on' : ''} />)}</div>
-        <p className="eyebrow-date">Step {step + 1} of {onboardingSteps.length}</p>
+        <p className="eyebrow">Step {step + 1} of {onboardingSteps.length}</p>
         <h2 id="setup-title">{['About you', 'Your project leadership', 'Your security experience', 'Your skills and time', 'Your exam dates'][step]}</h2>
         <p className="lede">{['This is your plan. Tell it who it is for and why you are doing it. You can change both later.', 'PMP needs project leadership within the last 10 years: 36 months with a bachelor’s degree, 48 with an associate’s, 60 with secondary school, or 24 with a GAC-accredited degree. Plus 35 training hours, or an active CAPM.', 'CISSP needs five years of paid work across at least two of its eight domains. A four-year degree or an approved credential waives one year. With less, passing earns the Associate of ISC2.', 'This sets how hard practice pushes. The plan averages about 14 hours of sessions a week.', 'Optional. Dates drive your countdowns. PL-300 and ITIL fall in week 6, PMP in week 10, CISSP in week 13.'][step]}</p>
         <form onSubmit={(event) => { if (!last) { event.preventDefault(); setStep(step + 1); return; } onSubmit(event); }}>
@@ -1804,7 +1829,7 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
             </div>
           </fieldset>
           {notice && <p className="toast is-error" role="alert">{notice.text}</p>}
-          <div className="row form-actions">
+          <div className="row-actions form-actions">
             {step > 0 && <button type="button" className="ghost" onClick={() => setStep(step - 1)}>Back</button>}
             <button className="primary wide" disabled={saving} type="submit">{last ? (saving ? 'Creating your plan' : 'Create my plan') : 'Continue'}</button>
           </div>
@@ -1822,112 +1847,59 @@ function SkillSelect({ name, label }: { name: string; label: string }) {
    Visual pieces
    ========================================================================== */
 
-/* The ridge: Beacon's 13 weeks as signal fires on a line of Alberta
-   foothills. A week's beacon grows with each session and burns fully when
-   all five are done. The three exam gates are the tall towers. Everything
-   is laid out on u (0 to 1 across), so the wide and narrow drawings share
-   the same label positions. */
-const RIDGE_H = 330;
-const ridgeGates: Record<number, string> = { 6: 'PL-300 and ITIL', 10: 'PMP', 13: 'CISSP' };
-const ridgeU = Array.from({ length: 13 }, (_, i) => 0.056 + i * (0.888 / 12));
-const ridgeGround = (u: number) => 286 - 92 * Math.pow(u, 1.35) + 7 * Math.sin((u * 1000) / 61) + 4 * Math.sin((u * 1000) / 23 + 1);
-const ridgeMid = (u: number) => 246 - 30 * Math.pow(u, 1.1) + 9 * Math.sin((u * 1000) / 90 + 2) + 5 * Math.sin((u * 1000) / 37);
-const RIDGE_PEAKS: Array<[number, number]> = [[0, 170], [0.04, 128], [0.078, 160], [0.12, 104], [0.16, 150], [0.205, 118], [0.25, 166], [0.3, 138], [0.35, 182], [0.42, 176], [0.52, 206], [0.64, 214], [0.8, 222], [1, 214]];
-const ridgeFar = (u: number) => {
-  for (let i = 0; i < RIDGE_PEAKS.length - 1; i += 1) {
-    const [u1, y1] = RIDGE_PEAKS[i];
-    const [u2, y2] = RIDGE_PEAKS[i + 1];
-    if (u >= u1 && u <= u2) return y1 + ((y2 - y1) * (u - u1)) / (u2 - u1);
-  }
-  return 214;
-};
-const RIDGE_STARS: Array<[number, number, number]> = [[0.09, 40, 1.9], [0.17, 82, 1.3], [0.24, 30, 1.3], [0.33, 66, 1.9], [0.42, 22, 1.3], [0.5, 58, 1.3], [0.59, 34, 1.9], [0.66, 88, 1.3], [0.73, 26, 1.3], [0.8, 60, 1.9], [0.88, 38, 1.3], [0.95, 80, 1.3], [0.13, 120, 1.9], [0.56, 110, 1.3]];
+/* The 13 weeks as one row of bars. Each bar fills as its five sessions are
+   done. The three exam gates are marked above their week. With onSelect the
+   weeks are buttons (laptop and tablet); without it the row is a picture
+   with one summary label (phones, onboarding). */
+const trackGates: Record<number, string> = { 6: 'PL-300 and ITIL', 10: 'PMP', 13: 'CISSP' };
+const trackGateShort: Record<number, string> = { 6: 'PL-300, ITIL', 10: 'PMP', 13: 'CISSP' };
+
+function WeekTrack({ weeks, selected, current, onSelect }: { weeks: number[]; selected?: number; current?: number; onSelect?: (week: number) => void }) {
+  const total = weeks.reduce((sum, done) => sum + Math.min(5, done), 0);
+  return (
+    <div className={onSelect ? 'track track-interactive' : 'track track-static'} role={onSelect ? 'group' : 'img'} aria-label={onSelect ? 'Your 13 weeks' : `${total} of ${weeks.length * 5} sessions done${current ? `, week ${current} of ${weeks.length} in progress` : ''}. Exam gates in weeks 6, 10 and 13.`}>
+      <div className="track-gates" aria-hidden="true">
+        {Object.entries(trackGateShort).map(([week, label]) => <span key={week} className={Number(week) === weeks.length ? 'track-gate at-end' : 'track-gate'} style={{ left: `${((Number(week) - 0.5) / weeks.length) * 100}%` }}>{label}</span>)}
+      </div>
+      <ol className="track-row" aria-hidden={onSelect ? undefined : true}>
+        {weeks.map((done, index) => {
+          const week = index + 1;
+          const gate = trackGates[week];
+          const classes = [done >= 5 ? 'is-full' : done > 0 ? 'is-partial' : '', gate ? 'is-gate' : '', week === selected ? 'is-selected' : '', week === current ? 'is-current' : ''].filter(Boolean).join(' ');
+          const inner = (
+            <>
+              <span className="track-bar"><span style={{ width: `${(Math.min(5, done) / 5) * 100}%` }} /></span>
+              <span className="track-num">{week}</span>
+            </>
+          );
+          return (
+            <li key={week}>
+              {onSelect
+                ? <button className={`track-week ${classes}`} onClick={() => onSelect(week)} aria-pressed={week === selected} aria-label={`Week ${week}: ${done} of 5 sessions done${gate ? `, ${gate} exam gate` : ''}`}>{inner}</button>
+                : <span className={`track-cell ${classes}`}>{inner}</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+/* Five short marks for the five sessions of a week. */
+function Pips({ done }: { done: number }) {
+  return <span className="pips" aria-hidden="true">{[0, 1, 2, 3, 4].map((index) => <i key={index} className={index < done ? 'on' : ''} />)}</span>;
+}
+
+/* The flame from the mark, used where there is no name to show. */
 const FLAME_OUTER = 'M0 0C-12 0-16-9-14-18C-12-27-3-30 2-44C6-33 15-26 15-16C15-7 11 0 0 0Z';
 const FLAME_INNER = 'M0 0C-6 0-8-5-7-10C-6-16-1-18 1-26C4-19 8-15 8-9C8-4 5 0 0 0Z';
 
-function ridgeLand(fn: (u: number) => number, width: number) {
-  let d = `M0 ${RIDGE_H}`;
-  for (let step = 0; step <= 100; step += 1) d += `L${((step / 100) * width).toFixed(1)} ${fn(step / 100).toFixed(1)}`;
-  return `${d}L${width} ${RIDGE_H}Z`;
-}
-
-function RidgeArt({ width, weeks, id }: { width: number; weeks: number[]; id: string }) {
+function Flame({ size = 24 }: { size?: number }) {
   return (
-    <svg className={width > 700 ? 'ridge-art ridge-wide' : 'ridge-art ridge-narrow'} viewBox={`0 0 ${width} ${RIDGE_H}`} aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id={`${id}sky`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#171b44" /><stop offset=".55" stopColor="#262a63" /><stop offset=".8" stopColor="#4b3f74" /><stop offset="1" stopColor="#b8695a" /></linearGradient>
-        <radialGradient id={`${id}glow`}><stop offset="0" stopColor="#ffb347" stopOpacity=".55" /><stop offset="1" stopColor="#ff6a1f" stopOpacity="0" /></radialGradient>
-      </defs>
-      <rect width={width} height={RIDGE_H} fill={`url(#${id}sky)`} />
-      {RIDGE_STARS.map(([u, y, r], index) => <circle key={index} cx={u * width} cy={y} r={r} fill="#fff" opacity={index % 2 ? 0.45 : 0.75} />)}
-      <path d={ridgeLand(ridgeFar, width)} fill="#34336b" />
-      <path d={ridgeLand(ridgeMid, width)} fill="#25265a" />
-      <path d={ridgeLand(ridgeGround, width)} fill="#141739" />
-      {ridgeU.map((u, index) => {
-        const x = u * width;
-        const y = ridgeGround(u);
-        const done = weeks[index] || 0;
-        const gate = Boolean(ridgeGates[index + 1]);
-        const post = gate ? 58 : 30;
-        const bowl = gate ? 15 : 10;
-        const top = y - post;
-        const lit = done >= 5;
-        const scale = done === 0 ? 0 : (gate ? 1.35 : 1) * (lit ? 1 : 0.4 + done * 0.1);
-        return (
-          <g key={index} className={done > 0 && !lit ? 'beacon is-burning' : 'beacon'}>
-            {lit && <circle cx={x} cy={top - 16 * scale} r={38 * scale} fill={`url(#${id}glow)`} />}
-            <rect x={x - 1.6} y={top} width="3.2" height={post + 6} fill="#0b0d26" />
-            {gate && <path d={`M${x - 9} ${y + 2}L${x} ${top + 18}L${x + 9} ${y + 2}`} stroke="#0b0d26" strokeWidth="3" fill="none" />}
-            <path d={`M${x - bowl} ${top - 6}H${x + bowl}L${x + bowl * 0.55} ${top + 2}H${x - bowl * 0.55}Z`} fill="#0b0d26" />
-            {done === 0
-              ? <circle cx={x} cy={top - 8} r={gate ? 3.4 : 2.6} fill="#4b4f80" />
-              : <g transform={`translate(${x} ${top - 5}) scale(${scale})`}><path className="flame-shape" d={FLAME_OUTER} fill="#ff6a1f" /><path className="flame-shape" d={FLAME_INNER} fill="#ffc94a" /></g>}
-          </g>
-        );
-      })}
+    <svg className="flame" width={size} height={size} viewBox="-24 -50 48 56" aria-hidden="true">
+      <path d={FLAME_OUTER} fill="currentColor" />
     </svg>
   );
-}
-
-function Ridge({ weeks, selected, onSelect, children }: { weeks: number[]; selected?: number; onSelect?: (week: number) => void; children?: ReactNode }) {
-  const id = `r${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
-  const spacing = 0.888 / 12;
-  return (
-    <section className="ridge" aria-label="Your 13 weeks as beacons">
-      <div className="ridge-scene">
-        <RidgeArt width={1000} weeks={weeks} id={`${id}w`} />
-        <RidgeArt width={560} weeks={weeks} id={`${id}n`} />
-        {Object.entries(ridgeGates).map(([week, label]) => <span key={week} className={ridgeU[Number(week) - 1] > 0.9 ? 'ridge-gate edge-end' : 'ridge-gate'} style={{ left: `${ridgeU[Number(week) - 1] * 100}%` }}>{label}</span>)}
-        {ridgeU.map((u, index) => {
-          const week = index + 1;
-          const done = weeks[index] || 0;
-          const label = `Week ${week}: ${done} of 5 sessions done${ridgeGates[week] ? `, ${ridgeGates[week]} exam gate` : ''}`;
-          const style = { left: `${u * 100}%`, top: `${((ridgeGround(u) + 14) / RIDGE_H) * 100}%` } as CSSProperties;
-          return onSelect ? (
-            <button key={week} className={week === selected ? 'ridge-week is-selected' : 'ridge-week'} style={{ left: `${(u - spacing / 2) * 100}%`, width: `${spacing * 100}%` }} onClick={() => onSelect(week)} aria-pressed={week === selected} aria-label={label}>
-              <span style={{ top: style.top }}>{week}</span>
-            </button>
-          ) : <span key={week} className="ridge-num" style={style} aria-hidden="true">{week}</span>;
-        })}
-      </div>
-      {children && <div className="ridge-foot">{children}</div>}
-    </section>
-  );
-}
-
-/* One flame, used for focus mode, the completion screen and empty states. */
-function Flame({ size = 96, burning = false, className = '' }: { size?: number; burning?: boolean; className?: string }) {
-  return (
-    <svg className={['flame', burning ? 'is-burning' : '', className].filter(Boolean).join(' ')} width={size} height={size} viewBox="-24 -50 48 56" aria-hidden="true">
-      <path className="flame-shape" d={FLAME_OUTER} fill="#ff6a1f" />
-      <path className="flame-shape" d={FLAME_INNER} fill="#ffc94a" />
-    </svg>
-  );
-}
-
-/* Five small marks for the five sessions of a week. */
-function Embers({ done }: { done: number }) {
-  return <span className="embers" aria-hidden="true">{[0, 1, 2, 3, 4].map((index) => <i key={index} className={index < done ? 'on' : ''} />)}</span>;
 }
 
 function DayMark({ done, gate, running }: { done: boolean; gate: boolean; running: boolean }) {
@@ -1942,13 +1914,20 @@ function Meter({ value, label }: { value: number; label?: string }) {
   return <span className="meter" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true}><span style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%` }} /></span>;
 }
 
-function Part({ label, value, max }: { label: string; value: number; max: number }) {
+/* The four parts of a readiness score, each with its own short bar:
+   coverage (30), documents (35), judgment (25) and recall (10). */
+function ReadinessParts({ score }: { score: ScoreParts }) {
+  const parts: Array<[string, number, number]> = [['Coverage', score.coverage, 30], ['Documents', score.evidence, 35], ['Judgment', score.judgment, 25], ['Recall', score.recall, 10]];
   return (
-    <div className="part">
-      <span className="part-label">{label}</span>
-      <span className="part-track" aria-hidden="true"><span style={{ width: `${(value / max) * 100}%` }} /></span>
-      <span className="part-value">{Math.round(value)}/{max}</span>
-    </div>
+    <dl className="parts">
+      {parts.map(([label, value, max]) => (
+        <div key={label}>
+          <dt>{label}</dt>
+          <dd>{Math.round(value)}<span>/{max}</span></dd>
+          <span className="part-bar" aria-hidden="true"><span style={{ width: `${Math.min(100, (value / max) * 100)}%` }} /></span>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -1957,47 +1936,45 @@ function Digits({ value }: { value: string }) {
   return <span className="digits" aria-label={value}>{value.split('').map((char, index) => <span key={index} className={/\d/.test(char) ? 'dg' : 'sep'} aria-hidden="true">{char}</span>)}</span>;
 }
 
-/* The mark: a beacon burning on a night ridge. */
-function BrandMark({ size = 32 }: { size?: number }) {
+/* The mark: one flame on a dark tile. The flame takes the learner's colour. */
+function BrandMark({ size = 30 }: { size?: number }) {
   return (
     <svg className="brand-mark" width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <rect width="64" height="64" rx="16" fill="#1d2152" />
-      <path d="M0 50C14 45 30 47 64 39V48C64 56.8 56.8 64 48 64H16C7.2 64 0 56.8 0 48Z" fill="#11143a" />
-      <g transform="translate(32 46) scale(0.86)"><path d={FLAME_OUTER} fill="#ff6a1f" /><path d={FLAME_INNER} fill="#ffc94a" /></g>
+      <rect width="64" height="64" rx="18" className="bm-tile" />
+      <g transform="translate(32 50) scale(0.82)"><path d={FLAME_OUTER} className="bm-flame" /><path d={FLAME_INNER} className="bm-core" /></g>
     </svg>
   );
 }
 
 function Check() {
-  return <svg className="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return <svg className="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
 function Chevron({ dir }: { dir: 'left' | 'right' | 'up' | 'down' }) {
   const rotate = { right: 0, down: 90, left: 180, up: 270 }[dir];
-  return <svg className="chev" viewBox="0 0 16 16" aria-hidden="true" style={{ transform: `rotate(${rotate}deg)` }}><path d="M6 3.5l4.5 4.5L6 12.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return <svg className="chev" viewBox="0 0 16 16" aria-hidden="true" style={{ transform: `rotate(${rotate}deg)` }}><path d="M6 3.5l4.5 4.5L6 12.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
 function NavIcon({ name }: { name: View }) {
   const paths: Record<View, ReactNode> = {
-    today: <path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.4 2.4-5.4 3.7-8.4 1 1.3 1.4 2.4 1.5 3.7 1.5-1.4 2.7-3.9 2.6-7.2 3.4 2.4 5.2 6.9 5.2 10.6 0 4.6-2.5 7.4-6.5 7.4z" />,
-    learn: <path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" />,
+    today: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></>,
     plan: <><rect x="3.5" y="5" width="17" height="15" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /></>,
+    learn: <path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" />,
     projects: <><path d="M6 3.5h8l4.5 4.5v12.5H6z" /><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6" /></>,
     practice: <path d="M13 2.5 5 13.5h6l-1 8 8-11h-6z" />,
     progress: <path d="M4 20V13M9.5 20V8M15 20v-5M20.5 20V4" />,
   };
-  return <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+  return <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
-function TileArt({ kind }: { kind: 'scenarios' | 'timed' | 'review' | 'cards' | 'labs' }) {
-  const art: Record<typeof kind, ReactNode> = {
-    scenarios: <><path d="M60 98V66C60 52 46 46 34 40M60 66C60 52 74 46 86 40" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" opacity=".45" /><path d="M60 98V66C60 52 74 46 86 40" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" /><path d="M72 30l16 9-10 15" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" /><circle cx="30" cy="38" r="7" fill="currentColor" opacity=".45" /></>,
-    timed: <><circle cx="60" cy="64" r="32" fill="none" stroke="currentColor" strokeWidth="9" /><path d="M60 64V44M52 22h16" stroke="currentColor" strokeWidth="9" strokeLinecap="round" /></>,
-    review: <><path d="M30 64a30 30 0 1 0 9-21" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" /><path d="M36 30v14h14" fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" /></>,
-    cards: <><rect x="28" y="34" width="52" height="40" rx="8" fill="none" stroke="currentColor" strokeWidth="8" opacity=".4" /><rect x="40" y="46" width="52" height="40" rx="8" fill="none" stroke="currentColor" strokeWidth="8" /></>,
-    labs: <><path d="M50 26v24L32 84a6 6 0 0 0 5 9h46a6 6 0 0 0 5-9L70 50V26" fill="none" stroke="currentColor" strokeWidth="8" strokeLinejoin="round" /><path d="M44 26h32" stroke="currentColor" strokeWidth="8" strokeLinecap="round" /></>,
+function Glyph({ name }: { name: 'timed' | 'review' | 'cards' | 'labs' }) {
+  const paths: Record<typeof name, ReactNode> = {
+    timed: <><circle cx="12" cy="13.5" r="7" /><path d="M12 13.5V10M9.5 3h5" /></>,
+    review: <><path d="M5 12a7 7 0 1 0 2.1-5" /><path d="M6.5 3.5V7.5h4" /></>,
+    cards: <><rect x="3.5" y="7" width="13" height="10" rx="2" /><path d="M7.5 4h11a2 2 0 0 1 2 2v8" /></>,
+    labs: <><path d="M9.5 3.5v6L4.8 17.6a2 2 0 0 0 1.7 2.9h11a2 2 0 0 0 1.7-2.9L14.5 9.5v-6" /><path d="M8 3.5h8M7.2 14h9.6" /></>,
   };
-  return <svg className="tile-art" viewBox="0 0 120 120" aria-hidden="true">{art[kind]}</svg>;
+  return <span className="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg></span>;
 }
 
 /* ==========================================================================
@@ -2006,7 +1983,7 @@ function TileArt({ kind }: { kind: 'scenarios' | 'timed' | 'review' | 'cards' | 
 
 function ReviewList({ attempts, queue, onOpen }: { attempts: AttemptRow[]; queue: AttemptRow[]; onOpen: (key: string) => void }) {
   if (!queue.length) {
-    return <section className="empty"><Flame size={72} /><h2>All clear</h2><p>Answers you get wrong or mark as a guess land here, linked to the document that teaches them.</p></section>;
+    return <section className="empty"><span className="empty-badge" aria-hidden="true"><Check /></span><h2>All clear</h2><p>Answers you get wrong or mark as a guess land here, linked to the document that teaches them.</p></section>;
   }
   return (
     <>
@@ -2055,10 +2032,10 @@ function DatasetLibrary() {
     ['Security architecture worksheet', '/datasets/security-architecture-template.md', 'Markdown'],
   ];
   return (
-    <section className="card-block" aria-labelledby="datasets-title">
+    <section className="card" aria-labelledby="datasets-title">
       <h2 id="datasets-title">Kestrel Health datasets</h2>
       <p className="hint">Synthetic and deliberately imperfect: duplicates, impossible times, invalid codes and orphaned keys are documented in the reconciliation answers, not hidden.</p>
-      <ul className="files">{files.map(([label, url, kind]) => <li key={url}><a href={url} download><span>{label}</span><small>{kind}</small></a></li>)}</ul>
+      <ul className="list files">{files.map(([label, url, kind]) => <li key={url}><a href={url} download><span>{label}</span><small>{kind}</small></a></li>)}</ul>
     </section>
   );
 }
@@ -2124,6 +2101,13 @@ function docNumberFor(item: Deliverable) {
    Helpers
    ========================================================================== */
 
+/* Keep exam and document codes on one line: "PL-300" never splits at its
+   hyphen. The text itself is unchanged. */
+const unbroken = /(PL-300|ITIL V5|R\d-\d\d|CR-\d\d)/;
+function keepTogether(text: string): ReactNode {
+  if (!unbroken.test(text)) return text;
+  return text.split(unbroken).map((part, index) => (index % 2 ? <span key={index} className="nobr">{part}</span> : part));
+}
 function countWord(value: number) { const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']; return words[value] || String(value); }
 function ratio(numerator: number, denominator: number) { return denominator ? Math.min(1, numerator / denominator) : 0; }
 function safeDomains(value: string) { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : []; } catch { return []; } }
@@ -2163,11 +2147,20 @@ function deriveCurrentWeek(progress: ProgressRow[]) {
 function scrollBehavior(): ScrollBehavior {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }
-function routeFromHash(): { view: View; tab?: 'readiness' | 'portfolio' } | null {
+function routeFromHash(): { view: View; tab?: 'readiness' | 'portfolio'; learnTab?: LearnTab } | null {
   const hash = window.location.hash.replace('#', '');
   if (hash === 'home') return { view: 'today' };
+  if (hash === 'projects') return { view: 'learn', learnTab: 'documents' };
   if (hash === 'portfolio') return { view: 'progress', tab: 'portfolio' };
   return navItems.some(([key]) => key === hash) ? { view: hash as View } : null;
+}
+/* Night is the default. Version 6 saved "system" for everyone who never
+   chose, so a "system" saved before version 7 starts at night once. */
+const prefsVersion = 7;
+function savedTheme(prefs: UiPrefs): Theme {
+  if (prefs.theme === 'light') return 'light';
+  if (prefs.theme === 'system' && prefs.v === prefsVersion) return 'system';
+  return 'dark';
 }
 function readPrefs(): UiPrefs {
   try { const parsed = JSON.parse(window.localStorage.getItem(uiPrefsKey) || '{}'); return parsed && typeof parsed === 'object' ? parsed : {}; } catch { return {}; }

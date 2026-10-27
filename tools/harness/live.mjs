@@ -101,7 +101,9 @@ await check('Completing five sessions moves the current week to 2 after a full r
 });
 
 await check('Artifact draft persists in D1 and reopens on reload', async () => {
-  await page.click('.nav button:has(.nav-label:text-is("Project"))');
+  await page.click('.nav button:has(.nav-label:text-is("Learn"))');
+  await page.click('.segmented button:has-text("Documents")');
+  await page.click('.releases .release >> nth=0');
   await page.waitForSelector('.doc-list');
   await page.click('.doc-list li >> nth=1 >> button');
   await page.fill('#work', 'Coverage map draft written in the live run. '.repeat(4));

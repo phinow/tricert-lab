@@ -33,20 +33,21 @@ const nav = (label) => page.click(`.nav button:has(.nav-label:text-is("${label}"
 await page.goto(`${base}/?state=midway`);
 await page.waitForSelector('.hero-session');
 
-await check('Today greets Moye by name and shows the ridge, week 6, day 3', async () => {
+await check('Today greets Moye by name and shows the 13-week track, week 6, day 3', async () => {
   assert.match(await page.textContent('.hello h1'), /^Good (morning|afternoon|evening), Moye$/);
   assert.match(await page.textContent('.hello .lede'), /Week 6 of 13\. One session, then your PL-300 and ITIL V5 gate\./);
   assert.match(await page.textContent('.why'), /Pass all four/);
-  assert.equal(await page.locator('.ridge-week').count(), 13);
-  assert.equal(await page.locator('.ridge-wide .beacon.is-burning').count(), 1);
-  assert.equal(await page.getAttribute('.ridge-week.is-selected', 'aria-label'), 'Week 6: 2 of 5 sessions done, PL-300 and ITIL exam gate');
+  assert.equal(await page.locator('.track-week').count(), 13);
+  assert.equal(await page.locator('.track-interactive .track-week.is-partial').count(), 1);
+  assert.equal(await page.locator('.track-interactive .track-week.is-full').count(), 5);
+  assert.equal(await page.getAttribute('.track-week.is-selected', 'aria-label'), 'Week 6: 2 of 5 sessions done, PL-300 and ITIL exam gate');
   assert.match(await page.textContent('.hero-when'), /Week 6, Day 3/);
   assert.equal(await page.locator('.days .day-mark.is-done').count(), 2);
   assert.equal(await page.locator('.ring-arc, .rings').count(), 0);
 });
 
-await check('Clicking a beacon shows that week', async () => {
-  await page.click('.ridge-week >> nth=1');
+await check('Clicking a week on the track shows that week', async () => {
+  await page.click('.track-week >> nth=1');
   assert.match(await page.textContent('.hero-when'), /Week 2, Day 5/);
   await page.click('.week-strip .text-link');
   assert.match(await page.textContent('.hero-when'), /Week 6, Day 3/);
@@ -89,18 +90,18 @@ await check('Mark done finishes the week; Plan shows week 7 as current', async (
   await page.click('.hero-actions .ghost');
   await page.click('.celebrate .primary');
   await nav('Plan');
-  await page.waitForSelector('.plan .ridge');
+  await page.waitForSelector('.plan .track-week');
   assert.match(await page.textContent('.weeks > li.is-current'), /Week 7, this week/);
 });
 
 await check('A session opened from Plan shows on Today', async () => {
-  await page.click('.plan .ridge-week >> nth=0');
+  await page.click('.plan .track-week >> nth=0');
   await page.click('#week-1 .week-detail li >> nth=4 >> button');
   await page.waitForSelector('.hero-session');
   assert.match(await page.textContent('#session-title'), /programme charter/i);
   assert.match(await page.textContent('.hero-actions'), /Done/);
   await nav('Plan');
-  await page.click('.plan .ridge-week >> nth=6');
+  await page.click('.plan .track-week >> nth=6');
   await page.click('#week-7 .week-detail li >> nth=0 >> button');
   await page.waitForSelector('.hero-session');
   assert.match(await page.textContent('#session-title'), /WBS/);
@@ -193,9 +194,11 @@ await check('Learn: exam guide, glossary search and document guide', async () =>
   await page.fill('#term-search', 'critical path');
   assert.ok(await page.locator('.terms > div').count() >= 1);
   await page.click('.segmented button:has-text("Documents")');
-  await page.click('.lesson-week[open] li button >> nth=0');
-  await page.click('.reader-actions .primary');
+  assert.equal(await page.locator('.releases .release').count(), 3);
+  await page.click('.releases .release >> nth=0');
+  await page.click('.doc-list li >> nth=0 >> button');
   await page.waitForSelector('.doc');
+  assert.equal((await page.textContent('#doc-title')).trim(), 'Programme brief');
   assert.equal(await page.locator('.guide-fold').count(), 2);
   await page.click('.finished-fold > summary');
   assert.ok((await page.textContent('.finished-fold .rich')).length > 1500);
@@ -218,7 +221,7 @@ await check('Focus mode: read the lesson while the timer keeps running', async (
 await check('Practice: timed set uses the chosen exam; flashcards filter by exam', async () => {
   await nav('Practice');
   await page.selectOption('#lens', 'CISSP');
-  await page.click('.tile-timed .primary');
+  await page.click('.tile-timed .start');
   await page.waitForSelector('.quiz');
   assert.match(await page.textContent('.quiz-meta'), /CISSP|All four/);
   await page.click('.quiz .close');
@@ -255,7 +258,7 @@ await check('Make it yours: colour and appearance apply at once; name and why sa
   assert.equal(await page.evaluate(() => document.documentElement.dataset.accent), 'glacier');
   await page.click('.chip-option:has-text("Night")');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
-  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(18, 22, 48)');
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(9, 9, 11)');
   await page.fill('#yours-name', 'Samira');
   await page.fill('#yours-why', 'Lead the next programme.');
   await page.click('.yours .primary');

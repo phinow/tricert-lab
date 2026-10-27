@@ -1,3 +1,16 @@
+# TriCert Lab, version 7 candidate: Modern night (branch `design-night`)
+
+## What changed
+
+- **Night first, still light when you want it.** A deep neutral background, slightly lighter panels and cards edged with fine lines. Light appearance uses the same layout. "Make it yours" offers Night, Light or Match this device; Night is the default.
+- **One bright action per screen.** The accent colour (Beacon orange by default, or Wild rose, Canola or Glacier) marks only the next step and your progress: Start session on Today, Start on Practice, Check and Continue in a scenario, Mark complete on a document. Everything else is a quiet list.
+- **Progress as plain numbers and one row of bars.** Today shows sessions done and days to your next exam in bold, with your 13 weeks as 13 bars (exam gates marked above weeks 6, 10 and 13). The ridge drawing and the flames in focus mode are gone. Progress shows each exam's score out of 100 with its four parts.
+- **Five places instead of six.** Today, Plan, Learn, Practice and Progress. Project documents now live in Learn, under Documents, next to the lessons that teach them. Opening a document goes straight to the writing page, with "How to write it", the finished example and "Done when" folded above your work.
+- **Scenario feedback stays in view.** After Check, the verdict appears under the answers, and Continue stays at the bottom of the screen.
+- **New type.** Geist for the interface and reading, Geist Mono for codes and small numbers. Both SIL Open Font License and self-hosted. Bricolage Grotesque and Literata are removed.
+- **Logo.** One flame on a dark tile. Favicon, touch icon, share image and downloadable lockup regenerated.
+- **No data changes.** The API, database and learning content are unchanged.
+
 # TriCert Lab, version 6: Beacon design
 
 ## What changed
