@@ -23,11 +23,11 @@ await check('Fresh database shows onboarding, with the self-hosted font applied'
   await page.goto(base);
   await page.waitForSelector('.onboard-form');
   const family = await page.evaluate(() => getComputedStyle(document.querySelector('h2')).fontFamily);
-  assert.match(family, /Bricolage Grotesque/);
+  assert.match(family, /^Geist,/);
   await page.evaluate(() => document.fonts.ready);
-  assert.equal(await page.evaluate(() => document.fonts.check('16px "Bricolage Grotesque"')), true);
+  assert.equal(await page.evaluate(() => document.fonts.check('600 16px "Geist"')), true);
   const note = await page.evaluate(() => getComputedStyle(document.querySelector('.onboard-note')).fontFamily);
-  assert.match(note, /Literata/);
+  assert.match(note, /^Geist,/);
   await page.screenshot({ path: path.join(shots, 'live-onboarding.png'), fullPage: true });
 });
 

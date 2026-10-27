@@ -1,14 +1,21 @@
-# TriCert Lab, version 7 candidate: Modern night (branch `design-night`)
+# TriCert Lab, version 7: Modern night
+
+Moye's verdict on version 6: "I want something that's very modern, but it's still very usable. And very, very simple." Version 7 answers that with a calm, dark study desk where every screen has one job and one bright button.
 
 ## What changed
 
-- **Night first, still light when you want it.** A deep neutral background, slightly lighter panels and cards edged with fine lines. Light appearance uses the same layout. "Make it yours" offers Night, Light or Match this device; Night is the default.
-- **One bright action per screen.** The accent colour (Beacon orange by default, or Wild rose, Canola or Glacier) marks only the next step and your progress: Start session on Today, Start on Practice, Check and Continue in a scenario, Mark complete on a document. Everything else is a quiet list.
-- **Progress as plain numbers and one row of bars.** Today shows sessions done and days to your next exam in bold, with your 13 weeks as 13 bars (exam gates marked above weeks 6, 10 and 13). The ridge drawing and the flames in focus mode are gone. Progress shows each exam's score out of 100 with its four parts.
-- **Five places instead of six.** Today, Plan, Learn, Practice and Progress. Project documents now live in Learn, under Documents, next to the lessons that teach them. Opening a document goes straight to the writing page, with "How to write it", the finished example and "Done when" folded above your work.
-- **Scenario feedback stays in view.** After Check, the verdict appears under the answers, and Continue stays at the bottom of the screen.
-- **New type.** Geist for the interface and reading, Geist Mono for codes and small numbers. Both SIL Open Font License and self-hosted. Bricolage Grotesque and Literata are removed.
-- **Logo.** One flame on a dark tile. Favicon, touch icon, share image and downloadable lockup regenerated.
+- **Night first, light when you want it.** A near-black window with the page on one slightly lighter panel. Lists are drawn with fine lines instead of boxes inside boxes, so the only filled card on a screen is the thing to act on. Light uses the same layout. "Make it yours" offers Night, Light or Match this device; Night is the default.
+- **One colour, one meaning.** Your colour (Beacon orange by default, or Wild rose, Canola or Glacier) marks only the next action and your progress. The four exam colour dots are gone: exams are plain outlined tags (PMP, PL-300, CISSP, ITIL V5). Green and red still mean right and wrong.
+- **Today is the session and nothing else.** Your greeting and why, two numbers (sessions done and days to your next exam), then the session card: "Up next", the session title in large type, Start session, Read the lesson and Mark done, and the five days of the week. Below it, only what is waiting on you: answers to review, drafts, and the reflection for a week you have finished. The 13-week track moved to Plan and the weekly reflection moved into its week on Plan.
+- **Plan is the map.** The 13 weeks as one row of bars with a small diamond on each exam gate. Tap a week to open it. On a phone the row wraps into seven and six so every week is a full-size target. Finished weeks say "Done"; others say "2 of 5".
+- **Progress leads with the next gate.** "Your next gate is PL-300 and ITIL V5. 0 of 5 checks met." Then the five checks, then one row per exam with its score out of 100, one bar, and the four parts as plain numbers. The 16 small bars are gone.
+- **Five places instead of six.** Today, Plan, Learn, Practice and Progress. Project documents live in Learn, under Documents, and open straight into the writing page.
+- **Lessons read like a book.** Larger reading text at a comfortable line length, clear section headings, quiet tables and code. On a laptop, long lessons have an "On this page" list in the right margin that follows where you are and jumps to any section.
+- **Practice.** One "Start scenarios" button at the top, then Timed set, Review, Flashcards and Labs as a short list. In a scenario, the verdict appears under your answer so you can still see what you picked, with Continue right under it (on a phone it stays in reach above the tabs). Each run names itself at the top: Scenarios, Timed set, PL-300, or Check yourself.
+- **Phone.** A slim top bar on every screen with your initial (Make it yours) and, while a session runs, its timer. Tabs at the bottom have icons and labels, and the review count sits on the icon so it never covers a word.
+- **Type.** Geist for everything, with even-width figures for counts and timers (no more code-style zeros). Geist Mono is kept only for code in lessons. Both SIL Open Font License and self-hosted.
+- **Small fixes.** Exam codes such as PL-300 never split across lines. Keyboard focus is visible everywhere, including inside lists, and moves in the order you see. Disabled buttons look disabled. Every phone target is at least 44 pixels.
+- **Logo.** The flame on a dark tile stays. The share image now shows the 13-week track as Plan draws it.
 - **No data changes.** The API, database and learning content are unchanged.
 
 # TriCert Lab, version 6: Beacon design

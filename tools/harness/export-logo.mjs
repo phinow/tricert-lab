@@ -1,4 +1,5 @@
-// v7 logo set ("Modern night"): one flame on a dark tile, Geist wordmark.
+// v7 logo set ("Modern night"): one flame on a dark tile, Geist wordmark,
+// and a share image with the 13-week track as the Plan screen draws it.
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,14 +15,15 @@ const mark = (size) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" 
 fs.writeFileSync('public/favicon.svg', mark(64) + '\n');
 fs.writeFileSync('public/tricert-mark.svg', mark(512) + '\n');
 
-// The 13-week track, as on Today: weeks 1 to 9 done, week 10 under way.
+// The 13-week track, as on Plan: the week number above each bar, a small
+// diamond beside the three exam gates. Weeks 1 to 9 done, week 10 under way.
 const weeks = [5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 0, 0, 0];
-const gates = { 6: 'PL-300, ITIL', 10: 'PMP', 13: 'CISSP' };
+const gates = new Set([6, 10, 13]);
 const trackW = 1040, gap = 10, cell = (trackW - gap * 12) / 13;
-const track = `<div style="position:relative;width:${trackW}px;height:74px">${weeks.map((done, i) => {
+const track = `<div style="position:relative;width:${trackW}px;height:58px">${weeks.map((done, i) => {
   const x = i * (cell + gap);
-  const label = gates[i + 1] ? `<span style="position:absolute;left:${x + cell / 2}px;top:0;transform:translateX(${i === 12 ? '-70%' : '-50%'});font:600 15px G;letter-spacing:.06em;color:#8b8b94;white-space:nowrap">${gates[i + 1]}</span>` : '';
-  return `${label}<span style="position:absolute;left:${x}px;top:32px;width:${cell}px;height:16px;border-radius:5px;background:#27282d;overflow:hidden"><span style="display:block;height:100%;width:${(done / 5) * 100}%;background:${ember}"></span></span><span style="position:absolute;left:${x}px;top:56px;width:${cell}px;text-align:center;font:500 15px G;color:${i === 9 ? '#f4f4f5' : '#8b8b94'}">${i + 1}</span>`;
+  const diamond = gates.has(i + 1) ? '<span style="display:inline-block;width:8px;height:8px;margin-left:7px;border-radius:1.5px;background:#a6a6ae;transform:rotate(45deg)"></span>' : '';
+  return `<span style="position:absolute;left:${x}px;top:0;width:${cell}px;display:flex;align-items:center;justify-content:center;font:${i === 9 ? 650 : 500} 17px G;color:${i === 9 ? '#f5f5f6' : '#8b8b95'}">${i + 1}${diamond}</span><span style="position:absolute;left:${x}px;top:36px;width:${cell}px;height:10px;border-radius:5px;background:#2a2a30;overflow:hidden"><span style="display:block;height:100%;width:${(done / 5) * 100}%;background:${ember}"></span></span>`;
 }).join('')}</div>`;
 
 const css = `@font-face{font-family:G;src:url(data:font/woff2;base64,${geist}) format('woff2');font-weight:100 900}
@@ -38,7 +40,7 @@ const word = (size) => `<span style="font:600 ${size}px G;letter-spacing:-.035em
 await shot(1600, 520, `<div style="display:flex;align-items:center;gap:52px;height:520px;padding:0 100px 0 80px;background:#09090b;border-radius:64px">${mark(340)}${word(168)}</div>`, 'public/tricert-lab-logo.png', true);
 await shot(1200, 630, `<div style="position:relative;width:1200px;height:630px;background:#09090b;overflow:hidden">
 <div style="position:absolute;left:80px;top:64px;display:flex;align-items:center;gap:22px">${mark(72)}${word(44)}</div>
-<p style="position:absolute;left:80px;top:180px;font:600 68px/1.04 G;letter-spacing:-.04em;color:#f4f4f5;width:960px">Four certifications. Thirteen weeks. One session at a time.</p>
+<p style="position:absolute;left:80px;top:176px;font:640 64px/1.04 G;letter-spacing:-.045em;color:#f5f5f6;width:1000px">Four certifications.<br>Thirteen weeks.<br>One session at a time.</p>
 <div style="position:absolute;left:80px;bottom:64px">${track}</div></div>`, 'public/og.png');
 await shot(180, 180, `<div style="background:#18181b;width:180px;height:180px">${mark(180).replace('rx="18"', 'rx="0"')}</div>`, 'public/apple-touch-icon.png');
 await shot(512, 512, mark(512), 'public/icon-512.png', true);

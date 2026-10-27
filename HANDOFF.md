@@ -17,14 +17,21 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 - Browser checks in `tools/harness`: 20 flow checks pass, 6 live checks against the real server pass, the live reading check passes, and the strict typecheck of the main component passes.
 - Content tools reproduce the committed files byte for byte: `build-library.py` and `inject-scenarios.py` regenerate the `lib/` files exactly, `datasets/generate.py` regenerates every dataset exactly, and `check2.py` passes on all 19 content files.
 - Content: 65 lessons, 66 document writing guides with finished examples, 112 practice questions (96 exam questions plus 16 cross-exam scenarios), 98 flashcards, 242 glossary terms, 4 exam guides, 22 downloadable dataset files. Exam facts were checked against PMI, Microsoft Learn, ISC2 and PeopleCert on 18 October 2026.
-- Version 6 design ("Beacon"): light by default with a night mode; the 13 weeks shown as signal fires on a ridge; greeting by name; a one-line "why"; "Make it yours" settings for name, why, colour and appearance.
-- Branch `design-night` (2026-10-27) holds a version 7 candidate, "Modern night", after Moye's verdict on version 6 ("I want something that's very modern, but it's still very usable. And very, very simple"): night by default with light available, Geist type, one accent colour, a row of 13 week bars instead of the ridge, five places in the navigation (Project documents moved into Learn, Documents tab). Waiting for his verdict.
+- Version 7 design ("Modern night", branch `v7-redesign`, 2026-10-27), made after Moye turned down version 6 ("I want something that's very modern, but it's still very usable. And very, very simple"). A calm, dark study desk: night by default with the same layout in light, Geist type (Geist Mono only for code), one accent colour of his choosing that marks only the next action and progress, and exams named with plain outlined tags. Each screen has one job and one filled card:
+  - Today: greeting, why line, two numbers (sessions done, days to the next exam), the session card ("Up next", Start session, Read the lesson, Mark done, the week's five days) and "Waiting on you" (answers to review, drafts, the reflection for a finished week).
+  - Plan: the 13 weeks as one row of bars with diamonds on the exam gates (wraps 7 and 6 on a phone), then the three releases with their weeks. Each week opens its sessions and its reflection.
+  - Learn: Lessons (one list of 13 weeks), Documents (the 66 project documents by release, opening straight into the writing page), Exams and Glossary. Long lessons have an "On this page" list on wide screens.
+  - Practice: "Start scenarios", then Timed set, Review, Flashcards and Labs. Scenario feedback sits under the answers with Continue right under it.
+  - Progress: the next gate's five checks first, then one row per exam with a score and one bar; Portfolio is a tab.
+  - Phone: a slim top bar on every screen (Make it yours, the running timer) and five icon tabs at the bottom.
+  - "Make it yours" keeps name, why, appearance (Night, Light, Match this device) and four colours.
+- Version 6 ("Beacon": light default, signal fires on a ridge, Bricolage Grotesque and Literata) is replaced by version 7. Its history is in `CHANGES.md`.
 - A hosted copy runs as a private claude.ai artifact (see section 6). Version 6 was published there on 2026-10-20.
 
 ### What is half done
 
-- Version 6 design was delivered on 2026-10-20 and Moye has not reviewed it yet. Treat it as waiting for his verdict, not as approved.
-- `README.md` "Demonstration walkthrough" uses old screen names (Roadmap, Readiness, Portfolio as top-level screens). The current screens are Today, Plan, Learn, Project, Practice and Progress (Portfolio is a tab inside Progress).
+- Version 7 was built on 2026-10-27 on branch `v7-redesign` and is not merged into `main` or published to the hosted artifact yet. Moye has not seen it. Treat it as waiting for his verdict, not as approved.
+- Design review screenshots of every screen (desktop 1440 wide and phone 390 wide, light, and night for the main screens) are made with `tools/harness/shoot.mjs`. They are not committed.
 - `docs/implementation-backlog.md` still has many boxes unticked for work that is done. It is out of date.
 
 ### What is broken or known to be imperfect
@@ -45,7 +52,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `HANDOFF.md` | This file. |
 | `CLAUDE.md` | Standing instructions Claude Code loads in every session: run in the cloud only, writing rules, how to edit content, checks to run before calling work done. |
 | `README.md` | Project overview and run commands. Walkthrough section is out of date (see Status). |
-| `CHANGES.md` | Release notes for versions 6, 5 and 4, and earlier redesign notes. |
+| `CHANGES.md` | Release notes for versions 7, 6, 5 and 4, and earlier redesign notes. |
 | `LOCAL_COPY_README.txt` | Plain-text run guide written for Moye's own computer (Windows and macOS), including how to keep version 5 progress. |
 | `package.json` | App scripts and dependencies. The package name is `sites-project`, left from the original scaffold. |
 | `package-lock.json` | GENERATED by npm. Exact dependency versions; `npm ci` uses it. |
@@ -54,7 +61,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `vite.config.ts` | Build setup: vinext, the OpenAI Sites Vite plugin, the Cloudflare Vite plugin, Tailwind through PostCSS, and a local D1 binding with a placeholder database id. |
 | `next.config.ts` | Empty Next.js config. |
 | `tsconfig.json` | TypeScript settings. `tools` was added to `exclude` on 2026-10-24 so the harness files are not type-checked with the app. |
-| `eslint.config.mjs` | ESLint with the Next.js core-web-vitals and TypeScript rules. |
+| `eslint.config.mjs` | ESLint with the Next.js core-web-vitals and TypeScript rules. Ignores generated output (including `tools/harness/out`) and `.claude`, where Claude Code keeps worktrees (other checkouts of this repository). |
 | `drizzle.config.ts` | drizzle-kit settings: schema in `db/schema.ts`, migrations in `drizzle/`. |
 | `next-env.d.ts` | GENERATED Next.js type stub. Listed in `.gitignore`, so git will not track it. |
 
@@ -65,7 +72,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `app/page.tsx` | Renders the app component. |
 | `app/layout.tsx` | Page shell: title, icons, share image, font preload, and a small inline script that applies the saved colour and light or night setting before the first paint. |
 | `app/globals.css` | All styling: colour tokens, night (default) and light themes, four accent colours, and every screen. The design note at the top describes the current design. |
-| `app/tricert-app.tsx` | The whole interface (about 2,200 lines): Today, Plan, Learn (lessons, project documents, exams, glossary), Practice, Progress, focus mode, completion screen, onboarding, "Make it yours", the 13-week track and the logo mark. |
+| `app/tricert-app.tsx` | The whole interface (about 2,300 lines): Today, Plan, Learn (lessons with their "On this page" outline, project documents, exams, glossary), Practice, Progress, focus mode, completion screen, onboarding, "Make it yours", the 13-week track and the logo mark. |
 | `app/api/state/route.ts` | The one API endpoint. `GET` returns all saved state; `PUT` accepts `save-profile`, `save-personal`, `set-progress`, `record-attempt` and `save-artifact`. |
 
 ### `lib/`
@@ -94,7 +101,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 |---|---|
 | `public/favicon.svg`, `tricert-mark.svg`, `apple-touch-icon.png`, `icon-512.png`, `og.png`, `tricert-lab-logo.png` | GENERATED by `tools/harness/export-logo.mjs`. Logo set: one flame on a dark tile, with a Geist wordmark. |
 | `public/fonts/geist-latin-wght-normal.woff2`, `geist-latin-ext-wght-normal.woff2` | Geist, the interface and reading font, self-hosted (from `@fontsource-variable/geist` 5.3.0). |
-| `public/fonts/geist-mono-latin-wght-normal.woff2` | Geist Mono, for codes, counts and small numbers (from `@fontsource-variable/geist-mono` 5.3.0). |
+| `public/fonts/geist-mono-latin-wght-normal.woff2` | Geist Mono, for code blocks in lessons only (from `@fontsource-variable/geist-mono` 5.3.0). |
 | `public/fonts/LICENSE-Geist-OFL.txt`, `LICENSE-GeistMono-OFL.txt` | Font licences (SIL Open Font License). |
 | `public/datasets/` (22 files) | GENERATED by `tools/content/datasets/generate.py`, then copied here. Synthetic Kestrel data the learner downloads in Labs: `khn_ed_visits.csv`, `khn_bed_census.csv`, `khn_sites.csv`, `khn_units.csv`, `khn_service_desk.csv`, `khn_programme_register.csv`, `khn_schedule.csv`, `khn_identity.csv`, `khn_role_permissions.csv`, `khn_user_permissions.csv`, `khn_access_reviews.csv`, `khn_security_events.csv`, `khn_assets.csv`, `khn_controls.csv`, `khn_vendors.csv`, `khn_lab.sql`, `data-dictionary.csv`, `source-to-target.csv`, `quality-and-reconciliation.md`, `dax-measure-starters.md`, `itil-value-stream-template.md`, `security-architecture-template.md`. All are byte-identical to the copies in `tools/content/datasets/out/`. |
 
@@ -122,7 +129,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `datasets/generate.py` | Generates every Kestrel dataset with a fixed seed (20261001) and cross-checks 604 figures. Writes to `datasets/out/`. |
 | `datasets/out/` (23 files) | GENERATED. The 22 dataset files plus `truth.json`, the figure answer key used when writing and checking content. `truth.json` is not in `public/`. |
 | `WORLD.md` | The Kestrel world: sites, people with IDs, systems, vendors, dates, programme figures. Every lesson and document must agree with it. |
-| `BRIEF2.md` | Writing brief for content: accuracy rules, style rules, formatting the app can render, how the app works. Its sentence about "four readiness rings" describes version 5; version 6 shows readiness as scores with bars. |
+| `BRIEF2.md` | Writing brief for content: accuracy rules, style rules, formatting the app can render, how the app works. Its sentence about "four readiness rings" describes version 5; version 7 shows readiness as one score and one bar per exam. |
 | `DECISIONS.md` | Final values for facts that different writers had set differently. |
 | `FACTCHECK.md` | The brief used for the independent fact-check. |
 | `verified-facts.md` | The checked source for exam facts (counts, weights, domains, eligibility, ITIL Version 5 terms). |
@@ -137,8 +144,8 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `build.mjs` | Bundles the app with a fake API into `out/<name>/` for fast browser checks. |
 | `entry.tsx` | Fake API for the harness, with two sample states: `fresh` (no profile) and `midway` (week 6, day 3). The sample name "Moye" and the sample why line "Pass all four, then lead the projects I used to support." are placeholders, not Moye's words. |
 | `flows.mjs` | 20 browser checks of the main flows on the harness build. |
-| `shoot.mjs`, `theme-shots.mjs`, `final-shots.mjs` | Screenshots at desktop and phone sizes, in each colour and theme. Write to `shots/`. |
-| `night-shots.mjs` | Design review screenshots: `node night-shots.mjs <outDir> [views]` writes `<view>-<desktop|phone>-<light|dark>.png` for Today, Plan, Learn, a lesson, a document, Practice, an answered scenario, Progress and focus mode. Extra screens (onboarding, flashcards, celebrate and others) when named. |
+| `shoot.mjs` | Design review screenshots of every screen: after `node build.mjs after ../..`, run `node shoot.mjs after [views] [outDir]`. Writes `<view>-<desktop|phone>-<light|dark>.png` (desktop 1440x900 full page, phone 390x844 viewport; night as well for Today, Plan, lesson, Practice, an answered scenario, Progress, focus mode and Make it yours). `PHONE_FULL=<dir>` adds full-page phone shots. Reports console errors and sideways scrolling. |
+| `theme-shots.mjs`, `final-shots.mjs` | Quick screenshots of the colour choices and of the main screens. Write to `shots/`. |
 | `live.mjs` | 6 browser checks against the real dev server and database. Needs a fresh database. |
 | `live-reading.mjs` | Checks that lessons and document guides load on demand on the real server. |
 | `tsconfig.check.json` | Strict typecheck of `app/tricert-app.tsx`. |
@@ -261,10 +268,12 @@ In order, with his words where they exist.
 7. No research left to the learner, and one project for all four exams: "it's telling me to do research on the, you know, the course material and everything. I don't want to have to do that ... I want you to have done that for me. Then all I need to do is to read through and see how it is." And: "I want you to build a project um, for the Canada region or North America region that encompasses not just PMP skills, um, but I also need you to imbibe uh, CISSP, like security principles, as well as the ITIL and the Power BI principles as well ... So as I'm learning, I'm also building."
 8. Chose the case "Alberta health network" and chose to "Keep current gates": PL-300 and ITIL in week 6 (day 4), PMP in week 10 (day 3), CISSP in week 13 (day 4).
 9. Turned down the Apple look of versions 3 to 5: "I like the design, but it looks too much like an Apple product ... think of a creative way to kind of make it more personalized ... look into other ways to make it simpler ... it basically looks like the Apple Watch".
-10. Version 6 (beacons, light by default, name and why, four colours, new fonts, flame logo) was my answer to item 9. He has not approved or turned it down yet. Do not revert it, and do not treat it as approved.
+10. Version 6 (beacons, light by default, name and why, four colours, new fonts, flame logo) was my answer to item 9. He turned it down on 2026-10-27 (item 13).
 11. His standing writing rules, applied to all app content: no em dashes, and never the words Delve, Tapestry, Landscape, Spearheaded, Seamless, Navigating, Fostering, Comprehensive, Transformative, Pivotal, Successfully, Effectively, Carefully, Strategically, Proactively. `tests/library.test.ts` checks em dashes; `tools/content/check2.py` checks both.
 
 12. Run strictly in the cloud (2026-10-24): "I hope you have set an instruction for this to be run strictly in the cloud so that the usage credits can be used from there. Please set that". Recorded at the top of this file and in `CLAUDE.md`.
+
+13. Turned down version 6 (2026-10-27): "in terms of UI, it's not still looking too good. I want something that's very modern, but it's still very usable. And very, very simple. This does not provide that." Version 7 ("Modern night", branch `v7-redesign`) is the answer. He has not seen it yet. Do not treat it as approved. Keep the name and why line, light and night, and "Make it yours".
 
 Content rules that follow from items 6 and 7 (set while building, recorded in `tools/content/BRIEF2.md` and `DECISIONS.md`): every lesson teaches in full and never tells the learner to look things up; every build has a finished example; exam facts come only from `verified-facts.md`; Alberta law only from `verified-alberta.md`; data figures only from the datasets; ITIL Version 5 terms only; "PIA" means physician initial assessment only.
 
@@ -273,10 +282,10 @@ Content rules that follow from items 6 and 7 (set while building, recorded in `t
 In priority order.
 
 1. Create the private GitHub repo from this folder and push it. Serves: "I am moving this project to Claude Code in the cloud, where it will live in a private GitHub repo." The `.gitignore` already covers dependencies, build output, the local database and the harness output.
-2. Get Moye's verdict on the version 6 design and change what he asks for. Serves: "make it more personalized ... look into other ways to make it simpler ... it basically looks like the Apple Watch".
+2. Show Moye version 7 (branch `v7-redesign`) and change what he asks for. When he approves it, merge it into `main`. Serves: "I want something that's very modern, but it's still very usable. And very, very simple."
 3. After any change, rebuild the hosted copy (`cd tools/harness && npm run artifact`) and republish `tools/harness/out/artifact/index.html` to https://claude.ai/artifact/GPeDwtK5stmbqQHyzHTTGE, if the tools allow it. Serves: "fam just run it here" and "Run it here".
 4. Before Moye books each exam, recheck the exam facts in `lib/tricert-exams.ts` and `tools/content/verified-facts.md` against PMI, Microsoft Learn, ISC2 and PeopleCert (last checked 18 October 2026). Serves: "ensure that all the information is accurate".
-5. Bring `README.md` (walkthrough screen names), `docs/implementation-backlog.md` and the "readiness rings" line in `tools/content/BRIEF2.md` up to date. Serves this handoff: "so a new agent with no memory of our chats can carry on."
+5. Bring `docs/implementation-backlog.md` and the "readiness rings" line in `tools/content/BRIEF2.md` up to date (the `README.md` walkthrough was updated for version 7). Serves this handoff: "so a new agent with no memory of our chats can carry on."
 
 The 15 root TypeScript errors are not tied to any request of Moye's; they are listed in Status so nobody mistakes them for a new break.
 

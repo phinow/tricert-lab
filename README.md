@@ -28,13 +28,15 @@ Run `test:e2e` while the development server is active. Set `TRICERT_BASE_URL` to
 
 ## Demonstration walkthrough
 
-1. Complete the eligibility baseline and review the advisory PMP/CISSP paths.
-2. Open Roadmap, choose a week, and complete one daily session.
-3. Open Project, pick a Beacon release and a document, read its guide and finished example, and save your own draft with a teach-back reflection. ITIL evidence includes value propositions, value streams, service measures, incident/problem workflows, and continual improvement.
-4. Answer one artifact scenario and record confidence before reading the explanation.
-5. Open Practice to use flashcards, download a lab, start a timed mock, and inspect the wrong-answer queue.
-6. Open Readiness to review the five evidence gates; completion alone cannot mark an exam ready.
-7. Open Portfolio to track export evidence and download the demonstration script.
+The app has five places: Today, Plan, Learn, Practice and Progress. On a laptop they sit in the left sidebar; on a phone they are the tabs at the bottom, with your initial at the top right for "Make it yours".
+
+1. Complete the five setup steps (your name and why, leadership, security, skills, exam dates). The PMP and CISSP eligibility notes are advisory.
+2. On Today, press Start session. Focus mode keeps the timer, the lesson and the session's documents in one place. Finish the session, or use Mark done.
+3. Open Plan to see the 13 weeks and the three exam gates. Open a week to jump to any session or to write that week's reflection.
+4. Open Learn. Lessons holds the 65 lessons; Documents holds the 66 Beacon documents by release. Open a document to read how to write it and the finished example, then save your own draft with a teach-back explanation. Exams and Glossary hold the four exam guides and 242 terms.
+5. In a document, use Check yourself to answer five decisions about it, choosing how sure you are before you check.
+6. Open Practice for scenarios, a timed set for one exam, flashcards, labs with the Kestrel datasets, and Review for wrong or guessed answers.
+7. Open Progress. Readiness starts with the five checks for your next exam gate (completion alone cannot mark an exam ready), then each exam's evidence score. Portfolio tracks the handover package and holds the demonstration script, the disclosure and the logo.
 
 ## Architecture
 

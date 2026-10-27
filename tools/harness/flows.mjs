@@ -33,22 +33,30 @@ const nav = (label) => page.click(`.nav button:has(.nav-label:text-is("${label}"
 await page.goto(`${base}/?state=midway`);
 await page.waitForSelector('.hero-session');
 
-await check('Today greets Moye by name and shows the 13-week track, week 6, day 3', async () => {
+await check('Today greets Moye by name and shows week 6, day 3 and the totals; Plan shows the 13-week track', async () => {
   assert.match(await page.textContent('.hello h1'), /^Good (morning|afternoon|evening), Moye$/);
   assert.match(await page.textContent('.hello .lede'), /Week 6 of 13\. One session, then your PL-300 and ITIL V5 gate\./);
   assert.match(await page.textContent('.why'), /Pass all four/);
+  assert.match(await page.textContent('.tally'), /Sessions done\s*27\/65/);
+  assert.match(await page.textContent('.tally'), /Days to PL-300/);
+  assert.match(await page.textContent('.hero-label'), /Up next/);
+  assert.match(await page.textContent('.hero-when'), /Week 6, Day 3/);
+  assert.equal(await page.locator('.days .day-mark.is-done').count(), 2);
+  assert.equal(await page.locator('.ring-arc, .rings').count(), 0);
+  await nav('Plan');
+  await page.waitForSelector('.plan .track-week');
   assert.equal(await page.locator('.track-week').count(), 13);
   assert.equal(await page.locator('.track-interactive .track-week.is-partial').count(), 1);
   assert.equal(await page.locator('.track-interactive .track-week.is-full').count(), 5);
   assert.equal(await page.getAttribute('.track-week.is-selected', 'aria-label'), 'Week 6: 2 of 5 sessions done, PL-300 and ITIL exam gate');
-  assert.match(await page.textContent('.hero-when'), /Week 6, Day 3/);
-  assert.equal(await page.locator('.days .day-mark.is-done').count(), 2);
-  assert.equal(await page.locator('.ring-arc, .rings').count(), 0);
+  await nav('Today');
+  await page.waitForSelector('.hero-session');
 });
 
-await check('Clicking a week on the track shows that week', async () => {
-  await page.click('.track-week >> nth=1');
+await check('Choosing another week on Today shows that week', async () => {
+  for (let step = 0; step < 4; step += 1) await page.click('.strip-head .arrow[aria-label="Previous week"]');
   assert.match(await page.textContent('.hero-when'), /Week 2, Day 5/);
+  assert.match(await page.textContent('.hero-label'), /Done/);
   await page.click('.week-strip .text-link');
   assert.match(await page.textContent('.hero-when'), /Week 6, Day 3/);
 });
@@ -83,15 +91,20 @@ await check('Finish shows the completion screen and advances to day 4', async ()
   assert.equal(await page.locator('.days .day-mark.is-done').count(), 3);
 });
 
-await check('Mark done finishes the week; Plan shows week 7 as current', async () => {
+await check('Mark done finishes the week; its reflection opens and saves on Plan, with week 7 current', async () => {
   await page.click('.hero-actions .ghost');
   await page.click('.celebrate .primary');
   await page.waitForFunction(() => document.querySelector('.hero-when')?.textContent?.includes('Day 5'));
   await page.click('.hero-actions .ghost');
   await page.click('.celebrate .primary');
-  await nav('Plan');
-  await page.waitForSelector('.plan .track-week');
+  await page.click('.waiting .row:has-text("Week 6 reflection")');
+  await page.waitForSelector('.plan #reflection-6[open]');
   assert.match(await page.textContent('.weeks > li.is-current'), /Week 7, this week/);
+  assert.match(await page.textContent('#reflection-6 summary'), /Not written yet/);
+  await page.fill('#retro-6', 'Decision I can now defend: grain before visuals. '.repeat(3));
+  await page.click('#reflection-6 .primary');
+  await page.waitForSelector('.toast:not(.is-error)');
+  assert.match(await page.textContent('#reflection-6 summary'), /Saved/);
 });
 
 await check('A session opened from Plan shows on Today', async () => {
