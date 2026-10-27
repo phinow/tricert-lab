@@ -330,6 +330,24 @@ await check('Make it yours: colour and appearance apply at once; name and why sa
   assert.equal(await page.evaluate(() => document.documentElement.dataset.accent), 'glacier');
 });
 
+await check('Browser Back from a lesson returns to Today or Plan', async () => {
+  await page.goto(`${base}/?state=midway#today`);
+  await page.waitForSelector('.hero-session');
+  await page.click('.hero-lesson');
+  await page.waitForSelector('.reader .lesson');
+  await page.goBack();
+  await page.waitForSelector('.hero-session');
+  assert.equal(new URL(page.url()).hash, '#today');
+  assert.equal(await page.locator('.reader').count(), 0);
+  await nav('Plan');
+  await page.click('#week-6 .week-detail li >> nth=2 >> button');
+  await page.waitForSelector('.reader .lesson');
+  await page.goBack();
+  await page.waitForSelector('.plan #week-6.is-open');
+  assert.equal(new URL(page.url()).hash, '#plan');
+  assert.equal(await page.locator('.reader').count(), 0);
+});
+
 await check('Errors show as an alert', async () => {
   await page.goto(`${base}/?state=midway`);
   await page.waitForSelector('.hero-session');

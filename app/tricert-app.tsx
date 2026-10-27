@@ -202,13 +202,16 @@ export default function TriCertApp() {
   const [now, setNow] = useState(nowMs);
   const [today] = useState(todayIso);
   const [learnTab, setLearnTab] = useState<LearnTab>('documents');
-  const [lessonFrom, setLessonFrom] = useState<'today' | 'plan'>('today');
+  const [lessonFrom, setLessonFrom] = useState<LessonFrom>('today');
   const [learnItem, setLearnItem] = useState<string | null>(null);
   const [flashCert, setFlashCert] = useState<Certification | 'All'>('All');
   const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : savedTheme(readPrefs())));
   const [accent, setAccent] = useState<Accent>(() => (typeof window === 'undefined' ? 'beacon' : readPrefs().accent || 'beacon'));
   const [settingsOpen, setSettingsOpen] = useState(false);
   const reading = useReading();
+  /* Browser Back and Forward move between a lesson and the screen it came
+     from. The popstate listener is set once, so it reads this ref. */
+  const lessonNav = useRef<{ open: boolean; leave: () => void; show: (key: string, from: LessonFrom) => void }>({ open: false, leave: () => {}, show: () => {} });
 
   useEffect(() => {
     // Colour and appearance are interface preferences: this device only.
@@ -229,6 +232,9 @@ export default function TriCertApp() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to load your study plan.');
         if (route) { setView(route.view); if (route.tab) setProgressTab(route.tab); if (route.learnTab) setLearnTab(route.learnTab); }
+        // A reload on a lesson's history entry opens that lesson again.
+        const entry = lessonEntry();
+        if (entry && window.location.hash === `#${entry.from}`) { setLessonFrom(entry.from); setLearnTab('lessons'); setLearnItem(entry.lesson); setView('learn'); }
         setSelectedProject(restoredProject.key);
         setSelectedArtifact(restoredArtifact.key);
         if (prefs.timer && allTasks.some((task) => task.key === prefs.timer?.key)) setTimer(prefs.timer);
@@ -248,17 +254,28 @@ export default function TriCertApp() {
       .catch((error) => setNotice({ text: error.message, kind: 'error' }))
       .finally(() => setLoading(false));
 
+    const onPopState = () => {
+      const entry = lessonEntry();
+      if (entry) { lessonNav.current.show(entry.lesson, entry.from); window.scrollTo({ top: 0 }); }
+      else if (lessonNav.current.open) lessonNav.current.leave();
+    };
     const onHashChange = () => {
       const next = routeFromHash();
-      if (!next) return;
+      // Returning to a lesson's entry: the popstate listener has opened it.
+      if (!next || lessonEntry()) return;
       setView(next.view);
       if (next.tab) setProgressTab(next.tab);
       if (next.learnTab) { setLearnTab(next.learnTab); setLearnItem(null); }
       else if (next.view === 'learn') { setLearnItem(null); setLearnTab((tab) => (tab === 'lessons' ? 'documents' : tab)); }
     };
+    window.addEventListener('popstate', onPopState);
     window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    return () => { window.removeEventListener('popstate', onPopState); window.removeEventListener('hashchange', onHashChange); };
   }, []);
+
+  useEffect(() => {
+    lessonNav.current = { open: view === 'learn' && learnTab === 'lessons' && Boolean(learnItem), leave: leaveLesson, show: showLesson };
+  });
 
   useEffect(() => {
     if (!loading) writePrefs({ v: prefsVersion, project: selectedProject, artifact: selectedArtifact, timer, rubric: rubricChecks, theme, accent });
@@ -348,7 +365,7 @@ export default function TriCertApp() {
     setView(next);
     if (next === 'practice' && practiceScreen !== 'run') setPracticeScreen('hub');
     const hash = next === 'progress' && progressTab === 'portfolio' ? 'portfolio' : next;
-    if (window.location.hash !== `#${hash}`) window.history.pushState(null, '', `#${hash}`);
+    if (window.location.hash !== `#${hash}` || lessonEntry()) window.history.pushState(null, '', `#${hash}`);
     window.scrollTo({ top: 0, behavior: scrollBehavior() });
   }
 
@@ -367,15 +384,25 @@ export default function TriCertApp() {
   }
 
   /* A lesson belongs to its session, so it opens from Plan or Today and
-     its back button returns there. */
-  function openLesson(key: string, from: 'today' | 'plan') {
+     its back button returns there. Each lesson gets its own history entry
+     on that address, so browser Back returns there too. */
+  function openLesson(key: string, from: LessonFrom) {
+    showLesson(key, from);
+    window.history.pushState({ lesson: key, from } satisfies LessonEntry, '', `#${from}`);
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
+  }
+
+  function showLesson(key: string, from: LessonFrom) {
     setFocusOpen(false);
     setLessonFrom(from);
     setLearnTab('lessons');
     setLearnItem(key);
     setView('learn');
-    if (window.location.hash !== `#${from}`) window.history.pushState(null, '', `#${from}`);
-    window.scrollTo({ top: 0, behavior: scrollBehavior() });
+  }
+
+  // The lesson's back button steps back through history, so the browser and the app agree.
+  function backFromLesson() {
+    if (lessonEntry()) window.history.back(); else leaveLesson();
   }
 
   function leaveLesson() {
@@ -758,7 +785,7 @@ export default function TriCertApp() {
               const badge = key === 'practice' && reviewQueue.length > 0 ? reviewQueue.length : 0;
               return (
                 <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} aria-label={badge ? `${label}, ${badge} to review` : undefined} onClick={() => go(key)}>
-                  <span className="nav-glyph"><NavIcon name={key} />{badge > 0 && <span className="nav-badge" aria-hidden="true">{badge}</span>}</span>
+                  <span className="nav-glyph"><NavIcon name={key} />{badge > 0 && <span className="nav-badge" aria-hidden="true">{badge > 99 ? '99+' : badge}</span>}</span>
                   <span className="nav-label">{label}</span>
                 </button>
               );
@@ -961,9 +988,15 @@ export default function TriCertApp() {
               tab={view === 'projects' ? 'documents' : learnTab}
               item={view === 'projects' ? null : learnItem}
               lessonFrom={lessonFrom}
-              onLeaveLesson={leaveLesson}
+              onLeaveLesson={backFromLesson}
               onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
-              onItem={(item) => { setLearnItem(item); window.scrollTo({ top: 0 }); }}
+              onItem={(item) => {
+                setLearnItem(item);
+                // Previous and Next keep the lesson's history entry on the lesson shown.
+                const entry = lessonEntry();
+                if (entry && learnTab === 'lessons' && item) window.history.replaceState({ lesson: item, from: entry.from } satisfies LessonEntry, '');
+                window.scrollTo({ top: 0 });
+              }}
               completed={completed}
               documents={documentsPanel}
               onStart={(task) => { showWeek(Math.floor(allTasks.indexOf(task) / 5) + 1, allTasks.indexOf(task) % 5); startSession(task); }}
@@ -1366,7 +1399,7 @@ function Celebrate({ celebration, programmeDone, onDone }: { celebration: Celebr
 const learnTabs: Array<[LearnTab, string]> = [['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
 
 function LearnView({ tab: chosenTab, item, lessonFrom, onLeaveLesson, onTab, onItem, completed, documents, onStart, onOpenDoc }: {
-  tab: LearnTab; item: string | null; lessonFrom: 'today' | 'plan'; onLeaveLesson: () => void; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
+  tab: LearnTab; item: string | null; lessonFrom: LessonFrom; onLeaveLesson: () => void; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
   completed: Set<string>; documents: ReactNode;
   onStart: (task: StudyTask) => void; onOpenDoc: (item: Deliverable) => void;
 }) {
@@ -2336,6 +2369,15 @@ function deriveCurrentWeek(progress: ProgressRow[]) {
 }
 function scrollBehavior(): ScrollBehavior {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+}
+type LessonFrom = 'today' | 'plan';
+type LessonEntry = { lesson: string; from: LessonFrom };
+/* The lesson recorded on the current history entry, if any. */
+function lessonEntry(): LessonEntry | null {
+  const value: unknown = window.history.state;
+  if (!value || typeof value !== 'object') return null;
+  const { lesson, from } = value as Partial<LessonEntry>;
+  return typeof lesson === 'string' && lessonIndex[lesson] && (from === 'today' || from === 'plan') ? { lesson, from } : null;
 }
 function routeFromHash(): { view: View; tab?: 'readiness' | 'portfolio'; learnTab?: LearnTab } | null {
   const hash = window.location.hash.replace('#', '');
