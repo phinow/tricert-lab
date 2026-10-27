@@ -180,8 +180,14 @@ select { padding-right: 34px; appearance: none; background-image: linear-gradien
 textarea { min-height: 140px; resize: vertical; line-height: 1.65; }
 textarea.short { min-height: 84px; }
 input::placeholder, textarea::placeholder { color: var(--text-3); opacity: 1; }
-input:hover, select:hover, textarea:hover { border-color: var(--text-3); }
-input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px color-mix(in srgb, var(--a) 22%, transparent); }
+/* Same specificity as the base field rule above, so hover and focus apply
+   to text, number, date and search inputs as well as to textareas. Focus is
+   a 2px ring in the accent ink, which meets 3:1 in both appearances. */
+input:not([type='checkbox']):not([type='radio']):hover, select:hover, textarea:hover { border-color: var(--text-3); }
+input:not([type='checkbox']):not([type='radio']):focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+label.field + .field-hint { margin: -2px 0 10px; }
+ul.field-hint { display: grid; gap: 4px; padding-left: 1.2em; list-style: disc; }
+ul.field-hint li::marker { color: var(--text-3); }
 input[type='date'] { color-scheme: inherit; }
 fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .tickbox { display: flex; align-items: center; gap: 12px; align-self: end; min-height: 44px; margin-top: 20px; font-weight: 500; cursor: pointer; }
@@ -773,7 +779,8 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
   .focus-meter { margin-top: 10px; }
 }
 .focus-read { width: min(700px, 100%); margin: 0 auto; padding: 18px 20px 64px; display: grid; gap: 8px; }
-.focus-read h2 { margin-bottom: 8px; font-size: var(--t-2xl); letter-spacing: -0.032em; }
+.focus-read > h2 { margin-bottom: 8px; font-size: var(--t-2xl); letter-spacing: -0.032em; }
+.focus .read-heading { max-width: none; font-size: var(--t-xl); letter-spacing: -0.026em; }
 .focus-read .eyebrow { color: var(--ink); }
 .focus-read .lesson { margin-bottom: 24px; }
 .focus-reading .focus-bar { position: sticky; top: 0; padding-bottom: 12px; background: linear-gradient(var(--panel) 70%, transparent); }

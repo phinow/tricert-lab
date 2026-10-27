@@ -14,7 +14,7 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 
 - The app runs locally with `npm run dev` and stores progress in a local Cloudflare D1 (SQLite) database.
 - `npm test`: 11 of 11 pass. `npm run lint`: 0 errors, 1 warning. `npm run build`: completes. `npm run test:e2e`: 2 of 2 pass against the dev server.
-- Browser checks in `tools/harness`: 21 flow checks pass, 6 live checks against the real server pass, the live reading check passes, and the strict typecheck of the main component passes.
+- Browser checks in `tools/harness`: 23 flow checks pass, 6 live checks against the real server pass, the live reading check passes, and the strict typecheck of the main component passes.
 - Content tools reproduce the committed files byte for byte: `build-library.py` and `inject-scenarios.py` regenerate the `lib/` files exactly, `datasets/generate.py` regenerates every dataset exactly, and `check2.py` passes on all 19 content files.
 - Content: 65 lessons, 66 document writing guides with finished examples, 112 practice questions (96 exam questions plus 16 cross-exam scenarios), 98 flashcards, 242 glossary terms, 4 exam guides, 22 downloadable dataset files. Exam facts were checked against PMI, Microsoft Learn, ISC2 and PeopleCert on 18 October 2026.
 - Version 7 design ("Modern night", branch `v7-redesign`, 2026-10-27), made after Moye turned down version 6 ("I want something that's very modern, but it's still very usable. And very, very simple"). A calm, dark study desk: night by default with the same layout in light, Geist type (Geist Mono only for code), one accent colour of his choosing that marks only the next action and progress, and exams named with plain outlined tags. Each screen has one job and one filled card:
@@ -39,7 +39,7 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 
 ### What is broken or known to be imperfect
 
-- `npx tsc --noEmit -p .` in the root reports 15 errors: `data` typed as `unknown` after `response.json()` in `app/tricert-app.tsx` (9 errors), `.ts` import paths in `tests/*.ts` (5 errors), and `r2` missing from `.openai/hosting.json` typing in `vite.config.ts` (1 error). The same kinds of errors were already in the project as Moye first uploaded it. The build, lint and tests do not run this check, so they still pass.
+- `npx tsc --noEmit -p .` in the root reports 14 errors: `data` typed as `unknown` after `response.json()` in `app/tricert-app.tsx` (8 errors), `.ts` import paths in `tests/*.ts` (5 errors), and `r2` missing from `.openai/hosting.json` typing in `vite.config.ts` (1 error). The same kinds of errors were already in the project as Moye first uploaded it. The build, lint and tests do not run this check, so they still pass.
 - Lint warning: `@next/next/no-img-element` for the logo `<img>` on the Progress, Portfolio tab.
 - `npm run start` (production server) was not tested in this handoff. Result unknown.
 - The hosted artifact build is made from a different entry file (`tools/harness/entry-artifact.tsx`) and keeps progress in the artifact's own storage. Progress there and progress in a local copy are separate and do not sync.
@@ -146,7 +146,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `package.json`, `package-lock.json` | Harness tools: esbuild, Tailwind CLI, Playwright, TypeScript. Uses the app's own React from the root `node_modules`. |
 | `build.mjs` | Bundles the app with a fake API into `out/<name>/` for fast browser checks. |
 | `entry.tsx` | Fake API for the harness, with two sample states: `fresh` (no profile) and `midway` (week 6, day 3). The sample name "Moye" and the sample why line "Pass all four, then lead the projects I used to support." are placeholders, not Moye's words. |
-| `flows.mjs` | 21 browser checks of the main flows on the harness build, including keyboard focus in overlays and reflections after an early session is left undone. |
+| `flows.mjs` | 23 browser checks of the main flows on the harness build, including keyboard focus in overlays, reflections after an early session is left undone, browser Back from a lesson, and unsaved reflection writing kept through a lesson and back. |
 | `shoot.mjs` | Design review screenshots of every screen: after `node build.mjs after ../..`, run `node shoot.mjs after [views] [outDir]`. Writes `<view>-<desktop|phone>-<light|dark>.png` (desktop 1440x900 full page, phone 390x844 viewport; night as well for Today, Plan, lesson, Practice, an answered scenario, Progress, focus mode and Make it yours). `PHONE_FULL=<dir>` adds full-page phone shots. Reports console errors and sideways scrolling. |
 | `theme-shots.mjs`, `final-shots.mjs` | Quick screenshots of the colour choices and of the main screens. Write to `shots/`. |
 | `live.mjs` | 6 browser checks against the real dev server and database. Needs a fresh database. |
@@ -240,13 +240,13 @@ After `generate.py`, copy changed dataset files from `tools/content/datasets/out
 | `npm run build` (root) | `Build complete.` |
 | `npm run test:e2e` (root, with `npm run dev` running) | `# pass 2`, `# fail 0` |
 | `npm run typecheck` (tools/harness) | No output, exit code 0 |
-| `npm run flows` (tools/harness) | `21 flow checks passed, no console errors` |
+| `npm run flows` (tools/harness) | `23 flow checks passed, no console errors` |
 | `npm run live` (tools/harness, with `npm run dev` running on a fresh database) | `6 live checks passed against the real server, no console errors`, then `ok, no console errors` |
 | `npm run artifact` (tools/harness) | `html bytes ... font inlined true abs datasets left 0` |
 | `python3 -I tools/content/check2.py tools/content/parts2/*.json` | `OK` |
 | `python3 -I tools/content/build-library.py` | `lessons 65/65, guides 66/66, glossary 242, flashcards 80, questions 96 -> library 316 KB, reading 1561 KB`, and `lib/` files unchanged |
 | `python3 -I tools/content/datasets/generate.py` | `Figures cross-checked: 604` and `SELF-CHECK OK`, and datasets unchanged |
-| `npx tsc --noEmit -p .` (root) | 15 known errors (see Status). Not part of the passing checks. |
+| `npx tsc --noEmit -p .` (root) | 14 known errors (see Status). Not part of the passing checks. |
 
 ## 6. Secrets and accounts
 

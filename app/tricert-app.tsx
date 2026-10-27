@@ -192,7 +192,9 @@ export default function TriCertApp() {
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashRevealed, setFlashRevealed] = useState(false);
   const [progressTab, setProgressTab] = useState<'readiness' | 'portfolio'>('readiness');
-  const [retroText, setRetroText] = useState(retroTemplate);
+  /* Reflection writing is held per week, so leaving a week (to read one of
+     its lessons, or to open another week) never throws away unsaved text. */
+  const [retroDrafts, setRetroDrafts] = useState<Record<number, string>>({});
   const [reflectionOpen, setReflectionOpen] = useState(false);
   const [itilLevelDraft, setItilLevelDraft] = useState('beginner');
   const [itilTargetDraft, setItilTargetDraft] = useState('');
@@ -248,8 +250,6 @@ export default function TriCertApp() {
         const week = deriveCurrentWeek(data.progress || []);
         setSelectedWeek(week);
         setExpandedWeek(week);
-        const savedRetro = data.artifacts?.find((row: ArtifactRow) => row.artifact_key === `retrospective-w${week}`);
-        setRetroText(savedRetro?.evidence_text || retroTemplate);
       })
       .catch((error) => setNotice({ text: error.message, kind: 'error' }))
       .finally(() => setLoading(false));
@@ -348,6 +348,9 @@ export default function TriCertApp() {
   const wrongAnswers = latestAttempts.filter((attempt) => !attempt.correct);
   const reviewQueue = latestAttempts.filter((attempt) => !attempt.correct || attempt.confidence === 'low');
   const retroSaved = (week: number) => state.artifacts.some((row) => row.artifact_key === `retrospective-w${week}`);
+  const retroStored = (week: number) => state.artifacts.find((row) => row.artifact_key === `retrospective-w${week}`)?.evidence_text || retroTemplate;
+  const retroText = (week: number) => retroDrafts[week] ?? retroStored(week);
+  const retroUnsaved = (week: number) => week in retroDrafts && retroDrafts[week] !== retroStored(week);
   const draftArtifacts = state.artifacts
     .filter((row) => row.status === 'draft')
     .map((row) => allDeliverables.find((item) => item.key === row.artifact_key))
@@ -562,12 +565,13 @@ export default function TriCertApp() {
     setSelectedDay(day);
   }
 
-  /* Plan opens one week at a time. Its reflection lives inside it. */
+  /* Plan opens one week at a time. Its reflection lives inside it. Coming
+     back to the open week keeps the reflection as it was, and a reflection
+     with unsaved writing opens with its week. */
   function expandWeek(number: number, reflect = false) {
+    if (number !== expandedWeek) setReflectionOpen(reflect || retroUnsaved(number));
+    else if (reflect) setReflectionOpen(true);
     setExpandedWeek(number);
-    setReflectionOpen(reflect);
-    const saved = state.artifacts.find((row) => row.artifact_key === `retrospective-w${number}`);
-    setRetroText(saved?.evidence_text || retroTemplate);
   }
 
   function openReflection(week: number) {
@@ -667,15 +671,15 @@ export default function TriCertApp() {
     setPracticeScreen('hub');
   }
 
-  async function saveRetrospective() {
+  async function saveRetrospective(week: number) {
     const saved = await update({
       action: 'save-artifact',
-      artifactKey: `retrospective-w${expandedWeek}`,
+      artifactKey: `retrospective-w${week}`,
       status: 'complete',
-      evidenceText: retroText,
-      reflection: `Week ${expandedWeek} teach-back and improvement commitment recorded.`,
+      evidenceText: retroText(week),
+      reflection: `Week ${week} teach-back and improvement commitment recorded.`,
     });
-    if (saved) say(`Week ${expandedWeek} reflection saved.`);
+    if (saved) say(`Week ${week} reflection saved.`);
   }
 
   if (loading) {
@@ -947,13 +951,13 @@ export default function TriCertApp() {
                                 </ol>
                                 {(week.number <= currentWeek || done > 0 || retroSaved(week.number)) && (
                                   <details id={`reflection-${week.number}`} className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
-                                    <summary className="row"><span className="row-text"><strong>Week {week.number} reflection</strong><small>{retroSaved(week.number) ? 'Saved' : 'Not written yet'}</small></span><FoldMark /></summary>
+                                    <summary className="row"><span className="row-text"><strong>Week {week.number} reflection</strong><small>{retroUnsaved(week.number) ? (retroSaved(week.number) ? 'Changes not saved' : 'Draft not saved') : retroSaved(week.number) ? 'Saved' : 'Not written yet'}</small></span><FoldMark /></summary>
                                     <div className="reflect-body">
                                       <label className="field" htmlFor={`retro-${week.number}`}>What can you now defend, what still needs notes, and what will you change?</label>
-                                      <textarea id={`retro-${week.number}`} value={retroText} onChange={(event) => setRetroText(event.target.value)} />
+                                      <textarea id={`retro-${week.number}`} value={retroText(week.number)} onChange={(event) => { const text = event.target.value; setRetroDrafts((drafts) => ({ ...drafts, [week.number]: text })); }} />
                                       <div className="row-actions">
-                                        <button className="primary" onClick={saveRetrospective} disabled={saving || retroText.trim().length < 100}>Save reflection</button>
-                                        <span className="hint">{retroText.trim().length < 100 ? `${100 - retroText.trim().length} more characters` : 'Ready to save'}</span>
+                                        <button className="primary" onClick={() => saveRetrospective(week.number)} disabled={saving || retroText(week.number).trim().length < 100}>Save reflection</button>
+                                        <span className="hint">{retroText(week.number).trim().length < 100 ? `${100 - retroText(week.number).trim().length} more characters` : 'Ready to save'}</span>
                                       </div>
                                     </div>
                                   </details>
@@ -1041,7 +1045,8 @@ export default function TriCertApp() {
               <label className="field" htmlFor="work">Your work</label>
               <textarea id="work" className="writing" value={artifactText} onChange={(event) => setArtifactText(event.target.value)} />
               <label className="field" htmlFor="explain">Explain it in your own words</label>
-              <textarea id="explain" value={artifactReflection} onChange={(event) => setArtifactReflection(event.target.value)} placeholder={deliverable.reflections.join('\n')} />
+              <ul className="hint field-hint" id="explain-prompts">{deliverable.reflections.map((prompt) => <li key={prompt}>{keepTogether(prompt)}</li>)}</ul>
+              <textarea id="explain" aria-describedby="explain-prompts" value={artifactReflection} onChange={(event) => setArtifactReflection(event.target.value)} placeholder="Write your answers here" />
               <div className="doc-actions">
                 <span className="hint">{completeBlockers.length ? `To mark complete: ${completeBlockers.join(' and ')}.` : deliverableStatus === 'complete' ? 'Complete. Saving again keeps it complete.' : 'Ready to mark complete.'}</span>
                 <button className="ghost" onClick={exportArtifact}>Export</button>
@@ -1955,7 +1960,7 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
             <legend className="sr-only">About you</legend>
             <div className="form-grid">
               <div className="wide"><label className="field" htmlFor="displayName">What should we call you?</label><input id="displayName" name="displayName" autoComplete="given-name" maxLength={40} placeholder="Your first name" /></div>
-              <div className="wide"><label className="field" htmlFor="motivation">Why are you doing this?</label><textarea id="motivation" name="motivation" className="short" maxLength={140} placeholder="One line you will see on Today, for example: Move from support into programme work by next summer." /></div>
+              <div className="wide"><label className="field" htmlFor="motivation">Why are you doing this?</label><p className="hint field-hint" id="motivation-hint">One line you will see on Today.</p><textarea id="motivation" name="motivation" className="short" maxLength={140} aria-describedby="motivation-hint" placeholder="For example: move into programme work by next summer" /></div>
             </div>
           </fieldset>
           <fieldset hidden={step !== 1}>

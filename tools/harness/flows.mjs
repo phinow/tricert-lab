@@ -103,6 +103,13 @@ await check('Mark done finishes the week; its reflection opens and saves on Plan
   await page.waitForSelector('.plan #reflection-6[open]');
   assert.match(await page.textContent('.weeks > li.is-current'), /Week 7, this week/);
   assert.match(await page.textContent('#reflection-6 summary'), /Not written yet/);
+  // Writing that is not saved yet stays when Today's row is used again.
+  await page.fill('#retro-6', 'Half a thought about grain.');
+  await nav('Today');
+  await page.click('.waiting .row:has-text("Week 6 reflection")');
+  await page.waitForSelector('.plan #reflection-6[open]');
+  assert.equal(await page.inputValue('#retro-6'), 'Half a thought about grain.');
+  assert.match(await page.textContent('#reflection-6 summary'), /Draft not saved/);
   await page.fill('#retro-6', 'Decision I can now defend: grain before visuals. '.repeat(3));
   await page.click('#reflection-6 .primary');
   await page.waitForSelector('.toast:not(.is-error)');
@@ -346,6 +353,35 @@ await check('Browser Back from a lesson returns to Today or Plan', async () => {
   await page.waitForSelector('.plan #week-6.is-open');
   assert.equal(new URL(page.url()).hash, '#plan');
   assert.equal(await page.locator('.reader').count(), 0);
+});
+
+await check('Unsaved reflection writing stays through a lesson and back, and when its week closes and opens', async () => {
+  await page.goto(`${base}/?state=midway#plan`);
+  await page.waitForSelector('.plan #week-6.is-open');
+  await page.click('#reflection-6 > summary');
+  const draft = 'Grain first, then the measures. I still need notes for row-level security.';
+  await page.fill('#retro-6', draft);
+  await page.click('#week-6 .week-detail li >> nth=2 >> button');
+  await page.waitForSelector('.reader .lesson');
+  await page.click('.reader .back');
+  await page.waitForSelector('.plan #reflection-6[open]');
+  assert.equal(await page.inputValue('#retro-6'), draft);
+  await page.click('#week-6 .week-detail li >> nth=2 >> button');
+  await page.waitForSelector('.reader .lesson');
+  await page.goBack();
+  await page.waitForSelector('.plan #reflection-6[open]');
+  assert.equal(await page.inputValue('#retro-6'), draft);
+  await page.click('#week-6 .week-row');
+  await page.waitForSelector('#retro-6', { state: 'detached' });
+  await page.click('#week-6 .week-row');
+  await page.waitForSelector('.plan #reflection-6[open]');
+  assert.equal(await page.inputValue('#retro-6'), draft);
+  await page.click('.plan .track-week >> nth=4');
+  await page.waitForSelector('#retro-6', { state: 'detached' });
+  await page.click('.plan .track-week >> nth=5');
+  await page.waitForSelector('.plan #reflection-6[open]');
+  assert.equal(await page.inputValue('#retro-6'), draft);
+  assert.match(await page.textContent('#reflection-6 summary'), /Draft not saved/);
 });
 
 await check('Errors show as an alert', async () => {
