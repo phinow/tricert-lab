@@ -14,23 +14,26 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 
 - The app runs locally with `npm run dev` and stores progress in a local Cloudflare D1 (SQLite) database.
 - `npm test`: 11 of 11 pass. `npm run lint`: 0 errors, 1 warning. `npm run build`: completes. `npm run test:e2e`: 2 of 2 pass against the dev server.
-- Browser checks in `tools/harness`: 20 flow checks pass, 6 live checks against the real server pass, the live reading check passes, and the strict typecheck of the main component passes.
+- Browser checks in `tools/harness`: 21 flow checks pass, 6 live checks against the real server pass, the live reading check passes, and the strict typecheck of the main component passes.
 - Content tools reproduce the committed files byte for byte: `build-library.py` and `inject-scenarios.py` regenerate the `lib/` files exactly, `datasets/generate.py` regenerates every dataset exactly, and `check2.py` passes on all 19 content files.
 - Content: 65 lessons, 66 document writing guides with finished examples, 112 practice questions (96 exam questions plus 16 cross-exam scenarios), 98 flashcards, 242 glossary terms, 4 exam guides, 22 downloadable dataset files. Exam facts were checked against PMI, Microsoft Learn, ISC2 and PeopleCert on 18 October 2026.
 - Version 7 design ("Modern night", branch `v7-redesign`, 2026-10-27), made after Moye turned down version 6 ("I want something that's very modern, but it's still very usable. And very, very simple"). A calm, dark study desk: night by default with the same layout in light, Geist type (Geist Mono only for code), one accent colour of his choosing that marks only the next action and progress, and exams named with plain outlined tags. Each screen has one job and one filled card:
-  - Today: greeting, why line, two numbers (sessions done, days to the next exam), the session card ("Up next", Start session, Read the lesson, Mark done, the week's five days) and "Waiting on you" (answers to review, drafts, the reflection for a finished week).
-  - Plan: the 13 weeks as one row of bars with diamonds on the exam gates (wraps 7 and 6 on a phone), then the three releases with their weeks. Each week opens its sessions and its reflection.
-  - Learn: Lessons (one list of 13 weeks), Documents (the 66 project documents by release, opening straight into the writing page), Exams and Glossary. Long lessons have an "On this page" list on wide screens.
+  - Today: greeting, why line, two numbers (sessions done, days to the next exam), the session card ("Up next", Start session, Read the lesson, Mark done, the week's five days) and "Waiting on you" (answers to review, drafts, the reflection for the newest finished week that has none).
+  - Plan: the 13 weeks as one row of bars with diamonds under the exam gates (wraps 7 and 6 on a phone), then the three releases with their weeks. This is the only list of weeks: each week opens its five sessions and its reflection, and each session opens its lesson (with Start this session, and a back button to Plan). A week's reflection stays reachable once the week is started or written, even when an earlier session is not done.
+  - Learn: the library. Documents (the 66 project documents by release, opening straight into the writing page), Exams and Glossary. Lessons open from their session on Plan or Today; long lessons have an "On this page" list on wide screens.
   - Practice: "Start scenarios", then Timed set, Review, Flashcards and Labs. Scenario feedback sits under the answers with Continue right under it.
   - Progress: the next gate's five checks first, then one row per exam with a score and one bar; Portfolio is a tab.
-  - Phone: a slim top bar on every screen (Make it yours, the running timer) and five icon tabs at the bottom.
-  - "Make it yours" keeps name, why, appearance (Night, Light, Match this device) and four colours.
+  - Phone: a slim top bar on every screen (Make it yours, the running timer; in a scenario run the timer sits in the run's own bar) and five icon tabs at the bottom. Tablets and small laptops (761 to 1100 wide) get a narrow rail with a small label under each icon. Touch screens get 44 pixel targets at every width.
+  - One type scale (`--t-xs` to `--t-3xl` plus the focus clock in `app/globals.css`), one status mark (done, started, not started), one disclosure chevron, and two chosen-state styles (segmented tabs; a tint with a coloured edge for every other choice). Fields and ticks use the `--control` edge colour, which keeps 3:1 contrast in both appearances.
+  - Focus mode, Session complete and Make it yours make the page behind them inert, take keyboard focus when they open and return it when they close. Messages show at the bottom of the screen.
+  - "Make it yours" keeps name, why, appearance (Night, Light, Match this device) and four colours. It closes with × or Escape; Save is its only footer button.
 - Version 6 ("Beacon": light default, signal fires on a ridge, Bricolage Grotesque and Literata) is replaced by version 7. Its history is in `CHANGES.md`.
 - A hosted copy runs as a private claude.ai artifact (see section 6). Version 6 was published there on 2026-10-20.
 
 ### What is half done
 
 - Version 7 was built on 2026-10-27 on branch `v7-redesign` and is not merged into `main` or published to the hosted artifact yet. Moye has not seen it. Treat it as waiting for his verdict, not as approved.
+- The live checks (`npm run live`) were not re-run after the first round of version 7 review fixes (2026-10-27); they need `npm run dev`. `live-reading.mjs` now opens its lesson from Plan, because Learn no longer lists lessons.
 - Design review screenshots of every screen (desktop 1440 wide and phone 390 wide, light, and night for the main screens) are made with `tools/harness/shoot.mjs`. They are not committed.
 - `docs/implementation-backlog.md` still has many boxes unticked for work that is done. It is out of date.
 
@@ -51,7 +54,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 |---|---|
 | `HANDOFF.md` | This file. |
 | `CLAUDE.md` | Standing instructions Claude Code loads in every session: run in the cloud only, writing rules, how to edit content, checks to run before calling work done. |
-| `README.md` | Project overview and run commands. Walkthrough section is out of date (see Status). |
+| `README.md` | Project overview, run commands and a walkthrough of the five version 7 places. |
 | `CHANGES.md` | Release notes for versions 7, 6, 5 and 4, and earlier redesign notes. |
 | `LOCAL_COPY_README.txt` | Plain-text run guide written for Moye's own computer (Windows and macOS), including how to keep version 5 progress. |
 | `package.json` | App scripts and dependencies. The package name is `sites-project`, left from the original scaffold. |
@@ -71,8 +74,8 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 |---|---|
 | `app/page.tsx` | Renders the app component. |
 | `app/layout.tsx` | Page shell: title, icons, share image, font preload, and a small inline script that applies the saved colour and light or night setting before the first paint. |
-| `app/globals.css` | All styling: colour tokens, night (default) and light themes, four accent colours, and every screen. The design note at the top describes the current design. |
-| `app/tricert-app.tsx` | The whole interface (about 2,300 lines): Today, Plan, Learn (lessons with their "On this page" outline, project documents, exams, glossary), Practice, Progress, focus mode, completion screen, onboarding, "Make it yours", the 13-week track and the logo mark. |
+| `app/globals.css` | All styling: colour tokens, the type scale, night (default) and light themes, four accent colours, and every screen. The design note at the top describes the current design. |
+| `app/tricert-app.tsx` | The whole interface (about 2,300 lines): Today, Plan, Learn (project documents, exams, glossary, and the lesson reader with its "On this page" outline), Practice, Progress, focus mode, completion screen, onboarding, "Make it yours", the 13-week track and the logo mark. |
 | `app/api/state/route.ts` | The one API endpoint. `GET` returns all saved state; `PUT` accepts `save-profile`, `save-personal`, `set-progress`, `record-attempt` and `save-artifact`. |
 
 ### `lib/`
@@ -143,7 +146,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `package.json`, `package-lock.json` | Harness tools: esbuild, Tailwind CLI, Playwright, TypeScript. Uses the app's own React from the root `node_modules`. |
 | `build.mjs` | Bundles the app with a fake API into `out/<name>/` for fast browser checks. |
 | `entry.tsx` | Fake API for the harness, with two sample states: `fresh` (no profile) and `midway` (week 6, day 3). The sample name "Moye" and the sample why line "Pass all four, then lead the projects I used to support." are placeholders, not Moye's words. |
-| `flows.mjs` | 20 browser checks of the main flows on the harness build. |
+| `flows.mjs` | 21 browser checks of the main flows on the harness build, including keyboard focus in overlays and reflections after an early session is left undone. |
 | `shoot.mjs` | Design review screenshots of every screen: after `node build.mjs after ../..`, run `node shoot.mjs after [views] [outDir]`. Writes `<view>-<desktop|phone>-<light|dark>.png` (desktop 1440x900 full page, phone 390x844 viewport; night as well for Today, Plan, lesson, Practice, an answered scenario, Progress, focus mode and Make it yours). `PHONE_FULL=<dir>` adds full-page phone shots. Reports console errors and sideways scrolling. |
 | `theme-shots.mjs`, `final-shots.mjs` | Quick screenshots of the colour choices and of the main screens. Write to `shots/`. |
 | `live.mjs` | 6 browser checks against the real dev server and database. Needs a fresh database. |
@@ -237,7 +240,7 @@ After `generate.py`, copy changed dataset files from `tools/content/datasets/out
 | `npm run build` (root) | `Build complete.` |
 | `npm run test:e2e` (root, with `npm run dev` running) | `# pass 2`, `# fail 0` |
 | `npm run typecheck` (tools/harness) | No output, exit code 0 |
-| `npm run flows` (tools/harness) | `20 flow checks passed, no console errors` |
+| `npm run flows` (tools/harness) | `21 flow checks passed, no console errors` |
 | `npm run live` (tools/harness, with `npm run dev` running on a fresh database) | `6 live checks passed against the real server, no console errors`, then `ok, no console errors` |
 | `npm run artifact` (tools/harness) | `html bytes ... font inlined true abs datasets left 0` |
 | `python3 -I tools/content/check2.py tools/content/parts2/*.json` | `OK` |

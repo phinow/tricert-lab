@@ -86,6 +86,8 @@ await check('Finish shows the completion screen and advances to day 4', async ()
   await page.click('button:has-text("Finish session")');
   await page.waitForSelector('.celebrate');
   assert.match(await page.textContent('.celebrate-stats'), /3 of 5/);
+  await page.waitForFunction(() => document.activeElement?.matches('.celebrate .primary'));
+  assert.equal(await page.evaluate(() => document.querySelector('.app').inert), true);
   await page.click('.celebrate .primary');
   await page.waitForFunction(() => document.querySelector('.hero-when')?.textContent?.includes('Day 4'));
   assert.equal(await page.locator('.days .day-mark.is-done').count(), 3);
@@ -107,17 +109,49 @@ await check('Mark done finishes the week; its reflection opens and saves on Plan
   assert.match(await page.textContent('#reflection-6 summary'), /Saved/);
 });
 
-await check('A session opened from Plan shows on Today', async () => {
+await check('An early session left undone keeps later reflections open on Plan', async () => {
+  await nav('Today');
+  await page.waitForSelector('.hero-session');
+  while (!(await page.textContent('.hero-when')).includes('Week 3,')) await page.click('.strip-head .arrow[aria-label="Previous week"]');
+  await page.click('.days li >> nth=1 >> button');
+  await page.click('.hero-actions button:has-text("Mark as not done")');
+  await page.waitForFunction(() => /Week 3 of 13/.test(document.querySelector('.hello .lede')?.textContent || ''));
+  assert.ok((await page.locator('.waiting .row').allTextContents()).some((row) => /Week 4 reflection/.test(row)));
+  await nav('Plan');
+  await page.click('.plan .track-week >> nth=4');
+  await page.click('#reflection-5 > summary');
+  assert.match(await page.textContent('#reflection-5 summary'), /Saved/);
+  assert.match(await page.inputValue('#retro-5'), /Grain before visuals/);
+  await page.click('.plan .track-week >> nth=5');
+  assert.match(await page.textContent('#reflection-6 summary'), /Saved/);
+  await nav('Today');
+  assert.match(await page.textContent('.hero-when'), /Week 3, Day 2/);
+  await page.click('.hero-actions button:has-text("Mark done")');
+  await page.click('.celebrate .primary');
+  await page.waitForFunction(() => /Week 7 of 13/.test(document.querySelector('.hello .lede')?.textContent || ''));
+});
+
+await check('A session opened from Plan opens its lesson; starting it there shows it on Today', async () => {
+  await nav('Plan');
   await page.click('.plan .track-week >> nth=0');
   await page.click('#week-1 .week-detail li >> nth=4 >> button');
-  await page.waitForSelector('.hero-session');
-  assert.match(await page.textContent('#session-title'), /programme charter/i);
-  assert.match(await page.textContent('.hero-actions'), /Done/);
-  await nav('Plan');
+  await page.waitForSelector('.reader .lesson');
+  assert.match(await page.textContent('#reader-title'), /programme charter/i);
+  assert.match(await page.textContent('.reader-head .eyebrow'), /Week 1, Day 5, done/);
+  assert.equal(await page.locator('.reader-actions .primary').count(), 0);
+  await page.click('.reader .back');
+  await page.waitForSelector('.plan #week-1.is-open');
   await page.click('.plan .track-week >> nth=6');
   await page.click('#week-7 .week-detail li >> nth=0 >> button');
-  await page.waitForSelector('.hero-session');
+  await page.waitForSelector('.reader .lesson');
+  assert.match(await page.textContent('#reader-title'), /WBS/);
+  await page.click('.reader-actions .primary');
+  await page.waitForSelector('.focus');
+  assert.match(await page.textContent('#focus-title'), /WBS/);
+  await page.click('.focus-bar .ghost');
+  await nav('Today');
   assert.match(await page.textContent('#session-title'), /WBS/);
+  assert.match(await page.textContent('.hero-label'), /In session/);
 });
 
 await check('Focus work link opens the document with its draft', async () => {
@@ -188,7 +222,7 @@ await check('Learn: lesson opens from Today and moves to the next lesson', async
   await page.click('.hero-lesson');
   await page.waitForSelector('.reader .lesson');
   assert.equal((await page.textContent('#reader-title')).trim(), title);
-  assert.equal(new URL(page.url()).hash, '#learn');
+  assert.equal(new URL(page.url()).hash, '#today');
   assert.equal(await page.locator('.self-check li').count(), 3);
   await page.click('.self-check details >> nth=0 >> summary');
   assert.ok((await page.textContent('.self-check details >> nth=0 >> p')).length >= 60);
@@ -199,6 +233,8 @@ await check('Learn: lesson opens from Today and moves to the next lesson', async
 
 await check('Learn: exam guide, glossary search and document guide', async () => {
   await page.click('.back');
+  await page.waitForSelector('.hero-session');
+  await nav('Learn');
   await page.click('.segmented button:has-text("Exams")');
   await page.click('.exam-card:has-text("ITIL")');
   assert.match(await page.textContent('.reader'), /Discover.*Design.*Acquire.*Build.*Transition.*Operate.*Deliver.*Support/s);
@@ -258,7 +294,10 @@ await check('Onboarding steps through and creates the plan', async () => {
   await page.click('button:has-text("Create my plan")');
   await page.waitForSelector('.hero-session');
   assert.match(await page.textContent('.hero-when'), /Week 1, Day 1/);
+  assert.match(await page.textContent('.tally'), /Days to PL-300/);
+  await nav('Plan');
   assert.match(await page.textContent('.rail-exam'), /PL-300/);
+  await nav('Today');
   assert.match(await page.textContent('.hello h1'), /, Sam$/);
   assert.match(await page.textContent('.why'), /security architecture/);
   assert.equal(await page.textContent('.me .avatar'), 'SR');
@@ -267,6 +306,8 @@ await check('Onboarding steps through and creates the plan', async () => {
 await check('Make it yours: colour and appearance apply at once; name and why save', async () => {
   await page.click('.me');
   await page.waitForSelector('.yours');
+  await page.waitForFunction(() => document.activeElement?.id === 'yours-name');
+  assert.equal(await page.evaluate(() => document.querySelector('.app').inert), true);
   await page.click('.swatch:has-text("Glacier")');
   assert.equal(await page.evaluate(() => document.documentElement.dataset.accent), 'glacier');
   await page.click('.chip-option:has-text("Night")');
@@ -282,6 +323,7 @@ await check('Make it yours: colour and appearance apply at once; name and why sa
   await page.click('.chip-option:has-text("Light")');
   await page.keyboard.press('Escape');
   await page.waitForSelector('.yours', { state: 'detached' });
+  await page.waitForFunction(() => document.activeElement?.matches('.me'));
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'light');
   await page.reload();
   await page.waitForSelector('.onboard-form, .hero-session');

@@ -53,7 +53,7 @@ const views = {
   today: { steps: [] },
   plan: { steps: [nav('Plan')] },
   learn: { steps: [nav('Learn')] },
-  lesson: { steps: [nav('Learn'), ['click', '.lesson-week[open] li button >> nth=2'], ['wait', 300]] },
+  lesson: { steps: [nav('Plan'), ['click', '#week-6 .week-detail li >> nth=2 >> button'], ['wait', 300]] },
   'learn-exams': { steps: [nav('Learn'), learnTab('Exams')] },
   'learn-exam': { steps: [nav('Learn'), learnTab('Exams'), ['click', '.exam-card >> nth=2'], ['click', '.area summary >> nth=0']] },
   'learn-docs': { steps: [nav('Learn'), learnTab('Documents')] },

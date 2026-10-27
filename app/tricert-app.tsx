@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import { FormEvent, ReactNode, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import {
   coverageRows,
   flashcards,
@@ -201,7 +201,8 @@ export default function TriCertApp() {
   const [celebration, setCelebration] = useState<Celebration | null>(null);
   const [now, setNow] = useState(nowMs);
   const [today] = useState(todayIso);
-  const [learnTab, setLearnTab] = useState<LearnTab>('lessons');
+  const [learnTab, setLearnTab] = useState<LearnTab>('documents');
+  const [lessonFrom, setLessonFrom] = useState<'today' | 'plan'>('today');
   const [learnItem, setLearnItem] = useState<string | null>(null);
   const [flashCert, setFlashCert] = useState<Certification | 'All'>('All');
   const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : savedTheme(readPrefs())));
@@ -249,7 +250,11 @@ export default function TriCertApp() {
 
     const onHashChange = () => {
       const next = routeFromHash();
-      if (next) { setView(next.view); if (next.tab) setProgressTab(next.tab); if (next.learnTab) { setLearnTab(next.learnTab); setLearnItem(null); } }
+      if (!next) return;
+      setView(next.view);
+      if (next.tab) setProgressTab(next.tab);
+      if (next.learnTab) { setLearnTab(next.learnTab); setLearnItem(null); }
+      else if (next.view === 'learn') { setLearnItem(null); setLearnTab((tab) => (tab === 'lessons' ? 'documents' : tab)); }
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
@@ -339,7 +344,7 @@ export default function TriCertApp() {
   function go(next: View) {
     if (next === 'projects') { openDocuments(); return; }
     // The Learn tab always opens the Learn index, on the section last used.
-    if (next === 'learn') setLearnItem(null);
+    if (next === 'learn') { setLearnItem(null); if (learnTab === 'lessons') setLearnTab('documents'); }
     setView(next);
     if (next === 'practice' && practiceScreen !== 'run') setPracticeScreen('hub');
     const hash = next === 'progress' && progressTab === 'portfolio' ? 'portfolio' : next;
@@ -359,6 +364,34 @@ export default function TriCertApp() {
     setView('learn');
     if (window.location.hash !== '#learn') window.history.pushState(null, '', '#learn');
     window.scrollTo({ top: 0, behavior: scrollBehavior() });
+  }
+
+  /* A lesson belongs to its session, so it opens from Plan or Today and
+     its back button returns there. */
+  function openLesson(key: string, from: 'today' | 'plan') {
+    setFocusOpen(false);
+    setLessonFrom(from);
+    setLearnTab('lessons');
+    setLearnItem(key);
+    setView('learn');
+    if (window.location.hash !== `#${from}`) window.history.pushState(null, '', `#${from}`);
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
+  }
+
+  function leaveLesson() {
+    const key = learnItem;
+    setLearnItem(null);
+    setLearnTab('documents');
+    if (lessonFrom === 'plan' && key) {
+      const index = allTasks.findIndex((task) => task.key === key);
+      const week = Math.floor(Math.max(0, index) / 5) + 1;
+      expandWeek(week);
+      setView('plan');
+      window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 30);
+      return;
+    }
+    setView('today');
+    window.scrollTo({ top: 0 });
   }
 
   async function update(body: Record<string, unknown>) {
@@ -524,7 +557,7 @@ export default function TriCertApp() {
   function openWork(link: WorkLink) {
     setFocusOpen(false);
     if (link.kind === 'artifact') { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(link.item); return; }
-    if (link.kind === 'lab') { setPracticeScreen('labs'); setView('practice'); window.history.pushState(null, '', '#practice'); window.setTimeout(() => document.getElementById(`lab-${link.lab.key}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }), 60); return; }
+    if (link.kind === 'lab') { setPracticeScreen('labs'); setView('practice'); window.history.pushState(null, '', '#practice'); window.setTimeout(() => { const fold = document.getElementById(`lab-${link.lab.key}`); if (fold instanceof HTMLDetailsElement) fold.open = true; fold?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }); }, 60); return; }
     setView('practice');
     window.history.pushState(null, '', '#practice');
     startScenarios();
@@ -651,7 +684,8 @@ export default function TriCertApp() {
   const standing = programmeDone === allTasks.length
     ? 'All 65 sessions are done. Finish the handover package on Progress.'
     : `Week ${currentWeek} of 13. ${toGate === 0 ? `Your ${nextPhase.gate.label} gate is next.` : `${countWord(toGate)} ${toGate === 1 ? 'session' : 'sessions'}, then your ${nextPhase.gate.label} gate.`}`;
-  const navActive: View = view === 'projects' ? 'learn' : view;
+  const readingLesson = view === 'learn' && learnTab === 'lessons' && Boolean(learnItem);
+  const navActive: View = view === 'projects' ? 'learn' : readingLesson ? lessonFrom : view;
   const gatesMet = gates.filter((gate) => gate.met).length;
 
   const isNext = activeIndex === currentIndex && !completed.has(activeTask.key);
@@ -660,14 +694,15 @@ export default function TriCertApp() {
   const openTimer = () => { showWeek(Math.floor(timerIndex / 5) + 1, timerIndex % 5); setFocusOpen(true); };
   const nextGateWeek = Math.floor(nextPhase.gate.at / 5) + 1;
   const nextGateDay = (nextPhase.gate.at % 5) + 1;
-  const reflectWeek = programmeDone === allTasks.length ? studyWeeks.length : currentWeek - 1;
+  /* The newest finished week that still has no reflection. */
+  const reflectWeek = [...studyWeeks].reverse().find((week) => weeksDone[week.number - 1] === 5 && !retroSaved(week.number))?.number ?? 0;
 
   /* Today keeps a short list of things already started: answers to review,
      drafts, and the reflection for a week that is finished. */
   const waiting: Array<{ title: string; detail: string; go: () => void }> = [];
   if (reviewQueue.length) waiting.push({ title: `Review ${reviewQueue.length} ${reviewQueue.length === 1 ? 'answer' : 'answers'}`, detail: 'Wrong or guessed', go: () => { setPracticeScreen('review'); setView('practice'); window.history.pushState(null, '', '#practice'); window.scrollTo({ top: 0 }); } });
   draftArtifacts.slice(0, 2).forEach((item) => waiting.push({ title: item.title, detail: `Draft, ${docNumberFor(item)}`, go: () => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); } }));
-  if (reflectWeek >= 1 && weeksDone[reflectWeek - 1] === 5 && !retroSaved(reflectWeek)) waiting.push({ title: `Week ${reflectWeek} reflection`, detail: 'The week is done. Write what you learned.', go: () => openReflection(reflectWeek) });
+  if (reflectWeek >= 1) waiting.push({ title: `Week ${reflectWeek} reflection`, detail: 'The week is done. Write what you learned.', go: () => openReflection(reflectWeek) });
 
   const documentsPanel = (
     <div className="projects">
@@ -693,7 +728,7 @@ export default function TriCertApp() {
               <button onClick={() => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}>
                 <span className="doc-no">{docNumber(project.key, index)}</span>
                 <span className="doc-title"><strong>{item.title}</strong><small>{item.summary}</small></span>
-                <span className={`status status-${status || 'none'}`}>{statusLabel(status)}</span>
+                <DocStatus status={status} />
                 <Chevron dir="right" />
               </button>
             </li>
@@ -703,515 +738,536 @@ export default function TriCertApp() {
     </div>
   );
 
+  /* While an overlay is open the page behind it is inert, so keyboard focus
+     stays inside the overlay. Messages sit outside and stay reachable. */
+  const overlayOpen = (focusOpen && Boolean(timer && timerTask)) || Boolean(celebration) || settingsOpen;
+  const timerChip = timer && timerTask && !focusOpen ? (
+    <button className="live-chip" onClick={openTimer} aria-label={`${timer.pausedAt ? 'Paused' : 'In session'}, ${formatClock(elapsedSeconds)}. Back to your session`}>
+      <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
+      <Digits value={formatClock(elapsedSeconds)} />
+    </button>
+  ) : null;
+
   return (
-    <div className="app">
-      <aside className="rail">
-        <a className="brand" href="#today" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark /><span className="brand-name">TriCert Lab</span></a>
-        <nav className="nav" aria-label="Main navigation">
-          {navItems.map(([key, label]) => (
-            <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} onClick={() => go(key)}>
-              <span className="nav-glyph"><NavIcon name={key} />{key === 'practice' && reviewQueue.length > 0 && <span className="nav-badge" aria-label={`${reviewQueue.length} to review`}>{reviewQueue.length}</span>}</span>
-              <span className="nav-label">{label}</span>
-            </button>
-          ))}
-        </nav>
-        {timer && timerTask && !focusOpen && (
-          <button className="live-pill" onClick={openTimer}>
-            <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
-            <span className="live-text"><span className="live-clock"><Digits value={formatClock(elapsedSeconds)} /></span><span className="live-name">{timer.pausedAt ? 'Paused, back to it' : 'Back to your session'}</span></span>
-          </button>
-        )}
-        <div className="rail-foot">
-          {nextExam && <p className="rail-exam"><strong>{nextExam.days}</strong> {nextExam.days === 1 ? 'day' : 'days'} to {nextExam.label}</p>}
-          <button className="me" onClick={() => setSettingsOpen(true)}>
-            <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
-            <span className="me-text"><strong>{firstName || 'You'}</strong><small>Make it yours</small></span>
-          </button>
-        </div>
-      </aside>
-
-      {!inRun && (
-        <header className="topbar">
-          <a className="brand" href="#today" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark size={28} /><span className="brand-name">TriCert Lab</span></a>
-          <span className="topbar-end">
-            {timer && timerTask && !focusOpen && (
-              <button className="live-chip" onClick={openTimer} aria-label={`${timer.pausedAt ? 'Paused' : 'In session'}, ${formatClock(elapsedSeconds)}. Back to your session`}>
-                <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
-                <Digits value={formatClock(elapsedSeconds)} />
-              </button>
-            )}
-            <button className="avatar-button" onClick={() => setSettingsOpen(true)} aria-label="Make it yours: your name, why, colour and appearance">
-              <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
-            </button>
-          </span>
-        </header>
-      )}
-
-      <main className={`stage view-${view}${inRun ? ' is-run' : ''}`} id="main">
-        {notice && <div className={notice.kind === 'error' ? 'toast is-error' : 'toast'} role={notice.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{notice.kind === 'error' ? '!' : <Check />}</span><span>{notice.text}</span><button onClick={() => setNotice(null)} aria-label="Dismiss message">×</button></div>}
-
-        {view === 'today' && (
-          <div className="today">
-            <header className="hello">
-              <div className="hello-text">
-                <h1>{greeting}</h1>
-                <p className="lede">{keepTogether(standing)}</p>
-                {profile.motivation
-                  ? <p className="why">{profile.motivation}</p>
-                  : <button className="text-link why-add" onClick={() => setSettingsOpen(true)}>Add why you are doing this</button>}
-              </div>
-              <dl className="tally" aria-label="Your progress">
-                <div><dt>Sessions done</dt><dd><strong>{programmeDone}</strong><span>/{allTasks.length}</span></dd></div>
-                {nextExam && <div><dt>{nextExam.days === 1 ? 'Day' : 'Days'} to {nextExam.label}</dt><dd><strong>{nextExam.days}</strong></dd></div>}
-              </dl>
-            </header>
-
-            <section className={completed.has(activeTask.key) ? 'hero-session is-done' : 'hero-session'} aria-labelledby="session-title">
-              <div className="hero-top">
-                <p className="hero-when-line">
-                  <span className="hero-label">{completed.has(activeTask.key) ? 'Done' : timer?.key === activeTask.key ? 'In session' : isNext ? 'Up next' : activeGate ? 'Exam gate' : 'Later'}</span>
-                  <span className="hero-when">Week {selectedWeek}, {activeTask.day}{activeGate ? ', exam gate' : ''}</span>
-                </p>
-                <span className="hero-tags">{activeTask.certifications.map((cert) => <Tag key={cert}>{examLabel(cert)}</Tag>)}</span>
-              </div>
-              <h2 id="session-title">{keepTogether(activeTask.title)}</h2>
-              <p className="hero-sub"><span>{formatMinutes(taskMinutes(activeTask.meta))}</span><span>{taskOutput(activeTask.meta)}</span></p>
-              <div className="hero-actions">
-                {completed.has(activeTask.key)
-                  ? <span className="hero-done"><Check /> Done</span>
-                  : (
-                    <button className="primary play" onClick={() => startSession(activeTask)}>
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
-                      <span className="play-label">{timer?.key === activeTask.key ? <>Resume, <Digits value={formatClock(elapsedSeconds)} /></> : 'Start session'}</span>
-                    </button>
-                  )}
-                {lessonIndex[activeTask.key] && <button className="secondary hero-lesson" onClick={() => openLearn('lessons', activeTask.key)}><BookIcon /> Read the lesson</button>}
-                {completed.has(activeTask.key)
-                  ? <button className="ghost push" onClick={() => toggleProgress(activeTask.key)} disabled={saving}>Mark as not done</button>
-                  : <button className="ghost push" onClick={() => finishSession(activeTask)} disabled={saving}>Mark done</button>}
-              </div>
-              <div className="week-strip" aria-label={`Week ${selectedWeek}`}>
-                <div className="strip-head">
-                  <button className="arrow" onClick={() => showWeek(selectedWeek - 1)} disabled={selectedWeek === 1} aria-label="Previous week"><Chevron dir="left" /></button>
-                  <p className="strip-title"><strong>Week {selectedWeek}</strong> <span>{keepTogether(weekData.theme)}</span></p>
-                  <button className="arrow" onClick={() => showWeek(selectedWeek + 1)} disabled={selectedWeek === studyWeeks.length} aria-label="Next week"><Chevron dir="right" /></button>
-                </div>
-                <ol className="days">
-                  {weekData.tasks.map((task, index) => {
-                    const done = completed.has(task.key);
-                    const gate = gateAt.has(sessionIndex(selectedWeek, index + 1));
-                    return (
-                      <li key={task.key}>
-                        <button className={index === activeDay ? 'day is-active' : 'day'} onClick={() => setSelectedDay(index)} aria-pressed={index === activeDay} aria-label={`${task.day}: ${task.title}${done ? ', done' : ''}${gate ? ', exam gate' : ''}`}>
-                          <DayMark done={done} gate={gate} running={timer?.key === task.key} />
-                          <span className="day-name">{task.day}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ol>
-                {selectedWeek !== currentWeek && <button className="text-link" onClick={() => showWeek(currentWeek)}>Back to this week</button>}
-              </div>
-            </section>
-
-            {waiting.length > 0 && (
-              <section className="waiting" aria-labelledby="waiting-title">
-                <h2 id="waiting-title" className="section-title">Waiting on you</h2>
-                <ul className="list">
-                  {waiting.map((item) => <li key={item.title}><button className="row" onClick={item.go}><span className="row-text"><strong>{keepTogether(item.title)}</strong><small>{item.detail}</small></span><Chevron dir="right" /></button></li>)}
-                </ul>
-              </section>
-            )}
-          </div>
-        )}
-
-        {view === 'plan' && (
-          <div className="plan">
-            <header className="screen-head">
-              <h1>Plan</h1>
-              <p className="lede">Week {currentWeek} of 13. {programmeDone} of {allTasks.length} sessions done across three releases of Project Beacon, each ending at an exam gate.</p>
-            </header>
-            <section className="plan-track" aria-label="Your 13 weeks">
-              <WeekTrack weeks={weeksDone} selected={expandedWeek || undefined} current={currentWeek} onSelect={(week) => { expandWeek(week); window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }), 30); }} />
-            </section>
-            {phases.map((phase, phaseIndex) => {
-              const phaseProject = projects.find((item) => item.key === phase.project) || projects[0];
-              const weeks = studyWeeks.filter((week) => phaseFor(sessionIndex(week.number, 1)) === phase);
-              const gateWeek = Math.floor(phase.gate.at / 5) + 1;
-              const gateDay = (phase.gate.at % 5) + 1;
-              const gateDates = phase.gate.certs.map((cert) => exams.find((exam) => exam.cert === cert)).filter((exam) => exam?.date).map((exam) => `${exam?.label} ${formatDate(exam?.date || '')}`).join(', ');
+    <>
+      <div className="app" inert={overlayOpen}>
+        <aside className="rail">
+          <a className="brand" href="#today" aria-label="TriCert Lab, Today" title="TriCert Lab" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark /><span className="brand-name">TriCert Lab</span></a>
+          <nav className="nav" aria-label="Main navigation">
+            {navItems.map(([key, label]) => {
+              const badge = key === 'practice' && reviewQueue.length > 0 ? reviewQueue.length : 0;
               return (
-                <section className="phase" key={phase.project} aria-labelledby={`phase-${phase.project}`}>
-                  <header className="phase-head">
-                    <span className="eyebrow"><span>Release {phaseIndex + 1}</span><span>Weeks {weeks[0].number} to {weeks[weeks.length - 1].number}</span></span>
-                    <h2 id={`phase-${phase.project}`}>{phaseProject.title}</h2>
-                  </header>
-                  <ul className="list weeks">
-                    {weeks.map((week) => {
-                      const done = week.tasks.filter((task) => completed.has(task.key)).length;
-                      const open = expandedWeek === week.number;
-                      const current = week.number === currentWeek;
+                <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} aria-label={badge ? `${label}, ${badge} to review` : undefined} onClick={() => go(key)}>
+                  <span className="nav-glyph"><NavIcon name={key} />{badge > 0 && <span className="nav-badge" aria-hidden="true">{badge}</span>}</span>
+                  <span className="nav-label">{label}</span>
+                </button>
+              );
+            })}
+          </nav>
+          {timer && timerTask && !focusOpen && (
+            <button className="live-pill" onClick={openTimer}>
+              <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
+              <span className="live-text"><span className="live-clock"><Digits value={formatClock(elapsedSeconds)} /></span><span className="live-name">{timer.pausedAt ? 'Paused, back to it' : 'Back to your session'}</span></span>
+            </button>
+          )}
+          <div className="rail-foot">
+            {nextExam && view !== 'today' && <p className="rail-exam"><strong>{nextExam.days}</strong> {nextExam.days === 1 ? 'day' : 'days'} to {nextExam.label}</p>}
+            <button className="me" title="Make it yours" onClick={() => setSettingsOpen(true)}>
+              <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
+              <span className="me-text"><strong>{firstName || 'You'}</strong><small>Make it yours</small></span>
+            </button>
+          </div>
+        </aside>
+
+        {!inRun && (
+          <header className="topbar">
+            <a className="brand" href="#today" aria-label="TriCert Lab, Today" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark size={28} /><span className="brand-name">TriCert Lab</span></a>
+            <span className="topbar-end">
+              {timerChip}
+              <button className="avatar-button" onClick={() => setSettingsOpen(true)} aria-label="Make it yours: your name, why, colour and appearance">
+                <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
+              </button>
+            </span>
+          </header>
+        )}
+
+        <main className={`stage view-${view}${inRun ? ' is-run' : ''}`} id="main" tabIndex={-1}>
+          {view === 'today' && (
+            <div className="today">
+              <header className="hello">
+                <div className="hello-text">
+                  <h1>{greeting}</h1>
+                  <p className="lede">{keepTogether(standing)}</p>
+                  {profile.motivation
+                    ? <p className="why">{profile.motivation}</p>
+                    : <button className="text-link why-add" onClick={() => setSettingsOpen(true)}>Add why you are doing this</button>}
+                </div>
+                <dl className="tally" aria-label="Your progress">
+                  <div><dt>Sessions done</dt><dd><strong>{programmeDone}</strong><span>/{allTasks.length}</span></dd></div>
+                  {nextExam && <div><dt>{nextExam.days === 1 ? 'Day' : 'Days'} to {nextExam.label}</dt><dd><strong>{nextExam.days}</strong></dd></div>}
+                </dl>
+              </header>
+
+              <section className={completed.has(activeTask.key) ? 'hero-session is-done' : 'hero-session'} aria-labelledby="session-title">
+                <div className="hero-top">
+                  <p className="hero-when-line">
+                    <span className="hero-label">{completed.has(activeTask.key) ? 'Done' : timer?.key === activeTask.key ? 'In session' : isNext ? 'Up next' : activeGate ? 'Exam gate' : 'Later'}</span>
+                    <span className="hero-when">Week {selectedWeek}, {activeTask.day}{activeGate ? ', exam gate' : ''}</span>
+                  </p>
+                  <span className="hero-tags">{activeTask.certifications.map((cert) => <Tag key={cert}>{examLabel(cert)}</Tag>)}</span>
+                </div>
+                <h2 id="session-title">{keepTogether(activeTask.title)}</h2>
+                <p className="hero-sub"><span>{formatMinutes(taskMinutes(activeTask.meta))}</span><span>{taskOutput(activeTask.meta)}</span></p>
+                <div className="hero-actions">
+                  {completed.has(activeTask.key)
+                    ? <Status kind="done">Done</Status>
+                    : (
+                      <button className="primary play" onClick={() => startSession(activeTask)}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+                        <span className="play-label">{timer?.key === activeTask.key ? <>Resume, <Digits value={formatClock(elapsedSeconds)} /></> : 'Start session'}</span>
+                      </button>
+                    )}
+                  {lessonIndex[activeTask.key] && <button className="secondary hero-lesson" onClick={() => openLesson(activeTask.key, 'today')}><BookIcon /> Read the lesson</button>}
+                  {completed.has(activeTask.key)
+                    ? <button className="ghost push" onClick={() => toggleProgress(activeTask.key)} disabled={saving}>Mark as not done</button>
+                    : <button className="ghost push" onClick={() => finishSession(activeTask)} disabled={saving}>Mark done</button>}
+                </div>
+                <div className="week-strip" aria-label={`Week ${selectedWeek}`}>
+                  <div className="strip-head">
+                    <button className="arrow" onClick={() => showWeek(selectedWeek - 1)} disabled={selectedWeek === 1} aria-label="Previous week"><Chevron dir="left" /></button>
+                    <p className="strip-title"><strong>Week {selectedWeek}</strong> <span>{keepTogether(weekData.theme)}</span></p>
+                    <button className="arrow" onClick={() => showWeek(selectedWeek + 1)} disabled={selectedWeek === studyWeeks.length} aria-label="Next week"><Chevron dir="right" /></button>
+                  </div>
+                  <ol className="days">
+                    {weekData.tasks.map((task, index) => {
+                      const done = completed.has(task.key);
+                      const gate = gateAt.has(sessionIndex(selectedWeek, index + 1));
                       return (
-                        <li key={week.number} id={`week-${week.number}`} className={[current ? 'is-current' : '', open ? 'is-open' : ''].filter(Boolean).join(' ') || undefined}>
-                          <button className="week-row" aria-expanded={open} onClick={() => (open ? setExpandedWeek(0) : expandWeek(week.number))}>
-                            <span className="week-text"><small>Week {week.number}{current ? ', this week' : ''}</small><strong>{keepTogether(week.theme)}</strong></span>
-                            <span className={done === 5 ? 'week-status is-done' : 'week-status'}>{done === 5 ? <><Check /> Done</> : `${done} of 5`}</span>
-                            <Chevron dir={open ? 'up' : 'down'} />
+                        <li key={task.key}>
+                          <button className={index === activeDay ? 'day is-active' : 'day'} onClick={() => setSelectedDay(index)} aria-pressed={index === activeDay} aria-label={`${task.day}: ${task.title}${done ? ', done' : ''}${gate ? ', exam gate' : ''}`}>
+                            <DayMark done={done} gate={gate} running={timer?.key === task.key} />
+                            <span className="day-name">{task.day}</span>
                           </button>
-                          {open && (
-                            <div className="week-detail">
-                              <p>{week.outcome}</p>
-                              <ol>
-                                {week.tasks.map((task, index) => {
-                                  const idx = sessionIndex(week.number, index + 1);
-                                  return (
-                                    <li key={task.key}>
-                                      <button onClick={() => openSession(idx)}>
-                                        <span className={completed.has(task.key) ? 'tick is-done' : gateAt.has(idx) ? 'tick is-gate' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
-                                        <span className="wd-title"><small>{task.day}{gateAt.has(idx) ? ', exam gate' : ''}</small><span>{keepTogether(task.title)}</span></span>
-                                        <span className="wd-time">{formatMinutes(taskMinutes(task.meta))}</span>
-                                      </button>
-                                    </li>
-                                  );
-                                })}
-                              </ol>
-                              {week.number <= currentWeek && (
-                                <details id={`reflection-${week.number}`} className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
-                                  <summary className="row"><span className="row-text"><strong>Week {week.number} reflection</strong><small>{retroSaved(week.number) ? 'Saved' : 'Not written yet'}</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-                                  <div className="reflect-body">
-                                    <label className="field" htmlFor={`retro-${week.number}`}>What can you now defend, what still needs notes, and what will you change?</label>
-                                    <textarea id={`retro-${week.number}`} value={retroText} onChange={(event) => setRetroText(event.target.value)} />
-                                    <div className="row-actions">
-                                      <button className="primary" onClick={saveRetrospective} disabled={saving || retroText.trim().length < 100}>Save reflection</button>
-                                      <span className="hint">{retroText.trim().length < 100 ? `${100 - retroText.trim().length} more characters` : 'Ready to save'}</span>
-                                    </div>
-                                  </div>
-                                </details>
-                              )}
-                            </div>
-                          )}
                         </li>
                       );
                     })}
-                    <li className="gate-row">
-                      <span className="gate-mark" aria-hidden="true" />
-                      <span className="gate-text"><small>Exam gate, week {gateWeek}, day {gateDay}</small><strong>{keepTogether(phase.gate.label)}</strong></span>
-                      <span className="gate-when">{gateDates ? keepTogether(gateDates) : 'No date set'}</span>
-                    </li>
+                  </ol>
+                  {selectedWeek !== currentWeek && <button className="text-link" onClick={() => showWeek(currentWeek)}>Back to this week</button>}
+                </div>
+              </section>
+
+              {waiting.length > 0 && (
+                <section className="waiting" aria-labelledby="waiting-title">
+                  <h2 id="waiting-title" className="section-title">Waiting on you</h2>
+                  <ul className="list">
+                    {waiting.map((item) => <li key={item.title}><button className="row" onClick={item.go}><span className="row-text"><strong>{keepTogether(item.title)}</strong><small>{item.detail}</small></span><Chevron dir="right" /></button></li>)}
                   </ul>
                 </section>
-              );
-            })}
-            <details className="fold reference">
-              <summary className="row"><span className="row-text"><strong>How the four certifications connect</strong><small>One project, four exams</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-              <div className="reference-body">
-                <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name}><Tag>{examLabel(name)}</Tag><strong>{title}</strong><p>{copy}</p></div>)}</div>
-                <div className="table-scroll"><table><thead><tr><th>Activity</th><th>PMP</th><th>PL-300</th><th>CISSP</th><th>ITIL V5</th></tr></thead><tbody>{coverageRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
-                <p className="hint">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
-              </div>
-            </details>
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
-        {(view === 'learn' || (view === 'projects' && !docOpen)) && (
-          <LearnView
-            tab={view === 'projects' ? 'documents' : learnTab}
-            item={view === 'projects' ? null : learnItem}
-            onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
-            onItem={(item) => { setLearnItem(item); window.scrollTo({ top: 0 }); }}
-            completed={completed}
-            currentIndex={currentIndex}
-            documents={documentsPanel}
-            onStart={(task) => { showWeek(Math.floor(allTasks.indexOf(task) / 5) + 1, allTasks.indexOf(task) % 5); startSession(task); }}
-            onOpenDoc={(item) => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}
-          />
-        )}
-
-        {view === 'projects' && docOpen && (
-          <article className="doc" aria-labelledby="doc-title">
-            <button className="back" onClick={openDocuments}><Chevron dir="left" /> Documents</button>
-            <header className="doc-head">
-              <p className="eyebrow"><span>{docNumber(project.key, deliverableIndex)}</span><span>Release {phases.findIndex((phase) => phase.project === project.key) + 1}</span><span className={`status status-${deliverableStatus || 'none'}`}>{statusLabel(deliverableStatus)}</span></p>
-              <h1 id="doc-title">{deliverable.title}</h1>
-              <p className="lede">{keepTogether(deliverable.summary)}</p>
-            </header>
-            <div className="folds">
-              {reading?.docGuides[deliverable.key] ? (
-                <>
-                  <details className="brief guide-fold" open={!deliverableStatus}>
-                    <summary className="row"><span className="row-text"><strong>How to write it</strong><small>{reading.docGuides[deliverable.key].sections.length} sections, with common mistakes</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-                    <GuideBody guide={reading.docGuides[deliverable.key]} showModel={false} />
-                  </details>
-                  <details className="brief guide-fold finished-fold">
-                    <summary className="row"><span className="row-text"><strong>See the finished example</strong><small>The Kestrel version, written in full</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-                    <div className="lesson"><RichText text={reading.docGuides[deliverable.key].modelDocument} /></div>
-                  </details>
-                </>
-              ) : guideIndex[deliverable.key] ? <p className="hint loading-note">Loading the writing guide</p> : null}
-              <details className="brief done-when">
-                <summary className="row"><span className="row-text"><strong>Done when</strong><small>{ticked.size} of {deliverable.rubric.length} checked</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-                <div className="brief-body">
-                  <ul className="rubric">
-                    {deliverable.rubric.map((item, index) => (
-                      <li key={item}><label><input type="checkbox" checked={ticked.has(index)} onChange={() => toggleRubric(index)} /><span className="box" aria-hidden="true"><Check /></span><span>{item}</span></label></li>
-                    ))}
-                  </ul>
-                  <p className="hint">{deliverable.why}</p>
-                  <div className="ideas">{deliverable.concepts.map((concept) => <details key={concept}><summary>{concept}</summary><p>{conceptGlossary[concept] || 'A core idea that connects this document to the exams.'}</p></details>)}</div>
+          {view === 'plan' && (
+            <div className="plan">
+              <header className="screen-head">
+                <h1>Plan</h1>
+                <p className="lede">Week {currentWeek} of 13. {programmeDone} of {allTasks.length} sessions done across three releases of Project Beacon, each ending at an exam gate.</p>
+              </header>
+              <section className="plan-track" aria-label="Your 13 weeks">
+                <WeekTrack weeks={weeksDone} selected={expandedWeek || undefined} current={currentWeek} onSelect={(week) => { expandWeek(week); window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }), 30); }} />
+              </section>
+              {phases.map((phase, phaseIndex) => {
+                const phaseProject = projects.find((item) => item.key === phase.project) || projects[0];
+                const weeks = studyWeeks.filter((week) => phaseFor(sessionIndex(week.number, 1)) === phase);
+                const gateWeek = Math.floor(phase.gate.at / 5) + 1;
+                const gateDay = (phase.gate.at % 5) + 1;
+                const gateDates = phase.gate.certs.map((cert) => exams.find((exam) => exam.cert === cert)).filter((exam) => exam?.date).map((exam) => `${exam?.label} ${formatDate(exam?.date || '')}`).join(', ');
+                return (
+                  <section className="phase" key={phase.project} aria-labelledby={`phase-${phase.project}`}>
+                    <header className="phase-head">
+                      <span className="eyebrow"><span>Release {phaseIndex + 1}</span><span>Weeks {weeks[0].number} to {weeks[weeks.length - 1].number}</span></span>
+                      <h2 id={`phase-${phase.project}`}>{phaseProject.title}</h2>
+                    </header>
+                    <ul className="list weeks">
+                      {weeks.map((week) => {
+                        const done = week.tasks.filter((task) => completed.has(task.key)).length;
+                        const open = expandedWeek === week.number;
+                        const current = week.number === currentWeek;
+                        return (
+                          <li key={week.number} id={`week-${week.number}`} className={[current ? 'is-current' : '', open ? 'is-open' : ''].filter(Boolean).join(' ') || undefined}>
+                            <button className="week-row" aria-expanded={open} onClick={() => (open ? setExpandedWeek(0) : expandWeek(week.number))}>
+                              <span className="week-text"><small>Week {week.number}{current ? ', this week' : ''}</small><strong>{keepTogether(week.theme)}</strong></span>
+                              <Status kind={done === 5 ? 'done' : done > 0 ? 'progress' : 'none'}>{done === 5 ? 'Done' : `${done} of 5`}</Status>
+                              <FoldMark />
+                            </button>
+                            {open && (
+                              <div className="week-detail">
+                                <p>{week.outcome}</p>
+                                <ol>
+                                  {week.tasks.map((task, index) => {
+                                    const idx = sessionIndex(week.number, index + 1);
+                                    return (
+                                      <li key={task.key}>
+                                        <button onClick={() => (lessonIndex[task.key] ? openLesson(task.key, 'plan') : openSession(idx))}>
+                                          <span className={completed.has(task.key) ? 'tick is-done' : gateAt.has(idx) ? 'tick is-gate' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
+                                          <span className="wd-title"><small>{task.day}{gateAt.has(idx) ? ', exam gate' : ''}</small><span>{keepTogether(task.title)}</span>{completed.has(task.key) && <span className="sr-only">, done</span>}</span>
+                                          <span className="wd-time">{formatMinutes(taskMinutes(task.meta))}</span>
+                                          <Chevron dir="right" />
+                                        </button>
+                                      </li>
+                                    );
+                                  })}
+                                </ol>
+                                {(week.number <= currentWeek || done > 0 || retroSaved(week.number)) && (
+                                  <details id={`reflection-${week.number}`} className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
+                                    <summary className="row"><span className="row-text"><strong>Week {week.number} reflection</strong><small>{retroSaved(week.number) ? 'Saved' : 'Not written yet'}</small></span><FoldMark /></summary>
+                                    <div className="reflect-body">
+                                      <label className="field" htmlFor={`retro-${week.number}`}>What can you now defend, what still needs notes, and what will you change?</label>
+                                      <textarea id={`retro-${week.number}`} value={retroText} onChange={(event) => setRetroText(event.target.value)} />
+                                      <div className="row-actions">
+                                        <button className="primary" onClick={saveRetrospective} disabled={saving || retroText.trim().length < 100}>Save reflection</button>
+                                        <span className="hint">{retroText.trim().length < 100 ? `${100 - retroText.trim().length} more characters` : 'Ready to save'}</span>
+                                      </div>
+                                    </div>
+                                  </details>
+                                )}
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+                      <li className="gate-row">
+                        <span className="gate-mark" aria-hidden="true" />
+                        <span className="gate-text"><small>Exam gate, week {gateWeek}, day {gateDay}</small><strong>{keepTogether(phase.gate.label)}</strong></span>
+                        <span className="gate-when">{gateDates ? keepTogether(gateDates) : 'No date set'}</span>
+                      </li>
+                    </ul>
+                  </section>
+                );
+              })}
+              <details className="fold reference">
+                <summary className="row"><span className="row-text"><strong>How the four certifications connect</strong><small>One project, four exams</small></span><FoldMark /></summary>
+                <div className="reference-body">
+                  <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name}><Tag>{examLabel(name)}</Tag><strong>{title}</strong><p>{copy}</p></div>)}</div>
+                  <div className="table-scroll"><table><thead><tr><th>Activity</th><th>PMP</th><th>PL-300</th><th>CISSP</th><th>ITIL V5</th></tr></thead><tbody>{coverageRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
+                  <p className="hint">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
                 </div>
               </details>
             </div>
-            <label className="field" htmlFor="work">Your work</label>
-            <textarea id="work" className="writing" value={artifactText} onChange={(event) => setArtifactText(event.target.value)} />
-            <label className="field" htmlFor="explain">Explain it in your own words</label>
-            <textarea id="explain" value={artifactReflection} onChange={(event) => setArtifactReflection(event.target.value)} placeholder={deliverable.reflections.join('\n')} />
-            <div className="doc-actions">
-              <span className="hint">{completeBlockers.length ? `To mark complete: ${completeBlockers.join(' and ')}.` : deliverableStatus === 'complete' ? 'Complete. Saving again keeps it complete.' : 'Ready to mark complete.'}</span>
-              <button className="ghost" onClick={exportArtifact}>Export</button>
-              <button className="secondary" onClick={() => saveArtifact('draft')} disabled={saving}>Save draft</button>
-              <button className="primary" onClick={() => saveArtifact('complete')} disabled={saving || completeBlockers.length > 0}>Mark complete</button>
-            </div>
-            <ul className="list doc-more">
-              <li>
-                <button className="row check-yourself" onClick={startArtifactCheck}>
-                  <span className="row-text"><strong>Check yourself</strong><small>Five decisions about this document</small></span>
-                  <Chevron dir="right" />
-                </button>
-              </li>
-            </ul>
-          </article>
-        )}
+          )}
 
-        {view === 'practice' && practiceScreen === 'hub' && (
-          <div className="practice">
-            <header className="screen-head">
-              <h1>Practice</h1>
-              <p className="lede">{latestAttempts.length} decisions recorded so far{reviewQueue.length ? `, ${reviewQueue.length} to review` : ''}.</p>
-            </header>
-            <div className="tiles">
-              <button className="tile tile-scenarios" onClick={startScenarios}>
-                <span className="tile-text">
-                  <strong>Scenarios</strong>
-                  <small>{practiceBank.length} decisions across all four exams, at your own pace. You pick up where you left off.</small>
-                </span>
-                <span className="tile-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start scenarios</span>
-              </button>
-              <ul className="list practice-list">
-                <li>
-                  <div className="row tile tile-timed">
-                    <Glyph name="timed" />
-                    <span className="row-text"><strong>Timed set</strong><small>{timedQuestions(mockCert).length} {examLabel(mockCert)} questions, 15 minutes</small></span>
-                    <span className="tile-controls">
-                      <label className="sr-only" htmlFor="lens">Exam</label>
-                      <select id="lens" value={mockCert} onChange={(event) => setMockCert(event.target.value as Certification)}><option value="PMP">PMP</option><option value="PL-300">PL-300</option><option value="CISSP">CISSP</option><option value="ITIL">ITIL V5</option></select>
-                      <button className="secondary start" onClick={startTimed}>Start</button>
-                    </span>
+          {(view === 'learn' || (view === 'projects' && !docOpen)) && (
+            <LearnView
+              tab={view === 'projects' ? 'documents' : learnTab}
+              item={view === 'projects' ? null : learnItem}
+              lessonFrom={lessonFrom}
+              onLeaveLesson={leaveLesson}
+              onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
+              onItem={(item) => { setLearnItem(item); window.scrollTo({ top: 0 }); }}
+              completed={completed}
+              documents={documentsPanel}
+              onStart={(task) => { showWeek(Math.floor(allTasks.indexOf(task) / 5) + 1, allTasks.indexOf(task) % 5); startSession(task); }}
+              onOpenDoc={(item) => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}
+            />
+          )}
+
+          {view === 'projects' && docOpen && (
+            <article className="doc" aria-labelledby="doc-title">
+              <button className="back" onClick={openDocuments}><Chevron dir="left" /> Documents</button>
+              <header className="doc-head">
+                <p className="eyebrow"><span>{docNumber(project.key, deliverableIndex)}</span><span>Release {phases.findIndex((phase) => phase.project === project.key) + 1}</span><DocStatus status={deliverableStatus} /></p>
+                <h1 id="doc-title">{deliverable.title}</h1>
+                <p className="lede">{keepTogether(deliverable.summary)}</p>
+              </header>
+              <div className="folds">
+                {reading?.docGuides[deliverable.key] ? (
+                  <>
+                    <details className="brief guide-fold" open={!deliverableStatus}>
+                      <summary className="row"><span className="row-text"><strong>How to write it</strong><small>{reading.docGuides[deliverable.key].sections.length} sections, with common mistakes</small></span><FoldMark /></summary>
+                      <GuideBody guide={reading.docGuides[deliverable.key]} showModel={false} />
+                    </details>
+                    <details className="brief guide-fold finished-fold">
+                      <summary className="row"><span className="row-text"><strong>See the finished example</strong><small>The Kestrel version, written in full</small></span><FoldMark /></summary>
+                      <div className="lesson"><RichText text={reading.docGuides[deliverable.key].modelDocument} /></div>
+                    </details>
+                  </>
+                ) : guideIndex[deliverable.key] ? <p className="hint loading-note">Loading the writing guide</p> : null}
+                <details className="brief done-when">
+                  <summary className="row"><span className="row-text"><strong>Done when</strong><small>{ticked.size} of {deliverable.rubric.length} checked</small></span><FoldMark /></summary>
+                  <div className="brief-body">
+                    <ul className="rubric">
+                      {deliverable.rubric.map((item, index) => (
+                        <li key={item}><label><input type="checkbox" checked={ticked.has(index)} onChange={() => toggleRubric(index)} /><span className="box" aria-hidden="true"><Check /></span><span>{item}</span></label></li>
+                      ))}
+                    </ul>
+                    <p className="hint">{deliverable.why}</p>
+                    <div className="ideas">{deliverable.concepts.map((concept) => <details key={concept}><summary>{concept}</summary><p>{conceptGlossary[concept] || 'A core idea that connects this document to the exams.'}</p></details>)}</div>
                   </div>
-                </li>
+                </details>
+              </div>
+              <label className="field" htmlFor="work">Your work</label>
+              <textarea id="work" className="writing" value={artifactText} onChange={(event) => setArtifactText(event.target.value)} />
+              <label className="field" htmlFor="explain">Explain it in your own words</label>
+              <textarea id="explain" value={artifactReflection} onChange={(event) => setArtifactReflection(event.target.value)} placeholder={deliverable.reflections.join('\n')} />
+              <div className="doc-actions">
+                <span className="hint">{completeBlockers.length ? `To mark complete: ${completeBlockers.join(' and ')}.` : deliverableStatus === 'complete' ? 'Complete. Saving again keeps it complete.' : 'Ready to mark complete.'}</span>
+                <button className="ghost" onClick={exportArtifact}>Export</button>
+                <button className="secondary" onClick={() => saveArtifact('draft')} disabled={saving}>Save draft</button>
+                <button className="primary" onClick={() => saveArtifact('complete')} disabled={saving || completeBlockers.length > 0}>Mark complete</button>
+              </div>
+              <ul className="list doc-more">
                 <li>
-                  <button className="row tile tile-review" onClick={() => setPracticeScreen('review')}>
-                    <Glyph name="review" />
-                    <span className="row-text"><strong>Review</strong><small>{reviewQueue.length ? 'Wrong or guessed answers to go over' : 'All clear'}</small></span>
-                    {reviewQueue.length > 0 && <span className="count" aria-hidden="true">{reviewQueue.length}</span>}
-                    <Chevron dir="right" />
-                  </button>
-                </li>
-                <li>
-                  <button className="row tile tile-cards" onClick={() => { setFlashRevealed(false); setPracticeScreen('flashcards'); }}>
-                    <Glyph name="cards" />
-                    <span className="row-text"><strong>Flashcards</strong><small>{allFlashcards.length} cards, filter by exam</small></span>
-                    <Chevron dir="right" />
-                  </button>
-                </li>
-                <li>
-                  <button className="row tile tile-labs" onClick={() => setPracticeScreen('labs')}>
-                    <Glyph name="labs" />
-                    <span className="row-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done, with datasets</small></span>
+                  <button className="row check-yourself" onClick={startArtifactCheck}>
+                    <span className="row-text"><strong>Check yourself</strong><small>Five decisions about this document</small></span>
                     <Chevron dir="right" />
                   </button>
                 </li>
               </ul>
+            </article>
+          )}
+
+          {view === 'practice' && practiceScreen === 'hub' && (
+            <div className="practice">
+              <header className="screen-head">
+                <h1>Practice</h1>
+                <p className="lede">{latestAttempts.length} decisions recorded so far{reviewQueue.length ? `, ${reviewQueue.length} to review` : ''}.</p>
+              </header>
+              <div className="tiles">
+                <button className="tile tile-scenarios" onClick={startScenarios}>
+                  <span className="tile-text">
+                    <strong>Scenarios</strong>
+                    <small>{practiceBank.length} decisions across all four exams, at your own pace. You pick up where you left off.</small>
+                  </span>
+                  <span className="tile-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start scenarios</span>
+                </button>
+                <ul className="list practice-list">
+                  <li>
+                    <div className="row tile tile-timed">
+                      <Glyph name="timed" />
+                      <span className="row-text"><strong>Timed set</strong><small>{timedQuestions(mockCert).length} {examLabel(mockCert)} questions, 15 minutes</small></span>
+                      <span className="tile-controls">
+                        <label className="sr-only" htmlFor="lens">Exam</label>
+                        <select id="lens" value={mockCert} onChange={(event) => setMockCert(event.target.value as Certification)}><option value="PMP">PMP</option><option value="PL-300">PL-300</option><option value="CISSP">CISSP</option><option value="ITIL">ITIL V5</option></select>
+                        <button className="secondary start" onClick={startTimed}>Start</button>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <button className="row tile tile-review" onClick={() => setPracticeScreen('review')}>
+                      <Glyph name="review" />
+                      <span className="row-text"><strong>Review</strong><small>{reviewQueue.length ? 'Wrong or guessed answers to go over' : 'All clear'}</small></span>
+                      {reviewQueue.length > 0 && <span className="count" aria-hidden="true">{reviewQueue.length}</span>}
+                      <Chevron dir="right" />
+                    </button>
+                  </li>
+                  <li>
+                    <button className="row tile tile-cards" onClick={() => { setFlashRevealed(false); setPracticeScreen('flashcards'); }}>
+                      <Glyph name="cards" />
+                      <span className="row-text"><strong>Flashcards</strong><small>{allFlashcards.length} cards, filter by exam</small></span>
+                      <Chevron dir="right" />
+                    </button>
+                  </li>
+                  <li>
+                    <button className="row tile tile-labs" onClick={() => setPracticeScreen('labs')}>
+                      <Glyph name="labs" />
+                      <span className="row-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done, with datasets</small></span>
+                      <Chevron dir="right" />
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {view === 'practice' && practiceScreen === 'run' && run && (
-          <QuizRun
-            key={`${run.kind}-${run.questions[run.index].id}-${run.index}`}
-            run={run}
-            saving={saving}
-            seconds={run.kind === 'timed' ? mockSeconds : null}
-            onAnswer={answer}
-            onNext={advance}
-            onClose={endRun}
-          />
-        )}
+          {view === 'practice' && practiceScreen === 'run' && run && (
+            <QuizRun
+              key={`${run.kind}-${run.questions[run.index].id}-${run.index}`}
+              run={run}
+              saving={saving}
+              seconds={run.kind === 'timed' ? mockSeconds : null}
+              timerChip={timerChip}
+              onAnswer={answer}
+              onNext={advance}
+              onClose={endRun}
+            />
+          )}
 
-        {view === 'practice' && practiceScreen === 'flashcards' && (() => {
-          const deck = flashCert === 'All' ? allFlashcards : allFlashcards.filter(([cert]) => cert === flashCert);
-          const index = Math.min(flashIndex, deck.length - 1);
-          const card = deck[index];
-          const move = (step: number) => { setFlashIndex((index + step + deck.length) % deck.length); setFlashRevealed(false); };
-          return (
-            <div className="flash">
+          {view === 'practice' && practiceScreen === 'flashcards' && (() => {
+            const deck = flashCert === 'All' ? allFlashcards : allFlashcards.filter(([cert]) => cert === flashCert);
+            const index = Math.min(flashIndex, deck.length - 1);
+            const card = deck[index];
+            const move = (step: number) => { setFlashIndex((index + step + deck.length) % deck.length); setFlashRevealed(false); };
+            return (
+              <div className="flash">
+                <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
+                <header className="screen-head"><h1>Flashcards</h1><p className="lede">Say the answer out loud, then tap the card to check.</p></header>
+                <div className="pills" role="group" aria-label="Deck">
+                  {(['All', 'PMP', 'PL-300', 'CISSP', 'ITIL'] as const).map((cert) => (
+                    <button key={cert} className={flashCert === cert ? 'pill active' : 'pill'} aria-pressed={flashCert === cert} onClick={() => { setFlashCert(cert); setFlashIndex(0); setFlashRevealed(false); }}>{examLabel(cert)}</button>
+                  ))}
+                </div>
+                <button className={flashRevealed ? 'flash-card revealed' : 'flash-card'} onClick={() => setFlashRevealed(!flashRevealed)} aria-label={flashRevealed ? 'Hide answer' : 'Show answer'}>
+                  <span className="flash-top">
+                    <span className="flash-cert">{examLabel(card[0])}, card {index + 1} of {deck.length}</span>
+                    <span className="flash-progress" aria-hidden="true"><span style={{ width: `${((index + 1) / deck.length) * 100}%` }} /></span>
+                  </span>
+                  <span className="flash-q">{keepTogether(card[1])}</span>
+                  {flashRevealed ? <span className="flash-a">{keepTogether(card[2])}</span> : <span className="flash-hint">Tap to reveal the answer</span>}
+                </button>
+                <div className="row-actions spread">
+                  <button className="secondary" onClick={() => move(-1)}><Chevron dir="left" /> Previous</button>
+                  <button className="primary" onClick={() => move(1)}>Next card <Chevron dir="right" /></button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {view === 'practice' && practiceScreen === 'labs' && (
+            <div className="labs-screen">
               <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-              <header className="screen-head"><h1>Flashcards</h1><p className="lede">Say the answer out loud, then tap the card to check.</p></header>
-              <div className="pills" role="group" aria-label="Deck">
-                {(['All', 'PMP', 'PL-300', 'CISSP', 'ITIL'] as const).map((cert) => (
-                  <button key={cert} className={flashCert === cert ? 'pill active' : 'pill'} aria-pressed={flashCert === cert} onClick={() => { setFlashCert(cert); setFlashIndex(0); setFlashRevealed(false); }}>{examLabel(cert)}</button>
+              <header className="screen-head"><h1>Labs</h1><p className="lede">{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done. Each lab uses the synthetic Kestrel data listed at the end.</p></header>
+              <div className="list labs">
+                {labCards.map((lab) => (
+                  <details className="lab" key={lab.key} id={`lab-${lab.key}`}>
+                    <summary className="row">
+                      <span className="row-text">
+                        <strong>{lab.title}</strong>
+                        <span className="lab-certs">{lab.certification.split(' · ').map((cert) => <Tag key={cert}>{cert}</Tag>)}</span>
+                      </span>
+                      <Status kind={completed.has(lab.key) ? 'done' : 'none'}>{completed.has(lab.key) ? 'Done' : 'Not started'}</Status>
+                      <FoldMark />
+                    </summary>
+                    <div className="lab-body">
+                      <p>{keepTogether(lab.brief)}</p>
+                      <ol className="steps">{lab.steps.map((step) => <li key={step}>{keepTogether(step)}</li>)}</ol>
+                      <div className="row-actions">
+                        <a className="secondary" href={lab.download} download><DownloadIcon /> Download file</a>
+                        <button className="ghost" onClick={() => toggleProgress(lab.key)} disabled={saving}>{completed.has(lab.key) ? 'Mark as not done' : <><Check /> Mark done</>}</button>
+                      </div>
+                    </div>
+                  </details>
                 ))}
               </div>
-              <button className={flashRevealed ? 'flash-card revealed' : 'flash-card'} onClick={() => setFlashRevealed(!flashRevealed)} aria-label={flashRevealed ? 'Hide answer' : 'Show answer'}>
-                <span className="flash-top">
-                  <span className="flash-cert">{examLabel(card[0])}, card {index + 1} of {deck.length}</span>
-                  <span className="flash-progress" aria-hidden="true"><span style={{ width: `${((index + 1) / deck.length) * 100}%` }} /></span>
-                </span>
-                <span className="flash-q">{keepTogether(card[1])}</span>
-                {flashRevealed ? <span className="flash-a">{keepTogether(card[2])}</span> : <span className="flash-hint">Tap to reveal the answer</span>}
-              </button>
-              <div className="row-actions spread">
-                <button className="secondary" onClick={() => move(-1)}><Chevron dir="left" /> Previous</button>
-                <button className="primary" onClick={() => move(1)}>Next card <Chevron dir="right" /></button>
+              <DatasetLibrary />
+            </div>
+          )}
+
+          {view === 'practice' && practiceScreen === 'review' && (
+            <div className="review">
+              <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
+              <header className="screen-head">
+                <h1>Review</h1>
+                {reviewQueue.length > 0 && <p className="lede">{wrongAnswers.length} wrong, {reviewQueue.length - wrongAnswers.length} guessed. Restate the scenario, name the principle, say why your answer failed, then update the document.</p>}
+              </header>
+              <ReviewList queue={reviewQueue} onOpen={(key) => {
+                const found = allDeliverables.find((item) => item.key === key);
+                if (found) { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(found); }
+              }} />
+            </div>
+          )}
+
+          {view === 'progress' && (
+            <div className="progress">
+              <header className="screen-head">
+                <h1>Progress</h1>
+                <p className="lede">{programmeDone === allTasks.length ? `All 65 sessions done. ${gatesMet} of ${gates.length} checks met for your last gate.` : <>Your next gate is {keepTogether(nextPhase.gate.label)}. {gatesMet} of {gates.length} checks met.</>}</p>
+              </header>
+              <div className="segmented" role="tablist" aria-label="Progress sections">
+                <button role="tab" aria-selected={progressTab === 'readiness'} className={progressTab === 'readiness' ? 'active' : ''} onClick={() => { setProgressTab('readiness'); window.history.replaceState(null, '', '#progress'); }}>Readiness</button>
+                <button role="tab" aria-selected={progressTab === 'portfolio'} className={progressTab === 'portfolio' ? 'active' : ''} onClick={() => { setProgressTab('portfolio'); window.history.replaceState(null, '', '#portfolio'); }}>Portfolio</button>
               </div>
-            </div>
-          );
-        })()}
 
-        {view === 'practice' && practiceScreen === 'labs' && (
-          <div className="labs-screen">
-            <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-            <header className="screen-head"><h1>Labs</h1><p className="lede">{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done. Each lab uses the synthetic Kestrel data listed at the end.</p></header>
-            <div className="labs">
-              {labCards.map((lab) => (
-                <section className={completed.has(lab.key) ? 'card lab is-done' : 'card lab'} key={lab.key} id={`lab-${lab.key}`} aria-labelledby={`lab-title-${lab.key}`}>
-                  <div className="lab-top">
-                    <span className="lab-certs">{lab.certification.split(' · ').map((cert) => <Tag key={cert}>{cert}</Tag>)}</span>
-                    {completed.has(lab.key) && <span className="hero-done small"><Check /> Done</span>}
-                  </div>
-                  <h2 id={`lab-title-${lab.key}`}>{lab.title}</h2>
-                  <p className="hint">{keepTogether(lab.brief)}</p>
-                  <ol className="steps">{lab.steps.map((step) => <li key={step}>{keepTogether(step)}</li>)}</ol>
-                  <div className="row-actions">
-                    <a className="secondary" href={lab.download} download><DownloadIcon /> Download file</a>
-                    <button className="ghost" onClick={() => toggleProgress(lab.key)} disabled={saving}>{completed.has(lab.key) ? 'Mark as not done' : <><Check /> Mark done</>}</button>
-                  </div>
-                </section>
-              ))}
-            </div>
-            <DatasetLibrary />
-          </div>
-        )}
-
-        {view === 'practice' && practiceScreen === 'review' && (
-          <div className="review">
-            <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-            <header className="screen-head"><h1>Review</h1></header>
-            <ReviewList attempts={wrongAnswers} queue={reviewQueue} onOpen={(key) => {
-              const found = allDeliverables.find((item) => item.key === key);
-              if (found) { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(found); }
-            }} />
-          </div>
-        )}
-
-        {view === 'progress' && (
-          <div className="progress">
-            <header className="screen-head">
-              <h1>Progress</h1>
-              <p className="lede">{programmeDone === allTasks.length ? `All 65 sessions done. ${gatesMet} of ${gates.length} checks met for your last gate.` : <>Your next gate is {keepTogether(nextPhase.gate.label)}. {gatesMet} of {gates.length} checks met.</>}</p>
-            </header>
-            <div className="segmented" role="tablist" aria-label="Progress sections">
-              <button role="tab" aria-selected={progressTab === 'readiness'} className={progressTab === 'readiness' ? 'active' : ''} onClick={() => { setProgressTab('readiness'); window.history.replaceState(null, '', '#progress'); }}>Readiness</button>
-              <button role="tab" aria-selected={progressTab === 'portfolio'} className={progressTab === 'portfolio' ? 'active' : ''} onClick={() => { setProgressTab('portfolio'); window.history.replaceState(null, '', '#portfolio'); }}>Portfolio</button>
-            </div>
-
-            {progressTab === 'readiness' && (
-              <>
-                <section className="card gate-checks" aria-labelledby="gates-title">
-                  <div className="card-head">
-                    <div className="gate-head">
-                      <p className="eyebrow">Next gate, week {nextGateWeek}, day {nextGateDay}</p>
-                      <h2 id="gates-title">Before you book {keepTogether(nextPhase.gate.label)}</h2>
+              {progressTab === 'readiness' && (
+                <>
+                  <section className="card gate-checks" aria-labelledby="gates-title">
+                    <div className="card-head">
+                      <div className="gate-head">
+                        <p className="eyebrow">Next gate, week {nextGateWeek}, day {nextGateDay}</p>
+                        <h2 id="gates-title">Before you book {keepTogether(nextPhase.gate.label)}</h2>
+                      </div>
+                      <p className="gate-score" aria-label={`${gatesMet} of ${gates.length} checks met`}><strong>{gatesMet}</strong><span>/{gates.length}</span></p>
                     </div>
-                    <p className="gate-score" aria-label={`${gatesMet} of ${gates.length} checks met`}><strong>{gatesMet}</strong><span>/{gates.length}</span></p>
-                  </div>
-                  <p className="hint">Completion alone does not make you ready. Meet all five checks, then book.</p>
-                  <ul className="checklist">{gates.map((gate) => <li key={gate.title}><span className={gate.met ? 'tick is-done' : 'tick'} aria-hidden="true">{gate.met && <Check />}</span><span><strong>{gate.title}</strong><small>{keepTogether(gate.detail)}</small></span></li>)}</ul>
-                </section>
+                    <p className="hint">Completion alone does not make you ready. Meet all five checks, then book.</p>
+                    <ul className="checklist">{gates.map((gate) => <li key={gate.title}><span className={gate.met ? 'tick is-done' : 'tick'} aria-hidden="true">{gate.met && <Check />}</span><span><strong>{gate.title}</strong><small>{keepTogether(gate.detail)}</small></span></li>)}</ul>
+                  </section>
 
-                <h2 className="section-title">Exam readiness</h2>
-                <ul className="list cert-scores">
-                  {exams.map((exam) => {
-                    const score = readiness[exam.cert];
-                    return (
-                      <li key={exam.cert}>
-                        <div className="cs-top">
-                          <span className="cs-id"><strong>{exam.label}</strong><small>{exam.name}</small></span>
-                          <p className="cs-total"><strong>{score.total}</strong><small>/100</small></p>
-                        </div>
-                        <Meter value={score.total / 100} label={`${exam.label} readiness ${score.total} of 100`} />
-                        <div className="cs-foot">
-                          <ReadinessParts score={score} />
-                          <span className="cs-date">{exam.date ? `${formatDate(exam.date)}${exam.days !== null && exam.days >= 0 ? `, in ${exam.days} ${exam.days === 1 ? 'day' : 'days'}` : ''}` : 'No exam date set'}</span>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <p className="hint cs-note">Each score adds evidence out of 100: coverage 30, documents 35, judgment 25 and recall 10. It guides you; it does not predict a pass.</p>
-
-                <details className="fold">
-                  <summary className="row"><span className="row-text"><strong>Eligibility</strong><small>PMI and ISC2 decide</small></span><span className="fold-mark" aria-hidden="true" /></summary>
-                  <div className="fold-body">
-                    <ul className="checklist">
-                      <li><span className={pmpEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{pmpEligible && <Check />}</span><span><strong>PMP</strong><small>{pmpEligible ? 'Baseline appears satisfied. Verify application evidence.' : `${profile.pm_months} of ${pmpNeeded} leadership months, ${profile.pm_training_hours} of 35 training hours`}</small></span></li>
-                      <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>PL-300</strong><small>No experience requirement.</small></span></li>
-                      <li><span className={cisspEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{cisspEligible && <Check />}</span><span><strong>CISSP</strong><small>{cisspEligible ? 'Baseline appears satisfied. Verify domain evidence.' : `${profile.cyber_months} of ${cisspNeeded} months${cisspNeeded === 48 ? ' (degree waiver applied)' : ''}, ${profileDomains.length} of 2 domains. The Associate of ISC2 route remains open.`}</small></span></li>
-                      <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5</strong><small>Entry credential: 40 questions, 60 minutes, 65% to pass.</small></span></li>
-                    </ul>
-                    <div className="inline-form">
-                      <div><label className="field" htmlFor="itil-level">ITIL V5 level</label><select id="itil-level" value={itilLevelDraft} onChange={(event) => setItilLevelDraft(event.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
-                      <div><label className="field" htmlFor="itil-date">ITIL V5 exam date</label><input id="itil-date" type="date" value={itilTargetDraft} onChange={(event) => setItilTargetDraft(event.target.value)} /></div>
-                      <button className="secondary" disabled={saving} onClick={saveItilBaseline}>Update</button>
-                    </div>
-                  </div>
-                </details>
-              </>
-            )}
-
-            {progressTab === 'portfolio' && (
-              <>
-                <section className="card" aria-labelledby="package-title">
-                  <div className="card-head">
-                    <h2 id="package-title">Handover package</h2>
-                    <p className="gate-score small"><strong>{portfolioChecklist.filter(([key]) => completed.has(key)).length}</strong><span>/{portfolioChecklist.length}</span></p>
-                  </div>
-                  <p className="hint">{portfolioChecklist.filter(([key]) => completed.has(key)).length} of {portfolioChecklist.length} ready. Tap an item when it is done.</p>
-                  <ul className="checklist interactive">
-                    {portfolioChecklist.map(([key, title, detail]) => (
-                      <li key={key}><button aria-pressed={completed.has(key)} onClick={() => toggleProgress(key)} disabled={saving}><span className={completed.has(key) ? 'tick is-done' : 'tick'} aria-hidden="true">{completed.has(key) && <Check />}</span><span><strong>{title}</strong><small>{detail}</small></span></button></li>
-                    ))}
+                  <h2 className="section-title">Exam readiness</h2>
+                  <ul className="list cert-scores">
+                    {exams.map((exam) => {
+                      const score = readiness[exam.cert];
+                      return (
+                        <li key={exam.cert}>
+                          <div className="cs-top">
+                            <span className="cs-id"><strong>{exam.label}</strong><small>{exam.name}</small></span>
+                            <p className="cs-total"><strong>{score.total}</strong><small>/100</small></p>
+                          </div>
+                          <Meter value={score.total / 100} label={`${exam.label} readiness ${score.total} of 100`} />
+                          <div className="cs-foot">
+                            <ReadinessParts score={score} />
+                            <span className="cs-date">{exam.date ? `${formatDate(exam.date)}${exam.days !== null && exam.days >= 0 ? `, in ${exam.days} ${exam.days === 1 ? 'day' : 'days'}` : ''}` : 'No exam date set'}</span>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
-                </section>
-                <section className="card" aria-labelledby="demo-title">
-                  <h2 id="demo-title">Demo script, 3 to 5 minutes</h2>
-                  <ol className="steps"><li>State the disconnected-reporting problem.</li><li>Show the governed data model and quality evidence.</li><li>Explain one IAM and one resilience decision.</li><li>Demonstrate role-aware reporting and tests.</li><li>Close with value, trade-offs, and next action.</li></ol>
-                  <button className="secondary" onClick={() => downloadFile('tricert-demo-script.md', demoScript, 'text/markdown')}><DownloadIcon /> Download script</button>
-                </section>
-                <section className="card" aria-labelledby="disclosure-title">
-                  <h2 id="disclosure-title">Required disclosure</h2>
-                  <blockquote>{disclosure}</blockquote>
-                  <button className="secondary" onClick={() => navigator.clipboard.writeText(disclosure).then(() => say('Disclosure copied.'), () => setNotice({ text: 'Copy is blocked here. Select the text and copy it instead.', kind: 'error' }))}>Copy disclosure</button>
-                </section>
-                <section className="card logo-block" aria-labelledby="logo-title">
-                  <h2 id="logo-title">Logo</h2>
-                  <div className="logo-preview"><img src="/tricert-lab-logo.png" alt="TriCert Lab logo" /></div>
-                  <a className="secondary" href="/tricert-lab-logo.png" download="tricert-lab-logo.png"><DownloadIcon /> Download PNG</a>
-                </section>
-              </>
-            )}
-          </div>
-        )}
-      </main>
+                  <p className="hint cs-note">Each score adds evidence out of 100: coverage 30, documents 35, judgment 25 and recall 10. It guides you; it does not predict a pass.</p>
+
+                  <details className="fold">
+                    <summary className="row"><span className="row-text"><strong>Eligibility</strong><small>PMI and ISC2 decide</small></span><FoldMark /></summary>
+                    <div className="fold-body">
+                      <ul className="checklist">
+                        <li><span className={pmpEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{pmpEligible && <Check />}</span><span><strong>PMP</strong><small>{pmpEligible ? 'Baseline appears satisfied. Verify application evidence.' : `${profile.pm_months} of ${pmpNeeded} leadership months, ${profile.pm_training_hours} of 35 training hours`}</small></span></li>
+                        <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>PL-300</strong><small>No experience requirement.</small></span></li>
+                        <li><span className={cisspEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{cisspEligible && <Check />}</span><span><strong>CISSP</strong><small>{cisspEligible ? 'Baseline appears satisfied. Verify domain evidence.' : `${profile.cyber_months} of ${cisspNeeded} months${cisspNeeded === 48 ? ' (degree waiver applied)' : ''}, ${profileDomains.length} of 2 domains. The Associate of ISC2 route remains open.`}</small></span></li>
+                        <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5</strong><small>Entry credential: 40 questions, 60 minutes, 65% to pass.</small></span></li>
+                      </ul>
+                      <div className="inline-form">
+                        <div><label className="field" htmlFor="itil-level">ITIL V5 level</label><select id="itil-level" value={itilLevelDraft} onChange={(event) => setItilLevelDraft(event.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
+                        <div><label className="field" htmlFor="itil-date">ITIL V5 exam date</label><input id="itil-date" type="date" value={itilTargetDraft} onChange={(event) => setItilTargetDraft(event.target.value)} /></div>
+                        <button className="secondary" disabled={saving} onClick={saveItilBaseline}>Update</button>
+                      </div>
+                    </div>
+                  </details>
+                </>
+              )}
+
+              {progressTab === 'portfolio' && (
+                <>
+                  <section className="card" aria-labelledby="package-title">
+                    <div className="card-head">
+                      <h2 id="package-title">Handover package</h2>
+                      <p className="gate-score small"><strong>{portfolioChecklist.filter(([key]) => completed.has(key)).length}</strong><span>/{portfolioChecklist.length}</span></p>
+                    </div>
+                    <p className="hint">{portfolioChecklist.filter(([key]) => completed.has(key)).length} of {portfolioChecklist.length} ready. Tap an item when it is done.</p>
+                    <ul className="checklist interactive">
+                      {portfolioChecklist.map(([key, title, detail]) => (
+                        <li key={key}><button aria-pressed={completed.has(key)} onClick={() => toggleProgress(key)} disabled={saving}><span className={completed.has(key) ? 'tick is-done' : 'tick'} aria-hidden="true">{completed.has(key) && <Check />}</span><span><strong>{title}</strong><small>{detail}</small></span></button></li>
+                      ))}
+                    </ul>
+                  </section>
+                  <section className="card" aria-labelledby="demo-title">
+                    <h2 id="demo-title">Demo script, 3 to 5 minutes</h2>
+                    <ol className="steps"><li>State the disconnected-reporting problem.</li><li>Show the governed data model and quality evidence.</li><li>Explain one IAM and one resilience decision.</li><li>Demonstrate role-aware reporting and tests.</li><li>Close with value, trade-offs, and next action.</li></ol>
+                    <button className="secondary" onClick={() => downloadFile('tricert-demo-script.md', demoScript, 'text/markdown')}><DownloadIcon /> Download script</button>
+                  </section>
+                  <section className="card" aria-labelledby="disclosure-title">
+                    <h2 id="disclosure-title">Required disclosure</h2>
+                    <blockquote>{disclosure}</blockquote>
+                    <button className="secondary" onClick={() => navigator.clipboard.writeText(disclosure).then(() => say('Disclosure copied.'), () => setNotice({ text: 'Copy is blocked here. Select the text and copy it instead.', kind: 'error' }))}>Copy disclosure</button>
+                  </section>
+                  <section className="card logo-block" aria-labelledby="logo-title">
+                    <h2 id="logo-title">Logo</h2>
+                    <div className="logo-preview"><img src="/tricert-lab-logo.png" alt="TriCert Lab logo" /></div>
+                    <a className="secondary" href="/tricert-lab-logo.png" download="tricert-lab-logo.png"><DownloadIcon /> Download PNG</a>
+                  </section>
+                </>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {notice && <div className={notice.kind === 'error' ? 'toast is-error' : 'toast'} role={notice.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{notice.kind === 'error' ? '!' : <Check />}</span><span>{notice.text}</span><button onClick={() => setNotice(null)} aria-label="Dismiss message">×</button></div>}
 
       {focusOpen && timer && timerTask && (
         <FocusSession
@@ -1231,21 +1287,7 @@ export default function TriCertApp() {
         />
       )}
 
-      {celebration && (
-        <div className="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title">
-          <div className="celebrate-inner">
-            <span className="celebrate-badge" aria-hidden="true"><Check /></span>
-            <h2 id="celebrate-title">{celebration.weekDone === 5 ? `Week ${celebration.week} complete` : 'Session complete'}</h2>
-            <p>Week {celebration.week}, {celebration.task.day}: {celebration.task.title}</p>
-            <dl className="celebrate-stats">
-              <div><dt>Studied</dt><dd>{celebration.minutes ? formatMinutes(celebration.minutes) : 'Not timed'}</dd></div>
-              <div><dt>This week</dt><dd>{celebration.weekDone} of 5</dd><Pips done={celebration.weekDone} /></div>
-              <div><dt>Programme</dt><dd>{programmeDone} of {allTasks.length}</dd></div>
-            </dl>
-            <button className="primary wide" onClick={() => setCelebration(null)} autoFocus>Done</button>
-          </div>
-        </div>
-      )}
+      {celebration && <Celebrate celebration={celebration} programmeDone={programmeDone} onDone={() => setCelebration(null)} />}
 
       {settingsOpen && (
         <MakeItYours
@@ -1260,6 +1302,57 @@ export default function TriCertApp() {
           onClose={() => setSettingsOpen(false)}
         />
       )}
+    </>
+  );
+}
+
+/* ==========================================================================
+   Overlays: focus moves in when one opens and goes back when it closes.
+   ========================================================================== */
+
+function useOverlayFocus(target: RefObject<HTMLElement | null>, fallbacks: string[], key?: unknown) {
+  const opener = useRef<HTMLElement | null>(null);
+  const places = useRef(fallbacks);
+  useEffect(() => {
+    const active = document.activeElement;
+    if (!opener.current && active instanceof HTMLElement && active !== document.body) opener.current = active;
+    const fallbackList = places.current;
+    return () => {
+      const back = opener.current;
+      // Wait for the page behind to stop being inert, then return focus
+      // unless something else already has it.
+      window.setTimeout(() => {
+        const lost = !document.activeElement || document.activeElement === document.body;
+        if (!lost) return;
+        if (back && back.isConnected && back.getClientRects().length) { back.focus(); return; }
+        for (const selector of fallbackList) {
+          const element = document.querySelector<HTMLElement>(selector);
+          if (element && element.getClientRects().length) { element.focus({ preventScroll: true }); return; }
+        }
+      }, 0);
+    };
+  }, []);
+  useEffect(() => {
+    target.current?.focus({ preventScroll: true });
+  }, [target, key]);
+}
+
+function Celebrate({ celebration, programmeDone, onDone }: { celebration: Celebration; programmeDone: number; onDone: () => void }) {
+  const done = useRef<HTMLButtonElement>(null);
+  useOverlayFocus(done, ['.hero-session .play', '.hero-session .hero-lesson', '#main']);
+  return (
+    <div className="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title">
+      <div className="celebrate-inner">
+        <span className="celebrate-badge" aria-hidden="true"><Check /></span>
+        <h2 id="celebrate-title">{celebration.weekDone === 5 ? `Week ${celebration.week} complete` : 'Session complete'}</h2>
+        <p>Week {celebration.week}, {celebration.task.day}: {celebration.task.title}</p>
+        <dl className="celebrate-stats">
+          <div><dt>Studied</dt><dd>{celebration.minutes ? formatMinutes(celebration.minutes) : 'Not timed'}</dd></div>
+          <div><dt>This week</dt><dd>{celebration.weekDone} of 5</dd><Pips done={celebration.weekDone} /></div>
+          <div><dt>Programme</dt><dd>{programmeDone} of {allTasks.length}</dd></div>
+        </dl>
+        <button ref={done} className="primary wide" onClick={onDone}>Done</button>
+      </div>
     </div>
   );
 }
@@ -1268,20 +1361,24 @@ export default function TriCertApp() {
    Learn: everything to read, inside the app.
    ========================================================================== */
 
-const learnTabs: Array<[LearnTab, string]> = [['lessons', 'Lessons'], ['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
+/* The 65 lessons live with their sessions on Plan and Today. Learn holds
+   the rest of the library. */
+const learnTabs: Array<[LearnTab, string]> = [['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
 
-function LearnView({ tab, item, onTab, onItem, completed, currentIndex, documents, onStart, onOpenDoc }: {
-  tab: LearnTab; item: string | null; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
-  completed: Set<string>; currentIndex: number; documents: ReactNode;
+function LearnView({ tab: chosenTab, item, lessonFrom, onLeaveLesson, onTab, onItem, completed, documents, onStart, onOpenDoc }: {
+  tab: LearnTab; item: string | null; lessonFrom: 'today' | 'plan'; onLeaveLesson: () => void; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
+  completed: Set<string>; documents: ReactNode;
   onStart: (task: StudyTask) => void; onOpenDoc: (item: Deliverable) => void;
 }) {
   const [query, setQuery] = useState('');
   const [termCert, setTermCert] = useState<Certification | 'General' | 'All'>('All');
   const reading = useReading();
   const lessons = reading?.lessons;
-  if (item && tab === 'lessons' && !reading) {
-    return <div className="reader"><button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> Lessons</button><p className="hint loading-note">Opening the reading</p></div>;
+  const backLabel = lessonFrom === 'plan' ? 'Plan' : 'Today';
+  if (item && chosenTab === 'lessons' && !reading) {
+    return <div className="reader"><button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button><p className="hint loading-note">Opening the reading</p></div>;
   }
+  const tab: LearnTab = chosenTab === 'lessons' && !(item && lessons?.[item]) ? 'documents' : chosenTab;
 
   if (tab === 'lessons' && item && lessons?.[item]) {
     const index = allTasks.findIndex((task) => task.key === item);
@@ -1292,7 +1389,7 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, document
     return (
       <div className="reader-layout">
         <article className="reader" aria-labelledby="reader-title">
-          <button className="back" onClick={() => onItem(null)}><Chevron dir="left" /> Lessons</button>
+          <button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button>
           <header className="reader-head">
             <p className="eyebrow">Week {week}, {task.day}{completed.has(task.key) ? ', done' : ''}</p>
             <h1 id="reader-title">{keepTogether(task.title)}</h1>
@@ -1301,7 +1398,7 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, document
           <LessonBody lesson={lessons[item]} task={task} onOpenDoc={onOpenDoc} idPrefix="ls" />
           <div className="reader-actions">
             {!completed.has(task.key) && <button className="primary" onClick={() => onStart(task)}><svg className="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start this session</button>}
-            {task.docs.map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry)).map((entry) => <button key={entry.key} className="secondary" onClick={() => onOpenDoc(entry)}>Write {entry.title.charAt(0).toLowerCase() + entry.title.slice(1)}</button>)}
+            {task.docs.map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry)).map((entry) => <button key={entry.key} className="secondary" onClick={() => onOpenDoc(entry)}>Write {lowerFirst(entry.title)}</button>)}
           </div>
           <nav className="reader-nav" aria-label="Other lessons">
             {prev && lessonIndex[prev.key] ? <button onClick={() => onItem(prev.key)}><small><Chevron dir="left" /> Previous</small><span>{prev.title}</span></button> : <span />}
@@ -1327,43 +1424,16 @@ function LearnView({ tab, item, onTab, onItem, completed, currentIndex, document
 
   const needle = query.trim().toLowerCase();
   const terms = glossary.filter((term) => (termCert === 'All' || term.cert === termCert) && (!needle || term.term.toLowerCase().includes(needle) || term.definition.toLowerCase().includes(needle)));
-  const lessonCount = Object.keys(lessonIndex).length;
-  const thisWeek = Math.floor(currentIndex / 5) + 1;
 
   return (
     <div className="learn">
       <header className="screen-head">
         <h1>Learn</h1>
-        <p className="lede">{lessonCount} lessons, {Object.keys(guideIndex).length} documents with finished examples and {glossary.length} terms. Everything you need is here.</p>
+        <p className="lede">The {Object.keys(guideIndex).length} project documents with finished examples, the {countWord(examGuides.length).toLowerCase()} exam guides and {glossary.length} terms. Each session’s lesson opens from Plan.</p>
       </header>
       <div className="segmented" role="tablist" aria-label="Learn sections">
         {learnTabs.map(([key, label]) => <button key={key} role="tab" aria-selected={tab === key} className={tab === key ? 'active' : ''} onClick={() => onTab(key)}>{label}</button>)}
       </div>
-
-      {tab === 'lessons' && (
-        <div className="lesson-weeks">
-          {studyWeeks.map((week) => (
-            <details key={week.number} className={thisWeek === week.number ? 'lesson-week lw-fold is-current' : 'lesson-week lw-fold'} open={thisWeek === week.number}>
-              <summary className="row">
-                <span className="row-text"><small>Week {week.number}{thisWeek === week.number ? ', this week' : ''}</small><strong>{keepTogether(week.theme)}</strong></span>
-                <span className="lw-count">{week.tasks.filter((task) => completed.has(task.key)).length} of 5</span>
-                <span className="fold-mark" aria-hidden="true" />
-              </summary>
-              <ol>
-                {week.tasks.map((task) => (
-                  <li key={task.key}>
-                    <button onClick={() => onItem(task.key)} disabled={!lessonIndex[task.key]}>
-                      <span className={completed.has(task.key) ? 'tick is-done' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
-                      <span className="lw-title"><strong>{keepTogether(task.title)}</strong><small>{lessonIndex[task.key] || 'Lesson coming'}</small></span>
-                      <Chevron dir="right" />
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </details>
-          ))}
-        </div>
-      )}
 
       {tab === 'documents' && documents}
 
@@ -1427,13 +1497,13 @@ function LessonBody({ lesson, task, onOpenDoc, idPrefix }: { lesson: Lesson; tas
         <ol className="steps">{lesson.build.steps.map((step) => <li key={step}>{keepTogether(step)}</li>)}</ol>
         {lesson.build.modelAnswer && (
           <details className="finished" open={docs.length === 0}>
-            <summary>{docs.length ? 'What good looks like' : 'Model answer'}</summary>
+            <summary>{docs.length ? 'What good looks like' : 'Model answer'}<FoldMark /></summary>
             <RichText text={lesson.build.modelAnswer} />
           </details>
         )}
         {docs.filter((entry) => docGuides[entry.key]).map((entry) => (
           <details key={entry.key} className="finished">
-            <summary>See the finished {entry.title.charAt(0).toLowerCase() + entry.title.slice(1)}</summary>
+            <summary>See the finished {lowerFirst(entry.title)}<FoldMark /></summary>
             <RichText text={docGuides[entry.key].modelDocument} />
             {onOpenDoc && <button className="secondary" onClick={() => onOpenDoc(entry)}>Write your own version</button>}
           </details>
@@ -1563,7 +1633,8 @@ function ExamGuideBody({ guide }: { guide: ExamGuide }) {
               <details key={area.name} className="area">
                 <summary>
                   <span className="area-name">{area.name}</span>
-                  {area.weight && <span className="area-weight">{area.weight}</span>}
+                  <span className="area-weight">{area.weight}</span>
+                  <FoldMark />
                   {area.weight && <span className="area-bar" aria-hidden="true"><span style={{ width: `${Math.min(100, top * 2)}%` }} /></span>}
                 </summary>
                 <ul>{area.covers.map((line) => <li key={line}>{keepTogether(line)}</li>)}</ul>
@@ -1601,6 +1672,8 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
   onPause: () => void; onMinimise: () => void; onFinish: () => void; onDiscard: () => void; onOpenWork: (link: WorkLink) => void; lesson?: Lesson;
 }) {
   const [reading, setReading] = useState(false);
+  const dialog = useRef<HTMLDivElement>(null);
+  useOverlayFocus(dialog, ['#main'], reading);
   const planned = taskMinutes(task.meta) * 60;
   const fraction = Math.min(1, elapsed / planned);
   useEffect(() => {
@@ -1610,7 +1683,7 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
   }, [onMinimise, reading]);
   if (reading && lesson) {
     return (
-      <div className="focus focus-reading" role="dialog" aria-modal="true" aria-labelledby="focus-lesson-title">
+      <div ref={dialog} tabIndex={-1} className="focus focus-reading" role="dialog" aria-modal="true" aria-labelledby="focus-lesson-title">
         <header className="focus-bar">
           <button className="ghost" onClick={() => setReading(false)}><Chevron dir="left" /> Timer</button>
           <span className={timer.pausedAt ? 'focus-mini paused' : 'focus-mini'}><span className="live-dot" aria-hidden="true" /><Digits value={formatClock(elapsed)} /></span>
@@ -1625,7 +1698,7 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
     );
   }
   return (
-    <div className={timer.pausedAt ? 'focus is-paused' : 'focus'} role="dialog" aria-modal="true" aria-labelledby="focus-title">
+    <div ref={dialog} tabIndex={-1} className={timer.pausedAt ? 'focus is-paused' : 'focus'} role="dialog" aria-modal="true" aria-labelledby="focus-title">
       <header className="focus-bar">
         <span className="focus-where"><span className="live-dot" aria-hidden="true" />Week {Math.floor(index / 5) + 1}, {task.day}</span>
         <button className="ghost" onClick={onMinimise}>Minimise</button>
@@ -1652,7 +1725,7 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
                 <button onClick={() => onOpenWork(link)}>
                   <span className="fw-kind">{link.kind === 'artifact' ? docNumberFor(link.item) : link.kind === 'lab' ? 'Lab' : 'Practice'}</span>
                   <span className="fw-name">{link.kind === 'artifact' ? link.item.title : link.kind === 'lab' ? link.lab.title : 'Scenario practice'}</span>
-                  {link.kind === 'artifact' && <span className="fw-status">{statusLabel(artifactStatus(link.item.key))}</span>}
+                  <span className="fw-status">{link.kind === 'artifact' && <DocStatus status={artifactStatus(link.item.key)} />}</span>
                   <Chevron dir="right" />
                 </button>
               </li>
@@ -1676,8 +1749,8 @@ function FocusSession({ task, index, timer, elapsed, links, artifactStatus, savi
    and the next step stays in reach at the bottom.
    ========================================================================== */
 
-function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
-  run: Run; saving: boolean; seconds: number | null; onAnswer: (question: ScenarioQuestion, choice: string, confidence: string) => Promise<boolean>; onNext: () => void; onClose: () => void;
+function QuizRun({ run, saving, seconds, timerChip, onAnswer, onNext, onClose }: {
+  run: Run; saving: boolean; seconds: number | null; timerChip?: ReactNode; onAnswer: (question: ScenarioQuestion, choice: string, confidence: string) => Promise<boolean>; onNext: () => void; onClose: () => void;
 }) {
   const question = run.questions[run.index];
   const [choice, setChoice] = useState('');
@@ -1711,7 +1784,10 @@ function QuizRun({ run, saving, seconds, onAnswer, onNext, onClose }: {
         <div className="quiz-progress" role="progressbar" aria-valuemin={0} aria-valuemax={run.questions.length} aria-valuenow={run.index + (submitted ? 1 : 0)} aria-label={`${run.title}, question ${run.index + 1} of ${run.questions.length}`}>
           <span style={{ width: `${((run.index + (submitted ? 1 : 0)) / run.questions.length) * 100}%` }} />
         </div>
-        {seconds !== null ? <span className={seconds < 60 ? 'quiz-time low' : 'quiz-time'}><Digits value={formatClock(seconds)} /></span> : <span className="quiz-count">{run.index + 1}/{run.questions.length}</span>}
+        <span className="quiz-end">
+          {seconds !== null ? <span className={seconds < 60 ? 'quiz-time low' : 'quiz-time'}><Digits value={formatClock(seconds)} /></span> : <span className="quiz-count">{run.index + 1}/{run.questions.length}</span>}
+          {timerChip}
+        </span>
       </header>
       <div className="quiz-body">
         <p className="quiz-run">{run.kind === 'artifact' ? `Check yourself: ${run.title}` : run.title}</p>
@@ -1764,6 +1840,8 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
 }) {
   const [draftName, setDraftName] = useState(name);
   const [draftWhy, setDraftWhy] = useState(why);
+  const first = useRef<HTMLInputElement>(null);
+  useOverlayFocus(first, ['#main']);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -1777,7 +1855,7 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
           <button type="button" className="close" onClick={onClose} aria-label="Close">×</button>
         </header>
         <label className="field" htmlFor="yours-name">Your name</label>
-        <input id="yours-name" value={draftName} maxLength={40} autoComplete="given-name" onChange={(event) => setDraftName(event.target.value)} autoFocus />
+        <input ref={first} id="yours-name" value={draftName} maxLength={40} autoComplete="given-name" onChange={(event) => setDraftName(event.target.value)} />
         <label className="field" htmlFor="yours-why">Why you are doing this</label>
         <textarea id="yours-why" className="short" value={draftWhy} maxLength={140} onChange={(event) => setDraftWhy(event.target.value)} placeholder="One line you will see on Today" />
         <p className="hint">{140 - draftWhy.length} characters left</p>
@@ -1806,7 +1884,6 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
         </fieldset>
         <p className="hint">Colour and appearance change straight away and stay on this device. Your name and why are saved with your plan.</p>
         <div className="row-actions form-actions">
-          <button type="button" className="ghost" onClick={onClose}>Close</button>
           <button className="primary wide" disabled={saving} type="submit">{saving ? 'Saving' : 'Save name and why'}</button>
         </div>
       </form>
@@ -1830,6 +1907,7 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
         <div className="onboard-pitch">
           <h1><span>Four certifications.</span> <span>Thirteen weeks.</span> <span>One session at a time.</span></h1>
           <p className="onboard-note">You build one fictional programme, Project Beacon, and every session teaches the exams through it. Each bar below is a week of five sessions. The marked weeks are your exam gates.</p>
+          <p className="onboard-short">Build one fictional programme, Project Beacon, and learn all four exams through it.</p>
           <WeekTrack weeks={[5, 5, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]} current={4} />
           <ul className="onboard-certs">{certs.map((item) => <li key={item.cert}><strong>{item.label}</strong><span>{item.name}</span></li>)}</ul>
         </div>
@@ -1906,7 +1984,7 @@ function SkillSelect({ name, label }: { name: string; label: string }) {
 
 /* The 13 weeks as one row of bars, one per week of five sessions. Each bar
    fills as its sessions are done, and the three exam gates carry a small
-   diamond. With onSelect each week is a button. On a phone the row wraps
+   diamond under the bar. With onSelect each week is a button. On a phone the row wraps
    into seven and six so every week stays a full-size target. */
 const trackGates: Record<number, string> = { 6: 'PL-300 and ITIL', 10: 'PMP', 13: 'CISSP' };
 
@@ -1921,8 +1999,9 @@ function WeekTrack({ weeks, selected, current, onSelect }: { weeks: number[]; se
           const classes = [done >= 5 ? 'is-full' : done > 0 ? 'is-partial' : '', gate ? 'is-gate' : '', week === selected ? 'is-selected' : '', week === current ? 'is-current' : ''].filter(Boolean).join(' ');
           const inner = (
             <>
-              <span className="track-num">{week}{gate && <span className="track-diamond" aria-hidden="true" />}</span>
+              <span className="track-num">{week}</span>
               <span className="track-bar"><span style={{ width: `${(Math.min(5, done) / 5) * 100}%` }} /></span>
+              <span className="track-gate" aria-hidden="true">{gate && <span className="track-diamond" />}</span>
             </>
           );
           return (
@@ -2045,6 +2124,22 @@ function Check() {
   return <svg className="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
+/* One disclosure mark for everything that opens in place: a chevron that
+   turns over when open. A right-pointing chevron means "go to". */
+function FoldMark() {
+  return <span className="fold-mark" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg></span>;
+}
+
+/* One status mark everywhere: a filled tick for done, a half-filled ring
+   for started, an empty ring for not started, then a word. */
+type StatusKind = 'done' | 'progress' | 'none';
+function Status({ kind, children }: { kind: StatusKind; children: ReactNode }) {
+  return <span className={`status is-${kind}`}><span className="status-mark" aria-hidden="true">{kind === 'done' && <Check />}</span><span>{children}</span></span>;
+}
+function DocStatus({ status }: { status?: string }) {
+  return <Status kind={status === 'complete' ? 'done' : status === 'draft' ? 'progress' : 'none'}>{statusLabel(status)}</Status>;
+}
+
 function Chevron({ dir }: { dir: 'left' | 'right' | 'up' | 'down' }) {
   const rotate = { right: 0, down: 90, left: 180, up: 270 }[dir];
   return <svg className="chev" viewBox="0 0 16 16" aria-hidden="true" style={{ transform: `rotate(${rotate}deg)` }}><path d="M6 3.5l4.5 4.5L6 12.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -2076,28 +2171,25 @@ function Glyph({ name }: { name: 'timed' | 'review' | 'cards' | 'labs' }) {
    Lists
    ========================================================================== */
 
-function ReviewList({ attempts, queue, onOpen }: { attempts: AttemptRow[]; queue: AttemptRow[]; onOpen: (key: string) => void }) {
+function ReviewList({ queue, onOpen }: { queue: AttemptRow[]; onOpen: (key: string) => void }) {
   if (!queue.length) {
     return <section className="empty"><span className="empty-badge" aria-hidden="true"><Check /></span><h2>All clear</h2><p>Answers you get wrong or mark as a guess land here, linked to the document that teaches them.</p></section>;
   }
   return (
-    <>
-      <p className="hint">{attempts.length} wrong, {queue.length - attempts.length} guessed. Restate the scenario, name the principle, say why your answer failed, then update the document.</p>
-      <ul className="review-list">
-        {queue.map((attempt) => {
-          const cleanId = attempt.question_id.replace(/^mock-(PMP|PL-300|CISSP|ITIL)-/, '');
-          const question = allArtifactQuestions.find((item) => item.id === cleanId) || allArtifactQuestions.find((item) => attempt.question_id.endsWith(item.id)) || scenarioBank.find((item) => item.id === cleanId);
-          return (
-            <li key={attempt.question_id}>
-              <span className={attempt.correct ? 'flag is-guess' : 'flag'}>{attempt.correct ? 'Guessed' : 'Wrong'}</span>
-              <strong>{keepTogether(question?.prompt || attempt.domain)}</strong>
-              <p>{keepTogether(question?.explanation || 'Reopen the connected document and explain the governing concept without notes.')}</p>
-              {question && <button className="text-link" onClick={() => onOpen(question.artifactKey)}>Open the document</button>}
-            </li>
-          );
-        })}
-      </ul>
-    </>
+    <ul className="review-list">
+      {queue.map((attempt) => {
+        const cleanId = attempt.question_id.replace(/^mock-(PMP|PL-300|CISSP|ITIL)-/, '');
+        const question = allArtifactQuestions.find((item) => item.id === cleanId) || allArtifactQuestions.find((item) => attempt.question_id.endsWith(item.id)) || scenarioBank.find((item) => item.id === cleanId);
+        return (
+          <li key={attempt.question_id}>
+            <span className={attempt.correct ? 'flag is-guess' : 'flag'}>{attempt.correct ? 'Guessed' : 'Wrong'}</span>
+            <strong>{keepTogether(question?.prompt || attempt.domain)}</strong>
+            <p>{keepTogether(question?.explanation || 'Reopen the connected document and explain the governing concept without notes.')}</p>
+            {question && <button className="text-link" onClick={() => onOpen(question.artifactKey)}>Open the document</button>}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -2127,8 +2219,8 @@ function DatasetLibrary() {
     ['Security architecture worksheet', '/datasets/security-architecture-template.md', 'Markdown'],
   ];
   return (
-    <section className="card" aria-labelledby="datasets-title">
-      <h2 id="datasets-title">Kestrel Health datasets</h2>
+    <section className="datasets" aria-labelledby="datasets-title">
+      <h2 id="datasets-title" className="section-title">Kestrel Health datasets</h2>
       <p className="hint">Synthetic and deliberately imperfect: duplicates, impossible times, invalid codes and orphaned keys are documented in the reconciliation answers, not hidden.</p>
       <ul className="list files">{files.map(([label, url, kind]) => <li key={url}><a href={url} download><span>{label}</span><small>{kind}</small></a></li>)}</ul>
     </section>
@@ -2203,6 +2295,9 @@ function keepTogether(text: string): ReactNode {
   if (!unbroken.test(text)) return text;
   return text.split(unbroken).map((part, index) => (index % 2 ? <span key={index} className="nobr">{part}</span> : part));
 }
+/* "MFA and SSO recommendation" keeps its capitals; "Business case" reads
+   "business case" mid-sentence. */
+function lowerFirst(title: string) { return /^.[a-z]/.test(title) ? title.charAt(0).toLowerCase() + title.slice(1) : title; }
 function countWord(value: number) { const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']; return words[value] || String(value); }
 function ratio(numerator: number, denominator: number) { return denominator ? Math.min(1, numerator / denominator) : 0; }
 function safeDomains(value: string) { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : []; } catch { return []; } }
