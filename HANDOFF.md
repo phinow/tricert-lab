@@ -32,6 +32,7 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 
 ### What is half done
 
+- Version 7.1 (branch `r2-polish`, from `v7-redesign`) is version 7 with soft filled surfaces, big numerals, Today week numeral, phone pill buttons, a bar under the focus clock and Make it yours as a bottom sheet. See the top of `CHANGES.md`. Not pushed. Moye has seen version 7 and loves it; he has not seen 7.1.
 - Version 7 was built on 2026-10-27 on branch `v7-redesign` and is not merged into `main` or published to the hosted artifact yet. Moye has not seen it. Treat it as waiting for his verdict, not as approved.
 - The live checks (`npm run live`) were not re-run after the first round of version 7 review fixes (2026-10-27); they need `npm run dev`. `live-reading.mjs` now opens its lesson from Plan, because Learn no longer lists lessons.
 - Design review screenshots of every screen (desktop 1440 wide and phone 390 wide, light, and night for the main screens) are made with `tools/harness/shoot.mjs`. They are not committed.

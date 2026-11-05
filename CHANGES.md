@@ -1,3 +1,19 @@
+# TriCert Lab, version 7.1: Modern night, polished
+
+Moye said "i love it" about version 7, so nothing he loves moved: dark first, Geist, one orange accent, five places, the sidebar on a laptop and the docked tabs on a phone. Four other designs were tried against it and none beat it, so version 7 stays and this pass takes the best ideas from them.
+
+## What changed
+
+- **Fewer lines, softer surfaces.** Lists, cards and tiles are soft filled planes instead of outlined boxes, so Progress, Plan and Waiting on you look calmer. Fields, ticks, answers and chosen tabs keep their edge. Light mode uses a faint shadow, a slightly warmer grey page and a darker grey for small text so it stays easy to read.
+- **Bigger numbers.** Sessions done (27/65), days to the exam, each exam score out of 100 and the gate count (0 of 5) are large, tight figures over small quiet labels. Sessions done has a small bar under it.
+- **One memorable moment on Today.** On a laptop the Up next card carries the week number as a large faded numeral, kept off the title. Phones do not show it.
+- **Start session sits higher on a phone.** Your why line moved under the session card, so the first button is closer to your thumb.
+- **Full pill main buttons on a phone.** Start session, Start scenarios, Continue, Finish session and Save are 56 pixels tall and fully rounded. The tab bar stays docked at the bottom so it never covers what you read.
+- **Focus mode.** The clock has a thicker bar growing under it with "of 3 h" below. The description is cut at three lines with a proper ellipsis. No ring: it looked too much like a watch.
+- **Make it yours** is a bottom sheet on a phone, with a grab handle, and its choices (Night, Light, Match this device, colours) are pills.
+- **Calmer motion.** Screens rise in once, bars grow into place, buttons press in slightly. All of it stops when your device asks for reduced motion.
+- **No data changes.** The API, database and learning content are unchanged.
+
 # TriCert Lab, version 7: Modern night
 
 Moye's verdict on version 6: "I want something that's very modern, but it's still very usable. And very, very simple." Version 7 answers that with a calm, dark study desk where every screen has one job and one bright button.

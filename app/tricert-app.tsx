@@ -1889,6 +1889,7 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
   return (
     <div className="sheet-backdrop" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <form className="yours" role="dialog" aria-modal="true" aria-labelledby="yours-title" onSubmit={(event) => { event.preventDefault(); onSave(draftName, draftWhy); }}>
+        <span className="yours-grab" aria-hidden="true" />
         <header className="yours-head">
           <h2 id="yours-title">Make it yours</h2>
           <button type="button" className="close" onClick={onClose} aria-label="Close">×</button>
