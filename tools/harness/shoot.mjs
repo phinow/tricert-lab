@@ -84,7 +84,7 @@ const views = {
   'today-new': { state: 'fresh', steps: [...onboard] },
   'review-empty': { state: 'fresh', steps: [...onboard, nav('Practice'), ['click', '.tile-review']] },
 };
-const dark = new Set(['today', 'plan', 'lesson', 'practice', 'quiz-right', 'progress', 'focus', 'yours']);
+const dark = process.env.ALL_DARK ? { has: () => true } : new Set(['today', 'plan', 'lesson', 'practice', 'quiz-right', 'progress', 'focus', 'yours']);
 const wanted = viewsCsv ? viewsCsv.split(',') : Object.keys(views);
 const devices = [
   ['desktop', { width: 1440, height: 900 }, 1],

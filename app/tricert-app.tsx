@@ -834,12 +834,13 @@ export default function TriCertApp() {
                     : <button className="text-link why-add" onClick={() => setSettingsOpen(true)}>Add why you are doing this</button>}
                 </div>
                 <dl className="tally" aria-label="Your progress">
-                  <div><dt>Sessions done</dt><dd><strong>{programmeDone}</strong><span>/{allTasks.length}</span></dd></div>
+                  <div className="tally-main"><dt>Sessions done</dt><dd><strong>{programmeDone}</strong><span>/{allTasks.length}</span></dd><span className="tally-bar" aria-hidden="true"><span style={{ width: `${Math.round((programmeDone / Math.max(1, allTasks.length)) * 100)}%` }} /></span></div>
                   {nextExam && <div><dt>{nextExam.days === 1 ? 'Day' : 'Days'} to {nextExam.label}</dt><dd><strong>{nextExam.days}</strong></dd></div>}
                 </dl>
               </header>
 
               <section className={completed.has(activeTask.key) ? 'hero-session is-done' : 'hero-session'} aria-labelledby="session-title">
+                <span className="hero-week" aria-hidden="true">{selectedWeek}</span>
                 <div className="hero-top">
                   <p className="hero-when-line">
                     <span className="hero-label">{completed.has(activeTask.key) ? 'Done' : timer?.key === activeTask.key ? 'In session' : isNext ? 'Up next' : activeGate ? 'Exam gate' : 'Later'}</span>
