@@ -411,7 +411,13 @@ details[open] > summary .fold-mark, [aria-expanded='true'] > .fold-mark { transf
 .guide div { display: grid; justify-items: start; gap: 6px; padding: 14px 16px; border-radius: var(--r-sm); box-shadow: inset 0 0 0 1px var(--line); }
 .guide strong { font-size: var(--t-md); }
 .guide p { color: var(--text-2); font-size: var(--t-sm); }
-.table-scroll { overflow-x: auto; }
+.table-scroll { overflow-x: auto; --edge: var(--panel); --edge-shadow: color-mix(in srgb, var(--text) 22%, transparent);
+  background:
+    linear-gradient(to right, var(--edge) 30%, transparent) left center / 28px 100% no-repeat local,
+    linear-gradient(to left, var(--edge) 30%, transparent) right center / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--edge-shadow), transparent) left center / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--edge-shadow), transparent) right center / 12px 100% no-repeat scroll; }
+.card .table-scroll, .card.table-scroll { --edge: var(--surface); }
 table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); text-align: left; }
 th { padding: 10px 12px; color: var(--text-3); font-size: var(--t-xs); font-weight: 550; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
 td { min-width: 140px; padding: 10px 12px; border-top: 1px solid var(--line); color: var(--text-2); vertical-align: top; }
@@ -1020,7 +1026,6 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
   .focus-bar { padding-left: var(--gutter); padding-right: 8px; }
   .focus-body { padding: 3vh var(--gutter) 28px; }
   .focus-meter { grid-template-columns: 180px auto; }
-  .focus-explain { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .focus-work button { grid-template-columns: 52px minmax(0, 1fr) 16px; }
   .fw-status { display: none; }
   .focus-actions { grid-template-columns: 52px minmax(0, 1fr); padding-left: var(--gutter); padding-right: var(--gutter); }
@@ -1091,8 +1096,6 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 @keyframes grow { from { transform: scaleX(0); } }
 .hero-session { gap: 12px; padding: 30px 34px 20px; overflow: hidden; isolation: isolate; }
 .hero-session > * { position: relative; z-index: 1; }
-.hero-week { position: absolute !important; z-index: 0 !important; bottom: 118px; right: 30px; color: transparent; font-size: 170px; font-weight: 700; line-height: 1; letter-spacing: -0.08em; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, color-mix(in srgb, var(--a) 14%, transparent), transparent 85%); -webkit-background-clip: text; background-clip: text; pointer-events: none; user-select: none; }
-.hero-session.is-done .hero-week { background: linear-gradient(180deg, var(--surface-3), transparent 78%); -webkit-background-clip: text; background-clip: text; }
 .hero-session h2 { max-width: 20ch; font-size: var(--t-4xl); font-weight: 650; letter-spacing: -0.05em; line-height: 1.02; margin-top: 10px; }
 .hero-sub { font-size: var(--t-lg); }
 .hero-actions { margin-top: 20px; }
@@ -1141,7 +1144,6 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 .tile-go svg, .play svg { transition: transform 0.2s var(--ease); }
 .play:hover svg, .tile-scenarios:hover .tile-go svg { transform: translateX(2px); }
 
-@media (max-width: 1100px) { .hero-week { font-size: 140px; } }
 @media (max-width: 760px) {
   :root { --t-4xl: 40px; --t-5xl: 56px; }
   .stage { padding-top: 10px; }
@@ -1150,7 +1152,6 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
   .tally dd { font-size: var(--t-3xl); }
   .tally dd span { font-size: var(--t-lg); }
   .hero-session { padding: 22px 20px 16px; border-radius: var(--r-xl); }
-  .hero-week { display: none; }
   .hero-session h2 { font-size: var(--t-3xl); letter-spacing: -0.045em; }
   .gate-checks { padding: 22px 20px 8px; }
   .gate-score strong { font-size: var(--t-4xl); }
@@ -1167,7 +1168,6 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 .focus-meter { grid-template-columns: 1fr; justify-items: center; gap: 8px; width: min(320px, 78vw); margin-top: 22px; }
 .focus-meter .meter { height: 6px; width: 100%; }
 .focus-meter .of { font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
-.focus-explain { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 /* Make it yours: pill choices, and a grab handle on the phone sheet. */
 .swatch, .chip-option { border-radius: 999px; }
 .yours-grab { display: none; }
@@ -1185,4 +1185,12 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Round 2 polish */
+.source-links, .source { display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; }
+@media (max-width: 760px) {
+  .hint a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+  .tally { order: 2; }
+  .tally dd { font-size: var(--t-2xl); }
 }

@@ -840,7 +840,6 @@ export default function TriCertApp() {
               </header>
 
               <section className={completed.has(activeTask.key) ? 'hero-session is-done' : 'hero-session'} aria-labelledby="session-title">
-                <span className="hero-week" aria-hidden="true">{selectedWeek}</span>
                 <div className="hero-top">
                   <p className="hero-when-line">
                     <span className="hero-label">{completed.has(activeTask.key) ? 'Done' : timer?.key === activeTask.key ? 'In session' : isNext ? 'Up next' : activeGate ? 'Exam gate' : 'Later'}</span>
@@ -982,7 +981,7 @@ export default function TriCertApp() {
                 <div className="reference-body">
                   <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name}><Tag>{examLabel(name)}</Tag><strong>{title}</strong><p>{copy}</p></div>)}</div>
                   <div className="table-scroll"><table><thead><tr><th>Activity</th><th>PMP</th><th>PL-300</th><th>CISSP</th><th>ITIL V5</th></tr></thead><tbody>{coverageRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
-                  <p className="hint">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
+                  <p className="hint source-links">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
                 </div>
               </details>
             </div>
