@@ -22,7 +22,9 @@ export const metadata: Metadata = {
   },
 };
 
-const themeScript = `try{var p=JSON.parse(localStorage.getItem('tricert.ui.v3')||'{}');var r=document.documentElement;if(p.theme==='light'||p.theme==='dark')r.dataset.theme=p.theme;r.dataset.accent=['beacon','rose','canola','glacier'].indexOf(p.accent)>-1?p.accent:'beacon';}catch(e){}`;
+/* Night is the default; "system" (saved from version 7 on) leaves the choice
+   to the device. Matches savedTheme() in tricert-app.tsx. */
+const themeScript = `try{var p=JSON.parse(localStorage.getItem('tricert.ui.v3')||'{}');var r=document.documentElement;var t=p.theme==='light'?'light':p.theme==='system'&&p.v===7?'system':'dark';if(t!=='system')r.dataset.theme=t;r.dataset.accent=['beacon','rose','canola','glacier'].indexOf(p.accent)>-1?p.accent:'beacon';}catch(e){document.documentElement.dataset.theme='dark';}`;
 
 export default function RootLayout({
   children,
@@ -37,7 +39,7 @@ export default function RootLayout({
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
-          href="/fonts/bricolage-grotesque-latin-standard-normal.woff2"
+          href="/fonts/geist-latin-wght-normal.woff2"
         />
         {/* Apply the learner's colour and appearance before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

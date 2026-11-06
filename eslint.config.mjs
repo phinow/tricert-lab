@@ -5,7 +5,9 @@ import nextTs from 'eslint-config-next/typescript';
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+  // Generated output, plus .claude, which holds Claude Code worktrees
+  // (other checkouts of this repository, not this project's source).
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'tools/harness/out/**', '.claude/**']),
 ]);
 
 export default eslintConfig;

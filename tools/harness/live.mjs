@@ -23,11 +23,11 @@ await check('Fresh database shows onboarding, with the self-hosted font applied'
   await page.goto(base);
   await page.waitForSelector('.onboard-form');
   const family = await page.evaluate(() => getComputedStyle(document.querySelector('h2')).fontFamily);
-  assert.match(family, /Bricolage Grotesque/);
+  assert.match(family, /^Geist,/);
   await page.evaluate(() => document.fonts.ready);
-  assert.equal(await page.evaluate(() => document.fonts.check('16px "Bricolage Grotesque"')), true);
+  assert.equal(await page.evaluate(() => document.fonts.check('600 16px "Geist"')), true);
   const note = await page.evaluate(() => getComputedStyle(document.querySelector('.onboard-note')).fontFamily);
-  assert.match(note, /Literata/);
+  assert.match(note, /^Geist,/);
   await page.screenshot({ path: path.join(shots, 'live-onboarding.png'), fullPage: true });
 });
 
@@ -101,7 +101,9 @@ await check('Completing five sessions moves the current week to 2 after a full r
 });
 
 await check('Artifact draft persists in D1 and reopens on reload', async () => {
-  await page.click('.nav button:has(.nav-label:text-is("Project"))');
+  await page.click('.nav button:has(.nav-label:text-is("Learn"))');
+  await page.click('.segmented button:has-text("Documents")');
+  await page.click('.releases .release >> nth=0');
   await page.waitForSelector('.doc-list');
   await page.click('.doc-list li >> nth=1 >> button');
   await page.fill('#work', 'Coverage map draft written in the live run. '.repeat(4));

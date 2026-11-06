@@ -13,15 +13,15 @@ const base = `http://localhost:${server.address().port}`;
 const browser = await chromium.launch();
 const nav = (label) => `.nav button:has(.nav-label:text-is("${label}"))`;
 const cases = [
-  ['v6-today', { width: 1440, height: 1000 }, {}, []],
-  ['v6-today-phone', { width: 390, height: 844 }, {}, []],
-  ['v6-today-night', { width: 1440, height: 1000 }, { theme: 'dark', accent: 'glacier' }, []],
-  ['v6-make-it-yours', { width: 1440, height: 900 }, {}, ['.me']],
-  ['v6-plan', { width: 1440, height: 1000 }, {}, [nav('Plan')]],
-  ['v6-focus', { width: 1440, height: 900 }, {}, ['.play', 2200]],
-  ['v6-lesson', { width: 1440, height: 1000 }, {}, ['.hero-lesson']],
-  ['v6-practice', { width: 1440, height: 900 }, {}, [nav('Practice')]],
-  ['v6-progress', { width: 1440, height: 1000 }, {}, [nav('Progress')]],
+  ['v7-today', { width: 1440, height: 1000 }, {}, []],
+  ['v7-today-phone', { width: 390, height: 844 }, {}, []],
+  ['v7-today-night', { width: 1440, height: 1000 }, { theme: 'dark', accent: 'glacier' }, []],
+  ['v7-make-it-yours', { width: 1440, height: 900 }, {}, ['.me']],
+  ['v7-plan', { width: 1440, height: 1000 }, {}, [nav('Plan')]],
+  ['v7-focus', { width: 1440, height: 900 }, {}, ['.play', 2200]],
+  ['v7-lesson', { width: 1440, height: 1000 }, {}, ['.hero-lesson']],
+  ['v7-practice', { width: 1440, height: 900 }, {}, [nav('Practice')]],
+  ['v7-progress', { width: 1440, height: 1000 }, {}, [nav('Progress')]],
 ];
 for (const [name, viewport, prefs, steps] of cases) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
