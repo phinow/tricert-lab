@@ -1,3 +1,10 @@
+# TriCert Lab, version 7.1.1: the hosted copy now saves
+
+- The hosted copy kept progress only until the page was reloaded. The address it saved to broke the store's rules, and the error was hidden. It now saves to a valid address.
+- If saved progress cannot be read, the app says so and writes nothing, so a bad connection cannot wipe it.
+- A phone and a laptop open at the same time no longer overwrite each other. Every save starts from what is stored.
+- New check: `npm run save` in `tools/harness` (3 checks).
+
 # TriCert Lab, version 7.1: Modern night, polished
 
 Moye said "i love it" about version 7, so nothing he loves moved: dark first, Geist, one orange accent, five places, the sidebar on a laptop and the docked tabs on a phone. Four other designs were tried against it and none beat it, so version 7 stays and this pass takes the best ideas from them.

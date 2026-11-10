@@ -15,8 +15,23 @@ const empty: State = { profile: null, progress: [], attempts: [], artifacts: [] 
 let state: State = empty;
 let docRef: DocRef | null = null;
 let ready: Promise<void> | null = null;
-let writeChain: Promise<void> = Promise.resolve();
-let persistent = false;
+let writeChain: Promise<unknown> = Promise.resolve();
+// Inside claude.ai progress is saved to the page's private store or not at all. Outside it
+// (the file opened on its own) the page keeps progress in memory.
+const hosted = () => Boolean(window.claude);
+// True once saved progress has been read from the store. Nothing is written before that,
+// so a failed read can never be followed by a save that wipes stored progress.
+let loaded = false;
+const unreachable = 'Your saved progress cannot be reached right now, so nothing was changed. Reload the page to try again.';
+
+function fromData(data: Partial<State> | undefined): State {
+  return {
+    profile: (data?.profile as Row) ?? null,
+    progress: (data?.progress as Row[]) ?? [],
+    attempts: (data?.attempts as Row[]) ?? [],
+    artifacts: (data?.artifacts as Row[]) ?? [],
+  };
+}
 
 async function connect() {
   const claude = window.claude;
@@ -26,28 +41,38 @@ async function connect() {
     { id(): Promise<string | null> } | null,
   ];
   const id = user ? await user.id() : null;
-  if (!db || !id) return;
-  docRef = db.doc(`data/users/${id}/study/state`);
+  if (!db || !id) throw new Error('The private store is not available.');
+  // A document path needs an even number of segments: data / users / <id> / state.
+  docRef = db.doc(`data/users/${id}/state`);
   const snap = await docRef.get();
-  const data = snap.exists ? (snap.data() as Partial<State>) : undefined;
-  if (data) {
-    state = {
-      profile: (data.profile as Row) ?? null,
-      progress: (data.progress as Row[]) ?? [],
-      attempts: (data.attempts as Row[]) ?? [],
-      artifacts: (data.artifacts as Row[]) ?? [],
-    };
-  }
-  persistent = true;
+  state = fromData(snap.exists ? (snap.data() as Partial<State>) : undefined);
+  loaded = true;
 }
 
-function persist() {
-  if (!docRef) return Promise.resolve(true);
-  const ref = docRef;
-  const body = JSON.parse(JSON.stringify(state)) as Row;
-  const next = writeChain.then(() => ref.set(body));
-  writeChain = next.catch(() => undefined);
-  return next.then(() => true, () => false);
+// One save at a time. Each save starts from what the store holds now, so a second device or
+// an older tab cannot write its stale copy over newer progress.
+function save(body: Row): Promise<Response> {
+  const run = writeChain.then(async () => {
+    const ref = docRef;
+    if (ref) {
+      const snap = await ref.get();
+      state = fromData(snap.exists ? (snap.data() as Partial<State>) : undefined);
+    }
+    const before = state;
+    const error = apply(body);
+    if (error) return json({ error }, 400);
+    if (ref) {
+      try {
+        await ref.set(JSON.parse(JSON.stringify(state)) as Row);
+      } catch {
+        state = before;
+        return json({ error: 'Your change could not be saved. Check your connection and try again.' }, 500);
+      }
+    }
+    return json(state);
+  }).catch(() => json({ error: unreachable }, 503));
+  writeChain = run;
+  return run;
 }
 
 function json(body: unknown, status = 200) {
@@ -127,17 +152,12 @@ const realFetch = window.fetch.bind(window);
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
   if (!url.startsWith('/api/state')) return realFetch(input, init);
-  ready ??= connect().catch(() => undefined);
+  // A failed connection is forgotten, so the next request tries again.
+  ready ??= connect().catch(() => { ready = null; });
   await ready;
+  if (hosted() && !loaded) return json({ error: unreachable }, 503);
   if (!init || init.method !== 'PUT') return json(state);
-  const before = state;
-  const error = apply(JSON.parse(String(init.body)) as Row);
-  if (error) return json({ error }, 400);
-  if (!(await persist())) {
-    state = before;
-    return json({ error: 'Your change could not be saved. Check your connection and try again.' }, 500);
-  }
-  return json(state);
+  return save(JSON.parse(String(init.body)) as Row);
 };
 
 // Downloads: the frame cannot start downloads itself, so hand files to the viewer's save prompt.
@@ -165,5 +185,4 @@ document.addEventListener('click', (event) => {
   void offer(anchor.href, nameFor(anchor));
 }, true);
 
-void persistent;
 createRoot(document.getElementById('root')!).render(<TriCertApp />);

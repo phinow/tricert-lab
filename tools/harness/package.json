@@ -12,6 +12,7 @@
     "shots:final": "node build.mjs after ../.. && node final-shots.mjs",
     "live": "node live.mjs && node live-reading.mjs",
     "artifact": "node build-artifact.mjs",
+    "save": "node build-artifact.mjs && node save.mjs",
     "logo": "node export-logo.mjs"
   },
   "devDependencies": {

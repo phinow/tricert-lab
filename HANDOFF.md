@@ -44,6 +44,7 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 - Lint warning: `@next/next/no-img-element` for the logo `<img>` on the Progress, Portfolio tab.
 - `npm run start` (production server) was not tested in this handoff. Result unknown.
 - The hosted artifact build is made from a different entry file (`tools/harness/entry-artifact.tsx`) and keeps progress in the artifact's own storage. Progress there and progress in a local copy are separate and do not sync.
+- Until 2026-11-10 the hosted build never saved progress: its storage path had five segments, the store refused it, and the error was hidden. Fixed in `entry-artifact.tsx`: a valid path, no write before saved progress has been read, and every save starts from what the store holds. `npm run save` in `tools/harness` checks it against a stand-in for the store. It has not been watched inside claude.ai yet. The official hosted artifact still runs version 6 with the old path until it is republished.
 
 ## 3. Files
 
@@ -154,6 +155,7 @@ Generated files are marked GENERATED. Nothing in the project holds a secret. Not
 | `live-reading.mjs` | Checks that lessons and document guides load on demand on the real server. |
 | `tsconfig.check.json` | Strict typecheck of `app/tricert-app.tsx`. |
 | `build-artifact.mjs`, `entry-artifact.tsx` | Builds the single-file hosted version (`out/artifact/index.html`) that keeps progress in the claude.ai artifact's own storage. |
+| `save.mjs` | 3 browser checks that the hosted build saves progress: it survives a reload, a failed read never leads to a write, and two devices keep each other's progress. |
 | `export-logo.mjs` | Regenerates the logo files in `public/`. |
 
 ## 4. How to run it
@@ -244,6 +246,7 @@ After `generate.py`, copy changed dataset files from `tools/content/datasets/out
 | `npm run flows` (tools/harness) | `23 flow checks passed, no console errors` |
 | `npm run live` (tools/harness, with `npm run dev` running on a fresh database) | `6 live checks passed against the real server, no console errors`, then `ok, no console errors` |
 | `npm run artifact` (tools/harness) | `html bytes ... font inlined true abs datasets left 0` |
+| `npm run save` (tools/harness) | `3 save checks passed` |
 | `python3 -I tools/content/check2.py tools/content/parts2/*.json` | `OK` |
 | `python3 -I tools/content/build-library.py` | `lessons 65/65, guides 66/66, glossary 242, flashcards 80, questions 96 -> library 316 KB, reading 1561 KB`, and `lib/` files unchanged |
 | `python3 -I tools/content/datasets/generate.py` | `Figures cross-checked: 604` and `SELF-CHECK OK`, and datasets unchanged |
