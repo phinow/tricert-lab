@@ -265,7 +265,9 @@ function countDelayed(
   return all;
 }
 
-/** Save one answer: the question's new state and the exam's delayed-review count. */
+/** Save one answer: the question's new state and the exam's delayed-review count.
+    A question already graded today is not graded again (a second tab, or a
+    retry after a lost response): the record comes back unchanged. */
 export function recordQuestionAnswer(
   srs: SrsRecord,
   question: Pick<StudyQuestionLike, 'id' | 'certification'>,
@@ -273,6 +275,7 @@ export function recordQuestionAnswer(
   today: string,
 ): SrsRecord {
   const previous = srs.questions[question.id];
+  if (previous?.last === today) return srs;
   return {
     ...srs,
     questions: { ...srs.questions, [question.id]: gradeQuestion(previous, result, today) },
@@ -309,8 +312,9 @@ export const NEW_FROM_LESSON = 6;
 
 /** Today's questions: due reviews of any exam (oldest due first), then up to 6
     new questions from the lesson, then other new daily questions of this
-    exam, up to the size (20 for a morning, 30 for a review morning). A short
-    morning takes due reviews only. Questions in a practice exam form that has
+    exam, up to the size (20 for a morning, 30 for a review morning). A review
+    morning tops up with questions already seen. A short morning takes due
+    reviews only. Questions in a practice exam form that has
     not been taken are never used. */
 export function dailySet<Q extends StudyQuestionLike>(input: {
   questions: Q[];
@@ -352,6 +356,24 @@ export function dailySet<Q extends StudyQuestionLike>(input: {
   const chosen = new Set(picked.map((question) => question.id));
   const room = size - picked.length;
   if (room > 0) picked.push(...fresh.filter((question) => isDailyPool(question) && !chosen.has(question.id)).slice(0, room));
+  if (mode !== 'review' || picked.length >= size) return picked;
+  // A review morning fills up to its size with questions already seen:
+  // not retired first, then the ones answered longest ago. Not today's.
+  const inSet = new Set(picked.map((question) => question.id));
+  const seen = usable
+    .filter(({ question }) => {
+      const state = states[question.id];
+      return question.certification === exam && state && !inSet.has(question.id) && state.last < today;
+    })
+    .sort((a, b) => {
+      const sa = states[a.question.id];
+      const sb = states[b.question.id];
+      const ra = isQuestionRetired(sa) ? 1 : 0;
+      const rb = isQuestionRetired(sb) ? 1 : 0;
+      return ra - rb || (sa.last < sb.last ? -1 : sa.last > sb.last ? 1 : a.index - b.index);
+    })
+    .map(({ question }) => question);
+  picked.push(...seen.slice(0, size - picked.length));
   return picked;
 }
 
@@ -373,8 +395,9 @@ export function formQuestions<Q extends StudyQuestionLike>(questions: Q[], exam:
 /** A practice exam drawn at random by area from this exam's questions not
     answered in the last 14 days. With `mix` (area to count) each area gets
     its count where it can; without it, areas get a share in proportion to
-    the questions available. Short areas are filled from the rest. The same
-    seed gives the same exam. */
+    the questions available. Short areas are filled from the rest, and a draw
+    still short of `count` from the questions seen longest ago. The same seed
+    gives the same exam. */
 export function drawExam<Q extends StudyQuestionLike>(input: {
   questions: Q[];
   states: Record<string, QuestionState>;
@@ -424,6 +447,13 @@ export function drawExam<Q extends StudyQuestionLike>(input: {
     leftover.push(...mixed.slice(take));
   });
   drawn.push(...shuffled(leftover, random).slice(0, Math.max(0, target - drawn.length)));
+  // Too few not seen in 14 days: fill to the exam size with the questions
+  // seen longest ago.
+  if (drawn.length < count) {
+    const recent = shuffled(questions.filter((question) => question.certification === exam && !candidates.includes(question)), random)
+      .sort((a, b) => (states[a.id].last < states[b.id].last ? -1 : states[a.id].last > states[b.id].last ? 1 : 0));
+    drawn.push(...recent.slice(0, count - drawn.length));
+  }
   return shuffled(drawn, random);
 }
 
@@ -498,7 +528,8 @@ export type ExamResult = {
 export type BookingBlockLike = {
   cert?: string;
   mornings: { key: string; kind: string }[];
-  exam: { target: number };
+  /** With `questions`, a result with fewer questions (a short draw) does not count. */
+  exam: { target: number; questions?: number };
 };
 
 export type CheckMet = boolean | 'not-enough-data';
@@ -563,7 +594,8 @@ export function readyToBook(input: {
   const results = input.results.filter(
     (result) => result.date <= today && !(block.cert && result.exam && result.exam !== block.cert),
   );
-  const passing = results.filter((result) => result.total > 0 && (result.right * 100) / result.total >= target);
+  const full = block.exam.questions ?? 1;
+  const passing = results.filter((result) => result.total > 0 && result.total >= full && (result.right * 100) / result.total >= target);
   const pairs: ExamResult[][] = [];
   passing.forEach((a, i) => passing.slice(i + 1).forEach((b) => {
     if (a.form !== b.form && Math.abs(daysBetween(a.date, b.date)) >= BOOKING_GAP_DAYS) {

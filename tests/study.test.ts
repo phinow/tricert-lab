@@ -336,7 +336,47 @@ test('a later exam draws by area from questions not seen in 14 days, the same fo
   const short = drawExam({ questions: bank, states, exam: 'ITIL', count: 12, today, seed: 3, mix: { Value: 20 } });
   assert.equal(short.length, 12);
   assert.equal(byArea(short).Value, 9);
-  assert.equal(drawExam({ questions: bank, states, exam: 'ITIL', count: 50, today, seed: 1 }).length, 29);
+  // Too few not seen in 14 days: the rest come from those seen longest ago.
+  const all = drawExam({ questions: bank, states, exam: 'ITIL', count: 50, today, seed: 1 });
+  assert.equal(all.length, 30);
+  assert.ok(all.some((item) => item.id === 'Value-0'));
+  const recent: Record<string, QuestionState> = Object.fromEntries(bank.map((item, index) => [item.id, { stage: 1, due: today, last: `2027-01-${String(10 + (index % 9)).padStart(2, '0')}`, first: '2026-12-01' }]));
+  const filled = drawExam({ questions: bank, states: recent, exam: 'ITIL', count: 12, today, seed: 5 });
+  assert.equal(filled.length, 12);
+  assert.ok(filled.every((item) => recent[item.id].last <= '2027-01-12'));
+});
+
+test('a practice exam shorter than the exam size does not count toward Ready to book', () => {
+  const sized = { ...block, exam: { target: 80, questions: 40 } };
+  const short = { ...result('draw-1', '2027-01-01', 14, even(14)), total: 15 };
+  const checks = readyToBook({ block: sized, done: [], results: [short, result('A', '2027-01-10', 36, even(36))], today: '2027-01-20' });
+  assert.equal(checks[1].met, false);
+});
+
+test('a question answered a second time on the same day is not graded again', () => {
+  const question = q('same-day');
+  const once = recordQuestionAnswer({ cards: {}, questions: {} }, question, 'wrong', '2026-11-28');
+  const twice = recordQuestionAnswer(once, question, 'right', '2026-11-28');
+  assert.deepEqual(twice, once);
+  assert.equal(twice.questions['same-day'].due, '2026-11-30');
+});
+
+test('a review morning tops up to 30 with questions already seen, not retired first, oldest answered first', () => {
+  const today = '2026-12-10';
+  const bank: StudyQuestionLike[] = [];
+  for (let index = 0; index < 40; index += 1) bank.push(q(`r-${index}`));
+  const states: Record<string, QuestionState> = {};
+  bank.forEach((item, index) => {
+    if (index < 35) states[item.id] = { stage: index < 5 ? 4 : 3, due: '2026-12-30', last: `2026-12-${String(1 + (index % 9)).padStart(2, '0')}`, first: '2026-11-20' };
+  });
+  states['r-34'] = { ...states['r-34'], last: today };
+  const set = dailySet({ questions: bank, states, exam: 'ITIL', today, mode: 'review' });
+  assert.equal(set.length, 30);
+  assert.ok(!set.some((item) => item.id === 'r-34'));
+  assert.equal(set.filter((item) => !states[item.id]).length, 5);
+  // 29 seen and not retired (r-5 to r-33); 25 are needed, so no retired one.
+  assert.ok(!set.some((item) => ['r-0', 'r-1', 'r-2', 'r-3', 'r-4'].includes(item.id)));
+  assert.equal(dailySet({ questions: bank, states, exam: 'ITIL', today, mode: 'learn' }).length, 5);
 });
 
 /* ---------- Ready to book ---------- */
