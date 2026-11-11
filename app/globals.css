@@ -1337,3 +1337,103 @@ button.plan-item:hover { background: var(--hover); }
   .step-line li { grid-template-columns: minmax(0, 1fr); }
   .step-mark { display: none; }
 }
+
+/* ============================================================ version 8, part 2 */
+/* Practice: Today's review first, then a short list. */
+.review-card { margin-bottom: 18px; }
+.review-card h2 { max-width: 26ch; }
+.practice-list .tile-exam .row-text small, .practice-list .tile-cross .row-text small { max-width: 60ch; }
+
+/* The practice exam's start screen. */
+.exam-open h2 { max-width: none; font-size: var(--t-2xl); }
+.exam-rules { display: grid; gap: 8px; margin: 6px 0 0; padding-left: 1.2em; color: var(--text-2); font-size: var(--t-md); line-height: 1.55; list-style: disc; }
+.exam-locked { margin-top: 12px; padding: 14px 16px; border-radius: var(--r-md); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--text-2); }
+.exam-locked strong { color: var(--text); font-weight: 600; }
+.exam-last { margin-top: 18px; }
+
+/* The exam in focus mode: the clock in the bar, a count and the tools under it. */
+.exam-clock { color: var(--text); font-size: var(--t-lg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.exam-clock.is-low { color: var(--ink); }
+.exam-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; width: min(700px, calc(100% - 40px)); margin: 10px auto 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.exam-count { color: var(--text-2); font-size: var(--t-sm); font-weight: 550; font-variant-numeric: tabular-nums; }
+.exam-tools { display: flex; gap: 4px; margin-right: -12px; }
+.exam-tools .ghost { min-height: 40px; padding: 0 12px; font-size: var(--t-sm); }
+.flag-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--text-2); font-family: var(--ui); font-size: var(--t-sm); font-weight: 600; }
+.flag-toggle::before { content: ''; width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; }
+.flag-toggle:hover { color: var(--text); background: var(--surface-3); }
+.flag-toggle.is-on { background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--fill); color: var(--text); }
+.flag-toggle.is-on::before { background: var(--fill); box-shadow: none; }
+.exam-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; }
+.exam-cell { display: grid; place-items: center; width: 100%; min-height: 48px; border: 0; border-radius: var(--r-sm); background: none; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--text-2); font-family: var(--ui); font-size: var(--t-md); font-weight: 600; font-variant-numeric: tabular-nums; }
+.exam-cell:hover { background: var(--hover); }
+.exam-cell.is-answered { background: var(--surface-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.exam-cell.is-flagged { box-shadow: inset 0 0 0 2px var(--fill); }
+.exam-cell.is-current { outline: 2px solid var(--text); outline-offset: 2px; }
+.exam .morning-actions > .secondary { flex: 0 1 38%; }
+
+/* The result: the score, by area, then every question. */
+.exam-result { display: grid; gap: 0; }
+.exam-result .screen-head h1:focus { outline: none; }
+.exam-unsaved { margin-bottom: 24px; justify-items: start; }
+.result-areas { margin-bottom: 32px; }
+.area-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 16px; padding: 14px 18px; }
+.area-row .meter { grid-column: 1 / -1; height: 4px; }
+.area-score { display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.area-score strong { font-size: var(--t-md); font-weight: 600; }
+.area-score small { min-width: 4.5ch; color: var(--text-3); font-size: var(--t-sm); text-align: right; }
+.exam-review { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.exam-review li { display: grid; gap: 10px; padding: 18px 20px; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line); }
+.exam-review li.is-wrong { box-shadow: inset 3px 0 0 var(--wrong), inset 0 0 0 1px var(--line); }
+.mark { font-weight: 600; letter-spacing: 0.02em; }
+.mark.is-right { color: var(--right); }
+.mark.is-wrong { color: var(--wrong); }
+.review-q { font-size: var(--t-md); font-weight: 560; line-height: 1.5; }
+.review-answers { display: grid; gap: 6px; margin: 0; }
+.review-answers div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; }
+.review-answers dt { color: var(--text-3); font-size: var(--t-sm); }
+.review-answers dd { margin: 0; color: var(--text-read); line-height: 1.5; }
+.review-answers dd strong { margin-right: 4px; color: var(--text); }
+.review-why { color: var(--text-read); font-size: var(--t-md); line-height: 1.6; }
+.review-why.hint { color: var(--text-2); font-size: var(--t-sm); }
+
+/* Progress: Ready to book, the practice exam history and delayed reviews. */
+.book-checks { gap: 10px; margin-bottom: 18px; padding: 24px 26px 12px; border-radius: var(--r-xl); background: radial-gradient(120% 90% at 0% 0%, var(--glow), transparent 55%), var(--surface); box-shadow: inset 0 0 0 1px var(--line), inset 0 1px 0 color-mix(in srgb, var(--a) 24%, transparent); }
+.book-head { display: grid; gap: 8px; }
+.book-head .eyebrow { color: var(--ink); }
+.book-checks h2 { font-size: var(--t-xl); letter-spacing: -0.024em; }
+.tick.is-wait { box-shadow: inset 0 0 0 1.5px var(--line-strong); background: repeating-linear-gradient(135deg, transparent 0 3px, var(--surface-3) 3px 5px); }
+.booking-list { margin: 0; }
+.progress .section-title { margin-top: 28px; }
+.history .row { min-height: 60px; }
+.history-score { display: grid; justify-items: end; gap: 2px; font-variant-numeric: tabular-nums; }
+.history-score strong { font-size: var(--t-lg); font-weight: 620; }
+.history-score small { color: var(--text-3); font-size: var(--t-sm); }
+.empty-line { margin: 0 2px; }
+.delayed { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 16px 24px; }
+.delayed-score { display: grid; gap: 2px; min-width: 9ch; }
+.delayed-score strong { font-size: var(--t-2xl); font-weight: 640; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.delayed-score span { color: var(--text-3); font-size: var(--t-sm); }
+.delayed-score.is-wait strong { color: var(--text-2); }
+.other-exams { margin-bottom: 18px; }
+
+/* The weekend lab: a tick for each step. */
+.focus .lab-steps { margin: 4px 0 0; }
+.focus .lab-steps li { margin: 0; }
+.focus .lab-steps label { padding: 10px 0; color: var(--text-read); line-height: 1.6; }
+.focus .lab-steps li + li { border-top: 1px solid var(--line); }
+.lab-no { color: var(--text-3); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px), (pointer: coarse) {
+  .flag-toggle, .exam-tools .ghost { min-height: 44px; }
+  .exam-bar { width: calc(100% - 32px); }
+}
+@media (max-width: 760px) {
+  .book-checks { padding: 20px 18px 8px; }
+  .delayed { grid-template-columns: minmax(0, 1fr); }
+  .review-answers div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .exam-review li { padding: 16px; }
+  .area-row { padding: 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exam-cell, .flag-toggle { transition: none; }
+}

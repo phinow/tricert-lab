@@ -2,22 +2,22 @@
 
 import { FormEvent, ReactNode, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  flashcards,
   labCards,
   portfolioChecklist,
   projects,
   questionsForDeliverable,
-  scenarioBank,
   studyWeeks,
   type Certification,
   type Deliverable,
   type ScenarioQuestion,
   type StudyTask,
 } from '@/lib/tricert-content';
-import { examQuestions, extraFlashcards, glossary, guideIndex, lessonIndex, type DocGuide, type Lesson } from '@/lib/tricert-library';
+import { glossary, guideIndex, lessonIndex, type DocGuide, type Lesson } from '@/lib/tricert-library';
 import { examBlocks, type BlockKey, type ExamBlock, type Morning, type WeekendBlock } from '@/lib/tricert-plan';
 import {
   addDays,
+  afterExam,
+  allChecksMet,
   answerCard,
   areaOf,
   cardQueue,
@@ -26,16 +26,35 @@ import {
   isCardRetired,
   isQuestionRetired,
   isStudyDate,
+  readyToBook,
   recordQuestionAnswer,
+  scoreExam,
   startCard,
   weekday,
+  type AreaScore,
+  type BookingCheck,
   type CardGrade,
   type CardQueueItem,
   type DailyMode,
+  type ExamAnswers,
+  type ExamResult,
   type QuestionResult,
   type SrsRecord,
 } from '@/lib/tricert-study';
-import { allCards, makeUserCard, questionById, todaysCards, todaysQuestions, type BankCard, type UserCard } from '@/lib/tricert-bank';
+import {
+  allCards,
+  cardsForExam,
+  crossExamScenarios,
+  makeUserCard,
+  nextPracticeExam,
+  questionBank,
+  questionById,
+  takenForms,
+  todaysCards,
+  todaysQuestions,
+  type BankCard,
+  type UserCard,
+} from '@/lib/tricert-bank';
 
 /* The long reading (65 lessons and 66 finished documents) loads on demand so
    the app opens fast. It starts loading as soon as the app mounts. */
@@ -88,31 +107,55 @@ type AttemptRow = { question_id: string; certification: string; domain: string; 
 type ArtifactRow = { artifact_key: string; status: string; evidence_text: string; reflection: string; updated_at?: string };
 /* One line per morning, short morning or weekend block (the log record). */
 type LogRow = { id: string; key: string; kind: string; block?: string; date: string; minutes: number; cards: number; questions: number; right: number };
-/* A practice exam result (the mocks record). Part 2 writes these. */
-type MockRow = { id: string; exam?: string; form: string; date: string; total?: number; right?: number; areas?: unknown[]; weekend?: string };
+/* A practice exam result (the mocks record), with his answers so the
+   result can be opened again from Progress. */
+type MockRow = {
+  id: string; exam?: string; form: string; date: string; total?: number; right?: number; areas?: AreaScore[]; weekend?: string;
+  ids?: string[]; answers?: ExamAnswers; flags?: string[]; minutes?: number;
+};
 type Records = { plan: { startDate?: string }; srs: SrsRecord; mocks: MockRow[]; log: LogRow[]; usercards: UserCard[] };
 type StudyState = { profile: Profile | null; progress: ProgressRow[]; attempts: AttemptRow[]; artifacts: ArtifactRow[]; records: Records };
 type View = 'today' | 'plan' | 'learn' | 'projects' | 'practice' | 'progress';
 type LearnTab = 'exams' | 'lessons' | 'documents' | 'glossary';
-type PracticeScreen = 'hub' | 'run' | 'flashcards' | 'labs' | 'review';
+type PracticeScreen = 'hub' | 'run' | 'flashcards' | 'labs' | 'exam' | 'result';
 type Notice = { text: string; kind: 'success' | 'error' } | null;
 type Theme = 'system' | 'light' | 'dark';
 type Accent = 'beacon' | 'rose' | 'canola' | 'glacier';
 type UiPrefs = { v?: number; project?: string; artifact?: string; rubric?: Record<string, number[]>; theme?: Theme; accent?: Accent };
-type ScoreParts = { coverage: number; evidence: number; judgment: number; recall: number; total: number };
-type Run = { kind: 'scenarios' | 'timed' | 'artifact'; title: string; questions: ScenarioQuestion[]; index: number; answered: number; correct: number };
+type Run = { kind: 'scenarios' | 'artifact'; title: string; questions: ScenarioQuestion[]; index: number; answered: number; correct: number };
+
+/* A practice exam in progress. It lives in this browser (see examKey) so a
+   reload returns to it; the clock always counts from startedAt. */
+type ExamRun = {
+  v: 1;
+  id: string;
+  exam: Certification;
+  block: BlockKey;
+  form: string; // 'A', 'B' or 'draw-<id>'
+  ids: string[];
+  answers: ExamAnswers;
+  flags: string[];
+  index: number;
+  startedAt: number;
+  minutes: number;
+  allowBack: boolean;
+  target: number;
+  finishedAt?: number;
+  date?: string;
+  saved: string[]; // the saving steps already done: mock, srs, progress, log
+};
 
 /* A morning in progress. It lives in this browser (see morningKey) so a
    reload or a closed tab returns to the same part. Every answer is saved to
    the server as it is given; the run only keeps his place and his writing. */
-type MorningMode = 'learn' | 'review' | 'repair' | 'short';
+type MorningMode = 'learn' | 'review' | 'repair' | 'short' | 'due';
 type PartKey = 'cards' | 'learn' | 'questions' | 'mistakes' | 'reflect';
 type LearnStage = 'brief' | 'lesson' | 'build' | 'recall';
 type MorningAnswer = { choice: string; sure: boolean; correct: boolean; result: QuestionResult; seconds: number };
 type MorningRun = {
   v: 1;
-  key: string; // the morning key, or short-<date>
-  morning: string | null; // the morning it completes; null for a short morning
+  key: string; // the morning key, short-<date> or due-<date> (Today's review)
+  morning: string | null; // the morning it completes; null for a short morning or Today's review
   mode: MorningMode;
   block: BlockKey;
   exam: Certification;
@@ -130,24 +173,14 @@ type MorningRun = {
 type Finished = { title: string; detail: string; kind: string; minutes: number; cards?: number; questions?: number; right?: number };
 
 /* ==========================================================================
-   Programme structure. The version 7 Kestrel sessions stay as the library
-   and still feed Progress until part 2 replaces it.
+   The library. The 65 Kestrel lessons and the three releases of documents
+   stay as reading; the plan itself is the exam blocks in lib/tricert-plan.ts.
    ========================================================================== */
 
 const allTasks = studyWeeks.flatMap((week) => week.tasks);
 const allDeliverables = projects.flatMap((project) => project.deliverables);
-const allArtifactQuestions = allDeliverables.flatMap((item) => questionsForDeliverable(item));
-const practiceBank: ScenarioQuestion[] = [...scenarioBank, ...examQuestions];
-const allFlashcards = [...flashcards, ...extraFlashcards];
-const timedQuestions = (cert: Certification) => practiceBank.filter((question) => question.certification === cert || question.certification === 'Intersection');
-const sessionIndex = (week: number, day: number) => (week - 1) * 5 + (day - 1);
-
-const phases = [
-  { project: 'r1', code: 'R1', from: 0, to: sessionIndex(6, 4), gate: { at: sessionIndex(6, 4), label: 'PL-300 and ITIL V5', certs: ['PL-300', 'ITIL'] as Certification[] } },
-  { project: 'r2', code: 'R2', from: sessionIndex(6, 5), to: sessionIndex(10, 3), gate: { at: sessionIndex(10, 3), label: 'PMP', certs: ['PMP'] as Certification[] } },
-  { project: 'r3', code: 'R3', from: sessionIndex(10, 4), to: allTasks.length - 1, gate: { at: sessionIndex(13, 4), label: 'CISSP', certs: ['CISSP'] as Certification[] } },
-];
-const docNumber = (projectKey: string, index: number) => `${phases.find((phase) => phase.project === projectKey)?.code || 'NS'}-${String(index + 1).padStart(2, '0')}`;
+const releaseNumber = (projectKey: string) => projects.findIndex((item) => item.key === projectKey) + 1;
+const docNumber = (projectKey: string, index: number) => `${releaseNumber(projectKey) ? `R${releaseNumber(projectKey)}` : 'NS'}-${String(index + 1).padStart(2, '0')}`;
 
 /* The four exams. They are named with plain text tags, never colours: the
    learner's one colour is kept for the next action and for progress. */
@@ -200,6 +233,8 @@ const conceptGlossary: Record<string, string> = {
 const disclosure = 'Kestrel Health Network and Project Beacon are fictional. Every patient visit, account, incident and figure in this case study is synthetic and created for learning.';
 const uiPrefsKey = 'tricert.ui.v3';
 const morningKey = 'tricert.morning.v1';
+const examKey = 'tricert.exam.v1';
+const labPrefix = 'tricert.lab.';
 const draftPrefix = 'tricert.draft.';
 const emptyRecords = (): Records => ({ plan: {}, srs: { cards: {}, questions: {} }, mocks: [], log: [], usercards: [] });
 const emptyState: StudyState = { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() };
@@ -210,6 +245,8 @@ const morningParts: Record<MorningMode, Array<[PartKey, string, number]>> = {
   review: [['cards', 'Cards', 10], ['questions', 'Quiz', 40], ['mistakes', 'Mistakes', 20], ['reflect', 'Reflection', 20]],
   repair: [['cards', 'Cards', 10], ['questions', 'Questions', 60], ['mistakes', 'Mistakes', 20]],
   short: [['cards', 'Cards', 8], ['questions', 'Questions', 25], ['mistakes', 'Mistakes', 10]],
+  // Today's review has no set length: it is whatever is due.
+  due: [['cards', 'Cards', 0], ['questions', 'Questions', 0], ['mistakes', 'Mistakes', 0]],
 };
 const MAX_CARDS = 40;
 
@@ -233,13 +270,14 @@ export default function TriCertApp() {
   const [practiceScreen, setPracticeScreen] = useState<PracticeScreen>('hub');
   const [run, setRun] = useState<Run | null>(null);
   const [scenarioCursor, setScenarioCursor] = useState(0);
-  const [mockCert, setMockCert] = useState<Certification>('PL-300');
-  const [mockSeconds, setMockSeconds] = useState(15 * 60);
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashRevealed, setFlashRevealed] = useState(false);
   const [progressTab, setProgressTab] = useState<'readiness' | 'portfolio'>('readiness');
-  const [itilLevelDraft, setItilLevelDraft] = useState('beginner');
-  const [itilTargetDraft, setItilTargetDraft] = useState('');
+  const [exam, setExam] = useState<ExamRun | null>(null);
+  const [examOpen, setExamOpen] = useState(false);
+  const [examRestored, setExamRestored] = useState(false);
+  const [resultId, setResultId] = useState<string | null>(null);
+  const [clock, setClock] = useState(0);
   const [morning, setMorning] = useState<MorningRun | null>(null);
   const [morningOpen, setMorningOpen] = useState(false);
   const [morningRestored, setMorningRestored] = useState(false);
@@ -250,6 +288,7 @@ export default function TriCertApp() {
   const [lessonFrom, setLessonFrom] = useState<LessonFrom>('learn');
   const [learnItem, setLearnItem] = useState<string | null>(null);
   const [flashCert, setFlashCert] = useState<Certification | 'All'>('All');
+  const [labTicks, setLabTicks] = useState<Record<string, number[]>>({});
   const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : savedTheme(readPrefs())));
   const [accent, setAccent] = useState<Accent>(() => (typeof window === 'undefined' ? 'beacon' : readPrefs().accent || 'beacon'));
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -261,6 +300,10 @@ export default function TriCertApp() {
   const openedAt = useRef<number | null>(null);
   const weekendStarted = useRef<number>(0);
   const morningRef = useRef<MorningRun | null>(null);
+  /* The latest saved state and practice exam, for timers and chained saves. */
+  const stateRef = useRef<StudyState>(emptyState);
+  const examRef = useRef<ExamRun | null>(null);
+  const examFinishing = useRef(false);
 
   useEffect(() => {
     // Colour and appearance are interface preferences: this device only.
@@ -289,17 +332,25 @@ export default function TriCertApp() {
         setSelectedArtifact(restoredArtifact.key);
         if (prefs.rubric) setRubricChecks(prefs.rubric);
         setState(data);
-        setItilLevelDraft(data.profile?.itil_level || 'beginner');
-        setItilTargetDraft(data.profile?.itil_target || '');
         const saved = data.artifacts.find((row) => row.artifact_key === restoredArtifact.key);
         setArtifactText(saved?.evidence_text || restoredArtifact.template);
         setArtifactReflection(saved?.reflection || '');
+        stateRef.current = data;
+        // A practice exam comes back with its clock still running from the
+        // start time. If the time ran out meanwhile, the timer finishes it.
+        const examKept = data.profile ? readExam() : null;
+        if (examKept) {
+          examRef.current = examKept;
+          setExam(examKept);
+          if (examKept.finishedAt) { setResultId(examKept.id); setView('practice'); setPracticeScreen('result'); void saveExamResult(examKept, data); }
+          else { setClock(Date.now()); setExamOpen(true); setExamRestored(true); }
+        }
         // A morning left open comes back on the same part.
         const kept = data.profile ? readMorning() : null;
         if (kept) {
           setMorning(kept);
           setMorningRestored(true);
-          if (kept.open) { openedAt.current = Date.now(); setMorningOpen(true); }
+          if (kept.open && !(examKept && !examKept.finishedAt)) { openedAt.current = Date.now(); setMorningOpen(true); }
         }
       })
       .catch((error) => setNotice({ text: error.message, kind: 'error' }))
@@ -322,11 +373,15 @@ export default function TriCertApp() {
     window.addEventListener('popstate', onPopState);
     window.addEventListener('hashchange', onHashChange);
     return () => { window.removeEventListener('popstate', onPopState); window.removeEventListener('hashchange', onHashChange); };
+    // Runs once on load; saveExamResult reads the latest state through refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     lessonNav.current = { open: view === 'learn' && learnTab === 'lessons' && Boolean(learnItem), leave: leaveLesson, show: showLesson };
     morningRef.current = morning;
+    stateRef.current = state;
+    examRef.current = exam;
   });
 
   /* The morning's place and writing are kept in this browser every two
@@ -348,49 +403,49 @@ export default function TriCertApp() {
     return () => window.clearTimeout(handle);
   }, [notice]);
 
+  /* The practice exam clock. It counts from the start time, so a reload or
+     a hidden tab does not stop it, and at 00:00 the exam finishes itself. */
+  const examRunning = Boolean(exam && !exam.finishedAt);
+  const examEndsAt = exam ? exam.startedAt + exam.minutes * 60000 : 0;
   useEffect(() => {
-    if (run?.kind !== 'timed' || mockSeconds <= 0) return;
-    const handle = window.setInterval(() => setMockSeconds((value) => Math.max(0, value - 1)), 1000);
+    if (!examRunning) return;
+    const tick = () => {
+      const at = Date.now();
+      setClock(at);
+      const current = examRef.current;
+      if (current && !current.finishedAt && at >= examEndsAt) void finishExam(current);
+    };
+    tick();
+    const handle = window.setInterval(tick, 1000);
     return () => window.clearInterval(handle);
-  }, [run?.kind, mockSeconds]);
+    // finishExam reads the latest state through refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examRunning, examEndsAt]);
 
   useEffect(() => {
-    const locked = morningOpen || Boolean(weekendOpen) || Boolean(finished) || settingsOpen;
+    const locked = morningOpen || examOpen || Boolean(weekendOpen) || Boolean(finished) || settingsOpen;
     document.documentElement.style.overflow = locked ? 'hidden' : '';
     return () => { document.documentElement.style.overflow = ''; };
-  }, [morningOpen, weekendOpen, finished, settingsOpen]);
+  }, [morningOpen, examOpen, weekendOpen, finished, settingsOpen]);
 
   const completed = useMemo(() => new Set(state.progress.filter((row) => row.status === 'complete').map((row) => row.item_key)), [state.progress]);
-  const currentIndex = useMemo(() => {
-    const index = allTasks.findIndex((task) => !completed.has(task.key));
-    return index === -1 ? allTasks.length - 1 : index;
-  }, [completed]);
-
-  const latestAttempts = useMemo(() => {
-    const map = new Map<string, AttemptRow>();
-    state.attempts.forEach((attempt) => { if (!map.has(attempt.question_id)) map.set(attempt.question_id, attempt); });
-    return [...map.values()];
-  }, [state.attempts]);
-
-  const readiness = useMemo(() => {
-    const artifactComplete = new Set(state.artifacts.filter((row) => row.status === 'complete').map((row) => row.artifact_key));
-    const teachBacks = state.artifacts.filter((row) => row.reflection.trim().length >= 80).length;
-    const parts = (cert: Certification): ScoreParts => {
-      const mappedTasks = allTasks.filter((task) => task.certifications.includes(cert));
-      const coverage = ratio(mappedTasks.filter((task) => completed.has(task.key)).length, mappedTasks.length) * 30;
-      const relevantArtifacts = allDeliverables.filter((item) => item.domains.some((domain) => domain.includes(cert === 'CISSP' ? 'CISSP' : cert)));
-      const evidence = ratio(relevantArtifacts.filter((item) => artifactComplete.has(item.key)).length, relevantArtifacts.length) * 35;
-      const attempts = latestAttempts.filter((attempt) => attempt.certification === cert || attempt.certification === 'Intersection' || attempt.certification === 'intersection');
-      const judgment = ratio(attempts.filter((attempt) => Boolean(attempt.correct)).length, Math.max(8, attempts.length)) * 25;
-      const recall = ratio(teachBacks, Math.max(6, relevantArtifacts.length)) * 10;
-      return { coverage, evidence, judgment, recall, total: Math.round(coverage + evidence + judgment + recall) };
-    };
-    return { PMP: parts('PMP'), 'PL-300': parts('PL-300'), CISSP: parts('CISSP'), ITIL: parts('ITIL') } as Record<Certification, ScoreParts>;
-  }, [completed, latestAttempts, state.artifacts]);
-
   const records = state.records;
   const srs = records.srs;
   const block = currentBlock(completed);
+  /* The exam he is working on: the current block, or the last ready one
+     once every ready block is done. Practice and Progress follow it. */
+  const studyBlock = block || [...examBlocks].reverse().find((item) => item.status === 'ready');
+  /* Exams he has started: the current block and any block with work done. */
+  const startedCerts = examBlocks
+    .filter((item) => item.status === 'ready' && (item.key === block?.key || [...item.mornings, ...item.weekends].some((entry) => completed.has(entry.key))))
+    .map((item) => item.cert);
+  const startedKey = startedCerts.join(',');
+  /* Scenarios across exams: the 16 cross-exam scenarios, then the questions
+     of exams not started yet. Free practice that counts toward nothing. */
+  const freePractice = useMemo(() => {
+    const started = startedKey.split(',');
+    return [...crossExamScenarios, ...examBlocks.filter((item) => !started.includes(item.cert)).flatMap((item) => questionBank[item.cert])];
+  }, [startedKey]);
   const estimates = useMemo(() => {
     const start = records.plan.startDate && isStudyDate(records.plan.startDate) ? records.plan.startDate : today;
     return new Map(estimateDates({ blocks: examBlocks, startDate: start, done: completed, today }).map((item) => [item.key, item.date]));
@@ -406,8 +461,6 @@ export default function TriCertApp() {
   const deliverableStatus = artifactStatus(deliverable.key);
   const savedDeliverable = state.artifacts.find((row) => row.artifact_key === deliverable.key);
   const projectDone = (key: string) => (projects.find((item) => item.key === key)?.deliverables || []).filter((item) => artifactStatus(item.key) === 'complete').length;
-  const wrongAnswers = latestAttempts.filter((attempt) => !attempt.correct);
-  const reviewQueue = latestAttempts.filter((attempt) => !attempt.correct || attempt.confidence === 'low');
   const draftArtifacts = state.artifacts
     .filter((row) => row.status === 'draft')
     .map((row) => allDeliverables.find((item) => item.key === row.artifact_key))
@@ -546,15 +599,15 @@ export default function TriCertApp() {
   }
 
   function startMorning(item: Morning | null, mode: MorningMode) {
-    const owner = item ? examBlocks.find((candidate) => candidate.mornings.some((entry) => entry.key === item.key)) : block;
+    const owner = item ? examBlocks.find((candidate) => candidate.mornings.some((entry) => entry.key === item.key)) : studyBlock;
     if (!owner) return;
-    const key = item ? item.key : `short-${today}`;
-    if (morning && (morning.key === key || (mode === 'short' && morning.mode === 'short'))) { resumeMorning(); return; }
+    const key = item ? item.key : `${mode === 'due' ? 'due' : 'short'}-${today}`;
+    if (morning && (morning.key === key || (!item && morning.mode === mode))) { resumeMorning(); return; }
     // Answers already given stay saved; only his place in the other morning is set aside.
     if (morning && (morning.part > 0 || Object.keys(morning.questions.answers).length > 0)) say('Your other morning was set aside. Its answers and cards are saved.');
     const taught = owner.mornings.filter((entry) => entry.kind === 'learn' && completed.has(entry.key)).map((entry) => entry.lesson || entry.key);
     const lesson = mode === 'learn' ? item?.lesson : undefined;
-    const engineMode: DailyMode = mode === 'short' ? 'short' : mode === 'learn' ? 'learn' : 'review';
+    const engineMode: DailyMode = mode === 'short' || mode === 'due' ? 'short' : mode === 'learn' ? 'learn' : 'review';
     const picks = todaysCards({ srs, today, lesson, usercards: records.usercards }).slice(0, MAX_CARDS);
     const questions = todaysQuestions({ exam: owner.cert, srs, today, lesson, mode: engineMode, mocks: records.mocks, taught });
     const next: MorningRun = {
@@ -645,7 +698,7 @@ export default function TriCertApp() {
     if (!current) return;
     const owner = examBlocks.find((item) => item.key === current.block);
     const item = owner?.mornings.find((entry) => entry.key === current.morning);
-    const title = item ? item.title : 'Short morning';
+    const title = item ? item.title : current.mode === 'due' ? 'Today’s review' : 'Short morning';
     if (current.mode === 'review' && current.reflection.trim()) {
       const saved = await update({ action: 'save-artifact', artifactKey: `retrospective-${current.key}`, status: 'complete', evidenceText: current.reflection, reflection: `${title}: weekly reflection recorded.` });
       if (!saved) return;
@@ -657,7 +710,7 @@ export default function TriCertApp() {
     const logged = await update({
       action: 'append-record',
       key: 'log',
-      item: { id: `log-${current.key}-${Date.now().toString(36)}`, key: current.morning || 'short', kind: current.mode, block: current.block, date: today, minutes, cards: current.cards.reviewed, questions: answers.length, right } satisfies LogRow,
+      item: { id: `log-${current.key}-${Date.now().toString(36)}`, key: current.morning || (current.mode === 'due' ? 'due-review' : 'short'), kind: current.mode, block: current.block, date: today, minutes, cards: current.cards.reviewed, questions: answers.length, right } satisfies LogRow,
     });
     if (!logged) return;
     clearMorning();
@@ -667,7 +720,8 @@ export default function TriCertApp() {
     setMorningOpen(false);
     setMorningRestored(false);
     const where = owner && item ? `${owner.cert}, morning ${owner.mornings.indexOf(item) + 1} of ${owner.mornings.length}` : 'Due cards and questions only';
-    setFinished({ title: current.mode === 'short' ? 'Short morning done' : 'Morning done', detail: current.mode === 'short' ? where : `${where}: ${title}`, kind: current.mode, minutes, cards: current.cards.reviewed, questions: answers.length, right });
+    const extra = current.mode === 'short' || current.mode === 'due';
+    setFinished({ title: current.mode === 'due' ? 'Review done' : current.mode === 'short' ? 'Short morning done' : 'Morning done', detail: extra ? where : `${where}: ${title}`, kind: current.mode, minutes, cards: current.cards.reviewed, questions: answers.length, right });
   }
 
   /* ----------------------------------------------------- weekend blocks */
@@ -678,12 +732,20 @@ export default function TriCertApp() {
     setWeekendOpen(item.key);
   }
 
-  /* TODO(part 2): the practice exam runner. Until it lands, a practice exam
-     weekend block opens Practice. */
+  /* A practice exam weekend block opens the practice exam's start screen. */
   function startPracticeExam(item: WeekendBlock) {
     void item;
-    setPracticeScreen('hub');
-    go('practice');
+    openPractice('exam');
+  }
+
+  function tickLab(key: string, index: number) {
+    setLabTicks((current) => {
+      const ticked = new Set(current[key] || readLab(key));
+      if (ticked.has(index)) ticked.delete(index); else ticked.add(index);
+      const next = [...ticked].sort((x, y) => x - y);
+      writeLab(key, next);
+      return { ...current, [key]: next };
+    });
   }
 
   async function finishWeekend(item: WeekendBlock) {
@@ -692,39 +754,12 @@ export default function TriCertApp() {
     const minutes = Math.max(1, Math.round((Date.now() - (weekendStarted.current || Date.now())) / 60000));
     const logged = await update({ action: 'append-record', key: 'log', item: { id: `log-${item.key}-${Date.now().toString(36)}`, key: item.key, kind: item.kind, block: owner?.key, date: today, minutes, cards: 0, questions: 0, right: 0 } satisfies LogRow });
     if (!logged) return;
+    clearLab(item.key);
     setWeekendOpen(null);
     setFinished({ title: 'Weekend block done', detail: item.title, kind: item.kind, minutes });
   }
 
   /* ---------------------------------------------------------- documents */
-
-  async function saveItilBaseline() {
-    if (!state.profile) return;
-    const profile = state.profile;
-    const saved = await update({
-      action: 'save-profile',
-      displayName: profile.display_name || '',
-      motivation: profile.motivation || '',
-      education: profile.education,
-      projectsLed: profile.projects_led,
-      pmMonths: profile.pm_months,
-      pmTrainingHours: profile.pm_training_hours,
-      pmTrainingComplete: Boolean(profile.pm_training_complete),
-      cyberMonths: profile.cyber_months,
-      cyberDomains: safeDomains(profile.cyber_domains),
-      powerBiLevel: profile.power_bi_level,
-      powerQueryLevel: profile.power_query_level,
-      daxLevel: profile.dax_level,
-      sqlLevel: profile.sql_level,
-      itilLevel: itilLevelDraft,
-      weeklyHours: profile.weekly_hours,
-      pmpTarget: profile.pmp_target,
-      pl300Target: profile.pl300_target,
-      cisspTarget: profile.cissp_target,
-      itilTarget: itilTargetDraft,
-    });
-    if (saved) say('ITIL V5 plan updated.');
-  }
 
   async function saveArtifact(status: 'draft' | 'complete') {
     const saved = await update({ action: 'save-artifact', artifactKey: deliverable.key, status, evidenceText: artifactText, reflection: artifactReflection });
@@ -776,18 +811,20 @@ export default function TriCertApp() {
     downloadFile(`${deliverable.key}.md`, content, 'text/markdown');
   }
 
-  /* ----------------------------------------------- practice (part 2) */
+  /* ------------------------------------------------------------ practice */
 
-  function startScenarios() {
-    const ordered = [...practiceBank.slice(scenarioCursor), ...practiceBank.slice(0, scenarioCursor)];
-    setRun({ kind: 'scenarios', title: 'Scenarios', questions: ordered, index: 0, answered: 0, correct: 0 });
-    setPracticeScreen('run');
-    window.scrollTo({ top: 0 });
+  function openPractice(screen: PracticeScreen = 'hub') {
+    setPracticeScreen(screen);
+    setView('practice');
+    if (window.location.hash !== '#practice') window.history.pushState(null, '', '#practice');
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   }
 
-  function startTimed() {
-    setMockSeconds(15 * 60);
-    setRun({ kind: 'timed', title: `Timed set, ${mockCert}`, questions: timedQuestions(mockCert), index: 0, answered: 0, correct: 0 });
+  /* Scenarios across exams: free practice that counts toward nothing, so
+     nothing is saved. */
+  function startScenarios() {
+    const ordered = [...freePractice.slice(scenarioCursor % freePractice.length), ...freePractice.slice(0, scenarioCursor % freePractice.length)];
+    setRun({ kind: 'scenarios', title: 'Scenarios across exams', questions: ordered, index: 0, answered: 0, correct: 0 });
     setPracticeScreen('run');
     window.scrollTo({ top: 0 });
   }
@@ -800,46 +837,133 @@ export default function TriCertApp() {
     window.scrollTo({ top: 0 });
   }
 
-  async function answer(question: ScenarioQuestion, choice: string, confidence: string) {
+  async function answer(question: ScenarioQuestion, choice: string) {
     if (!run) return false;
-    const prefix = run.kind === 'timed' ? `mock-${mockCert}-` : '';
-    const saved = await update({
-      action: 'record-attempt',
-      questionId: `${prefix}${question.id}`,
-      certification: prefix ? mockCert : question.certification,
-      domain: question.domain,
-      answer: choice,
-      correct: choice === question.correct,
-      confidence,
-    });
-    if (saved) setRun({ ...run, answered: run.answered + 1, correct: run.correct + (choice === question.correct ? 1 : 0) });
-    return Boolean(saved);
-  }
-
-  async function advance() {
-    if (!run) return;
-    if (run.kind === 'scenarios') setScenarioCursor((cursor) => (cursor + 1) % practiceBank.length);
-    if (run.index < run.questions.length - 1) { setRun({ ...run, index: run.index + 1 }); return; }
-    await endRun();
-  }
-
-  async function endRun() {
-    if (!run) return;
-    if (run.kind === 'timed' && run.answered > 0) {
-      const score = Math.round((run.correct / Math.max(1, run.answered)) * 100);
-      await update({
-        action: 'save-artifact',
-        artifactKey: mockArtifactKey(mockCert),
-        status: 'complete',
-        evidenceText: JSON.stringify({ certification: mockCert, score, answered: run.answered, durationMinutes: 15 }),
-        reflection: 'Timed original scenario drill. Review the wrong-answer journal before counting this result toward readiness.',
-      });
-      say(`Timed set recorded at ${score}%.`);
-    } else if (run.answered > 0) {
-      say(`${run.correct} of ${run.answered} sound decisions.`);
+    const correct = choice === question.correct;
+    if (run.kind === 'artifact') {
+      const saved = await update({ action: 'record-attempt', questionId: question.id, certification: question.certification, domain: question.domain, answer: choice, correct, confidence: 'medium' });
+      if (!saved) return false;
     }
+    setRun({ ...run, answered: run.answered + 1, correct: run.correct + (correct ? 1 : 0) });
+    return true;
+  }
+
+  function advance() {
+    if (!run) return;
+    if (run.kind === 'scenarios') setScenarioCursor((cursor) => cursor + 1);
+    if (run.index < run.questions.length - 1) { setRun({ ...run, index: run.index + 1 }); return; }
+    endRun();
+  }
+
+  function endRun() {
+    if (!run) return;
+    if (run.answered > 0) say(`${run.correct} of ${run.answered} right.`);
     setRun(null);
     setPracticeScreen('hub');
+  }
+
+  /* --------------------------------------------------- practice exams */
+
+  function changeExam(change: (current: ExamRun) => ExamRun) {
+    setExam((current) => {
+      if (!current || current.finishedAt) return current;
+      const next = change(current);
+      writeExam(next);
+      examRef.current = next;
+      return next;
+    });
+  }
+
+  function beginExam() {
+    if (!studyBlock) return;
+    if (exam && !exam.finishedAt) { setExamRestored(false); setExamOpen(true); return; }
+    const gate = practiceExamGate(studyBlock, completed, records.mocks, today);
+    if (!gate.open) return;
+    const id = `mock-${studyBlock.key}-${Date.now().toString(36)}`;
+    const next = nextPracticeExam({ exam: studyBlock.cert, mocks: records.mocks, srs, today, seed: id });
+    if (!next.questions.length) { setNotice({ text: 'There are no questions for this practice exam yet.', kind: 'error' }); return; }
+    const created: ExamRun = {
+      v: 1, id, exam: studyBlock.cert, block: studyBlock.key, form: next.form, ids: next.questions.map((question) => question.id), answers: {}, flags: [], index: 0,
+      startedAt: Date.now(), minutes: studyBlock.exam.minutes, allowBack: studyBlock.exam.allowBack, target: studyBlock.exam.target, saved: [],
+    };
+    writeExam(created);
+    examRef.current = created;
+    setExam(created);
+    setClock(created.startedAt);
+    setExamRestored(false);
+    setExamOpen(true);
+  }
+
+  /* Finish: on his word, or by itself at 00:00. The result shows at once;
+     saving follows and can be tried again if it fails. */
+  async function finishExam(current: ExamRun) {
+    if (examFinishing.current || current.finishedAt) return;
+    examFinishing.current = true;
+    const done: ExamRun = { ...current, finishedAt: Math.min(Date.now(), current.startedAt + current.minutes * 60000), date: today };
+    writeExam(done);
+    examRef.current = done;
+    setExam(done);
+    setExamOpen(false);
+    setExamRestored(false);
+    setResultId(done.id);
+    setPracticeScreen('result');
+    setView('practice');
+    if (window.location.hash !== '#practice') window.history.pushState(null, '', '#practice');
+    window.scrollTo({ top: 0 });
+    await saveExamResult(done);
+    examFinishing.current = false;
+  }
+
+  /* Saving a result: the mocks record (with his answers), the review
+     schedules the engine returns, and for form A or B its weekend block
+     (progress and a log line). Each step is noted so a retry never
+     repeats one. */
+  async function saveExamResult(run: ExamRun, base?: StudyState) {
+    let current = run;
+    let latest = base || stateRef.current;
+    const questions = run.ids.map((id) => questionById(id)).filter((question): question is ScenarioQuestion => Boolean(question));
+    const score = scoreExam(questions, run.answers);
+    const owner = examBlocks.find((item) => item.key === run.block);
+    const weekend = owner?.weekends.find((item) => item.kind === 'mock' && item.form === run.form)?.key;
+    const date = run.date || today;
+    const minutes = Math.max(1, Math.round(((run.finishedAt || Date.now()) - run.startedAt) / 60000));
+    const steps: Array<[string, () => Record<string, unknown> | null]> = [
+      ['mock', () => ({ action: 'append-record', key: 'mocks', item: { id: run.id, exam: run.exam, form: run.form, date, total: score.total, right: score.right, areas: score.areas, weekend, ids: run.ids, answers: run.answers, flags: run.flags, minutes } satisfies MockRow })],
+      ['srs', () => {
+        const after = afterExam(latest.records.srs, questions, run.answers, date);
+        const delayed = after.delayed?.[run.exam];
+        return { action: 'patch-record', key: 'srs', patch: { questions: Object.fromEntries(run.ids.filter((id) => after.questions[id]).map((id) => [id, after.questions[id]])), ...(delayed ? { delayed: { [run.exam]: delayed } } : {}) } };
+      }],
+      ['progress', () => (weekend && !latest.progress.some((row) => row.item_key === weekend && row.status === 'complete') ? { action: 'set-progress', itemKey: weekend, status: 'complete' } : null)],
+      ['log', () => ({ action: 'append-record', key: 'log', item: { id: `log-${run.id}`, key: weekend || 'practice-exam', kind: 'mock', block: run.block, date, minutes, cards: 0, questions: score.total, right: score.right } satisfies LogRow })],
+    ];
+    for (const [name, body] of steps) {
+      if (current.saved.includes(name)) continue;
+      const request = body();
+      if (request) {
+        const next = await update(request);
+        if (!next) return false;
+        latest = next;
+      }
+      current = { ...current, saved: [...current.saved, name] };
+      writeExam(current);
+      examRef.current = current;
+      setExam(current);
+    }
+    clearExam();
+    examRef.current = null;
+    setExam(null);
+    return true;
+  }
+
+  function leaveExam() {
+    setExamOpen(false);
+    setExamRestored(false);
+  }
+
+  function openResult(id: string) {
+    setResultId(id);
+    openPractice('result');
   }
 
   if (loading) {
@@ -857,14 +981,11 @@ export default function TriCertApp() {
   const cisspNeeded = profile.education === 'bachelor' || profile.education === 'gac' ? 48 : 60;
   const cisspEligible = profile.cyber_months >= cisspNeeded && profileDomains.length >= 2;
   const exams = certs.map((item) => ({ ...item, date: String(profile[item.field] || ''), days: daysUntil(String(profile[item.field] || ''), today) }));
-  const nextExam = exams.filter((exam) => exam.days !== null && exam.days >= 0).sort((a, b) => (a.days ?? 0) - (b.days ?? 0))[0];
-  const nextPhase = phases.find((phase) => currentIndex <= phase.gate.at) || phases[phases.length - 1];
-  const gates = gateResults(state, completed, latestAttempts, nextPhase);
+  const nextExam = exams.filter((item) => item.days !== null && item.days >= 0).sort((a, b) => (a.days ?? 0) - (b.days ?? 0))[0];
   const ticked = new Set(rubricChecks[deliverable.key] || []);
   const workShort = Math.max(0, 120 - artifactText.trim().length);
   const explainShort = Math.max(0, 40 - artifactReflection.trim().length);
   const completeBlockers = [workShort ? `${workShort} more characters of work` : '', explainShort ? `${explainShort} more characters of explanation` : ''].filter(Boolean);
-  const programmeDone = allTasks.filter((task) => completed.has(task.key)).length;
   const displayName = (profile.display_name || '').trim();
   const firstName = displayName.split(/\s+/)[0] || '';
   const initials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('');
@@ -872,10 +993,7 @@ export default function TriCertApp() {
   const greeting = `${hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'}${firstName ? `, ${firstName}` : ''}`;
   const readingLesson = view === 'learn' && learnTab === 'lessons' && Boolean(learnItem);
   const navActive: View = view === 'projects' ? 'learn' : readingLesson ? lessonFrom : view;
-  const gatesMet = gates.filter((gate) => gate.met).length;
   const inRun = view === 'practice' && practiceScreen === 'run';
-  const nextGateWeek = Math.floor(nextPhase.gate.at / 5) + 1;
-  const nextGateDay = (nextPhase.gate.at % 5) + 1;
 
   /* Today: the next item of the current block. Weekdays get the next
      morning; Saturday and Sunday get the next weekend block when one is open. */
@@ -892,11 +1010,30 @@ export default function TriCertApp() {
     : 'Every exam block that is ready is done. The next one is being built.';
   const openPlan = () => go('plan');
 
+  /* Practice and Progress follow the exam he is working on. */
+  const examGate = studyBlock ? practiceExamGate(studyBlock, completed, records.mocks, today) : null;
+  const examLeft = exam && !exam.finishedAt ? Math.max(0, Math.ceil((examEndsAt - clock) / 1000)) : 0;
+  const examResults: ExamResult[] = records.mocks
+    .filter((row) => typeof row.total === 'number' && typeof row.right === 'number' && isStudyDate(row.date))
+    .map((row) => ({ id: row.id, exam: row.exam, form: row.form, date: row.date, total: row.total as number, right: row.right as number, areas: row.areas || [] }));
+  const bookingChecks: BookingCheck[] = studyBlock ? readyToBook({ block: studyBlock, done: completed, results: examResults, delayed: srs.delayed?.[studyBlock.cert], today }) : [];
+  const bookingReady = bookingChecks.length > 0 && allChecksMet(bookingChecks);
+  const checksMet = bookingChecks.filter((item) => item.met === true).length;
+  const history = studyBlock ? records.mocks.filter((row) => row.exam === studyBlock.cert && typeof row.total === 'number').sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)) : [];
+  const delayed = studyBlock ? srs.delayed?.[studyBlock.cert] : undefined;
+  const resultRow = resultId ? records.mocks.find((row) => row.id === resultId) : undefined;
+  const resultSource: ExamView | null = exam && exam.finishedAt && exam.id === resultId
+    ? { id: exam.id, exam: exam.exam, form: exam.form, date: exam.date || today, ids: exam.ids, answers: exam.answers, target: exam.target, saved: false }
+    : resultRow && resultRow.ids
+      ? { id: resultRow.id, exam: (resultRow.exam || 'ITIL') as Certification, form: resultRow.form, date: resultRow.date, ids: resultRow.ids, answers: resultRow.answers || {}, target: examBlocks.find((item) => item.cert === resultRow.exam)?.exam.target ?? 80, saved: true }
+      : null;
+  const reviewRun = morning?.mode === 'due' ? morning : null;
+  const flashExams = startedCerts.length ? startedCerts : studyBlock ? [studyBlock.cert] : [];
+
   /* Today keeps a short list of things already started: drafts and reviews due. */
   const waiting: Array<{ title: string; detail: string; go: () => void }> = [];
   draftArtifacts.slice(0, 2).forEach((item) => waiting.push({ title: item.title, detail: `Draft, ${docNumberFor(item)}`, go: () => openDocument(item) }));
-  // TODO(part 2): open Today's review on Practice.
-  if (reviewsDue) waiting.push({ title: `${dueCards} ${dueCards === 1 ? 'card' : 'cards'} and ${dueQuestions} ${dueQuestions === 1 ? 'question' : 'questions'} due for review`, detail: 'Spaced review. A morning starts with them.', go: () => go('practice') });
+  if (reviewsDue) waiting.push({ title: `${dueCards} ${dueCards === 1 ? 'card' : 'cards'} and ${dueQuestions} ${dueQuestions === 1 ? 'question' : 'questions'} due for review`, detail: 'Today’s review on Practice. A morning also starts with them.', go: () => openPractice('hub') });
 
   const documentsPanel = (
     <div className="projects">
@@ -935,10 +1072,17 @@ export default function TriCertApp() {
   /* While an overlay is open the page behind it is inert, so keyboard focus
      stays inside the overlay. Messages sit outside and stay reachable. */
   const weekendItem = weekendOpen ? examBlocks.flatMap((item) => item.weekends).find((item) => item.key === weekendOpen) : undefined;
-  const overlayOpen = (morningOpen && Boolean(morning)) || Boolean(weekendItem) || Boolean(finished) || settingsOpen;
+  const examShown = examOpen && exam && !exam.finishedAt ? exam : null;
+  const overlayOpen = (morningOpen && Boolean(morning)) || Boolean(examShown) || Boolean(weekendItem) || Boolean(finished) || settingsOpen;
   const morningPart = morning ? morningParts[morning.mode][Math.min(morning.part, morningParts[morning.mode].length - 1)][1] : '';
-  const morningChip = morning && !morningOpen ? (
-    <button className="live-chip" onClick={resumeMorning} aria-label={`Back to your morning, ${morningPart}`}>
+  const examAway = exam && !exam.finishedAt && !examOpen;
+  const morningChip = examAway ? (
+    <button className="live-chip" onClick={beginExam} aria-label={`Back to your practice exam, ${formatClock(examLeft)} left`}>
+      <span className="live-dot" aria-hidden="true" />
+      <span><Digits value={formatClock(examLeft)} /></span>
+    </button>
+  ) : morning && !morningOpen ? (
+    <button className="live-chip" onClick={resumeMorning} aria-label={`Back to your ${morning.mode === 'due' ? 'review' : 'morning'}, ${morningPart}`}>
       <span className="live-dot paused" aria-hidden="true" />
       <span>{morningPart}</span>
     </button>
@@ -966,10 +1110,15 @@ export default function TriCertApp() {
               );
             })}
           </nav>
-          {morning && !morningOpen && (
+          {examAway ? (
+            <button className="live-pill" onClick={beginExam}>
+              <span className="live-dot" aria-hidden="true" />
+              <span className="live-text"><span className="live-clock"><Digits value={formatClock(examLeft)} /></span><span className="live-name">Back to your practice exam</span></span>
+            </button>
+          ) : morning && !morningOpen && (
             <button className="live-pill" onClick={resumeMorning}>
               <span className="live-dot paused" aria-hidden="true" />
-              <span className="live-text"><span className="live-clock">{morningPart}</span><span className="live-name">Back to your morning</span></span>
+              <span className="live-text"><span className="live-clock">{morningPart}</span><span className="live-name">{morning.mode === 'due' ? 'Back to your review' : 'Back to your morning'}</span></span>
             </button>
           )}
           <div className="rail-foot">
@@ -1111,7 +1260,7 @@ export default function TriCertApp() {
             <article className="doc" aria-labelledby="doc-title">
               <button className="back" onClick={openDocuments}><Chevron dir="left" /> Documents</button>
               <header className="doc-head">
-                <p className="eyebrow"><span>{docNumber(project.key, deliverableIndex)}</span><span>Release {phases.findIndex((phase) => phase.project === project.key) + 1}</span><DocStatus status={deliverableStatus} /></p>
+                <p className="eyebrow"><span>{docNumber(project.key, deliverableIndex)}</span><span>Release {releaseNumber(project.key)}</span><DocStatus status={deliverableStatus} /></p>
                 <h1 id="doc-title">{deliverable.title}</h1>
                 <p className="lede">{keepTogether(deliverable.summary)}</p>
               </header>
@@ -1168,52 +1317,46 @@ export default function TriCertApp() {
             <div className="practice">
               <header className="screen-head">
                 <h1>Practice</h1>
-                <p className="lede">{latestAttempts.length} decisions recorded so far{reviewQueue.length ? `, ${reviewQueue.length} to review` : ''}.</p>
+                <p className="lede">Spaced review keeps what you learned. The practice exam tells you when to book.</p>
               </header>
-              <div className="tiles">
-                <button className="tile tile-scenarios" onClick={startScenarios}>
-                  <span className="tile-text">
-                    <strong>Scenarios</strong>
-                    <small>{practiceBank.length} decisions across all four exams, at your own pace. You pick up where you left off.</small>
-                  </span>
-                  <span className="tile-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start scenarios</span>
-                </button>
-                <ul className="list practice-list">
-                  <li>
-                    <div className="row tile tile-timed">
-                      <Glyph name="timed" />
-                      <span className="row-text"><strong>Timed set</strong><small>{timedQuestions(mockCert).length} {examLabel(mockCert)} questions, 15 minutes</small></span>
-                      <span className="tile-controls">
-                        <label className="sr-only" htmlFor="lens">Exam</label>
-                        <select id="lens" value={mockCert} onChange={(event) => setMockCert(event.target.value as Certification)}><option value="PMP">PMP</option><option value="PL-300">PL-300</option><option value="CISSP">CISSP</option><option value="ITIL">ITIL V5</option></select>
-                        <button className="secondary start" onClick={startTimed}>Start</button>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <button className="row tile tile-review" onClick={() => setPracticeScreen('review')}>
-                      <Glyph name="review" />
-                      <span className="row-text"><strong>Review</strong><small>{reviewQueue.length ? 'Wrong or guessed answers to go over' : 'All clear'}</small></span>
-                      {reviewQueue.length > 0 && <span className="count" aria-hidden="true">{reviewQueue.length}</span>}
-                      <Chevron dir="right" />
-                    </button>
-                  </li>
-                  <li>
-                    <button className="row tile tile-cards" onClick={() => { setFlashRevealed(false); setPracticeScreen('flashcards'); }}>
-                      <Glyph name="cards" />
-                      <span className="row-text"><strong>Flashcards</strong><small>{allFlashcards.length} cards, filter by exam</small></span>
-                      <Chevron dir="right" />
-                    </button>
-                  </li>
-                  <li>
-                    <button className="row tile tile-labs" onClick={() => setPracticeScreen('labs')}>
-                      <Glyph name="labs" />
-                      <span className="row-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} done, with datasets</small></span>
-                      <Chevron dir="right" />
-                    </button>
-                  </li>
-                </ul>
-              </div>
+              <section className={reviewsDue || reviewRun ? 'hero-session review-card' : 'hero-session review-card is-done'} aria-labelledby="review-title">
+                <div className="hero-top">
+                  <p className="hero-when-line"><span className="hero-label">{reviewRun ? 'In progress' : 'Today’s review'}</span>{reviewsDue > 0 && <span className="hero-when">{reviewsDue} due</span>}</p>
+                </div>
+                <h2 id="review-title">{reviewsDue ? `${dueCards} ${dueCards === 1 ? 'card' : 'cards'} and ${dueQuestions} ${dueQuestions === 1 ? 'question' : 'questions'} due` : 'Nothing due today'}</h2>
+                <p className="hero-sub"><span>{reviewsDue || reviewRun ? 'Cards, then questions, then your mistakes. No lesson.' : 'Cards and questions come back here on the day they are due.'}</span></p>
+                {(reviewsDue > 0 || reviewRun) && <div className="hero-actions">{heroMain(reviewRun ? 'Resume review' : 'Start review', () => (reviewRun ? resumeMorning() : startMorning(null, 'due')))}</div>}
+              </section>
+              <ul className="list practice-list" aria-label="More practice">
+                <li>
+                  <button className="row tile tile-exam" onClick={() => openPractice('exam')}>
+                    <Glyph name="timed" />
+                    <span className="row-text"><strong>Practice exam</strong><small>{exam && !exam.finishedAt ? `In progress, ${formatClock(examLeft)} left` : examGate && studyBlock ? (examGate.open ? `${formName(examGate.form)}: ${studyBlock.exam.questions} questions in ${studyBlock.exam.minutes} minutes` : examGate.reason) : 'Opens with the first exam block'}</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+                <li>
+                  <button className="row tile tile-cards" onClick={() => { setFlashIndex(0); setFlashRevealed(false); setFlashCert('All'); setPracticeScreen('flashcards'); }}>
+                    <Glyph name="cards" />
+                    <span className="row-text"><strong>Flashcards</strong><small>{flashExams.reduce((sum, cert) => sum + cardsForExam(cert, records.usercards).length, 0)} cards from {flashExams.map(examLabel).join(', ') || 'your exams'}, to browse</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+                <li>
+                  <button className="row tile tile-cross" onClick={startScenarios}>
+                    <Glyph name="review" />
+                    <span className="row-text"><strong>Scenarios across exams</strong><small>{freePractice.length} questions from all four exams. Free practice that counts toward nothing.</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+                <li>
+                  <button className="row tile tile-labs" onClick={() => setPracticeScreen('labs')}>
+                    <Glyph name="labs" />
+                    <span className="row-text"><strong>Labs</strong><small>{labCards.filter((lab) => completed.has(lab.key)).length} of {labCards.length} Kestrel labs done, with datasets</small></span>
+                    <Chevron dir="right" />
+                  </button>
+                </li>
+              </ul>
             </div>
           )}
 
@@ -1222,7 +1365,6 @@ export default function TriCertApp() {
               key={`${run.kind}-${run.questions[run.index].id}-${run.index}`}
               run={run}
               saving={saving}
-              seconds={run.kind === 'timed' ? mockSeconds : null}
               timerChip={morningChip}
               onAnswer={answer}
               onNext={advance}
@@ -1230,27 +1372,52 @@ export default function TriCertApp() {
             />
           )}
 
+          {view === 'practice' && practiceScreen === 'exam' && (
+            <ExamStart
+              block={studyBlock}
+              gate={examGate}
+              running={exam && !exam.finishedAt ? exam : null}
+              left={examLeft}
+              lastResult={history[0]}
+              onBack={() => setPracticeScreen('hub')}
+              onStart={beginExam}
+              onResult={openResult}
+            />
+          )}
+
+          {view === 'practice' && practiceScreen === 'result' && (
+            resultSource
+              ? <ExamResultView result={resultSource} saving={saving} onSave={() => { if (exam && exam.finishedAt) void saveExamResult(exam); }} onBack={() => setPracticeScreen('hub')} />
+              : <div className="exam-result"><button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button><p className="lede">This result is no longer here.</p></div>
+          )}
+
           {view === 'practice' && practiceScreen === 'flashcards' && (() => {
-            const deck = flashCert === 'All' ? allFlashcards : allFlashcards.filter(([cert]) => cert === flashCert);
+            const all = flashExams.flatMap((cert) => cardsForExam(cert, records.usercards));
+            const deck = flashCert === 'All' ? all : all.filter((card) => card.exam === flashCert);
+            if (!deck.length) {
+              return <div className="flash"><button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button><header className="screen-head"><h1>Flashcards</h1><p className="lede">No cards yet for the exams you have started.</p></header></div>;
+            }
             const index = Math.min(flashIndex, deck.length - 1);
             const card = deck[index];
             const move = (step: number) => { setFlashIndex((index + step + deck.length) % deck.length); setFlashRevealed(false); };
             return (
               <div className="flash">
                 <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-                <header className="screen-head"><h1>Flashcards</h1><p className="lede">Say the answer out loud, then tap the card to check.</p></header>
-                <div className="pills" role="group" aria-label="Deck">
-                  {(['All', 'PMP', 'PL-300', 'CISSP', 'ITIL'] as const).map((cert) => (
-                    <button key={cert} className={flashCert === cert ? 'pill active' : 'pill'} aria-pressed={flashCert === cert} onClick={() => { setFlashCert(cert); setFlashIndex(0); setFlashRevealed(false); }}>{examLabel(cert)}</button>
-                  ))}
-                </div>
+                <header className="screen-head"><h1>Flashcards</h1><p className="lede">The cards of {flashExams.map(examLabel).join(' and ')}, to browse. Say the answer out loud, then tap the card to check. Your spaced review is on Practice.</p></header>
+                {flashExams.length > 1 && (
+                  <div className="pills" role="group" aria-label="Deck">
+                    {(['All', ...flashExams] as Array<Certification | 'All'>).map((cert) => (
+                      <button key={cert} className={flashCert === cert ? 'pill active' : 'pill'} aria-pressed={flashCert === cert} onClick={() => { setFlashCert(cert); setFlashIndex(0); setFlashRevealed(false); }}>{cert === 'All' ? 'All' : examLabel(cert)}</button>
+                    ))}
+                  </div>
+                )}
                 <button className={flashRevealed ? 'flash-card revealed' : 'flash-card'} onClick={() => setFlashRevealed(!flashRevealed)} aria-label={flashRevealed ? 'Hide answer' : 'Show answer'}>
                   <span className="flash-top">
-                    <span className="flash-cert">{examLabel(card[0])}, card {index + 1} of {deck.length}</span>
+                    <span className="flash-cert">{examLabel(card.exam)}{card.source === 'mine' ? ', your card' : ''}, card {index + 1} of {deck.length}</span>
                     <span className="flash-progress" aria-hidden="true"><span style={{ width: `${((index + 1) / deck.length) * 100}%` }} /></span>
                   </span>
-                  <span className="flash-q">{keepTogether(card[1])}</span>
-                  {flashRevealed ? <span className="flash-a">{keepTogether(card[2])}</span> : <span className="flash-hint">Tap to reveal the answer</span>}
+                  <span className="flash-q">{keepTogether(card.front)}</span>
+                  {flashRevealed ? <span className="flash-a">{keepTogether(card.back)}</span> : <span className="flash-hint">Tap to reveal the answer</span>}
                 </button>
                 <div className="row-actions spread">
                   <button className="secondary" onClick={() => move(-1)}><Chevron dir="left" /> Previous</button>
@@ -1290,80 +1457,87 @@ export default function TriCertApp() {
             </div>
           )}
 
-          {view === 'practice' && practiceScreen === 'review' && (
-            <div className="review">
-              <button className="back" onClick={() => setPracticeScreen('hub')}><Chevron dir="left" /> Practice</button>
-              <header className="screen-head">
-                <h1>Review</h1>
-                {reviewQueue.length > 0 && <p className="lede">{wrongAnswers.length} wrong, {reviewQueue.length - wrongAnswers.length} guessed. Restate the scenario, name the principle, say why your answer failed, then update the document.</p>}
-              </header>
-              <ReviewList queue={reviewQueue} onOpen={(key) => {
-                const found = allDeliverables.find((item) => item.key === key);
-                if (found) openDocument(found);
-              }} />
-            </div>
-          )}
-
           {view === 'progress' && (
             <div className="progress">
               <header className="screen-head">
                 <h1>Progress</h1>
-                <p className="lede">{programmeDone === allTasks.length ? `All 65 sessions done. ${gatesMet} of ${gates.length} checks met for your last gate.` : <>Your next gate is {keepTogether(nextPhase.gate.label)}. {gatesMet} of {gates.length} checks met.</>}</p>
+                <p className="lede">{studyBlock ? (bookingReady ? `${studyBlock.cert}: all four checks are met. You are ready to book.` : `${studyBlock.cert}: ${checksMet} of 4 checks met. Book when all four are met.`) : 'No exam block is ready yet.'}</p>
               </header>
               <div className="segmented" role="tablist" aria-label="Progress sections">
                 <button role="tab" aria-selected={progressTab === 'readiness'} className={progressTab === 'readiness' ? 'active' : ''} onClick={() => { setProgressTab('readiness'); window.history.replaceState(null, '', '#progress'); }}>Readiness</button>
                 <button role="tab" aria-selected={progressTab === 'portfolio'} className={progressTab === 'portfolio' ? 'active' : ''} onClick={() => { setProgressTab('portfolio'); window.history.replaceState(null, '', '#portfolio'); }}>Portfolio</button>
               </div>
 
-              {progressTab === 'readiness' && (
+              {progressTab === 'readiness' && studyBlock && (
                 <>
-                  <section className="card gate-checks" aria-labelledby="gates-title">
+                  <section className="card book-checks" aria-labelledby="book-title">
                     <div className="card-head">
-                      <div className="gate-head">
-                        <p className="eyebrow">Next gate, week {nextGateWeek}, day {nextGateDay}</p>
-                        <h2 id="gates-title">Before you book {keepTogether(nextPhase.gate.label)}</h2>
+                      <div className="book-head">
+                        <p className="eyebrow">{keepTogether(studyBlock.title)}</p>
+                        <h2 id="book-title">Ready to book?</h2>
                       </div>
-                      <p className="gate-score" aria-label={`${gatesMet} of ${gates.length} checks met`}><strong>{gatesMet}</strong><span>/{gates.length}</span></p>
+                      <p className="gate-score" aria-label={`${checksMet} of 4 checks met`}><strong>{checksMet}</strong><span>/4</span></p>
                     </div>
-                    <p className="hint">Completion alone does not make you ready. Meet all five checks, then book.</p>
-                    <ul className="checklist">{gates.map((gate) => <li key={gate.title}><span className={gate.met ? 'tick is-done' : 'tick'} aria-hidden="true">{gate.met && <Check />}</span><span><strong>{gate.title}</strong><small>{keepTogether(gate.detail)}</small></span></li>)}</ul>
+                    <ul className="checklist">
+                      {bookingChecks.map((item) => (
+                        <li key={item.key}>
+                          <span className={item.met === true ? 'tick is-done' : item.met === 'not-enough-data' ? 'tick is-wait' : 'tick'} aria-hidden="true">{item.met === true && <Check />}</span>
+                          <span><strong>{item.title}</strong><small>{item.met === true ? 'Met. ' : item.met === 'not-enough-data' ? 'Not checked yet. ' : 'Not yet. '}{keepTogether(item.detail)}</small></span>
+                        </li>
+                      ))}
+                    </ul>
                   </section>
 
-                  <h2 className="section-title">Exam readiness</h2>
-                  <ul className="list cert-scores">
-                    {exams.map((exam) => {
-                      const score = readiness[exam.cert];
-                      return (
-                        <li key={exam.cert}>
-                          <div className="cs-top">
-                            <span className="cs-id"><strong>{exam.label}</strong><small>{exam.name}</small></span>
-                            <p className="cs-total"><strong>{score.total}</strong><small>/100</small></p>
-                          </div>
-                          <Meter value={score.total / 100} label={`${exam.label} readiness ${score.total} of 100`} />
-                          <div className="cs-foot">
-                            <ReadinessParts score={score} />
-                            <span className="cs-date">{exam.date ? `${formatDate(exam.date)}${exam.days !== null && exam.days >= 0 ? `, in ${exam.days} ${exam.days === 1 ? 'day' : 'days'}` : ''}` : 'No exam date set'}</span>
-                          </div>
-                        </li>
-                      );
+                  {bookingReady && studyBlock.booking.length > 0 && (
+                    <section className="card" aria-labelledby="booking-title">
+                      <h2 id="booking-title">Before you book</h2>
+                      <ol className="steps booking-list">{studyBlock.booking.map((line) => <li key={line}>{keepTogether(line)}</li>)}</ol>
+                    </section>
+                  )}
+
+                  <h2 className="section-title">Practice exams</h2>
+                  {history.length ? (
+                    <ul className="list history" aria-label="Practice exam history">
+                      {history.map((row) => {
+                        const percent = Math.round(((row.right || 0) * 1000) / Math.max(1, row.total || 0)) / 10;
+                        const body = (
+                          <>
+                            <span className="row-text"><strong>{formName(row.form)}</strong><small>{formatDate(row.date)}</small></span>
+                            <span className="history-score"><strong>{percent}%</strong><small>{row.right} of {row.total}{percent >= studyBlock.exam.target ? ', at target' : ''}</small></span>
+                          </>
+                        );
+                        return <li key={row.id}>{row.ids ? <button className="row" onClick={() => openResult(row.id)}>{body}<Chevron dir="right" /></button> : <div className="row">{body}</div>}</li>;
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="hint empty-line">No practice exam yet. {examGate && !examGate.open ? examGate.reason : `${formName(examGate?.form || 'A')} is open on Practice.`}</p>
+                  )}
+
+                  <h2 className="section-title">Delayed reviews</h2>
+                  <section className="card delayed" aria-label="Delayed-review score">
+                    {delayed && delayed.total >= 20
+                      ? <p className="delayed-score"><strong>{Math.round((delayed.right * 100) / delayed.total)}%</strong><span>{delayed.right} of {delayed.total} right</span></p>
+                      : <p className="delayed-score is-wait"><strong>{delayed?.total || 0}</strong><span>of 20 answers needed</span></p>}
+                    <p className="hint">Answers given 7 days or more after you first saw the question. This shows what you keep, not what you just read. The target is 80% over at least 20 answers.</p>
+                  </section>
+
+                  <h2 className="section-title">Other exams</h2>
+                  <ul className="list other-exams">
+                    {examBlocks.filter((item) => item.key !== studyBlock.key).map((item) => {
+                      const started = [...item.mornings, ...item.weekends].some((entry) => completed.has(entry.key));
+                      const label = item.status === 'building' ? 'Being built' : blockFinished(item, completed) ? 'Done' : started ? 'Started' : 'Not started';
+                      return <li key={item.key}><div className="row"><span className="row-text"><strong>{keepTogether(item.title)}</strong></span><span className="pi-state">{label}</span></div></li>;
                     })}
                   </ul>
-                  <p className="hint cs-note">Each score adds evidence out of 100: coverage 30, documents 35, judgment 25 and recall 10. It guides you; it does not predict a pass.</p>
 
                   <details className="fold">
                     <summary className="row"><span className="row-text"><strong>Eligibility</strong><small>PMI and ISC2 decide</small></span><FoldMark /></summary>
                     <div className="fold-body">
                       <ul className="checklist">
                         <li><span className={pmpEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{pmpEligible && <Check />}</span><span><strong>PMP</strong><small>{pmpEligible ? 'Baseline appears satisfied. Verify application evidence.' : `${profile.pm_months} of ${pmpNeeded} leadership months, ${profile.pm_training_hours} of 35 training hours`}</small></span></li>
-                        <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>PL-300</strong><small>No experience requirement.</small></span></li>
                         <li><span className={cisspEligible ? 'tick is-done' : 'tick'} aria-hidden="true">{cisspEligible && <Check />}</span><span><strong>CISSP</strong><small>{cisspEligible ? 'Baseline appears satisfied. Verify domain evidence.' : `${profile.cyber_months} of ${cisspNeeded} months${cisspNeeded === 48 ? ' (degree waiver applied)' : ''}, ${profileDomains.length} of 2 domains. The Associate of ISC2 route remains open.`}</small></span></li>
-                        <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5</strong><small>Entry credential: 40 questions, 60 minutes, 65% to pass.</small></span></li>
+                        <li><span className="tick is-done" aria-hidden="true"><Check /></span><span><strong>ITIL V5 and PL-300</strong><small>No experience requirement.</small></span></li>
                       </ul>
-                      <div className="inline-form">
-                        <div><label className="field" htmlFor="itil-level">ITIL V5 level</label><select id="itil-level" value={itilLevelDraft} onChange={(event) => setItilLevelDraft(event.target.value)}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
-                        <div><label className="field" htmlFor="itil-date">ITIL V5 exam date</label><input id="itil-date" type="date" value={itilTargetDraft} onChange={(event) => setItilTargetDraft(event.target.value)} /></div>
-                        <button className="secondary" disabled={saving} onClick={saveItilBaseline}>Update</button>
-                      </div>
                     </div>
                   </details>
                 </>
@@ -1407,7 +1581,7 @@ export default function TriCertApp() {
 
       {notice && <div className={notice.kind === 'error' ? 'toast is-error' : 'toast'} role={notice.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{notice.kind === 'error' ? '!' : <Check />}</span><span>{notice.text}</span><button onClick={() => setNotice(null)} aria-label="Dismiss message">×</button></div>}
 
-      {morningOpen && morning && (
+      {morningOpen && morning && !examShown && (
         <MorningFocus
           run={morning}
           restored={morningRestored}
@@ -1423,11 +1597,24 @@ export default function TriCertApp() {
         />
       )}
 
+      {examShown && (
+        <ExamFocus
+          run={examShown}
+          left={examLeft}
+          restored={examRestored}
+          onChange={changeExam}
+          onLeave={leaveExam}
+          onFinish={() => finishExam(examShown)}
+        />
+      )}
+
       {weekendItem && (
         <WeekendFocus
           item={weekendItem}
           block={examBlocks.find((candidate) => candidate.weekends.includes(weekendItem))}
+          ticks={labTicks[weekendItem.key] || readLab(weekendItem.key)}
           saving={saving}
+          onTick={(index) => tickLab(weekendItem.key, index)}
           onLeave={() => setWeekendOpen(null)}
           onFinish={() => finishWeekend(weekendItem)}
         />
@@ -1533,8 +1720,8 @@ function MorningFocus({ run, restored, saving, lesson, usercards, onChange, onLe
     return () => window.removeEventListener('keydown', onKey);
   }, [onLeave]);
   const nextPart = () => onChange((current) => ({ ...current, part: current.part + 1 }));
-  const nextLabel = parts[index + 1] ? `Continue to ${parts[index + 1][1].toLowerCase()}` : 'Finish morning';
-  const where = owner && item ? `${owner.cert}, morning ${owner.mornings.indexOf(item) + 1}` : `${run.exam}, short morning`;
+  const nextLabel = parts[index + 1] ? `Continue to ${parts[index + 1][1].toLowerCase()}` : run.mode === 'due' ? 'Finish review' : 'Finish morning';
+  const where = owner && item ? `${owner.cert}, morning ${owner.mornings.indexOf(item) + 1}` : run.mode === 'due' ? 'Today’s review' : `${run.exam}, short morning`;
   const shared = { run, restored: restored && index === run.part, saving, step };
   return (
     <div ref={dialog} tabIndex={-1} className="focus morning" role="dialog" aria-modal="true" aria-labelledby="morning-title">
@@ -1547,14 +1734,14 @@ function MorningFocus({ run, restored, saving, lesson, usercards, onChange, onLe
           <li key={key} className={position < index ? 'is-done' : position === index ? 'is-now' : undefined} aria-current={position === index ? 'step' : undefined}>
             <span className="step-mark" aria-hidden="true">{position < index && <Check />}</span>
             <span className="step-name">{name}</span>
-            <span className="step-min">{minutes} min<span className="sr-only">{position < index ? ', done' : ''}</span></span>
+            <span className="step-min">{minutes ? `${minutes} min` : position < index ? 'Done' : position === index ? 'Now' : 'Next'}<span className="sr-only">{minutes && position < index ? ', done' : ''}</span></span>
           </li>
         ))}
       </ol>
       {part === 'cards' && <CardsPane {...shared} usercards={usercards} nextLabel={nextLabel} onChange={onChange} onGrade={onGrade} onNext={nextPart} />}
       {part === 'learn' && <LearnPane {...shared} item={item} lesson={lesson} nextLabel={nextLabel} onChange={onChange} onNext={nextPart} />}
       {part === 'questions' && <QuestionsPane {...shared} pace={owner?.exam.secondsPerQuestion || 90} nextLabel={nextLabel} onChange={onChange} onAnswer={onAnswer} onNext={nextPart} />}
-      {part === 'mistakes' && <MistakesPane {...shared} finalLabel={run.mode === 'review' ? nextLabel : 'Finish morning'} onChange={onChange} onDone={run.mode === 'review' ? onMistakesDone : onFinish} />}
+      {part === 'mistakes' && <MistakesPane {...shared} finalLabel={run.mode === 'review' ? nextLabel : run.mode === 'due' ? 'Finish review' : 'Finish morning'} onChange={onChange} onDone={run.mode === 'review' ? onMistakesDone : onFinish} />}
       {part === 'reflect' && <ReflectPane {...shared} onChange={onChange} onFinish={onFinish} />}
     </div>
   );
@@ -1833,8 +2020,10 @@ function ReflectPane({ run, restored, saving, step, onChange, onFinish }: PanePr
   );
 }
 
-/* A weekend lab: the steps in a real tool, then Finish lab. */
-function WeekendFocus({ item, block, saving, onLeave, onFinish }: { item: WeekendBlock; block?: ExamBlock; saving: boolean; onLeave: () => void; onFinish: () => void }) {
+/* A weekend lab: the steps in a real tool, a tick for each, then Finish block. */
+function WeekendFocus({ item, block, ticks, saving, onTick, onLeave, onFinish }: {
+  item: WeekendBlock; block?: ExamBlock; ticks: number[]; saving: boolean; onTick: (index: number) => void; onLeave: () => void; onFinish: () => void;
+}) {
   const dialog = useRef<HTMLDivElement>(null);
   useOverlayFocus(dialog, ['.hero-session .play', '#main']);
   useEffect(() => {
@@ -1842,17 +2031,243 @@ function WeekendFocus({ item, block, saving, onLeave, onFinish }: { item: Weeken
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onLeave]);
+  const done = new Set(ticks);
   return (
     <div ref={dialog} tabIndex={-1} className="focus morning" role="dialog" aria-modal="true" aria-labelledby="weekend-title">
       <header className="focus-bar">
         <span className="focus-where"><span className="live-dot" aria-hidden="true" />{block ? `${block.cert}, weekend block ${block.weekends.indexOf(item) + 1}` : 'Weekend block'}</span>
         <button className="ghost" onClick={onLeave}>Leave</button>
       </header>
-      <Pane step={item.key} foot={<button className="primary wide" onClick={onFinish} disabled={saving}>Finish lab</button>}>
+      <Pane step={item.key} foot={<button className="primary wide" onClick={onFinish} disabled={saving}>Finish block</button>}>
         <p className="eyebrow">Lab, {formatMinutes(item.minutes)}</p>
         <h2 id="weekend-title" className="m-title">{keepTogether(item.title)}</h2>
-        <ol className="steps lab-steps">{item.steps.map((line) => <li key={line}>{keepTogether(line)}</li>)}</ol>
+        <p className="hint" aria-live="polite">{done.size} of {item.steps.length} steps ticked. Ticks stay in this browser until you finish.</p>
+        <ol className="rubric lab-steps">
+          {item.steps.map((line, index) => (
+            <li key={line}>
+              <label>
+                <input type="checkbox" checked={done.has(index)} onChange={() => onTick(index)} />
+                <span className="box" aria-hidden="true"><Check /></span>
+                <span><span className="lab-no">{index + 1}.</span> {keepTogether(line)}</span>
+              </label>
+            </li>
+          ))}
+        </ol>
       </Pane>
+    </div>
+  );
+}
+
+/* ==========================================================================
+   Practice exam: a start screen, the exam itself in focus mode, and the
+   result. No feedback until the end; unanswered questions are wrong.
+   ========================================================================== */
+
+type ExamView = { id: string; exam: Certification; form: string; date: string; ids: string[]; answers: ExamAnswers; target: number; saved: boolean };
+type ExamGate = { open: boolean; form: string; reason: string };
+
+function ExamStart({ block, gate, running, left, lastResult, onBack, onStart, onResult }: {
+  block?: ExamBlock; gate: ExamGate | null; running: ExamRun | null; left: number; lastResult?: MockRow;
+  onBack: () => void; onStart: () => void; onResult: (id: string) => void;
+}) {
+  const settings = block?.exam;
+  return (
+    <div className="exam-start">
+      <button className="back" onClick={onBack}><Chevron dir="left" /> Practice</button>
+      <header className="screen-head">
+        <p className="eyebrow">{block ? keepTogether(block.title) : 'Practice exam'}</p>
+        <h1>{running ? formName(running.form) : gate ? formName(gate.form) : 'Practice exam'}</h1>
+        <p className="lede">A full practice exam at the real size and pace. It tells you, with Ready to book on Progress, when to book.</p>
+      </header>
+      {block && settings && (
+        <section className={running || gate?.open ? 'hero-session exam-open' : 'hero-session exam-open is-done'} aria-labelledby="exam-start-title">
+          <h2 id="exam-start-title">{settings.questions} questions, {settings.minutes} minutes</h2>
+          <ul className="exam-rules">
+            <li>No feedback until the end. Then you see your score, your score by area and every question with its explanation.</li>
+            <li>Unanswered questions count as wrong. At 00:00 the exam finishes by itself.</li>
+            <li>{settings.allowBack ? 'You can flag a question, go back, and jump to any question from the list.' : 'As in the real exam, you cannot go back to an earlier question.'}</li>
+            <li>The clock keeps running if you leave or reload. Aim for {settings.target}% or more.</li>
+          </ul>
+          {running
+            ? <div className="hero-actions"><button className="primary play" onClick={onStart}><span className="play-label">Resume practice exam, {formatClock(left)} left</span></button></div>
+            : gate?.open
+              ? <div className="hero-actions"><button className="primary play" onClick={onStart}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg><span className="play-label">Start practice exam</span></button></div>
+              : <p className="exam-locked" role="status"><strong>Not open yet.</strong> {gate?.reason}</p>}
+        </section>
+      )}
+      {lastResult && lastResult.ids && (
+        <ul className="list exam-last">
+          <li><button className="row" onClick={() => onResult(lastResult.id)}><span className="row-text"><strong>Your last result: {formName(lastResult.form)}</strong><small>{formatDate(lastResult.date)}, {lastResult.right} of {lastResult.total}</small></span><Chevron dir="right" /></button></li>
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ExamFocus({ run, left, restored, onChange, onLeave, onFinish }: {
+  run: ExamRun; left: number; restored: boolean; onChange: (change: (current: ExamRun) => ExamRun) => void; onLeave: () => void; onFinish: () => void;
+}) {
+  const [listOpen, setListOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const dialog = useRef<HTMLDivElement>(null);
+  const questions = useMemo(() => run.ids.map((id) => questionById(id)), [run.ids]);
+  const total = run.ids.length;
+  const index = Math.min(run.index, total - 1);
+  const question = questions[index];
+  const id = run.ids[index];
+  const answered = run.ids.filter((key) => run.answers[key]).length;
+  const unanswered = total - answered;
+  const flagged = run.flags.includes(id);
+  const step = `${index}-${listOpen}-${confirming}`;
+  useOverlayFocus(dialog, ['.exam-start .play', '#main'], step);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (confirming) setConfirming(false); else if (listOpen) setListOpen(false); else onLeave();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onLeave, confirming, listOpen]);
+  const goTo = (position: number) => { onChange((current) => ({ ...current, index: position })); setListOpen(false); setConfirming(false); };
+  const choose = (letter: string) => onChange((current) => ({ ...current, answers: { ...current.answers, [id]: letter } }));
+  const toggleFlag = () => onChange((current) => ({ ...current, flags: current.flags.includes(id) ? current.flags.filter((key) => key !== id) : [...current.flags, id] }));
+  const last = index >= total - 1;
+  const low = left <= 300;
+  let body: ReactNode;
+  let foot: ReactNode;
+  if (confirming) {
+    body = (
+      <>
+        <p className="eyebrow">Finish</p>
+        <h2 id="exam-title" className="m-title">Finish the exam?</h2>
+        <p className="lede">{unanswered ? `${unanswered} of ${total} ${unanswered === 1 ? 'question is' : 'questions are'} unanswered. ${unanswered === 1 ? 'It counts' : 'They count'} as wrong.` : `All ${total} questions have an answer.`}{run.flags.length ? ` ${run.flags.length} ${run.flags.length === 1 ? 'is' : 'are'} flagged.` : ''} You have {formatClock(left)} left.</p>
+      </>
+    );
+    foot = <><button className="secondary" onClick={() => setConfirming(false)}>Keep going</button><button className="primary" onClick={onFinish}>Finish exam</button></>;
+  } else if (listOpen) {
+    body = (
+      <>
+        <p className="eyebrow">All questions</p>
+        <h2 id="exam-title" className="m-title">{answered} of {total} answered</h2>
+        <p className="hint">Pick a number to go to that question. A ring marks a flag.</p>
+        <ol className="exam-list">
+          {run.ids.map((key, position) => {
+            const states = [run.answers[key] ? 'answered' : 'unanswered', run.flags.includes(key) ? 'flagged' : ''].filter(Boolean).join(', ');
+            return (
+              <li key={key}>
+                <button className={`exam-cell${run.answers[key] ? ' is-answered' : ''}${run.flags.includes(key) ? ' is-flagged' : ''}${position === index ? ' is-current' : ''}`} aria-current={position === index ? 'true' : undefined} aria-label={`Question ${position + 1}, ${states}`} onClick={() => goTo(position)}>{position + 1}</button>
+              </li>
+            );
+          })}
+        </ol>
+      </>
+    );
+    foot = <button className="primary wide" onClick={() => setListOpen(false)}>Back to question {index + 1}</button>;
+  } else {
+    body = question ? (
+      <>
+        {restored && <p className="hint restored" role="status">Back in your practice exam. The clock kept running.</p>}
+        <div className="q-head">
+          <p className="quiz-meta"><span>Question {index + 1} of {total}</span><span>{areaOf(question.domain)}</span></p>
+          <button className={flagged ? 'flag-toggle is-on' : 'flag-toggle'} aria-pressed={flagged} onClick={toggleFlag}>{flagged ? 'Flagged' : 'Flag'}</button>
+        </div>
+        <h2 id="exam-title" className="quiz-q">{keepTogether(question.prompt)}</h2>
+        <div className="answers" role="radiogroup" aria-labelledby="exam-title">
+          {question.options.map(([key, text]) => (
+            <label key={key} className={`answer ${run.answers[id] === key ? 'is-picked' : ''}`}>
+              <input type="radio" name={`exam-${id}`} value={key} checked={run.answers[id] === key} onChange={() => choose(key)} />
+              <span className="answer-key" aria-hidden="true">{key}</span>
+              <span>{keepTogether(text)}</span>
+            </label>
+          ))}
+        </div>
+      </>
+    ) : <h2 id="exam-title" className="m-title">This question is no longer in the bank. It counts as wrong.</h2>;
+    foot = (
+      <>
+        {run.allowBack && index > 0 && <button className="secondary" onClick={() => goTo(index - 1)}><Chevron dir="left" /> Previous</button>}
+        {last ? <button className="primary" onClick={() => setConfirming(true)}>Finish exam</button> : <button className="primary" onClick={() => goTo(index + 1)}>Next <Chevron dir="right" /></button>}
+      </>
+    );
+  }
+  return (
+    <div ref={dialog} tabIndex={-1} className="focus morning exam" role="dialog" aria-modal="true" aria-labelledby="exam-title">
+      <header className="focus-bar">
+        <span className="focus-where"><span className="live-dot" aria-hidden="true" />{run.exam === 'ITIL' ? 'ITIL' : run.exam}, {formName(run.form).toLowerCase()}</span>
+        <span className={low ? 'exam-clock is-low' : 'exam-clock'} role="timer" aria-label={`${formatClock(left)} left`}><Digits value={formatClock(left)} /></span>
+        <button className="ghost" onClick={onLeave}>Leave</button>
+      </header>
+      <div className="exam-bar">
+        <span className="exam-count">{answered} of {total} answered{run.flags.length ? `, ${run.flags.length} flagged` : ''}</span>
+        <span className="exam-tools">
+          {run.allowBack && <button className="ghost" aria-expanded={listOpen} onClick={() => { setConfirming(false); setListOpen(!listOpen); }}>{listOpen ? 'Hide list' : 'Question list'}</button>}
+          {!confirming && <button className="ghost" onClick={() => { setListOpen(false); setConfirming(true); }}>Finish exam</button>}
+        </span>
+      </div>
+      <Pane step={step} foot={foot}>{body}</Pane>
+    </div>
+  );
+}
+
+function ExamResultView({ result, saving, onSave, onBack }: { result: ExamView; saving: boolean; onSave: () => void; onBack: () => void }) {
+  const questions = result.ids.map((id) => questionById(id));
+  const known = questions.filter((question): question is ScenarioQuestion => Boolean(question));
+  const score = scoreExam(known, result.answers);
+  const total = result.ids.length;
+  const right = score.right;
+  const percent = Math.round((right * 1000) / Math.max(1, total)) / 10;
+  const met = (right * 100) / Math.max(1, total) >= result.target;
+  const unanswered = result.ids.filter((id) => !result.answers[id]).length;
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [result.id]);
+  return (
+    <div className="exam-result">
+      <button className="back" onClick={onBack}><Chevron dir="left" /> Practice</button>
+      <header className="screen-head">
+        <p className="eyebrow"><span>{result.exam === 'ITIL' ? 'ITIL' : result.exam}</span><span>{formName(result.form)}</span><span>{formatDate(result.date)}</span></p>
+        <h1 ref={heading} tabIndex={-1}>{right} of {total}, {percent}%</h1>
+        <p className="lede">{met ? `At or above your target of ${result.target}%.` : `Your target is ${result.target}%. That is ${Math.ceil((result.target * total) / 100) - right} more right ${Math.ceil((result.target * total) / 100) - right === 1 ? 'answer' : 'answers'}.`}{unanswered ? ` ${unanswered} unanswered ${unanswered === 1 ? 'question counts' : 'questions count'} as wrong.` : ''}</p>
+      </header>
+      {!result.saved && (
+        <section className="card exam-unsaved" role="status">
+          <p>{saving ? 'Saving your result.' : 'This result is not saved yet. Your answers are kept in this browser.'}</p>
+          {!saving && <button className="primary" onClick={onSave}>Save the result</button>}
+        </section>
+      )}
+      <h2 className="section-title">By area</h2>
+      <ul className="list result-areas">
+        {score.areas.map((area) => (
+          <li key={area.area}>
+            <div className="area-row">
+              <span className="area-name">{area.area}</span>
+              <span className="area-score"><strong>{area.right} of {area.total}</strong><small>{area.percent}%</small></span>
+              <Meter value={area.total ? area.right / area.total : 0} />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <h2 className="section-title">Every question</h2>
+      <ol className="exam-review">
+        {result.ids.map((id, position) => {
+          const question = questions[position];
+          const given = result.answers[id];
+          if (!question) return <li key={id}><p className="hint">Question {position + 1} is no longer in the bank.</p></li>;
+          const correct = given === question.correct;
+          const text = (letter: string) => question.options.find(([key]) => key === letter)?.[1] || '';
+          return (
+            <li key={id} className={correct ? 'is-right' : 'is-wrong'}>
+              <p className="quiz-meta"><span className={correct ? 'mark is-right' : 'mark is-wrong'}>{correct ? 'Right' : given ? 'Wrong' : 'Unanswered'}</span><span>Question {position + 1}</span><span>{areaOf(question.domain)}</span></p>
+              <p className="review-q">{keepTogether(question.prompt)}</p>
+              <dl className="review-answers">
+                <div><dt>Your answer</dt><dd>{given ? <><strong>{given}</strong> {keepTogether(text(given))}</> : 'None'}</dd></div>
+                {!correct && <div><dt>Right answer</dt><dd><strong>{question.correct}</strong> {keepTogether(text(question.correct))}</dd></div>}
+              </dl>
+              <p className="review-why">{keepTogether(question.explanation)}</p>
+              {given && !correct && question.incorrect[given] && <p className="review-why hint">Why {given} is wrong: {keepTogether(question.incorrect[given])}</p>}
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
@@ -2310,17 +2725,16 @@ function DownloadIcon() {
    and the next step stays in reach at the bottom.
    ========================================================================== */
 
-function QuizRun({ run, saving, seconds, timerChip, onAnswer, onNext, onClose }: {
-  run: Run; saving: boolean; seconds: number | null; timerChip?: ReactNode; onAnswer: (question: ScenarioQuestion, choice: string, confidence: string) => Promise<boolean>; onNext: () => void; onClose: () => void;
+function QuizRun({ run, saving, timerChip, onAnswer, onNext, onClose }: {
+  run: Run; saving: boolean; timerChip?: ReactNode; onAnswer: (question: ScenarioQuestion, choice: string) => Promise<boolean>; onNext: () => void; onClose: () => void;
 }) {
   const question = run.questions[run.index];
   const [choice, setChoice] = useState('');
-  const [confidence, setConfidence] = useState('medium');
   const [submitted, setSubmitted] = useState(false);
   const correct = choice === question.correct;
   async function check() {
     if (!choice || submitted || saving) return;
-    if (await onAnswer(question, choice, confidence)) setSubmitted(true);
+    if (await onAnswer(question, choice)) setSubmitted(true);
   }
   useEffect(() => {
     if (!submitted) return;
@@ -2346,12 +2760,12 @@ function QuizRun({ run, saving, seconds, timerChip, onAnswer, onNext, onClose }:
           <span style={{ width: `${((run.index + (submitted ? 1 : 0)) / run.questions.length) * 100}%` }} />
         </div>
         <span className="quiz-end">
-          {seconds !== null ? <span className={seconds < 60 ? 'quiz-time low' : 'quiz-time'}><Digits value={formatClock(seconds)} /></span> : <span className="quiz-count">{run.index + 1}/{run.questions.length}</span>}
+          <span className="quiz-count">{run.index + 1}/{run.questions.length}</span>
           {timerChip}
         </span>
       </header>
       <div className="quiz-body">
-        <p className="quiz-run">{run.kind === 'artifact' ? `Check yourself: ${run.title}` : run.title}</p>
+        <p className="quiz-run">{run.kind === 'artifact' ? `Check yourself: ${run.title}` : `${run.title}, counts toward nothing`}</p>
         <p className="quiz-meta"><Tag>{examLabel(question.certification)}</Tag><span>{question.domain}</span></p>
         <h1 className="quiz-q">{keepTogether(question.prompt)}</h1>
         <div className="answers" role="radiogroup" aria-label="Answers">
@@ -2366,19 +2780,11 @@ function QuizRun({ run, saving, seconds, timerChip, onAnswer, onNext, onClose }:
             );
           })}
         </div>
-        {!submitted && (
-          <fieldset className="sure">
-            <legend>How sure are you?</legend>
-            <div className="sure-options">
-              {(['low', 'medium', 'high'] as const).map((level) => <label key={level} className={confidence === level ? 'active' : ''}><input type="radio" name={`c-${question.id}`} value={level} checked={confidence === level} onChange={() => setConfidence(level)} />{level === 'low' ? 'Guessing' : level === 'medium' ? 'Fairly sure' : 'Certain'}</label>)}
-            </div>
-          </fieldset>
-        )}
         {submitted && (
           <section id="verdict" className={correct ? 'sheet is-right' : 'sheet is-wrong'} role="status">
             <strong className="sheet-title"><span className="sheet-icon" aria-hidden="true">{correct ? <Check /> : '×'}</span>{correct ? 'Sound decision' : `The best answer is ${question.correct}`}</strong>
             <p>{keepTogether(correct ? question.explanation : `${question.incorrect[choice] || 'This option does not address the governing issue.'} ${question.explanation}`)}</p>
-            <p className="sheet-link">Taught in: {allDeliverables.find((item) => item.key === question.artifactKey)?.title || 'Integrated decision record'}</p>
+            {question.artifactKey && <p className="sheet-link">Taught in: {allDeliverables.find((item) => item.key === question.artifactKey)?.title || 'Integrated decision record'}</p>}
           </section>
         )}
       </div>
@@ -2543,22 +2949,6 @@ function Meter({ value, label }: { value: number; label?: string }) {
   return <span className="meter" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true}><span style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%` }} /></span>;
 }
 
-/* The four parts of a readiness score as plain numbers: coverage (30),
-   documents (35), judgment (25) and recall (10). */
-function ReadinessParts({ score }: { score: ScoreParts }) {
-  const parts: Array<[string, number, number]> = [['Coverage', score.coverage, 30], ['Documents', score.evidence, 35], ['Judgment', score.judgment, 25], ['Recall', score.recall, 10]];
-  return (
-    <dl className="parts">
-      {parts.map(([label, value, max]) => (
-        <div key={label}>
-          <dt>{label}</dt>
-          <dd><strong>{Math.round(value)}</strong>/{max}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
 /* "On this page" beside a long lesson on wide screens. It follows the
    section in view and jumps to a section without changing the address. */
 function tocItems(lesson: Lesson, idPrefix: string): Array<[string, string]> {
@@ -2667,28 +3057,6 @@ function Glyph({ name }: { name: 'timed' | 'review' | 'cards' | 'labs' }) {
    Lists
    ========================================================================== */
 
-function ReviewList({ queue, onOpen }: { queue: AttemptRow[]; onOpen: (key: string) => void }) {
-  if (!queue.length) {
-    return <section className="empty"><span className="empty-badge" aria-hidden="true"><Check /></span><h2>All clear</h2><p>Answers you get wrong or mark as a guess land here, linked to the document that teaches them.</p></section>;
-  }
-  return (
-    <ul className="review-list">
-      {queue.map((attempt) => {
-        const cleanId = attempt.question_id.replace(/^mock-(PMP|PL-300|CISSP|ITIL)-/, '');
-        const question = allArtifactQuestions.find((item) => item.id === cleanId) || allArtifactQuestions.find((item) => attempt.question_id.endsWith(item.id)) || scenarioBank.find((item) => item.id === cleanId);
-        return (
-          <li key={attempt.question_id}>
-            <span className={attempt.correct ? 'flag is-guess' : 'flag'}>{attempt.correct ? 'Guessed' : 'Wrong'}</span>
-            <strong>{keepTogether(question?.prompt || attempt.domain)}</strong>
-            <p>{keepTogether(question?.explanation || 'Reopen the connected document and explain the governing concept without notes.')}</p>
-            {question?.artifactKey && <button className="text-link" onClick={() => onOpen(question.artifactKey!)}>Open the document</button>}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
 function DatasetLibrary() {
   const files: Array<[string, string, string]> = [
     ['Emergency department visits', '/datasets/khn_ed_visits.csv', 'CSV'],
@@ -2721,34 +3089,6 @@ function DatasetLibrary() {
       <ul className="list files">{files.map(([label, url, kind]) => <li key={url}><a href={url} download><span>{label}</span><small>{kind}</small></a></li>)}</ul>
     </section>
   );
-}
-
-/* The five checks for the next exam gate. Scope is everything up to that
-   gate: earlier sessions, documents in the releases so far, and practice
-   for the gate's own exams. */
-function gateResults(state: StudyState, completed: Set<string>, latestAttempts: AttemptRow[], phase: (typeof phases)[number]) {
-  const gateCerts = phase.gate.certs;
-  const releaseKeys = phases.slice(0, phases.indexOf(phase) + 1).map((item) => item.project);
-  const scopeDocs = projects.filter((item) => releaseKeys.includes(item.key)).flatMap((item) => item.deliverables);
-  const sessionsBefore = allTasks.slice(0, phase.gate.at);
-  const sessionsDone = sessionsBefore.filter((task) => completed.has(task.key)).length;
-  const completeKeys = new Set(state.artifacts.filter((item) => item.status === 'complete').map((item) => item.artifact_key));
-  const docsDone = scopeDocs.filter((item) => completeKeys.has(item.key)).length;
-  const explanations = state.artifacts.filter((item) => item.reflection.trim().length >= 80).length;
-  const perCert = gateCerts.map((cert) => {
-    const attempts = latestAttempts.filter((attempt) => attempt.certification === cert);
-    const wrong = attempts.filter((attempt) => !attempt.correct).length;
-    return { cert, mocks: strongMocks(state.artifacts, cert), attempts: attempts.length, wrong };
-  });
-  const openWrong = perCert.reduce((total, item) => total + item.wrong, 0);
-  const label = (cert: Certification) => (cert === 'ITIL' ? 'ITIL V5' : cert);
-  return [
-    { title: 'Sessions before the gate done', met: sessionsDone === sessionsBefore.length, detail: `${sessionsDone} of ${sessionsBefore.length} sessions` },
-    { title: 'Release documents complete', met: docsDone === scopeDocs.length, detail: `${docsDone} of ${scopeDocs.length} documents in Release ${releaseKeys.length === 1 ? '1' : `1 to ${releaseKeys.length}`}` },
-    { title: 'Two timed sets at 80% or better', met: perCert.every((item) => item.mocks >= 2), detail: perCert.map((item) => `${label(item.cert)} ${Math.min(2, item.mocks)} of 2`).join(', ') },
-    { title: 'No major weak area', met: perCert.every((item) => item.attempts >= 24 && item.wrong / Math.max(1, item.attempts) < 0.3), detail: perCert.map((item) => `${label(item.cert)} ${item.attempts} of 24 decisions, ${item.attempts ? Math.round((item.wrong / item.attempts) * 100) : 0}% wrong`).join('; ') },
-    { title: 'Mistakes reviewed and explained', met: openWrong === 0 && explanations >= 6, detail: `${openWrong} wrong answers open, ${explanations} of 6 explanations` },
-  ];
 }
 
 function docNumberFor(item: Deliverable) {
@@ -2799,6 +3139,28 @@ function weekendState(item: ExamBlock, weekend: WeekendBlock, done: Set<string>,
   return { open: true, reason: '' };
 }
 
+/* Practice exam A opens when the block's learn mornings are done; B opens
+   7 days after A (the plan's minDaysAfter); after both, a new draw. */
+function practiceExamGate(item: ExamBlock, done: Set<string>, mocks: MockRow[], today: string): ExamGate {
+  const taken = takenForms(mocks, item.cert);
+  const learn = item.mornings.filter((entry) => entry.kind === 'learn');
+  const learnDone = learn.filter((entry) => done.has(entry.key)).length;
+  if (!taken.includes('A')) {
+    if (!learn.length || learnDone < learn.length) return { open: false, form: 'A', reason: `Practice exam A opens when the ${learn.length} learn mornings are done. ${learnDone} of ${learn.length} are done.` };
+    return { open: true, form: 'A', reason: '' };
+  }
+  if (!taken.includes('B')) {
+    const gap = item.weekends.find((entry) => entry.form === 'B')?.minDaysAfter?.days ?? 7;
+    const onA = mocks.filter((row) => row.exam === item.cert && row.form === 'A').map((row) => row.date).filter(isStudyDate).sort().pop();
+    if (onA && daysBetween(onA, today) < gap) return { open: false, form: 'B', reason: `Practice exam B opens on ${formatDate(addDays(onA, gap))}, ${gap} days after exam A.` };
+    return { open: true, form: 'B', reason: '' };
+  }
+  return { open: true, form: 'draw', reason: '' };
+}
+function formName(form: string) {
+  return /^[A-Z]$/.test(form) ? `Practice exam ${form}` : 'Practice exam, new draw';
+}
+
 /* ==========================================================================
    Saved state, the morning in this browser, and drafts
    ========================================================================== */
@@ -2823,6 +3185,27 @@ function normalizeState(raw: unknown): StudyState {
   };
 }
 
+function readExam(): ExamRun | null {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(examKey) || 'null') as ExamRun | null;
+    return parsed && parsed.v === 1 && typeof parsed.id === 'string' && Array.isArray(parsed.ids) && typeof parsed.startedAt === 'number' && Array.isArray(parsed.saved) ? parsed : null;
+  } catch { return null; }
+}
+function writeExam(value: ExamRun) {
+  try { window.localStorage.setItem(examKey, JSON.stringify(value)); } catch { /* storage unavailable; the exam still runs */ }
+}
+function clearExam() {
+  try { window.localStorage.removeItem(examKey); } catch { /* storage unavailable */ }
+}
+function readLab(key: string): number[] {
+  try { const parsed = JSON.parse(window.localStorage.getItem(labPrefix + key) || '[]'); return Array.isArray(parsed) ? parsed.filter((value) => typeof value === 'number') : []; } catch { return []; }
+}
+function writeLab(key: string, value: number[]) {
+  try { window.localStorage.setItem(labPrefix + key, JSON.stringify(value)); } catch { /* storage unavailable */ }
+}
+function clearLab(key: string) {
+  try { window.localStorage.removeItem(labPrefix + key); } catch { /* storage unavailable */ }
+}
 function readMorning(): MorningRun | null {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(morningKey) || 'null') as MorningRun | null;
@@ -2892,10 +3275,7 @@ function keepTogether(text: string): ReactNode {
 /* "MFA and SSO recommendation" keeps its capitals; "Business case" reads
    "business case" mid-sentence. */
 function lowerFirst(title: string) { return /^.[a-z]/.test(title) ? title.charAt(0).toLowerCase() + title.slice(1) : title; }
-function ratio(numerator: number, denominator: number) { return denominator ? Math.min(1, numerator / denominator) : 0; }
 function safeDomains(value: string) { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : []; } catch { return []; } }
-function strongMocks(artifacts: ArtifactRow[], cert?: Certification) { return artifacts.filter((artifact) => { if (!artifact.artifact_key.startsWith('mock-')) return false; try { const evidence = JSON.parse(artifact.evidence_text); return Number(evidence.score) >= 80 && (!cert || evidence.certification === cert); } catch { return false; } }).length; }
-function mockArtifactKey(cert: Certification) { return `mock-${cert.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now()}`; }
 function nowMs() { return Date.now(); }
 /* Today's date. The browser checks can set it (window.__tricertToday) so they
    do not depend on the real calendar. */

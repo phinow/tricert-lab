@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 // Resolved through the esbuild alias "@app" to the version under test.
 import TriCertApp from '@app/tricert-app';
 import { projects } from '@/lib/tricert-content';
-import { cardsForLesson, makeUserCard, questionsForLesson } from '@/lib/tricert-bank';
+import { cardsForLesson, makeUserCard, practiceForm, questionsForLesson } from '@/lib/tricert-bank';
+import { scoreExam } from '@/lib/tricert-study';
 
 type Row = Record<string, unknown>;
 
@@ -36,6 +37,8 @@ const profile = {
   display_name: 'Moye',
   motivation: 'Pass all four, then lead the projects I used to support.',
 };
+
+/* Fixtures: ?state=midway (default), ready, booked or fresh. */
 
 /* Midway: the ITIL block with mornings 1 to 4 and review 1 done (started
    Monday 9 November), seven cards and eight questions due on 18 November,
@@ -91,6 +94,31 @@ function midwayState() {
   };
 }
 
+/* Ready: every ITIL morning up to review 2 and the lab are done, so
+   practice exam A is open (on Practice, and as this Saturday's block). */
+function readyState() {
+  const base = midwayState();
+  const more = ['itil-m5', 'itil-m6', 'itil-m7', 'itil-m8', 'itil-r2', 'itil-w1'];
+  more.forEach((key, index) => base.progress.push({ item_key: key, status: 'complete', updated_at: `2026-11-${String(16 + Math.min(index, 4)).padStart(2, '0')}T07:30:00Z` }));
+  return base;
+}
+
+/* Booked: the whole ITIL block is done, practice exams A and B both pass
+   with no weak area, 7 days apart, and 26 delayed reviews are 23 right. */
+function bookedState() {
+  const base = readyState();
+  ['itil-w2', 'itil-p1', 'itil-p2', 'itil-w3'].forEach((key) => base.progress.push({ item_key: key, status: 'complete', updated_at: '2026-11-15T09:00:00Z' }));
+  const result = (form: 'A' | 'B', date: string, miss: (index: number) => boolean) => {
+    const questions = practiceForm('ITIL', form);
+    const answers: Record<string, string> = {};
+    questions.forEach((question, index) => { answers[question.id] = miss(index) ? (question.correct === 'A' ? 'B' : 'A') : question.correct; });
+    const score = scoreExam(questions, answers);
+    return { id: `mock-itil-${form}-fixture`, exam: 'ITIL', form, date, total: score.total, right: score.right, areas: score.areas, weekend: form === 'A' ? 'itil-w2' : 'itil-w3', ids: questions.map((question) => question.id), answers, flags: [], minutes: 52 };
+  };
+  const mocks = [result('A', '2026-11-07', (index) => index % 7 === 3), result('B', '2026-11-15', (index) => index % 6 === 2)];
+  return { ...base, records: { ...base.records, mocks, srs: { ...base.records.srs, delayed: { ITIL: { total: 26, right: 23 } } } } };
+}
+
 type Records = { plan: Row; srs: Row; mocks: Row[]; log: Row[]; usercards: Row[] };
 function emptyRecords(): Records {
   return { plan: {}, srs: { cards: {}, questions: {} }, mocks: [], log: [], usercards: [] };
@@ -112,7 +140,8 @@ function kept(): State | null {
   if (!keepKey) return null;
   try { return JSON.parse(sessionStorage.getItem(keepKey) || 'null'); } catch { return null; }
 }
-let state: State = kept() || (fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() } : (midwayState() as unknown as State));
+const fixtures: Record<string, () => unknown> = { midway: midwayState, ready: readyState, booked: bookedState };
+let state: State = kept() || (fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() } : ((fixtures[fixture] || midwayState)() as State));
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
