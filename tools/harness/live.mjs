@@ -145,21 +145,25 @@ await check('Artifact draft persists in D1 and reopens on reload', async () => {
   await page.screenshot({ path: path.join(shots, 'live-projects.png'), fullPage: true });
 });
 
-await check('Scenario attempt is recorded and shows in the review queue', async () => {
+await check('Practice and Progress: scenarios across exams save nothing; Ready to book shows its four checks', async () => {
+  const before = await (await fetch(`${base}/api/state`)).json();
   await page.click('.nav button:has(.nav-label:text-is("Practice"))');
-  await page.click('.tile-scenarios');
+  await page.waitForSelector('.review-card');
+  await page.click('.tile-cross');
   await page.waitForSelector('.quiz');
   await page.click('.answer >> nth=0');
-  await page.click('.sure label:has-text("Guessing")');
   await page.click('button:has-text("Check")');
   await page.waitForSelector('.sheet');
   await page.click('.quiz .close');
-  await page.click('.tile-review');
-  await page.waitForSelector('.review-list li');
-  // TODO(part 2): Scenarios across exams replaces this run.
-  const state = await (await fetch(`${base}/api/state`)).json();
-  assert.ok(state.attempts.some((row) => row.certification === 'Intersection' || !/^q-itil-/.test(row.question_id)));
-  await page.screenshot({ path: path.join(shots, 'live-review.png'), fullPage: true });
+  await page.waitForSelector('.review-card');
+  const after = await (await fetch(`${base}/api/state`)).json();
+  assert.equal(after.attempts.length, before.attempts.length);
+  await page.click('.tile-exam');
+  await page.waitForSelector('.exam-locked');
+  await page.click('.nav button:has(.nav-label:text-is("Progress"))');
+  await page.waitForSelector('.book-checks');
+  assert.equal(await page.locator('.book-checks .checklist li').count(), 4);
+  await page.screenshot({ path: path.join(shots, 'live-progress.png'), fullPage: true });
 });
 
 assert.deepEqual(errors, [], `console errors: ${errors.join(' | ')}`);

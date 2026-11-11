@@ -1,6 +1,8 @@
 // Functional checks of the version 8 flows against the harness build (out/after).
 // The harness fixtures (entry.tsx): `midway` is the ITIL block with mornings 1 to 4
-// and review 1 done, cards and questions due, practice exam A not taken; `fresh`
+// and review 1 done, cards and questions due, practice exam A not taken; `ready`
+// has every morning to review 2 and the lab done, so practice exam A is open;
+// `booked` has the whole block and two passing practice exams; `fresh`
 // has no profile. ?today=YYYY-MM-DD sets the date (default Wednesday 2026-11-18)
 // and ?keep=1 keeps the fake server's state in the tab across reloads.
 import http from 'node:http';
@@ -137,10 +139,19 @@ await check('Saturday shows the next weekend block with a link to do a morning i
   await page.waitForSelector('.morning', { state: 'detached' });
 });
 
-await check('The lab lists its steps; Finish lab saves it and shows the completion screen', async () => {
+await check('The lab lists its steps with a tick for each; ticks survive a reload; Finish block saves it and shows the completion screen', async () => {
   await page.click('.hero-session .play');
   await page.waitForSelector('.morning #weekend-title');
   assert.equal(await page.locator('.lab-steps li').count(), 10);
+  await page.click('.lab-steps label >> nth=0');
+  await page.click('.lab-steps label >> nth=2');
+  assert.match(await page.textContent('.focus .hint'), /2 of 10 steps ticked/);
+  await page.reload();
+  await page.waitForSelector('.hero-session');
+  await page.click('.hero-session .play');
+  await page.waitForSelector('.morning #weekend-title');
+  assert.deepEqual(await page.locator('.lab-steps input').evaluateAll((boxes) => boxes.map((box) => box.checked).slice(0, 3)), [true, false, true]);
+  assert.equal((await page.textContent('.morning-foot .primary')).trim(), 'Finish block');
   await page.click('.morning-foot .primary');
   await page.waitForSelector('.celebrate');
   assert.match(await page.textContent('#celebrate-title'), /Weekend block done/);
@@ -463,48 +474,83 @@ await check('Done-when ticks and mark-complete explains what is missing', async 
   await page.waitForSelector('.toast:not(.is-error)');
 });
 
-// TODO(part 2): Practice is rebuilt in part 2 (Today's review, Practice exam,
-// Flashcards, Scenarios across exams, Labs). These checks cover the version 7
-// screens that are still there; part 2 replaces them, and adds the practice
-// exam that ends on time with unanswered questions marked wrong.
 await check('Check yourself runs five questions for this document', async () => {
   await page.click('.check-yourself');
   await page.waitForSelector('.quiz');
   assert.match(await page.textContent('.quiz-count'), /1\/5/);
   await page.click('.quiz .close');
-  await page.waitForSelector('.tiles');
+  await page.waitForSelector('.review-card');
 });
 
-// TODO(part 2): Scenarios across exams replaces this run.
-await check('Scenarios: keyboard B + Enter shows the sheet; Enter continues', async () => {
-  await page.click('.tile-scenarios');
+await check('Practice: Today’s review first with its count and one button; then Practice exam, Flashcards, Scenarios across exams and Labs; no Timed set or Review', async () => {
+  await nav('Practice');
+  await page.waitForSelector('.review-card');
+  assert.match(await page.textContent('.review-card h2'), /7 cards and 8 questions due/);
+  assert.equal(await page.locator('.practice .primary').count(), 1);
+  assert.equal((await page.textContent('.review-card .play')).trim(), 'Start review');
+  const rows = (await page.locator('.practice-list .row-text strong').allTextContents()).map((text) => text.trim());
+  assert.deepEqual(rows, ['Practice exam', 'Flashcards', 'Scenarios across exams', 'Labs']);
+  assert.match(await page.textContent('.tile-exam small'), /Practice exam A opens when the 8 learn mornings are done\. 4 of 8 are done\./);
+  const text = await page.textContent('main');
+  assert.doesNotMatch(text, /Timed set|Wrong or guessed answers to go over|week \d+ of 13|readiness score/i);
+});
+
+await check('Practice exam locked: the start screen says plainly when form A opens and has no start button', async () => {
+  await page.click('.tile-exam');
+  await page.waitForSelector('.exam-start');
+  assert.match(await page.textContent('.exam-start h1'), /Practice exam A/);
+  assert.match(await page.textContent('.exam-locked'), /Not open yet\. Practice exam A opens when the 8 learn mornings are done/);
+  assert.equal(await page.locator('.exam-start .play').count(), 0);
+  await page.click('.exam-start .back');
+  await page.waitForSelector('.review-card');
+});
+
+await check('Flashcards browse the cards of the exams he has started (ITIL only)', async () => {
+  await page.click('.tile-cards');
+  await page.waitForSelector('.flash-card');
+  assert.equal(await page.locator('.pills').count(), 0);
+  assert.match(await page.textContent('.flash-cert'), /^ITIL V5, card 1 of \d+$/);
+  await page.click('.flash-card');
+  await page.waitForSelector('.flash-a');
+  await page.click('.flash .back');
+});
+
+await check('Scenarios across exams: keyboard B + Enter shows the sheet; Enter continues; nothing is saved', async () => {
+  let puts = 0;
+  const count = (request) => { if (request.method() === 'PUT') puts += 1; };
+  page.on('request', count);
+  await page.click('.tile-cross');
   await page.waitForSelector('.quiz');
+  assert.match(await page.textContent('.quiz-run'), /Scenarios across exams, counts toward nothing/);
+  assert.match(await page.textContent('.quiz-count'), /^1\/88$/);
+  assert.equal(await page.locator('.sure').count(), 0);
   await page.keyboard.press('b');
   await page.keyboard.press('Enter');
-  await page.waitForSelector('.sheet.is-right');
+  await page.waitForSelector('.sheet');
   await page.keyboard.press('Enter');
-  await page.waitForFunction(() => /^2\/\d{3}$/.test(document.querySelector('.quiz-count')?.textContent || ''));
+  await page.waitForFunction(() => /^2\/88$/.test(document.querySelector('.quiz-count')?.textContent || ''));
   await page.click('.quiz .close');
   await page.waitForSelector('.toast');
+  page.off('request', count);
+  assert.equal(puts, 0);
 });
 
-// TODO(part 2): the old timed set and Review go; Practice exam and Flashcards by lesson come in.
-await check('Practice: timed set uses the chosen exam; flashcards filter by exam', async () => {
-  await nav('Practice');
-  await page.selectOption('#lens', 'CISSP');
-  await page.click('.tile-timed .start');
-  await page.waitForSelector('.quiz');
-  assert.match(await page.textContent('.quiz-meta'), /CISSP|All four/);
-  await page.click('.quiz .close');
-  await page.click('.tile-cards');
-  await page.click('.pills .pill:has-text("PL-300")');
-  assert.match(await page.textContent('.flash-cert'), /PL-300, card 1 of \d+/);
-});
-
-// TODO(part 2): Progress becomes Ready to book, the practice exam history and
-// the delayed-review score. Only the Portfolio tab and #portfolio carry over.
-await check('Progress: Portfolio tab and #portfolio work', async () => {
+await check('Progress: the four Ready to book checks with their details, an empty exam history, the delayed-review score and other exams; Portfolio and #portfolio work', async () => {
   await nav('Progress');
+  await page.waitForSelector('.book-checks');
+  assert.match(await page.textContent('.progress .lede'), /^ITIL: 0 of 4 checks met\. Book when all four are met\.$/);
+  const checks = await page.locator('.book-checks .checklist li').allTextContents();
+  assert.equal(checks.length, 4);
+  assert.match(checks[0], /Every learn morning done.*Not yet\. 4 of 8 learn mornings done\./);
+  assert.match(checks[1], /Two practice exams at 80% or more.*No practice exam yet/);
+  assert.match(checks[2], /No weak area.*Checked once two practice exams pass\./);
+  assert.match(checks[3], /Delayed reviews at 80% or more.*Not enough reviews yet: 6 of 20/);
+  assert.equal(await page.locator('.booking-list').count(), 0);
+  assert.match(await page.textContent('.empty-line'), /No practice exam yet\. Practice exam A opens when/);
+  assert.match(await page.textContent('.delayed-score'), /6\s*of 20 answers needed/);
+  assert.deepEqual((await page.locator('.other-exams .pi-state').allTextContents()), ['Being built', 'Being built', 'Being built']);
+  assert.equal(await page.locator('.cert-scores, .gate-checks, .parts').count(), 0);
+  assert.doesNotMatch(await page.textContent('main'), /gate|week \d+, day|Coverage|out of 100/i);
   await page.click('.segmented button:has-text("Portfolio")');
   assert.equal(new URL(page.url()).hash, '#portfolio');
   await page.reload();
@@ -529,6 +575,229 @@ await check('Errors show as an alert and the card stays on screen', async () => 
   await page.keyboard.press('Escape');
   await page.waitForSelector('.morning', { state: 'detached' });
   await page.waitForFunction(() => document.activeElement?.matches('.hero-session .play'));
+});
+await context.close();
+
+/* ------------------------------------------------------ Today's review */
+context = await open();
+await page.goto(`${base}/?state=midway&keep=1`);
+await page.waitForSelector('.hero-session');
+
+await check('Today’s review runs cards, then questions, then mistakes, with no lesson; it logs a line and completes no morning', async () => {
+  await page.click('.waiting .row:has-text("due for review")');
+  await page.waitForSelector('.review-card .play');
+  await page.click('.review-card .play');
+  await page.waitForSelector('.morning');
+  assert.match(await page.textContent('.focus-where'), /Today’s review/);
+  assert.deepEqual((await page.locator('.step-name').allTextContents()), ['Cards', 'Questions', 'Mistakes']);
+  assert.equal(await passCards(), 'Continue to questions');
+  await page.click('.morning-foot .primary');
+  await page.waitForSelector('.q-head');
+  assert.equal((await storedRun()).questions.ids.length, 8);
+  await answerAll('right', 'Sure');
+  assert.match(await page.textContent('#morning-title'), /Nothing to write up/);
+  assert.equal(await mainLabel(), 'Finish review');
+  await page.click('.morning-foot .primary');
+  await page.waitForSelector('.celebrate');
+  assert.match(await page.textContent('#celebrate-title'), /Review done/);
+  await page.click('.celebrate .primary');
+  const state = await getState();
+  assert.ok(state.records.log.some((row) => row.key === 'due-review' && row.kind === 'due' && row.questions === 8));
+  assert.equal(state.progress.filter((row) => row.status === 'complete').length, 6);
+  await page.waitForSelector('.review-card.is-done');
+  assert.match(await page.textContent('.review-card h2'), /Nothing due today/);
+  assert.equal(await page.locator('.practice .primary').count(), 0);
+});
+await context.close();
+
+/* ------------------------------------------------------ practice exam */
+const examRun = () => page.evaluate(() => JSON.parse(localStorage.getItem('tricert.exam.v1') || 'null'));
+const clockSeconds = async () => { const [m, sec] = (await page.getAttribute('.exam-clock', 'aria-label')).replace(' left', '').split(':').map(Number); return m * 60 + sec; };
+async function pick(kind = 'right') {
+  const run = await examRun();
+  const id = run.ids[run.index];
+  const correct = correctOf.get(id);
+  const letter = kind === 'wrong' ? ['A', 'B', 'C', 'D'].find((key) => key !== correct) : correct;
+  await page.click(`.exam .answer:has(input[value="${letter}"])`);
+  return id;
+}
+async function moveStart(secondsAgo) {
+  await page.evaluate((ago) => {
+    const run = JSON.parse(localStorage.getItem('tricert.exam.v1'));
+    run.startedAt = Date.now() - ago * 1000;
+    localStorage.setItem('tricert.exam.v1', JSON.stringify(run));
+  }, secondsAgo);
+}
+
+context = await open();
+await page.goto(`${base}/?state=ready&keep=1&today=2026-11-21`);
+await page.waitForSelector('.hero-session');
+let examIds = [];
+
+await check('A practice exam weekend block opens the practice exam: its start screen says what it is, with one button', async () => {
+  assert.match(await page.textContent('.hero-when'), /ITIL, weekend block 2 of 3/);
+  assert.equal((await page.textContent('#session-title')).trim(), 'Practice exam A');
+  assert.equal((await page.textContent('.hero-session .play')).trim(), 'Start practice exam');
+  await page.click('.hero-session .play');
+  await page.waitForSelector('.exam-start');
+  assert.equal(new URL(page.url()).hash, '#practice');
+  assert.match(await page.textContent('#exam-start-title'), /40 questions, 60 minutes/);
+  const rules = await page.textContent('.exam-rules');
+  assert.match(rules, /No feedback until the end/);
+  assert.match(rules, /Unanswered questions count as wrong\. At 00:00 the exam finishes by itself\./);
+  assert.match(rules, /flag a question, go back, and jump/);
+  assert.equal(await page.locator('.exam-start .primary').count(), 1);
+});
+
+await check('The exam: question n of N, the clock counting down, answers with no feedback, Flag, Previous and Next, and the question list to jump', async () => {
+  await page.click('.exam-start .play');
+  await page.waitForSelector('.exam .q-head');
+  await page.waitForFunction(() => document.activeElement?.closest('.exam'));
+  assert.equal(await page.evaluate(() => document.querySelector('.app').inert), true);
+  assert.match(await page.textContent('.exam .quiz-meta'), /Question 1 of 40/);
+  const first = await clockSeconds();
+  assert.ok(first <= 3600 && first > 3590, `clock ${first}`);
+  await page.waitForTimeout(2100);
+  assert.ok((await clockSeconds()) < first, 'the clock counts down');
+  examIds = (await examRun()).ids;
+  assert.equal(examIds.length, 40);
+  assert.equal((await examRun()).form, 'A');
+  const one = await pick('right');
+  assert.equal(await page.locator('.exam .sheet, .exam .is-right, .exam .is-wrong').count(), 0);
+  await page.click('.flag-toggle');
+  assert.equal(await page.getAttribute('.flag-toggle', 'aria-pressed'), 'true');
+  assert.equal(await page.locator('.morning-foot .secondary').count(), 0);
+  await page.click('.morning-foot .primary');
+  await page.waitForFunction(() => /Question 2 of 40/.test(document.querySelector('.exam .quiz-meta')?.textContent || ''));
+  await pick('wrong');
+  await page.click('.morning-foot .secondary');
+  await page.waitForFunction(() => /Question 1 of 40/.test(document.querySelector('.exam .quiz-meta')?.textContent || ''));
+  assert.equal(await page.locator(`.exam .answer.is-picked input[value="${correctOf.get(one)}"]`).count(), 1);
+  assert.match(await page.textContent('.exam-count'), /2\/40 answered, 1 flagged/);
+  await page.click('.exam-tools .ghost:has-text("Questions")');
+  await page.waitForSelector('.exam-list');
+  assert.equal(await page.locator('.exam-cell').count(), 40);
+  assert.equal(await page.getAttribute('.exam-cell >> nth=0', 'aria-label'), 'Question 1, answered, flagged');
+  assert.equal(await page.getAttribute('.exam-cell >> nth=2', 'aria-label'), 'Question 3, unanswered');
+  await page.click('.exam-cell >> nth=4');
+  await page.waitForFunction(() => /Question 5 of 40/.test(document.querySelector('.exam .quiz-meta')?.textContent || ''));
+  await pick('right');
+});
+
+await check('Finish exam asks first and says how many questions are unanswered; Keep going returns to the question', async () => {
+  await page.click('.exam-tools .ghost:has-text("Finish exam")');
+  await page.waitForSelector('#exam-title:text("Finish the exam?")');
+  assert.match(await page.textContent('.exam .lede'), /37 of 40 questions are unanswered\. They count as wrong\. 1 is flagged\./);
+  await page.click('.morning-foot .secondary');
+  await page.waitForSelector('.exam .q-head');
+  assert.match(await page.textContent('.exam .quiz-meta'), /Question 5 of 40/);
+});
+
+await check('A reload during the exam returns to it with the clock still running from the start time', async () => {
+  await moveStart(10 * 60);
+  await page.reload();
+  await page.waitForSelector('.exam .q-head');
+  assert.match(await page.textContent('.exam .restored'), /The clock kept running/);
+  const left = await clockSeconds();
+  assert.ok(left <= 50 * 60 && left > 50 * 60 - 15, `clock ${left}`);
+  assert.match(await page.textContent('.exam-count'), /3\/40 answered/);
+  await page.click('.focus-bar .ghost');
+  await page.waitForSelector('.exam', { state: 'detached' });
+  assert.match(await page.textContent('.live-pill'), /Back to your practice exam/);
+  await page.click('.live-pill');
+  await page.waitForSelector('.exam .q-head');
+});
+
+await check('At 00:00 the exam finishes by itself; unanswered questions are wrong; the result shows the score against the target, by area and every question', async () => {
+  await moveStart(60 * 60 - 3);
+  await page.reload();
+  await page.waitForSelector('.exam .q-head');
+  await page.waitForSelector('.exam-result', { timeout: 10000 });
+  assert.equal(await page.locator('.exam').count(), 0);
+  assert.match(await page.textContent('.exam-result h1'), /^2 of 40, 5%$/);
+  assert.match(await page.textContent('.exam-result .lede'), /Your target is 80%\. That is 30 more right answers\. 37 unanswered questions count as wrong\./);
+  assert.equal(await page.locator('.result-areas li').count(), 6);
+  assert.equal(await page.locator('.exam-review > li').count(), 40);
+  assert.equal(await page.locator('.exam-review .mark:text-is("Unanswered")').count(), 37);
+  assert.equal(await page.locator('.exam-review .mark:text-is("Wrong")').count(), 1);
+  assert.match(await page.textContent('.exam-review > li >> nth=0'), /Your answer.*Question 1|Right.*Your answer/s);
+  assert.match(await page.textContent('.exam-review > li >> nth=1'), /Your answer.*Right answer/s);
+  await page.waitForFunction(() => !localStorage.getItem('tricert.exam.v1'));
+  assert.equal(await page.locator('.exam-unsaved').count(), 0);
+});
+
+await check('The result is saved: the mocks record with his answers, the review schedules, the weekend block and a log line; form B waits 7 days', async () => {
+  const state = await getState();
+  assert.equal(state.records.mocks.length, 1);
+  const mock = state.records.mocks[0];
+  assert.equal(mock.form, 'A');
+  assert.equal(mock.exam, 'ITIL');
+  assert.equal(mock.date, '2026-11-21');
+  assert.equal(mock.total, 40);
+  assert.equal(mock.right, 2);
+  assert.equal(mock.areas.length, 6);
+  assert.deepEqual(mock.ids, examIds);
+  assert.equal(Object.keys(mock.answers).length, 3);
+  const unanswered = examIds.find((id) => !mock.answers[id]);
+  assert.equal(state.records.srs.questions[unanswered].due, '2026-11-23');
+  assert.ok(state.progress.some((row) => row.item_key === 'itil-w2' && row.status === 'complete'));
+  assert.ok(state.records.log.some((row) => row.key === 'itil-w2' && row.kind === 'mock' && row.right === 2));
+  await page.click('.exam-result .back');
+  await page.click('.tile-exam');
+  await page.waitForSelector('.exam-start');
+  assert.match(await page.textContent('.exam-start h1'), /Practice exam B/);
+  assert.match(await page.textContent('.exam-locked'), /Practice exam B opens on Nov\.? 28, 2026, 7 days after exam A\./);
+  assert.match(await page.textContent('.exam-last'), /Your last result: Practice exam A/);
+  await nav('Progress');
+  assert.match(await page.textContent('.history'), /Practice exam A.*5%.*2 of 40/s);
+});
+
+await check('Spaced review: the questions of a practice exam come due two days later', async () => {
+  await page.goto(`${base}/?state=ready&keep=1&today=2026-11-23`);
+  await page.waitForSelector('.hero-session');
+  await nav('Practice');
+  const due = Number((await page.textContent('.review-card h2')).match(/(\d+) questions due/)[1]);
+  assert.ok(due >= 38, `${due} due`);
+});
+await context.close();
+
+context = await open();
+await check('If the time ran out while the page was closed, the exam finishes as it loads', async () => {
+  await page.goto(`${base}/?state=ready&keep=1`);
+  await page.waitForSelector('.hero-session');
+  await nav('Practice');
+  await page.click('.tile-exam');
+  await page.click('.exam-start .play');
+  await page.waitForSelector('.exam .q-head');
+  await pick('right');
+  await moveStart(61 * 60);
+  await page.reload();
+  await page.waitForSelector('.exam-result');
+  assert.equal(await page.locator('.exam').count(), 0);
+  assert.match(await page.textContent('.exam-result h1'), /^1 of 40, 2\.5%$/);
+  await page.waitForFunction(async () => (await (await fetch('/api/state')).json()).records.mocks.length === 1);
+});
+await context.close();
+
+/* ------------------------------------------------------ ready to book */
+context = await open();
+await check('Ready to book: all four checks met shows the booking checklist; the history opens a past result; the next practice exam is a new draw', async () => {
+  await page.goto(`${base}/?state=booked#progress`);
+  await page.waitForSelector('.book-checks');
+  assert.match(await page.textContent('.progress .lede'), /ITIL: all four checks are met\. You are ready to book\./);
+  assert.equal(await page.locator('.book-checks .tick.is-done').count(), 4);
+  assert.equal(await page.locator('.booking-list li').count(), 6);
+  assert.match(await page.textContent('.booking-list'), /US\$690.*Take2.*48 hours.*65%/s);
+  assert.deepEqual((await page.locator('.history .row-text strong').allTextContents()), ['Practice exam B', 'Practice exam A']);
+  assert.match(await page.textContent('.delayed-score'), /88%\s*23 of 26 right/);
+  await page.click('.history .row >> nth=1');
+  await page.waitForSelector('.exam-result');
+  assert.match(await page.textContent('.exam-result h1'), /^34 of 40, 85%$/);
+  assert.match(await page.textContent('.exam-result .lede'), /At or above your target of 80%/);
+  await page.click('.exam-result .back');
+  await page.click('.tile-exam');
+  assert.match(await page.textContent('.exam-start h1'), /Practice exam, new draw/);
+  assert.equal(await page.locator('.exam-start .play').count(), 1);
 });
 await context.close();
 
@@ -628,6 +897,39 @@ await check('Phone: Today, a morning, Plan and Learn fit 390px with 44px targets
   await fits('Learn');
   await tall('.block-lessons .row');
   await tall('.segmented button');
+});
+
+await check('Phone: Practice, the practice exam, its result and Progress fit 390px with 44px targets', async () => {
+  const fits = async (where) => assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= 390), `${where} scrolls sideways`);
+  const tall = async (selector) => { const box = await page.locator(selector).first().boundingBox(); assert.ok(box && box.height >= 43.5, `${selector} is ${box?.height}px`); };
+  await page.goto(`${base}/?state=ready`);
+  await page.waitForSelector('.hero-session');
+  await page.click('.nav button:has(.nav-label:text-is("Practice"))');
+  await page.waitForSelector('.review-card');
+  await fits('Practice');
+  await tall('.review-card .play');
+  await tall('.practice-list .row');
+  await page.click('.tile-exam');
+  await fits('Practice exam start');
+  await tall('.exam-start .play');
+  await page.click('.exam-start .play');
+  await page.waitForSelector('.exam .q-head');
+  await fits('Practice exam');
+  await tall('.flag-toggle');
+  await tall('.exam-tools .ghost');
+  await tall('.morning-foot .primary');
+  await tall('.focus-bar .ghost');
+  assert.ok(await page.evaluate(() => document.querySelector('.exam-bar').getBoundingClientRect().height < 60), 'the exam bar stays on one line');
+  await page.click('.exam-tools .ghost:has-text("Questions")');
+  await tall('.exam-cell');
+  await fits('Question list');
+  await page.click('.exam-tools .ghost:has-text("Finish exam")');
+  await page.click('.morning-foot .primary');
+  await page.waitForSelector('.exam-result');
+  await fits('Result');
+  await page.click('.nav button:has(.nav-label:text-is("Progress"))');
+  await page.waitForSelector('.book-checks');
+  await fits('Progress');
 });
 await context.close();
 

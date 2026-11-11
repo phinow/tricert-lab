@@ -1077,9 +1077,9 @@ export default function TriCertApp() {
   const morningPart = morning ? morningParts[morning.mode][Math.min(morning.part, morningParts[morning.mode].length - 1)][1] : '';
   const examAway = exam && !exam.finishedAt && !examOpen;
   const morningChip = examAway ? (
-    <button className="live-chip" onClick={beginExam} aria-label={`Back to your practice exam, ${formatClock(examLeft)} left`}>
+    <button className="live-chip" onClick={beginExam} aria-label={`Back to your practice exam, ${formatCountdown(examLeft)} left`}>
       <span className="live-dot" aria-hidden="true" />
-      <span><Digits value={formatClock(examLeft)} /></span>
+      <span><Digits value={formatCountdown(examLeft)} /></span>
     </button>
   ) : morning && !morningOpen ? (
     <button className="live-chip" onClick={resumeMorning} aria-label={`Back to your ${morning.mode === 'due' ? 'review' : 'morning'}, ${morningPart}`}>
@@ -1113,7 +1113,7 @@ export default function TriCertApp() {
           {examAway ? (
             <button className="live-pill" onClick={beginExam}>
               <span className="live-dot" aria-hidden="true" />
-              <span className="live-text"><span className="live-clock"><Digits value={formatClock(examLeft)} /></span><span className="live-name">Back to your practice exam</span></span>
+              <span className="live-text"><span className="live-clock"><Digits value={formatCountdown(examLeft)} /></span><span className="live-name">Back to your practice exam</span></span>
             </button>
           ) : morning && !morningOpen && (
             <button className="live-pill" onClick={resumeMorning}>
@@ -1331,7 +1331,7 @@ export default function TriCertApp() {
                 <li>
                   <button className="row tile tile-exam" onClick={() => openPractice('exam')}>
                     <Glyph name="timed" />
-                    <span className="row-text"><strong>Practice exam</strong><small>{exam && !exam.finishedAt ? `In progress, ${formatClock(examLeft)} left` : examGate && studyBlock ? (examGate.open ? `${formName(examGate.form)}: ${studyBlock.exam.questions} questions in ${studyBlock.exam.minutes} minutes` : examGate.reason) : 'Opens with the first exam block'}</small></span>
+                    <span className="row-text"><strong>Practice exam</strong><small>{exam && !exam.finishedAt ? `In progress, ${formatCountdown(examLeft)} left` : examGate && studyBlock ? (examGate.open ? `${formName(examGate.form)}: ${studyBlock.exam.questions} questions in ${studyBlock.exam.minutes} minutes` : examGate.reason) : 'Opens with the first exam block'}</small></span>
                     <Chevron dir="right" />
                   </button>
                 </li>
@@ -1482,7 +1482,7 @@ export default function TriCertApp() {
                       {bookingChecks.map((item) => (
                         <li key={item.key}>
                           <span className={item.met === true ? 'tick is-done' : item.met === 'not-enough-data' ? 'tick is-wait' : 'tick'} aria-hidden="true">{item.met === true && <Check />}</span>
-                          <span><strong>{item.title}</strong><small>{item.met === true ? 'Met. ' : item.met === 'not-enough-data' ? 'Not checked yet. ' : 'Not yet. '}{keepTogether(item.detail)}</small></span>
+                          <span><strong>{item.title}</strong><small>{item.met === true ? 'Met. ' : item.met === 'not-enough-data' ? '' : 'Not yet. '}{keepTogether(item.detail)}</small></span>
                         </li>
                       ))}
                     </ul>
@@ -2089,7 +2089,7 @@ function ExamStart({ block, gate, running, left, lastResult, onBack, onStart, on
             <li>The clock keeps running if you leave or reload. Aim for {settings.target}% or more.</li>
           </ul>
           {running
-            ? <div className="hero-actions"><button className="primary play" onClick={onStart}><span className="play-label">Resume practice exam, {formatClock(left)} left</span></button></div>
+            ? <div className="hero-actions"><button className="primary play" onClick={onStart}><span className="play-label">Resume practice exam, {formatCountdown(left)} left</span></button></div>
             : gate?.open
               ? <div className="hero-actions"><button className="primary play" onClick={onStart}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg><span className="play-label">Start practice exam</span></button></div>
               : <p className="exam-locked" role="status"><strong>Not open yet.</strong> {gate?.reason}</p>}
@@ -2140,7 +2140,7 @@ function ExamFocus({ run, left, restored, onChange, onLeave, onFinish }: {
       <>
         <p className="eyebrow">Finish</p>
         <h2 id="exam-title" className="m-title">Finish the exam?</h2>
-        <p className="lede">{unanswered ? `${unanswered} of ${total} ${unanswered === 1 ? 'question is' : 'questions are'} unanswered. ${unanswered === 1 ? 'It counts' : 'They count'} as wrong.` : `All ${total} questions have an answer.`}{run.flags.length ? ` ${run.flags.length} ${run.flags.length === 1 ? 'is' : 'are'} flagged.` : ''} You have {formatClock(left)} left.</p>
+        <p className="lede">{unanswered ? `${unanswered} of ${total} ${unanswered === 1 ? 'question is' : 'questions are'} unanswered. ${unanswered === 1 ? 'It counts' : 'They count'} as wrong.` : `All ${total} questions have an answer.`}{run.flags.length ? ` ${run.flags.length} ${run.flags.length === 1 ? 'is' : 'are'} flagged.` : ''} You have {formatCountdown(left)} left.</p>
       </>
     );
     foot = <><button className="secondary" onClick={() => setConfirming(false)}>Keep going</button><button className="primary" onClick={onFinish}>Finish exam</button></>;
@@ -2194,13 +2194,13 @@ function ExamFocus({ run, left, restored, onChange, onLeave, onFinish }: {
     <div ref={dialog} tabIndex={-1} className="focus morning exam" role="dialog" aria-modal="true" aria-labelledby="exam-title">
       <header className="focus-bar">
         <span className="focus-where"><span className="live-dot" aria-hidden="true" />{run.exam === 'ITIL' ? 'ITIL' : run.exam}, {formName(run.form).toLowerCase()}</span>
-        <span className={low ? 'exam-clock is-low' : 'exam-clock'} role="timer" aria-label={`${formatClock(left)} left`}><Digits value={formatClock(left)} /></span>
+        <span className={low ? 'exam-clock is-low' : 'exam-clock'} role="timer" aria-label={`${formatCountdown(left)} left`}><Digits value={formatCountdown(left)} /></span>
         <button className="ghost" onClick={onLeave}>Leave</button>
       </header>
       <div className="exam-bar">
-        <span className="exam-count">{answered} of {total} answered{run.flags.length ? `, ${run.flags.length} flagged` : ''}</span>
+        <span className="exam-count">{answered}/{total} answered{run.flags.length ? `, ${run.flags.length} flagged` : ''}</span>
         <span className="exam-tools">
-          {run.allowBack && <button className="ghost" aria-expanded={listOpen} onClick={() => { setConfirming(false); setListOpen(!listOpen); }}>{listOpen ? 'Hide list' : 'Question list'}</button>}
+          {run.allowBack && <button className="ghost" aria-expanded={listOpen} onClick={() => { setConfirming(false); setListOpen(!listOpen); }}>{listOpen ? 'Hide list' : 'Questions'}</button>}
           {!confirming && <button className="ghost" onClick={() => { setListOpen(false); setConfirming(true); }}>Finish exam</button>}
         </span>
       </div>
@@ -3299,6 +3299,11 @@ function formatClock(seconds: number) {
   const minutes = Math.floor((total % 3600) / 60);
   const secs = total % 60;
   return hours ? `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}` : `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+/* The practice exam clock: minutes and seconds, so 60 minutes reads 60:00. */
+function formatCountdown(seconds: number) {
+  const total = Math.max(0, Math.floor(seconds));
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 function formatMinutes(minutes: number) {
   const whole = Math.round(minutes);
