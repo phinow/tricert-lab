@@ -1482,7 +1482,7 @@ export default function TriCertApp() {
                       {bookingChecks.map((item) => (
                         <li key={item.key}>
                           <span className={item.met === true ? 'tick is-done' : item.met === 'not-enough-data' ? 'tick is-wait' : 'tick'} aria-hidden="true">{item.met === true && <Check />}</span>
-                          <span><strong>{item.title}</strong><small>{item.met === true ? 'Met. ' : item.met === 'not-enough-data' ? '' : 'Not yet. '}{keepTogether(item.detail)}</small></span>
+                          <span><strong>{item.title}</strong><small>{item.met === true ? 'Met. ' : item.met === 'not-enough-data' ? '' : 'Not yet. '}{keepTogether(item.detail.replace(/\d{4}-\d{2}-\d{2}/g, (date) => formatDate(date)))}</small></span>
                         </li>
                       ))}
                     </ul>
@@ -2077,7 +2077,7 @@ function ExamStart({ block, gate, running, left, lastResult, onBack, onStart, on
       <header className="screen-head">
         <p className="eyebrow">{block ? keepTogether(block.title) : 'Practice exam'}</p>
         <h1>{running ? formName(running.form) : gate ? formName(gate.form) : 'Practice exam'}</h1>
-        <p className="lede">A full practice exam at the real size and pace. It tells you, with Ready to book on Progress, when to book.</p>
+        <p className="lede">Take it like the real exam. Your results feed Ready to book on Progress.</p>
       </header>
       {block && settings && (
         <section className={running || gate?.open ? 'hero-session exam-open' : 'hero-session exam-open is-done'} aria-labelledby="exam-start-title">
