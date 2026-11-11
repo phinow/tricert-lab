@@ -549,7 +549,9 @@ export default function TriCertApp() {
     const owner = item ? examBlocks.find((candidate) => candidate.mornings.some((entry) => entry.key === item.key)) : block;
     if (!owner) return;
     const key = item ? item.key : `short-${today}`;
-    if (morning && morning.key === key) { resumeMorning(); return; }
+    if (morning && (morning.key === key || (mode === 'short' && morning.mode === 'short'))) { resumeMorning(); return; }
+    // Answers already given stay saved; only his place in the other morning is set aside.
+    if (morning && (morning.part > 0 || Object.keys(morning.questions.answers).length > 0)) say('Your other morning was set aside. Its answers and cards are saved.');
     const taught = owner.mornings.filter((entry) => entry.kind === 'learn' && completed.has(entry.key)).map((entry) => entry.lesson || entry.key);
     const lesson = mode === 'learn' ? item?.lesson : undefined;
     const engineMode: DailyMode = mode === 'short' ? 'short' : mode === 'learn' ? 'learn' : 'review';

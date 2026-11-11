@@ -1,4 +1,6 @@
 // Usage: node shoot.mjs <name> [viewsCsv] [outDir]
+// Views follow the version 8 screens: Today, the morning in focus mode, Plan,
+// Learn and setup. Practice and Progress views are still the version 7 ones.
 // Serves out/<name> (run `node build.mjs <name> ../..` first) and writes
 // <view>-<desktop|phone>-<light|dark>.png for every screen into outDir
 // (default shots/<name>/). Desktop is 1440x900, full page; phone is 390x844,
@@ -43,17 +45,22 @@ const failSaves = ['eval', () => {
 
 const onboard = [
   ['fill', ['#displayName', 'Moye']],
-  ['click', 'button:has-text("Continue")'], ['click', 'button:has-text("Continue")'], ['click', 'button:has-text("Continue")'], ['click', 'button:has-text("Continue")'],
-  ['fill', ['#pl300Target', '2026-12-10']],
+  ['click', 'button:has-text("Continue")'], ['click', 'button:has-text("Continue")'],
   ['click', 'button:has-text("Create my plan")'], ['wait', 600],
 ];
+const start = [['click', '.hero-session .play'], ['wait', 300]];
+const toLearn = [...start, ['cards'], ['click', '.morning-foot .primary']];
+const toQuestions = [...toLearn, ['click', '.morning-foot .primary'], ['wait', 400], ['click', '.morning-foot .primary'], ['click', '.morning-foot .primary'], ['click', '.morning-foot .primary'], ['wait', 300]];
 
-// Each view: how to reach it from a freshly loaded page.
+// Each view: how to reach it from a freshly loaded page. `query` adds to the
+// address (the harness reads ?today=YYYY-MM-DD; Wednesday 18 November 2026 by default).
 const views = {
   today: { steps: [] },
+  'today-weekend': { query: 'today=2026-11-21', steps: [] },
   plan: { steps: [nav('Plan')] },
   learn: { steps: [nav('Learn')] },
-  lesson: { steps: [nav('Plan'), ['click', '#week-6 .week-detail li >> nth=2 >> button'], ['wait', 300]] },
+  lesson: { steps: [nav('Learn'), ['click', '.block-lessons li >> nth=2 >> button'], ['wait', 300]] },
+  'lesson-kestrel': { steps: [nav('Learn'), ['click', '#library-week-6 > summary'], ['click', '#library-week-6 .week-lessons li >> nth=2 >> button'], ['wait', 300]] },
   'learn-exams': { steps: [nav('Learn'), learnTab('Exams')] },
   'learn-exam': { steps: [nav('Learn'), learnTab('Exams'), ['click', '.exam-card >> nth=2'], ['click', '.area summary >> nth=0']] },
   'learn-docs': { steps: [nav('Learn'), learnTab('Documents')] },
@@ -61,6 +68,7 @@ const views = {
   glossary: { steps: [nav('Learn'), learnTab('Glossary')] },
   projects: { hash: 'projects', steps: [] },
   document: { steps: [nav('Learn'), learnTab('Documents'), ['click', '.doc-list li >> nth=5 >> button']] },
+  // TODO(part 2): Practice and Progress are rebuilt in part 2.
   practice: { steps: [nav('Practice')] },
   'quiz-run': { steps: [nav('Practice'), ['click', '.tile-scenarios'], ['click', '.answer >> nth=1']] },
   'quiz-right': { steps: [nav('Practice'), ['click', '.tile-scenarios'], ['click', '.answer >> nth=1'], ['click', '.quiz-foot .primary'], ['wait', 700]] },
@@ -71,25 +79,50 @@ const views = {
   review: { steps: [nav('Practice'), ['click', '.tile-review']] },
   progress: { steps: [nav('Progress')] },
   portfolio: { steps: [nav('Progress'), learnTab('Portfolio')] },
-  focus: { overlay: true, steps: [['click', '.play'], ['wait', 2200]] },
-  'focus-read': { overlay: true, steps: [['click', '.play'], ['wait', 800], ['click', '.focus-lesson'], ['wait', 300]] },
-  celebrate: { overlay: true, steps: [['click', '.play'], ['wait', 1200], ['click', 'button:has-text("Finish session")'], ['wait', 1400]] },
+  'morning-cards': { overlay: true, steps: [...start] },
+  'morning-card-back': { overlay: true, steps: [...start, ['click', '.morning-foot .primary']] },
+  'morning-brief': { overlay: true, steps: [...toLearn] },
+  'morning-lesson': { overlay: true, steps: [...toLearn, ['click', '.morning-foot .primary'], ['wait', 500]] },
+  'morning-build': { overlay: true, steps: [...toLearn, ['click', '.morning-foot .primary'], ['wait', 400], ['click', '.morning-foot .primary'], ['click', '.reveal']] },
+  'morning-recall': { overlay: true, steps: [...toLearn, ['click', '.morning-foot .primary'], ['wait', 400], ['click', '.morning-foot .primary'], ['click', '.morning-foot .primary'], ['click', '.recall .reveal >> nth=0']] },
+  'morning-question': { overlay: true, steps: [...toQuestions, ['click', '.answer >> nth=1'], ['click', '.sure label >> nth=0']] },
+  'morning-answered': { overlay: true, steps: [...toQuestions, ['answer'], ['wait', 500]] },
+  'morning-mistakes': { overlay: true, steps: [...toQuestions, ['questions']] },
+  'short-morning': { overlay: true, steps: [['click', '.hero-link'], ['wait', 300]] },
+  'weekend-lab': { overlay: true, query: 'today=2026-11-21', steps: [...start] },
+  celebrate: { overlay: true, query: 'today=2026-11-21', steps: [...start, ['click', '.morning-foot .primary'], ['wait', 900]] },
   onboarding: { state: 'fresh', steps: [] },
+  'onboarding-rhythm': { state: 'fresh', steps: [['click', 'button:has-text("Continue")'], ['click', 'button:has-text("Continue")']] },
   yours: { overlay: true, steps: [['click', '.me:visible, .avatar-button:visible'], ['wait', 400]] },
-  'error-toast': { steps: [failSaves, ['click', '.hero-actions .ghost'], ['wait', 600]] },
-  // Extra states worth a look: the running-session pill, a finished
-  // session, the first day after onboarding and an empty review queue.
-  timer: { steps: [['click', '.play'], ['wait', 1300], ['click', '.focus-bar .ghost'], ['wait', 400]] },
-  'today-done': { steps: [['click', '.strip-head .arrow[aria-label="Previous week"]']] },
+  'error-toast': { overlay: true, steps: [...start, ['click', '.morning-foot .primary'], failSaves, ['click', '.morning-foot .primary'], ['wait', 600]] },
+  // Extra states worth a look: a morning left open, the first day after
+  // setup and an empty review queue.
+  'morning-left': { steps: [...start, ['click', '.focus-bar .ghost'], ['wait', 400]] },
   'today-new': { state: 'fresh', steps: [...onboard] },
   'review-empty': { state: 'fresh', steps: [...onboard, nav('Practice'), ['click', '.tile-review']] },
 };
-const dark = process.env.ALL_DARK ? { has: () => true } : new Set(['today', 'plan', 'lesson', 'practice', 'quiz-right', 'progress', 'focus', 'yours']);
+const dark = process.env.ALL_DARK ? { has: () => true } : new Set(['today', 'plan', 'lesson', 'practice', 'quiz-right', 'progress', 'morning-cards', 'morning-answered', 'yours']);
 const wanted = viewsCsv ? viewsCsv.split(',') : Object.keys(views);
 const devices = [
   ['desktop', { width: 1440, height: 900 }, 1],
   ['phone', { width: 390, height: 844 }, 2],
 ];
+
+/* A morning: pass the cards with Good; answer with the second option and Sure. */
+async function passCards(page) {
+  for (let step = 0; step < 120; step += 1) {
+    const label = (await page.textContent('.morning-foot .primary')).trim();
+    if (label === 'Show answer') { await page.click('.morning-foot .primary'); await page.waitForSelector('.m-card-back'); continue; }
+    if (label === 'Good') { await page.click('.morning-foot .primary'); await page.waitForSelector('.m-card-back', { state: 'detached' }); continue; }
+    return;
+  }
+}
+async function answerFirst(page) {
+  await page.click('.answer >> nth=1');
+  await page.click('.sure label >> nth=0');
+  await page.click('.morning-foot .primary');
+  await page.waitForSelector('.sheet');
+}
 
 const browser = await chromium.launch();
 let failures = 0;
@@ -101,7 +134,7 @@ async function shoot(key, device, viewport, scale, theme, full) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error' && !/status of 500/.test(message.text())) errors.push(message.text()); });
-  await page.goto(`${base}/?state=${view.state || 'midway'}${view.hash ? `#${view.hash}` : ''}`);
+  await page.goto(`${base}/?state=${view.state || 'midway'}${view.query ? `&${view.query}` : ''}${view.hash ? `#${view.hash}` : ''}`);
   await page.waitForSelector(view.state === 'fresh' ? '.onboard-form' : 'main.stage', { timeout: 10000 });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(350);
@@ -110,6 +143,9 @@ async function shoot(key, device, viewport, scale, theme, full) {
     if (action === 'wait') await page.waitForTimeout(target);
     if (action === 'eval') await page.evaluate(target);
     if (action === 'fill') await page.fill(target[0], target[1]);
+    if (action === 'cards') await passCards(page);
+    if (action === 'answer') await answerFirst(page);
+    if (action === 'questions') { while (await page.locator('.q-head').count()) { await answerFirst(page); await page.click('.morning-foot .primary'); await page.waitForTimeout(200); } }
     await page.waitForTimeout(220);
   }
   await page.mouse.move(1, 1);
