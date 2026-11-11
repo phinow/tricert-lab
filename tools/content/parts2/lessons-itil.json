@@ -214,6 +214,220 @@
      "a": "Experience: targets measure what the provider controls, not how users perceive the service (the watermelon effect). The provider should first talk to and observe users to see where the experience fails, then add an experience measure."
     }
    ]
+  },
+  {
+   "key": "itil-m3",
+   "summary": "Learn the four dimensions of product and service management and the five components of the ITIL Value System, including governance, so you can say which dimension or component a situation is about.",
+   "read": [
+    {
+     "heading": "Why four dimensions",
+     "body": "A product or service can fail even when its technology is excellent. Staff were never trained, a supplier contract left out night support, or nobody agreed who approves what. ITIL guards against this with four dimensions that must all be considered for every product and service, and for the Value System as a whole.\n\nThe four dimensions are:\n\n1. Organizations and People\n2. Information and Technology\n3. Partners and Suppliers\n4. Value Streams and Processes\n\nThey are not steps done in order and not teams. They are four views of the same thing. Looking through all four is how ITIL puts the guiding principle Think and work holistically into practice: neglect one dimension and the gap shows up later as delay, cost or risk.\n\nAn exam question may describe a project that went wrong and ask which dimension was overlooked. Another may describe a concern, such as a contract or a skills gap, and ask which dimension it belongs to. Both need the same skill: hearing the key words in the stem.\n\nTake one example through this lesson: Kestrel's new mobile app that lets nurses swap shifts, with managers approving the swaps."
+    },
+    {
+     "heading": "The four dimensions in detail",
+     "body": "| Dimension | What it covers | Shift-swap app example |\n|---|---|---|\n| Organizations and People | Structure, roles and responsibilities, culture, skills and competencies, leadership, communication | Charge nurses trained to approve swaps; managers accept that staff arrange swaps themselves |\n| Information and Technology | Information and knowledge, the technology that manages it, how it is protected and kept, tools such as AI and automation | The app reads rosters from the HR system; swap records kept for one year and protected |\n| Partners and Suppliers | Relationships with other organizations involved in designing, delivering and supporting services; contracts and sourcing choices | A vendor hosts the app under a contract with night support within one hour |\n| Value Streams and Processes | How the parts work together: the steps, activities, workflows, controls and procedures that turn demand into value | Request swap, check rules, manager approves, roster updated, both nurses told |\n\nKey words help:\n\n- Culture, roles, skills, training, structure: Organizations and People.\n- Data, knowledge, tools, platforms, security of information: Information and Technology.\n- Contracts, vendors, outsourcing, other organizations: Partners and Suppliers.\n- Workflow, handoffs, steps, sequence, how work flows: Value Streams and Processes.\n\nSome situations touch two dimensions. A supplier's tool holding your data is both Partners and Suppliers and Information and Technology. Pick the one the question stresses: the contract, or the data."
+    },
+    {
+     "heading": "Outside forces",
+     "body": "The four dimensions sit inside a wider world the organization does not control. ITIL 4 grouped these outside influences under six headings, often remembered as PESTLE:\n\n- Political: government priorities and funding decisions.\n- Economic: budgets, prices, the job market.\n- Social: what people expect, how they like to work.\n- Technological: new tools and threats, such as AI.\n- Legal: laws and regulations, such as privacy law.\n- Environmental: energy use, climate and physical risks.\n\nThese factors constrain or shape every dimension. A privacy law limits what Information and Technology may hold. A tight job market affects Organizations and People. A rule that health data must stay in the country shapes Partners and Suppliers.\n\nFor the shift-swap app, a collective agreement on overtime is a legal factor: the app's rules must not let a swap break it. Recognizing an outside factor helps you separate it from the four dimensions. When a stem describes a new law, a market change or public expectations, it is describing an outside influence that the dimensions must respond to, not a dimension itself."
+    },
+    {
+     "heading": "The ITIL Value System",
+     "body": "The ITIL Value System describes how all the parts of an organization work together to create value. PeopleCert lists its components as guiding principles, governance, value chain activities, management practices and continual improvement.\n\n| Component | What it does |\n|---|---|\n| Guiding principles | Recommendations that guide decisions in every situation (lesson 4) |\n| Governance | Directs and controls the organization (next section) |\n| Value chain activities | The work that turns demand into value; Version 5 views this work through a complete product and service lifecycle (lesson 5) |\n| Management practices | Sets of organizational resources for a type of work, such as incident management (lessons 6 and 7) |\n| Continual improvement | Ongoing improvement at every level, everywhere in the system (lesson 8) |\n\nIn ITIL 4, which Version 5 builds on, the Value System has inputs and an output. Opportunity and demand go in. Opportunity means options to add value for stakeholders or to improve the organization. Demand means the need or desire for products and services from consumers inside and outside. Value comes out.\n\nThe point of a system is that the parts work together. Practices that each perform well but never share information create silos: the desk does not know about a release, the release team does not know the desk's top complaints. The Value System exists to join them up around value. In the exam, an answer that improves one team in isolation is usually weaker than one that links the components."
+    },
+    {
+     "heading": "Governance",
+     "body": "Governance is the means by which an organization is directed and controlled. It sits with a governing body, such as a board of directors, that is accountable for the organization's performance and compliance.\n\nGovernance has three activities:\n\n1. Evaluate: look at the organization, its strategy, performance and risks, and how they may change.\n2. Direct: assign responsibility for, and set the direction of, strategy and policies.\n3. Monitor: check performance and compliance against the direction set.\n\nGovernance is not management. The governing body sets direction and checks results; management plans and runs the work within that direction. A board that sets a policy that patient data must stay in Canada is governing. The team that chooses a hosting supplier in Canada and runs the contract is managing.\n\nFor the shift-swap app:\n\n- Governance: the board's policy that staff data stays in Canada, and its quarterly review of whether the policy is met.\n- Management: the project choosing the vendor, the desk supporting nurses, the manager approving swaps.\n\nGovernance applies to every part of the Value System, including how AI is used. In exam questions, words such as directs, controls, policy, accountability, evaluate and monitor point to governance. Words such as plans, builds, runs and supports point to management practices."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Four dimensions",
+     "definition": "Four views that must all be considered for every product and service: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes."
+    },
+    {
+     "term": "Organizations and People",
+     "definition": "The dimension covering structure, roles, culture, skills, leadership and communication. Training gaps and resistance to change belong here."
+    },
+    {
+     "term": "Information and Technology",
+     "definition": "The dimension covering information and knowledge, and the technology that manages and protects it, including tools such as AI and automation."
+    },
+    {
+     "term": "Partners and Suppliers",
+     "definition": "The dimension covering relationships with other organizations involved in designing, delivering and supporting services, including contracts and sourcing choices."
+    },
+    {
+     "term": "Value Streams and Processes",
+     "definition": "The dimension covering how the parts work together: the steps, workflows, controls and procedures that turn demand into value."
+    },
+    {
+     "term": "ITIL Value System",
+     "definition": "How the organization's parts work together to create value. Components: guiding principles, governance, value chain activities, management practices, continual improvement."
+    },
+    {
+     "term": "Governance",
+     "definition": "The means by which an organization is directed and controlled. A governing body evaluates, directs and monitors; management runs the work within that direction."
+    },
+    {
+     "term": "Opportunity and demand",
+     "definition": "The Value System's inputs in ITIL 4. Opportunity is an option to add value or improve; demand is the need for products and services from consumers."
+    }
+   ],
+   "build": {
+    "goal": "Sort eight statements about launching a staff shift-swap app into the four dimensions or an outside factor, then match five more statements to the five components of the ITIL Value System.",
+    "steps": [
+     "Dimensions, statements 1 to 4: (1) charge nurses need training to approve swaps; (2) the app reads rosters from the HR system; (3) a vendor hosts the app under a contract; (4) the steps from swap request to updated roster are drawn out.",
+     "Dimensions, statements 5 to 8: (5) managers must accept that staff arrange their own swaps; (6) swap records are kept one year and protected; (7) a collective agreement limits overtime; (8) the vendor must answer night calls within one hour.",
+     "Label each of the eight with a dimension, or as an outside factor, and underline the key word that decided it.",
+     "Components: (a) the board rules that staff data stays in Canada; (b) Keep it simple and practical is used to cut approval steps; (c) the service desk and change enablement support the app; (d) a list of improvement ideas is reviewed monthly; (e) the work of designing, building and running the app.",
+     "Match a to e with guiding principles, governance, value chain activities, management practices or continual improvement.",
+     "Compare with the model answer and write one line for any you missed."
+    ],
+    "modelAnswer": "| Statement | Answer | Key word |\n|---|---|---|\n| 1 Nurses need training | Organizations and People | training, skills |\n| 2 App reads rosters from HR system | Information and Technology | data from a system |\n| 3 Vendor hosts under contract | Partners and Suppliers | vendor, contract |\n| 4 Steps from request to roster | Value Streams and Processes | steps, flow |\n| 5 Managers accept staff arrange swaps | Organizations and People | culture |\n| 6 Records kept and protected | Information and Technology | information, protection |\n| 7 Collective agreement on overtime | Outside factor (legal) | agreement the organization must obey |\n| 8 Night calls answered within one hour | Partners and Suppliers | supplier's contracted support |\n\nStatement 8 is about support, so you might think of Value Streams and Processes. The key fact is that another organization has promised it in a contract, so Partners and Suppliers fits best.\n\n| Statement | Component |\n|---|---|\n| a Board rules data stays in Canada | Governance |\n| b Keep it simple and practical used | Guiding principles |\n| c Service desk and change enablement | Management practices |\n| d Improvement ideas reviewed monthly | Continual improvement |\n| e Designing, building and running the app | Value chain activities (lesson 5 shows how Version 5 describes this work as lifecycle activities) |\n\nStatement a is governance because it is a direction set by the governing body. If the statement had been the project choosing a Canadian vendor, that would be management carrying out the direction."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "The four dimensions must be considered for every product and service. Contracts or vendors point to Partners and Suppliers; culture or skills to Organizations and People; data or tools to Information and Technology; steps or handoffs to Value Streams and Processes."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "The ITIL Value System components are guiding principles, governance, value chain activities, management practices and continual improvement. A question about which component directs and controls the organization wants governance."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Governance evaluates, directs and monitors; management plans and runs the work. If an option has the governing body running daily operations, or a team setting the organization's policy, it mixes the two."
+    }
+   ],
+   "pitfalls": [
+    "Treating the four dimensions as teams or as steps done in order. They are four views of the same product or service, all considered together.",
+    "Calling a new law or market change a dimension. It is an outside factor that the dimensions must respond to.",
+    "Confusing governance with management. The governing body sets direction and checks it; managers run the work."
+   ],
+   "check": [
+    {
+     "q": "A new system has excellent software and good data, but staff were never trained and no supplier contract covers support. Which dimensions were neglected, and why does ITIL insist on all four?",
+     "a": "Organizations and People (no training) and Partners and Suppliers (no support contract). ITIL says all four dimensions must be considered for every product and service, because a gap in any one shows up later as delay, cost or risk, however good the technology is."
+    },
+    {
+     "q": "List the five components of the ITIL Value System and say in one line what each contributes.",
+     "a": "Guiding principles guide decisions in every situation; governance directs and controls; value chain activities are the work that turns demand into value; management practices are resources for types of work; continual improvement improves everything, at every level."
+    },
+    {
+     "q": "What is the difference between governance and management? Give one example of each.",
+     "a": "Governance directs and controls the organization by evaluating, directing and monitoring, for example a board setting a data policy and checking it is met. Management plans and runs the work within that direction, for example a team choosing a supplier that meets the policy."
+    }
+   ]
+  },
+  {
+   "key": "itil-m4",
+   "summary": "Learn the seven guiding principles, what each one asks of you, how they work together, and how to pick the principle a scenario is testing from the key words in the question.",
+   "read": [
+    {
+     "heading": "What a guiding principle is",
+     "body": "A guiding principle is a recommendation that guides an organization in all circumstances, whatever changes in its goals, strategies, type of work or management structure. The principles are universal and lasting. They are not steps and not rules to follow in order; they are questions to ask before you decide.\n\nVersion 5 keeps the seven titles unchanged from ITIL 4:\n\n1. Focus on value\n2. Start where you are\n3. Progress iteratively with feedback\n4. Collaborate and promote visibility\n5. Think and work holistically\n6. Keep it simple and practical\n7. Optimize and automate\n\nThree things to remember about using them:\n\n- They interact. Starting where you are often leads to progressing iteratively. Keeping it simple comes before automating.\n- Not every principle applies to every decision, and none is applied alone. Use judgment.\n- They guide the whole Value System, including how practices are adapted to the organization.\n\nIn exam questions, the stem describes a situation and asks which principle is being applied, ignored or best fits. This lesson gives each principle its key words, then shows how to separate principles that look alike.\n\nThe example running through the lesson: a service desk replacing its ticket tool."
+    },
+    {
+     "heading": "Focus on value; Start where you are",
+     "body": "Focus on value. Everything the organization does should link back, directly or indirectly, to value for itself, its customers and other stakeholders. That means knowing who the consumer is, what they value, and how they experience the service. It applies at every step, not only at the start.\n\n- Key words: who benefits, outcomes, what the customer values, experience.\n- Ticket tool: choose features because they shorten the time users wait, not because they are new.\n- Breaking it: counting pages built or tickets closed instead of outcomes for users.\n\nStart where you are. Do not start from nothing. Look at what already exists, measure it and observe it directly, and keep what works. Reports and opinions can mislead, so go and see the work. Starting over is right only when what exists truly cannot be used, and that conclusion should come from evidence.\n\n- Key words: current state, baseline, reuse, assess, observe directly.\n- Ticket tool: export a year of tickets, see which categories and scripts work, and carry them over.\n- Breaking it: a new manager throwing out every process and tool in week one.\n\nExam options that discard everything and begin again are usually wrong. Options that measure the current state first are usually right."
+    },
+    {
+     "heading": "Progress iteratively with feedback; Collaborate and promote visibility",
+     "body": "Progress iteratively with feedback. Do not try to do everything at once. Break work into smaller pieces that can be finished and used, and gather feedback before, during and after each one. Each piece must still deliver something of value. Feedback lets you change direction early, when it is cheap.\n\n- Key words: pilot, small steps, phases, feedback loop, adjust.\n- Ticket tool: move one team first, learn from its first month, then move the rest.\n- Breaking it: an 18-month project with a single launch at the end and no user contact in between.\n\nCollaborate and promote visibility. Work across boundaries with the right people in the right roles, and make work, decisions and progress visible. Hidden work and hidden problems lead to poor decisions and low trust. Collaboration includes users and customers, not only other teams; how much each group is involved depends on its relationship to the work.\n\n- Key words: involve, share, transparent, visible, stakeholders, silos.\n- Ticket tool: show the backlog and the migration plan to the business, including the delays.\n- Breaking it: hiding a backlog from the business because it looks bad.\n\nThese two often appear together: a pilot shared openly with users uses both. When a question stresses small steps, pick Progress iteratively. When it stresses sharing or involving people, pick Collaborate and promote visibility."
+    },
+    {
+     "heading": "Holistic, simple, then automated",
+     "body": "Think and work holistically. No service, practice or component stands alone. Results suffer unless the organization works on the whole, not just the parts. Use the four dimensions to see the whole.\n\n- Key words: end to end, whole, interfaces, all four dimensions, effect on other parts.\n- Ticket tool: plan the change with the teams that receive tickets, the reporting team and the supplier, not just the desk.\n- Breaking it: the network team changing a firewall without considering the applications behind it.\n\nKeep it simple and practical. Use the fewest steps needed to reach the objective. If a process, service, action or measure provides no value or useful outcome, remove it. Think in outcomes, and design rules that are easy to follow.\n\n- Key words: remove, eliminate, fewest steps, unnecessary, practical.\n- Ticket tool: cut 30 ticket categories to 12 that people actually choose correctly.\n- Breaking it: 40 report measures where nobody can name the three that drive decisions.\n\nOptimize and automate. Make work as useful and efficient as it can be, and use technology to take on frequent, repetitive work. Optimize first, then automate: automating a messy process makes a fast messy process. Keep people where they truly add value, such as judgment and empathy.\n\n- Key words: automate, efficiency, repetitive, tool, AI.\n- Ticket tool: after simplifying categories, route tickets automatically.\n- Breaking it: building a chatbot before knowing which questions users ask most."
+    },
+    {
+     "heading": "Choosing between principles in a question",
+     "body": "Several principles can seem to fit a scenario. Pick the one the stem's key words point to, and test it against the others.\n\n| Situation | Best fit | Why not the obvious alternative |\n|---|---|---|\n| Automating an approval chain nobody has reviewed | Optimize and automate (optimize first) | Keep it simple is close, but the stem is about automation |\n| Replacing a tool before checking how it is used | Start where you are | Focus on value matters, but the missing step is the assessment |\n| One big launch after a year of silent work | Progress iteratively with feedback | Collaborate is close, but the stem is about the size of the steps |\n| A team keeps bad news from stakeholders | Collaborate and promote visibility | Focus on value is too general |\n| A change in one team breaks another team's service | Think and work holistically | Collaborate is close, but the failure is not seeing the whole |\n| A report with measures nobody uses | Keep it simple and practical | Focus on value is close, but the action is removing |\n| Success measured by features shipped | Focus on value | The stem is about what counts as success |\n\nA short method:\n\n1. Underline the verb in the stem: assess, pilot, share, remove, automate.\n2. Match it to the principle that owns that verb.\n3. Check the options for one that names a principle but answers a different problem.\n\nQuestions about applying a principle often ask what the team should do next. The answer is the action the principle recommends, such as measuring the current state, starting with a pilot or removing a step."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Guiding principle",
+     "definition": "A recommendation that guides an organization in all circumstances, regardless of changes in its goals, strategies, type of work or management structure."
+    },
+    {
+     "term": "Focus on value",
+     "definition": "Everything the organization does should link back to value for stakeholders. Know the consumer, what they value and how they experience the service."
+    },
+    {
+     "term": "Start where you are",
+     "definition": "Assess and observe what already exists, measure it and reuse what works, rather than starting from nothing. Base any decision to replace on evidence."
+    },
+    {
+     "term": "Progress iteratively with feedback",
+     "definition": "Break work into smaller pieces that each deliver value, and use feedback before, during and after each piece to adjust direction early."
+    },
+    {
+     "term": "Collaborate and promote visibility",
+     "definition": "Work across boundaries with the right people, including users and customers, and make work, decisions and problems visible to support good decisions."
+    },
+    {
+     "term": "Think and work holistically",
+     "definition": "No service or component stands alone. Work on the whole, end to end, using all four dimensions, because results suffer when only parts are improved."
+    },
+    {
+     "term": "Keep it simple and practical",
+     "definition": "Use the fewest steps needed to reach the objective. Remove any process, action or measure that provides no value or useful outcome."
+    },
+    {
+     "term": "Optimize and automate",
+     "definition": "Make work as useful and efficient as possible, then use technology for frequent, repetitive work. Optimize first; keep people where they add value."
+    }
+   ],
+   "build": {
+    "goal": "Read eight short workplace situations, name the guiding principle each one tests (or breaks), and write the key word that decided it and the action the principle recommends.",
+    "steps": [
+     "Situations 1 to 3: (1) a new manager wants to replace the ticket tool before anyone checks how it is used; (2) a team plans an 18-month redesign with one launch at the end; (3) a monthly report has 40 measures and nobody can say which drive decisions.",
+     "Situations 4 to 6: (4) the network team changes a firewall without telling the application team, and an app breaks; (5) a team wants a chatbot to answer every question before checking which questions are common; (6) the desk hides its backlog from the business.",
+     "Situations 7 and 8: (7) a project counts success by features shipped, not by whether users' work got easier; (8) before buying a new tool, a team lists which existing scripts and reports already work.",
+     "For each situation write three things: the principle, the key word in the situation, and the next action the principle recommends, in one line.",
+     "For two situations of your choice, name a second principle that also applies and explain why it is not the best answer.",
+     "Compare with the model answer and note any pair of principles you confused."
+    ],
+    "modelAnswer": "| Situation | Principle | Key word | Next action |\n|---|---|---|---|\n| 1 Replace tool before checking use | Start where you are | before anyone checks | Measure and observe the current tool and keep what works |\n| 2 One launch after 18 months | Progress iteratively with feedback | one launch | Split into releases that each deliver value; get feedback after each |\n| 3 Forty unused measures | Keep it simple and practical | nobody can say | Keep the few measures that drive decisions; remove the rest |\n| 4 Firewall change breaks app | Think and work holistically | without telling | Assess changes end to end, across every affected service |\n| 5 Chatbot first | Optimize and automate | before checking | Find and simplify the common questions first, then automate |\n| 6 Hidden backlog | Collaborate and promote visibility | hides | Show the backlog and plan openly, including delays |\n| 7 Features shipped | Focus on value | counts success | Measure outcomes for users, such as time saved |\n| 8 List what already works | Start where you are | already work | Reuse the working scripts and reports in the new tool |\n\nSecond principles:\n\n- Situation 4 also touches Collaborate and promote visibility, because the teams did not talk. The failure the stem stresses is changing one part without seeing its effect on the whole, so Think and work holistically is the better answer.\n- Situation 5 also touches Start where you are, because nobody measured the questions. The stem's action is automation, and the rule broken is to optimize before automating, so Optimize and automate is the better answer.\n- Situation 3 also touches Focus on value. The action the stem points to is removing what adds nothing, which belongs to Keep it simple and practical."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "Start where you are: before replacing a process or tool, assess and observe what exists and reuse what works. An answer that discards everything and starts fresh is usually wrong."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Optimize and automate: simplify and optimize first, then automate. An answer that automates a tangled process before removing steps is weaker than one that simplifies first."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Collaborate and promote visibility: answers that make work, risks and progress visible to stakeholders beat answers that keep information inside the team, even when the news is bad."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "When two principles both seem to fit, find the verb in the stem (assess, pilot, share, remove, automate) and pick the principle that owns that verb."
+    }
+   ],
+   "pitfalls": [
+    "Treating the principles as steps in a fixed order. They interact and are applied together, with judgment about which matter most.",
+    "Reading Progress iteratively with feedback as permission to deliver nothing whole. Each piece must still deliver value.",
+    "Automating before simplifying. Automation of a poor process makes poor results faster."
+   ],
+   "check": [
+    {
+     "q": "A team wants to automate a seven-step approval process that has never been reviewed. Which two principles should guide them first, and in what order?",
+     "a": "Start where you are (observe and measure the current process) and Keep it simple and practical (remove steps that add no value). Only then Optimize and automate, because automating an unreviewed process makes a poor process faster."
+    },
+    {
+     "q": "Why should the guiding principles be applied together rather than one at a time? Give an example where two interact.",
+     "a": "They interact and none covers every concern, so using one alone gives a partial answer. For example, a pilot with one team (Progress iteratively with feedback) works best when its results are shared openly with users (Collaborate and promote visibility)."
+    },
+    {
+     "q": "A manager hides a delayed project from stakeholders until it is fixed. Which principle does this break, and what would following it look like?",
+     "a": "Collaborate and promote visibility. Following it would mean sharing the delay, its cause and the recovery plan with stakeholders now, so they can make good decisions and trust the team."
+    }
+   ]
   }
  ]
 }
