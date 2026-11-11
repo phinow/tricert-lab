@@ -72,8 +72,8 @@ await check('Make it yours saves name and why to D1; colour stays on the device'
   assert.equal(await page.textContent('.me .avatar'), 'MA');
   const bad = await fetch(`${base}/api/state`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'save-personal', displayName: 'x'.repeat(90), motivation: 'y'.repeat(400) }) });
   const after = await bad.json();
-  assert.equal(after.profile.display_name.length, 40);
-  assert.equal(after.profile.motivation.length, 140);
+  assert.equal(bad.status, 400);
+  assert.match(after.error, /Your name is 90 characters, over the limit of 40/);
   await fetch(`${base}/api/state`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'save-personal', displayName: 'Moye', motivation: 'Lead the projects I used to support.' }) });
   await page.click('.me');
   await page.click('.swatch:has-text("Beacon")');
