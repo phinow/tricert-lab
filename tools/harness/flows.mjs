@@ -934,6 +934,58 @@ await check('Phone: Practice, the practice exam, its result and Progress fit 390
 });
 await context.close();
 
+/* ------------------------------------------- the day moves, two tabs */
+context = await open();
+await check('A tab left open moves to the new day when it comes back into view', async () => {
+  await page.goto(`${base}/?state=midway#practice`);
+  await page.waitForSelector('.review-card');
+  const before = (await page.textContent('.review-card h2')).trim();
+  assert.match(before, /7 cards and 8 questions due/);
+  await page.evaluate(() => { window.__tricertToday = '2026-12-02'; window.dispatchEvent(new Event('focus')); });
+  await page.waitForFunction((text) => document.querySelector('.review-card h2')?.textContent.trim() !== text, before);
+  assert.match(await page.textContent('.review-card h2'), /due/);
+});
+await context.close();
+
+context = await open();
+await check('Two tabs: a morning finished in one tab is closed in the other and never written back', async () => {
+  const first = page;
+  await first.goto(`${base}/?state=midway&keep=1`);
+  await first.waitForSelector('.hero-session');
+  await first.click('.hero-session .play');
+  await first.waitForSelector('.morning');
+  const second = await context.newPage();
+  second.on('pageerror', (error) => errors.push(error.message));
+  await second.goto(`${base}/?state=midway&keep=1`);
+  await second.waitForSelector('.morning');
+  // The first tab finishes it: the run leaves this browser's storage.
+  await first.evaluate(() => localStorage.removeItem('tricert.morning.v1'));
+  await second.waitForSelector('.morning', { state: 'detached' });
+  await second.waitForTimeout(2600);
+  assert.equal(await second.evaluate(() => localStorage.getItem('tricert.morning.v1')), null);
+  await second.close();
+});
+await context.close();
+
+context = await open();
+await check('Two tabs: a practice exam finished in one tab is closed in the other and never written back', async () => {
+  const first = page;
+  await first.goto(`${base}/?state=ready&keep=1#practice`);
+  await first.click('.tile-exam');
+  await first.click('.exam-start .play');
+  await first.waitForSelector('.exam .q-head');
+  const second = await context.newPage();
+  second.on('pageerror', (error) => errors.push(error.message));
+  await second.goto(`${base}/?state=ready&keep=1`);
+  await second.waitForSelector('.exam .q-head');
+  await first.evaluate(() => localStorage.removeItem('tricert.exam.v1'));
+  await second.waitForSelector('.exam', { state: 'detached' });
+  await second.waitForTimeout(2600);
+  assert.equal(await second.evaluate(() => localStorage.getItem('tricert.exam.v1')), null);
+  await second.close();
+});
+await context.close();
+
 assert.deepEqual(errors, [], `console errors: ${errors.join(' | ')}`);
 console.log(`\n${passed} flow checks passed, no console errors`);
 await browser.close();
