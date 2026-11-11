@@ -1,0 +1,401 @@
+{
+ "type": "flashcards",
+ "items": [
+  {
+   "cert": "ITIL",
+   "front": "What is value in ITIL?",
+   "back": "The perceived benefits, usefulness and importance of something. The stakeholder judges it, not the provider, and it is more than money.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a product in ITIL?",
+   "back": "A configuration of an organization's resources, such as people, information, technology, partners and money, designed to offer value for a consumer.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which two things does a service take off the customer's hands?",
+   "back": "Specific costs and risks. The service facilitates the outcomes the customer wants without the customer having to manage them.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Utility in three words?",
+   "back": "Fit for purpose: what the product or service does. It supports a performance or removes a constraint.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Warranty in three words?",
+   "back": "Fit for use: how well it does it against agreed requirements, covering availability, capacity, security and continuity.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Can one person be customer, user and sponsor at the same time?",
+   "back": "Yes. The three roles are distinct, but one person or group can hold several of them at once.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What three parts make up a service relationship?",
+   "back": "Service provision, service consumption and service relationship management.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a service offering?",
+   "back": "A description of one or more services, designed for a target consumer group. It can include goods, access to resources and service actions.",
+   "lesson": "itil-m1"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Who creates value, in ITIL's view?",
+   "back": "Providers, consumers and other stakeholders together, through active collaboration. A provider does not hand value to a passive consumer.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What five factors are weighed in value co-creation in Version 5?",
+   "back": "Outcomes, costs, risks, experience and sustainability.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is experience, as a value factor?",
+   "back": "How a stakeholder perceives every contact with a product or service: ease, speed, clarity and trust. It shapes value even when targets are met.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does sustainability mean when weighing value?",
+   "back": "Whether the value can last, and what producing it costs over time in energy, hardware, workload and future money.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is the watermelon effect?",
+   "back": "Reports are green on every target while users are unhappy. Targets alone do not prove value, so experience must be measured too.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which kind of experience does PeopleCert call a core focus of Version 5?",
+   "back": "Digital experience: the quality of people's contact with digital products and services.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does AI-native mean for ITIL Version 5?",
+   "back": "It was designed with AI in mind from the start, so practices, value streams and roles can include AI to automate work and support decisions.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Who counts as a stakeholder in a service?",
+   "back": "Anyone with an interest in it: customers, users, sponsors, employees, partners and suppliers, funders and society.",
+   "lesson": "itil-m2"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which dimension covers skills, culture and resistance to change?",
+   "back": "Organizations and People.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which dimension covers information, knowledge and the tools that manage it, including AI?",
+   "back": "Information and Technology.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which dimension covers the steps and controls that turn demand into value?",
+   "back": "Value Streams and Processes.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "A new privacy law affects a service. Is that one of the four dimensions?",
+   "back": "No. It is an outside factor, such as political, economic, social, technological, legal or environmental, that the dimensions must respond to.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is governance?",
+   "back": "The means by which an organization is directed and controlled.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What three things does a governing body do?",
+   "back": "Evaluate, direct and monitor. Management then runs the work within that direction.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "A monthly review of improvement ideas belongs to which Value System component?",
+   "back": "Continual improvement.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What are the inputs to the Value System in ITIL 4?",
+   "back": "Opportunity and demand. Opportunity is an option to add value or improve; demand is the need for products and services.",
+   "lesson": "itil-m3"
+  },
+  {
+   "cert": "ITIL",
+   "front": "When does a guiding principle apply?",
+   "back": "In all circumstances, whatever the organization's goals, strategy, type of work or management structure.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which principle says to know the consumer and how they experience the service?",
+   "back": "Focus on value.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Under Start where you are, what should a decision to replace something rest on?",
+   "back": "Evidence from observing and measuring what exists now, so what works can be reused.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which principle says to break work into smaller pieces that each deliver value?",
+   "back": "Progress iteratively with feedback.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which principle says to make work, decisions and problems visible?",
+   "back": "Collaborate and promote visibility.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which principle says no service or component stands alone?",
+   "back": "Think and work holistically. Work end to end and use all four dimensions.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Which principle removes a measure that nobody uses to decide anything?",
+   "back": "Keep it simple and practical.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Do the guiding principles work one at a time?",
+   "back": "No. They interact and several usually apply. In a question, pick the one the key words point to.",
+   "lesson": "itil-m4"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the Discover activity do?",
+   "back": "Understands needs, demand and opportunities, and decides what is worth doing.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the Design activity do?",
+   "back": "Shapes the product or service, including how it will be used, supported and secured.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the Acquire activity do?",
+   "back": "Obtains the resources needed, from inside the organization or from partners and suppliers.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the Build activity do?",
+   "back": "Creates, configures and tests the components, using the resources acquired.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Operate versus Deliver?",
+   "back": "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the Support activity do?",
+   "back": "Helps users and restores normal use when things go wrong.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Does every value stream use all eight lifecycle activities?",
+   "back": "No. A value stream uses only the activities it needs to get from demand to value.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is technical debt?",
+   "back": "The future cost of quick choices made now, such as a shortcut in Build that Operate and Support must pay for later.",
+   "lesson": "itil-m5"
+  },
+  {
+   "cert": "ITIL",
+   "front": "How many management practices does Version 5 have, and in which groups?",
+   "back": "34, in two groups: Product and Service management practices, and General management practices.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does the service desk practice do?",
+   "back": "It captures demand for incident resolution and service requests, and is the single point of contact between the provider and all its users.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is an incident?",
+   "back": "An unplanned interruption to a service, or a reduction in its quality.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What two things set an incident's priority?",
+   "back": "Impact and urgency.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a major incident?",
+   "back": "An incident with significant business impact. It gets its own procedure: a clear lead, faster communication and more people.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a problem?",
+   "back": "A cause, or potential cause, of one or more incidents.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What are the three phases of problem management?",
+   "back": "Problem identification, problem control and error control.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What are the three kinds of event?",
+   "back": "Informational, warning and exception.",
+   "lesson": "itil-m6"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What does change enablement aim for?",
+   "back": "To maximize the number of successful changes by assessing risk, authorizing changes and managing the change schedule.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a standard change?",
+   "back": "A low-risk, well-understood change that is pre-authorized and done by a documented procedure, without fresh authorization each time.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a normal change?",
+   "back": "A change that is assessed and authorized by the right change authority before it is made.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is an emergency change?",
+   "back": "A change that must be made as soon as possible, such as to stop a security threat, with faster assessment and authorization.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Who authorizes a change?",
+   "back": "A change authority. It sits closer to the work for low-risk changes and higher up for high-risk ones.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Can a component be deployed before it is released?",
+   "back": "Yes. Deployment moves it to the live environment; release makes it available for use, which can happen later.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a configuration item (CI)?",
+   "back": "Any component that needs to be managed in order to deliver an IT service.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is an IT asset?",
+   "back": "Any financially valuable component that can contribute to delivering an IT product or service.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "A vendor misses its contracted response time. Which practice handles it?",
+   "back": "Supplier management: it monitors supplier performance against the contract and acts on it.",
+   "lesson": "itil-m7"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Is continual improvement a Value System component or a practice?",
+   "back": "Both. It is a component of the ITIL Value System and one of the 34 management practices.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Who is responsible for continual improvement?",
+   "back": "Everyone in the organization, at every level.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is a continual improvement register (CIR)?",
+   "back": "A record of improvement ideas with expected value, size, owner and status, used to do the most useful ideas first.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Continual improvement model: what are the first four steps?",
+   "back": "What is the vision? Where are we now? Where do we want to be? How do we get there?",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "Continual improvement model: what are the last three steps?",
+   "back": "Take action. Did we get there? How do we keep the momentum going?",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is lead time in a value stream?",
+   "back": "The total time from trigger to value: all work time plus all wait time.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "How is flow efficiency calculated?",
+   "back": "Total work time divided by lead time. A low figure means items spend most of their time waiting.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "What is percent complete and accurate (%C&A)?",
+   "back": "The share of a step's output that the next step can use without corrections.",
+   "lesson": "itil-m8"
+  },
+  {
+   "cert": "ITIL",
+   "front": "ITIL Foundation (Version 5) exam: questions, time and pass mark?",
+   "back": "40 questions in 60 minutes, closed book. The pass mark is 65%, which is 26 of 40.",
+   "lesson": "itil-m8"
+  }
+ ]
+}
