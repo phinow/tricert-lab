@@ -75,7 +75,7 @@
   },
   {
    "cert": "ITIL",
-   "front": "What is the watermelon effect?",
+   "front": "What is the watermelon effect (a common term, not an ITIL exam term)?",
    "back": "Reports are green on every target while users are unhappy. Targets alone do not prove value, so experience must be measured too.",
    "lesson": "itil-m2"
   },
@@ -105,7 +105,7 @@
   },
   {
    "cert": "ITIL",
-   "front": "Which dimension covers information, knowledge and the tools that manage it, including AI?",
+   "front": "Which dimension covers information, knowledge and the technology that manages it, which can include AI?",
    "back": "Information and Technology.",
    "lesson": "itil-m3"
   },
@@ -118,7 +118,7 @@
   {
    "cert": "ITIL",
    "front": "A new privacy law affects a service. Is that one of the four dimensions?",
-   "back": "No. It is an outside factor, such as political, economic, social, technological, legal or environmental, that the dimensions must respond to.",
+   "back": "No. It is an outside factor that the dimensions must respond to. ITIL 4 grouped these as political, economic, social, technological, legal and environmental; for Version 5, treat that list as background.",
    "lesson": "itil-m3"
   },
   {
@@ -130,7 +130,7 @@
   {
    "cert": "ITIL",
    "front": "What three things does a governing body do?",
-   "back": "Evaluate, direct and monitor. Management then runs the work within that direction.",
+   "back": "Evaluate, direct and monitor, in the ITIL 4 model that Version 5 builds on. Management then runs the work within that direction.",
    "lesson": "itil-m3"
   },
   {
@@ -196,43 +196,43 @@
   {
    "cert": "ITIL",
    "front": "What does the Discover activity do?",
-   "back": "Understands needs, demand and opportunities, and decides what is worth doing.",
+   "back": "Understands needs, demand and opportunities, and decides what is worth doing. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "What does the Design activity do?",
-   "back": "Shapes the product or service, including how it will be used, supported and secured.",
+   "back": "Shapes the product or service, including how it will be used, supported and secured. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "What does the Acquire activity do?",
-   "back": "Obtains the resources needed, from inside the organization or from partners and suppliers.",
+   "back": "Obtains the resources needed, from inside the organization or from partners and suppliers. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "What does the Build activity do?",
-   "back": "Creates, configures and tests the components, using the resources acquired.",
+   "back": "Creates, configures and tests the components, using the resources acquired. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "Operate versus Deliver?",
-   "back": "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers.",
+   "back": "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "What does the Support activity do?",
-   "back": "Helps users and restores normal use when things go wrong.",
+   "back": "Helps users and restores normal use when things go wrong. (Our plain-word reading, not an official definition.)",
    "lesson": "itil-m5"
   },
   {
    "cert": "ITIL",
    "front": "Does every value stream use all eight lifecycle activities?",
-   "back": "No. A value stream uses only the activities it needs to get from demand to value.",
+   "back": "No. A value stream draws on the activities its demand needs, so it does not have to touch all eight.",
    "lesson": "itil-m5"
   },
   {
@@ -382,7 +382,7 @@
   {
    "cert": "ITIL",
    "front": "How is flow efficiency calculated?",
-   "back": "Total work time divided by lead time. A low figure means items spend most of their time waiting.",
+   "back": "Total work time divided by lead time, a standard value stream mapping measure. A low figure means items spend most of their time waiting.",
    "lesson": "itil-m8"
   },
   {
