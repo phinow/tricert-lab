@@ -520,9 +520,9 @@
         ]
       ],
       "correct": "C",
-      "explanation": "PeopleCert still lists value chain activities as one of the five components. Version 5 views that work through the product and service lifecycle; it did not remove them.",
+      "explanation": "PeopleCert's Version 5 page still lists value chain activities as one of the five components of the ITIL Value System.",
       "incorrect": {
-        "A": "The lifecycle is the view Version 5 uses for this work; value chain activities remain a component.",
+        "A": "No PeopleCert source says the lifecycle replaced them; value chain activities remain a component.",
         "B": "The four dimensions are Organizations and People, Information and Technology, Partners and Suppliers, and Value Streams and Processes.",
         "D": "Management practices are a separate component of the Value System."
       },
@@ -817,7 +817,7 @@
         ]
       ],
       "correct": "B",
-      "explanation": "Transition moves new or changed products and services into live use: final testing, authorized change, training, handover and switch-on.",
+      "explanation": "Transition moves new or changed products and services into live use, which is what training staff, authorizing the change and switching the app on do here.",
       "incorrect": {
         "A": "Build creates and tests the components; that work is already done.",
         "C": "Deliver provides the service to consumers once it is live.",
@@ -830,7 +830,7 @@
       "id": "q-itil-130",
       "certification": "ITIL",
       "domain": "The product and service lifecycle · Order of the activities",
-      "prompt": "Which sequence of product and service lifecycle activities is in the correct order?",
+      "prompt": "Which list gives the first four product and service lifecycle activities in the order ITIL lists them?",
       "options": [
         [
           "A",
@@ -850,11 +850,11 @@
         ]
       ],
       "correct": "B",
-      "explanation": "The eight activities run Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support.",
+      "explanation": "ITIL lists the eight activities as Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. ITIL lists them in this order, but they do not have to run in a fixed sequence.",
       "incorrect": {
-        "A": "Discover comes before Design, and Acquire comes before Build.",
-        "C": "Design comes before Acquire: the need is shaped before resources are obtained.",
-        "D": "Acquire obtains the resources that Build then uses, so it comes first."
+        "A": "In ITIL's list, Discover comes before Design and Acquire before Build.",
+        "C": "In ITIL's list, Design comes before Acquire.",
+        "D": "In ITIL's list, Acquire comes before Build."
       },
       "pool": "mockB",
       "lesson": "itil-m5"
@@ -883,10 +883,10 @@
         ]
       ],
       "correct": "C",
-      "explanation": "Practices supply the resources and know-how each activity needs. One practice can serve many activities, and one activity uses many practices.",
+      "explanation": "Practices supply the know-how that activities use. One practice can serve several activities, and one activity can use several practices.",
       "incorrect": {
         "A": "Practices are not tied to one activity; they serve many.",
-        "B": "Practices are used across the lifecycle, for example supplier management in Acquire.",
+        "B": "Practices are used across the lifecycle, not only in two activities.",
         "D": "Activities describe the purpose of the work; practices are still the capabilities used."
       },
       "pool": "mockB",
@@ -896,7 +896,7 @@
       "id": "q-itil-132",
       "certification": "ITIL",
       "domain": "The product and service lifecycle · Value streams and lifecycle activities",
-      "prompt": "A gym adds a new class type to its online booking service. Which lifecycle activities does this value stream mainly use?",
+      "prompt": "A gym is adding a new class type to its online booking service. The work uses existing staff and systems only. Which lifecycle activities does the work of making the change mainly use before members can book it?",
       "options": [
         [
           "A",
@@ -916,11 +916,11 @@
         ]
       ],
       "correct": "B",
-      "explanation": "A value stream uses only the lifecycle activities its demand needs. A new feature needs the need understood, a design, a build and a move into live use.",
+      "explanation": "Making the change needs the need understood, a design, a build and a move into live use: Discover, Design, Build and Transition. Once members can book the class, Deliver takes over.",
       "incorrect": {
-        "A": "A member's booking mainly uses Deliver; adding a class type needs new work first.",
+        "A": "A member's booking comes after the change; adding a class type needs new work first.",
         "C": "These keep the service running and help users; they do not create the new class type.",
-        "D": "Nothing needs to be obtained, and Deliver alone does not create the new feature."
+        "D": "The work uses existing staff and systems, so nothing new is obtained, and Deliver comes after the change."
       },
       "pool": "mockB",
       "lesson": "itil-m5"
@@ -937,7 +937,7 @@
         ],
         [
           "B",
-          "The activities for creating, delivering and improving products and services"
+          "The activities from discovery and design to operation, delivery and support"
         ],
         [
           "C",
@@ -949,11 +949,11 @@
         ]
       ],
       "correct": "B",
-      "explanation": "The product and service lifecycle is Version 5's model for creating, delivering and continually improving products and services, made up of eight activities.",
+      "explanation": "PeopleCert describes the lifecycle through its management activities, from discovery and design to operation, delivery and support. ITIL lists eight of them.",
       "incorrect": {
         "A": "Practices are used across the lifecycle; they have no fixed order.",
         "C": "The improvement model is a separate set of seven questions.",
-        "D": "Evaluate, direct and monitor are governance activities, not lifecycle activities."
+        "D": "Evaluate, direct and monitor are ITIL 4 governance activities, not lifecycle activities."
       },
       "pool": "mockB",
       "lesson": "itil-m5"
@@ -985,7 +985,7 @@
       "explanation": "PeopleCert's lifecycle mindset covers better decisions, anticipating change, reducing technical debt, improving service continuity and keeping teams aligned instead of working in silos.",
       "incorrect": {
         "B": "That creates silos, which the lifecycle mindset is meant to avoid.",
-        "C": "Change enablement still applies; the lifecycle does not remove it.",
+        "C": "Nothing in PeopleCert's description says live changes stop needing authorization.",
         "D": "PeopleCert still lists 34 practices."
       },
       "pool": "mockB",
@@ -995,31 +995,31 @@
       "id": "q-itil-135",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Problem management",
-      "prompt": "In ITIL, what is the purpose of the problem management practice?",
+      "prompt": "A hospital wants fewer incidents in future, not just faster fixes when they happen. Which practice's purpose matches that aim?",
       "options": [
         [
           "A",
-          "To restore normal service as quickly as possible"
+          "Incident management"
         ],
         [
           "B",
-          "To reduce the likelihood and impact of incidents by finding their causes"
+          "Problem management"
         ],
         [
           "C",
-          "To handle all pre-defined, user-initiated requests in an agreed way"
+          "Service request management"
         ],
         [
           "D",
-          "To make sure the risks of changes are properly assessed and changes are authorized"
+          "Change enablement"
         ]
       ],
       "correct": "B",
       "explanation": "Problem management reduces the likelihood and impact of incidents by finding their actual and potential causes, and by managing workarounds and known errors.",
       "incorrect": {
-        "A": "That is the purpose of incident management.",
-        "C": "That is service request management.",
-        "D": "That is change enablement."
+        "A": "Incident management restores normal service as quickly as possible; it does not aim to stop incidents happening again.",
+        "C": "Service request management handles normal, pre-defined user requests.",
+        "D": "Change enablement assesses and authorizes changes; it does not look for the causes of incidents."
       },
       "pool": "mockB",
       "lesson": "itil-m6"
@@ -1081,7 +1081,7 @@
         ]
       ],
       "correct": "D",
-      "explanation": "Events are informational, warning or exception. An informational event shows all is well, for example a backup that finished.",
+      "explanation": "In ITIL, events are usually sorted into informational, warning or exception. An informational event shows all is well, for example a backup that finished.",
       "incorrect": {
         "A": "A warning shows a threshold is near, such as a disk filling up.",
         "B": "An exception shows something has failed or broken a threshold.",
@@ -1259,7 +1259,7 @@
       "id": "q-itil-143",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Continual improvement model",
-      "prompt": "A school cut laptop waiting times and confirmed it met its target. It now shares the results with staff and adds the next ideas to its improvement register. Which question of the continual improvement model is this?",
+      "prompt": "A school has cut laptop waiting times. It shares the results with staff and adds the next ideas to its improvement register so the effort carries on. Which question of the continual improvement model is it answering?",
       "options": [
         [
           "A",
@@ -1281,7 +1281,7 @@
       "correct": "B",
       "explanation": "In the ITIL 4 model, which Version 5 refines, the last question is How do we keep the momentum going? Sharing success and lining up the next ideas keeps improvement going.",
       "incorrect": {
-        "A": "That question was answered when the school confirmed it met its target.",
+        "A": "Did we get there? checks results against the target; the stem is about carrying the effort on.",
         "C": "Take action is when the planned improvement is carried out.",
         "D": "The vision is set at the start, before measuring and acting."
       },
@@ -1292,7 +1292,7 @@
       "id": "q-itil-144",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Managing a value stream",
-      "prompt": "A city office manages the value stream for building permits. Where should it focus improvement first?",
+      "prompt": "A city office manages the value stream for building permits. Where should it look first for improvement?",
       "options": [
         [
           "A",
@@ -1312,7 +1312,7 @@
         ]
       ],
       "correct": "A",
-      "explanation": "Managing a value stream means finding the bottleneck, the step where work waits longest, and improving it before anything else.",
+      "explanation": "A good first place to look is where work waits longest, because waiting is usually most of the lead time.",
       "incorrect": {
         "B": "Staff numbers do not show where work is held up.",
         "C": "Every step sees every request; the bottleneck is where work waits.",
