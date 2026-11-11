@@ -85,7 +85,7 @@ export const lessonIndex: Record<string, string> = {
  "itil-m2": "See how providers and consumers create value together, and what a consumer weighs: outcomes, costs, risks, experience and sustainability. Learn why digital experience is a core focus of Version 5 and how it treats AI as part of normal service work.",
  "itil-m3": "Learn the four dimensions of product and service management and the five components of the ITIL Value System, including governance, so you can say which dimension or component a situation is about.",
  "itil-m4": "Learn the seven guiding principles, what each one asks of you, how they work together, and how to pick the principle a scenario is testing from the key words in the question.",
- "itil-m5": "Learn the purpose of each product and service lifecycle activity, from Discover to Support, how to tell Operate, Deliver and Support apart, and how the lifecycle relates to value chain activities and value streams.",
+ "itil-m5": "Learn the purpose of each product and service lifecycle activity, from Discover to Support, how to tell Operate, Deliver and Support apart, and how value streams draw on these activities.",
  "itil-m6": "Learn what a management practice is, that there are 34 practices in two groups, and the purpose and key terms of six practices: service desk, incident management, service request management, problem management, service level management, and monitoring and event management.",
  "itil-m7": "Learn the purpose and key terms of eight more practices: change enablement, release management, deployment management, service configuration management, IT asset management, information security management, relationship management and supplier management.",
  "itil-m8": "Learn continual improvement as both a Value System component and a practice, the continual improvement model, how to map a value stream with work and wait times and manage it for flow, and the exam technique and booking facts for ITIL Foundation (Version 5)."
@@ -1930,7 +1930,7 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  ],
  [
   "ITIL",
-  "What is the watermelon effect?",
+  "What is the watermelon effect (a common term, not an ITIL exam term)?",
   "Reports are green on every target while users are unhappy. Targets alone do not prove value, so experience must be measured too.",
   "itil-m2"
  ],
@@ -1960,7 +1960,7 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  ],
  [
   "ITIL",
-  "Which dimension covers information, knowledge and the tools that manage it, including AI?",
+  "Which dimension covers information, knowledge and the technology that manages it, which can include AI?",
   "Information and Technology.",
   "itil-m3"
  ],
@@ -1973,7 +1973,7 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  [
   "ITIL",
   "A new privacy law affects a service. Is that one of the four dimensions?",
-  "No. It is an outside factor, such as political, economic, social, technological, legal or environmental, that the dimensions must respond to.",
+  "No. It is an outside factor that the dimensions must respond to. ITIL 4 grouped these as political, economic, social, technological, legal and environmental; for Version 5, treat that list as background.",
   "itil-m3"
  ],
  [
@@ -1985,7 +1985,7 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  [
   "ITIL",
   "What three things does a governing body do?",
-  "Evaluate, direct and monitor. Management then runs the work within that direction.",
+  "Evaluate, direct and monitor, in the ITIL 4 model that Version 5 builds on. Management then runs the work within that direction.",
   "itil-m3"
  ],
  [
@@ -2051,43 +2051,43 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  [
   "ITIL",
   "What does the Discover activity do?",
-  "Understands needs, demand and opportunities, and decides what is worth doing.",
+  "Understands needs, demand and opportunities, and decides what is worth doing. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "What does the Design activity do?",
-  "Shapes the product or service, including how it will be used, supported and secured.",
+  "Shapes the product or service, including how it will be used, supported and secured. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "What does the Acquire activity do?",
-  "Obtains the resources needed, from inside the organization or from partners and suppliers.",
+  "Obtains the resources needed, from inside the organization or from partners and suppliers. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "What does the Build activity do?",
-  "Creates, configures and tests the components, using the resources acquired.",
+  "Creates, configures and tests the components, using the resources acquired. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "Operate versus Deliver?",
-  "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers.",
+  "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "What does the Support activity do?",
-  "Helps users and restores normal use when things go wrong.",
+  "Helps users and restores normal use when things go wrong. (Our plain-word reading, not an official definition.)",
   "itil-m5"
  ],
  [
   "ITIL",
   "Does every value stream use all eight lifecycle activities?",
-  "No. A value stream uses only the activities it needs to get from demand to value.",
+  "No. A value stream draws on the activities its demand needs, so it does not have to touch all eight.",
   "itil-m5"
  ],
  [
@@ -2237,7 +2237,7 @@ export const extraFlashcards: [Certification, string, string, string][] = [
  [
   "ITIL",
   "How is flow efficiency calculated?",
-  "Total work time divided by lead time. A low figure means items spend most of their time waiting.",
+  "Total work time divided by lead time, a standard value stream mapping measure. A low figure means items spend most of their time waiting.",
   "itil-m8"
  ],
  [
@@ -5486,7 +5486,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "B",
-    "Costs matter to the consumer, but risks are a concern for the provider alone"
+    "Costs matter mainly to the consumer, while risks are mainly the provider's concern"
    ],
    [
     "C",
@@ -5581,7 +5581,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "options": [
    [
     "A",
-    "Warranty, because the checkout cannot cope with the number of customers"
+    "Risk, because the checkout holds customers' card details"
    ],
    [
     "B",
@@ -5599,7 +5599,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "correct": "D",
   "explanation": "Experience is how consumers find using a product or service. The checkout does its job and is available, so utility and warranty are not the issue. The repeated questions make it frustrating, and customers leave, so value is lost through poor experience.",
   "incorrect": {
-   "A": "The stem says the checkout is always available, so warranty is not the problem.",
+   "A": "Customers are not giving up over risk; they give up because the checkout is frustrating to use.",
    "B": "Nothing in the stem says the price is the reason customers give up.",
    "C": "The complaint is about the customer's experience, not long-term use of resources."
   },
@@ -5684,7 +5684,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "B",
-    "AI is part of normal product and service work, used with oversight and accountability"
+    "AI is part of normal product and service work, and its use is governed"
    ],
    [
     "C",
@@ -5696,9 +5696,9 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "ITIL (Version 5) is described as AI-native: its practices, value streams and roles are designed so AI can be part of normal work. It stays technology-agnostic and asks organizations to govern AI with oversight, accountability, risk management and trust.",
+  "explanation": "PeopleCert describes ITIL (Version 5) as AI-native, so AI is treated as part of normal product and service work rather than a separate subject. Like any other part of a service, its use is governed.",
   "incorrect": {
-   "A": "ITIL (Version 5) is technology-agnostic and does not tell organizations which AI products to use.",
+   "A": "ITIL does not tell organizations which AI products to use.",
    "C": "The guiding principles remain part of the ITIL Value System.",
    "D": "Version 5 builds AI into normal work rather than keeping it apart."
   },
@@ -5779,15 +5779,15 @@ export const examQuestions: ScenarioQuestion[] = [
   "options": [
    [
     "A",
-    "All four should be considered for every product and service"
+    "All four should be considered for every product and service, and for the Value System as a whole"
    ],
    [
     "B",
-    "Each dimension is owned by one department, which manages it without the others"
+    "Each dimension is usually managed by a separate department, which looks after it for the organization"
    ],
    [
     "C",
-    "They are used only when a new service is designed, not once it is running"
+    "They matter mainly when a new service is designed, and much less once it is running"
    ],
    [
     "D",
@@ -5857,15 +5857,15 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "D",
-    "Engage"
+    "Authorize"
    ]
   ],
   "correct": "C",
-  "explanation": "Governance evaluates the organization and its options, directs it by setting strategy and policies, and monitors performance and conformance against them. Checking each quarter that teams follow the policy is monitoring.",
+  "explanation": "In ITIL 4, which Version 5 builds on, governance evaluates the organization and its options, directs it by setting strategy and policies, and monitors performance and conformance against them. Checking each quarter that teams follow the policy is monitoring.",
   "incorrect": {
    "A": "Evaluating is reviewing the organization and its needs before direction is set.",
    "B": "Directing is setting the policy itself, which the board had already done.",
-   "D": "Engage is not one of the governance activities of evaluate, direct and monitor."
+   "D": "Authorize is not one of the ITIL 4 governance activities of evaluate, direct and monitor."
   },
   "pool": "daily",
   "lesson": "itil-m3"
@@ -5940,15 +5940,15 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-042",
   "certification": "ITIL",
   "domain": "The seven guiding principles · Collaborate and promote visibility",
-  "prompt": "A school IT team keeps its list of planned work to itself, so teachers find out about system changes only on the day they happen. Which guiding principle is the team ignoring?",
+  "prompt": "A school IT team chooses a new homework app without asking any teachers or pupils for their views. Teachers then find it does not fit how they set work. Which guiding principle did the team ignore?",
   "options": [
    [
     "A",
-    "Progress iteratively with feedback"
+    "Optimize and automate"
    ],
    [
     "B",
-    "Optimize and automate"
+    "Keep it simple and practical"
    ],
    [
     "C",
@@ -5960,11 +5960,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "Collaborate and promote visibility means working with the right stakeholders and making work and its progress visible to them. Hidden plans lead to surprises and poor decisions by the people affected.",
+  "explanation": "Collaborate and promote visibility means working with the right stakeholders in the right roles, and that includes users and customers, not only other IT teams. The teachers and pupils who use the app were never involved.",
   "incorrect": {
-   "A": "The problem is hidden plans, not the size of the steps or a lack of feedback loops.",
-   "B": "Nothing in the stem is about automation.",
-   "C": "The team is not ignoring the current state; it is keeping its work out of sight."
+   "A": "Nothing in the stem is about automating work.",
+   "B": "The problem is not extra steps; it is that the users were left out.",
+   "C": "Start where you are is about assessing what exists; the gap here is involving the people who will use the app."
   },
   "pool": "daily",
   "lesson": "itil-m4"
@@ -6010,7 +6010,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "options": [
    [
     "A",
-    "They must be applied one at a time, in the order in which they are listed"
+    "They are best applied in the order in which they are listed"
    ],
    [
     "B",
@@ -6018,7 +6018,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "C",
-    "Only Focus on value is required, and the other six principles are optional"
+    "Focus on value decides every situation, and the other six serve as tie-breakers"
    ],
    [
     "D",
@@ -6030,7 +6030,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "incorrect": {
    "A": "There is no fixed order for applying the principles.",
    "B": "The principles apply across all practices and all work, not to one practice each.",
-   "C": "All seven principles apply; none is optional."
+   "C": "All seven principles apply; none is only a tie-breaker."
   },
   "pool": "daily",
   "lesson": "itil-m4"
@@ -6104,16 +6104,16 @@ export const examQuestions: ScenarioQuestion[] = [
  {
   "id": "q-itil-047",
   "certification": "ITIL",
-  "domain": "The product and service lifecycle · Support",
-  "prompt": "A shop's card readers stop working in two stores. Staff restore payments with a temporary fix, and a team starts looking for the cause. Which lifecycle activity is this work part of?",
+  "domain": "The product and service lifecycle · Lifecycle activity names",
+  "prompt": "Which of these is one of the eight product and service lifecycle activities in ITIL (Version 5)?",
   "options": [
    [
     "A",
-    "Operate"
+    "Plan"
    ],
    [
     "B",
-    "Transition"
+    "Engage"
    ],
    [
     "C",
@@ -6121,15 +6121,15 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "D",
-    "Deliver"
+    "Improve"
    ]
   ],
   "correct": "C",
-  "explanation": "Support covers resolving incidents and problems for consumers, using workarounds and known errors where needed. Restoring payments and finding the cause of the failures is support work.",
+  "explanation": "The eight lifecycle activities are usually listed as Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. Support is one of them.",
   "incorrect": {
-   "A": "Operate is keeping components running as designed, such as monitoring and routine maintenance.",
-   "B": "Transition moves new or changed products into live use.",
-   "D": "Deliver covers consumers using the service and their requests, not fixing failures."
+   "A": "Plan is an ITIL 4 value chain activity name, not one of the eight lifecycle activities.",
+   "B": "Engage is an ITIL 4 value chain activity name, not one of the eight lifecycle activities.",
+   "D": "Improve is an ITIL 4 value chain activity name, not one of the eight lifecycle activities."
   },
   "pool": "daily",
   "lesson": "itil-m5"
@@ -6137,32 +6137,32 @@ export const examQuestions: ScenarioQuestion[] = [
  {
   "id": "q-itil-048",
   "certification": "ITIL",
-  "domain": "The product and service lifecycle · Deliver",
-  "prompt": "Residents use a city's online tax portal, ask for access to new features, and rate their visit in a short survey. Which lifecycle activity covers this contact with consumers using the service?",
+  "domain": "The product and service lifecycle · What the objective asks",
+  "prompt": "PeopleCert's learning objective for the product and service lifecycle asks you to understand what about each lifecycle management activity?",
   "options": [
    [
     "A",
-    "Operate"
+    "The job title that owns it"
    ],
    [
     "B",
-    "Deliver"
+    "Its purpose"
    ],
    [
     "C",
-    "Discover"
+    "Its fixed duration"
    ],
    [
     "D",
-    "Support"
+    "The tool that runs it"
    ]
   ],
   "correct": "B",
-  "explanation": "Deliver is where the service is provided to consumers as they use it: handling their requests and collecting their feedback. The portal being used, access requests and survey ratings are delivery work.",
+  "explanation": "PeopleCert's objective is to understand the purpose of each product and service lifecycle management activity, from discovery and design to operation, delivery and support, and how they work together to create value.",
   "incorrect": {
-   "A": "Operate keeps the portal's components running; it is not the contact with residents using it.",
-   "C": "Discover looks for new needs and opportunities before design starts.",
-   "D": "Support resolves incidents and problems; nothing has failed here."
+   "A": "The objective is about purpose, not job titles; roles vary between organizations.",
+   "C": "Activities have no fixed duration, and they do not have to run in a fixed sequence.",
+   "D": "ITIL does not tie an activity to a particular tool."
   },
   "pool": "daily",
   "lesson": "itil-m5"
@@ -6170,20 +6170,20 @@ export const examQuestions: ScenarioQuestion[] = [
  {
   "id": "q-itil-049",
   "certification": "ITIL",
-  "domain": "The product and service lifecycle · Lifecycle activities and value streams",
-  "prompt": "Which statement about product and service lifecycle activities and value streams is correct?",
+  "domain": "The product and service lifecycle · Value streams",
+  "prompt": "In ITIL, which statement about value streams in digital product and service management is correct?",
   "options": [
    [
     "A",
-    "A value stream can draw on several lifecycle activities and practices to turn a type of demand into value"
+    "A value stream can draw on several activities and practices to turn one type of demand into value"
    ],
    [
     "B",
-    "Each value stream uses exactly one lifecycle activity, and the practices are kept outside value streams"
+    "A value stream describes how one team organizes its own work, separate from other teams"
    ],
    [
     "C",
-    "The lifecycle activities must always run in the same fixed order, whatever the value stream and its demand"
+    "A value stream is the list of practices an organization uses, set out in the order they were adopted"
    ],
    [
     "D",
@@ -6191,11 +6191,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "A",
-  "explanation": "A value stream is the series of steps an organization takes to turn a type of demand into value. It combines the lifecycle activities and practices it needs, in the order that suits that demand.",
+  "explanation": "A value stream is the series of steps an organization takes to turn a type of demand into value. It can combine several activities and practices.",
   "incorrect": {
-   "B": "A value stream usually involves several activities and practices.",
-   "C": "Different value streams combine the activities in different ways and orders.",
-   "D": "Value streams use practices; they do not replace them."
+   "B": "A value stream runs from demand to value and usually crosses several teams.",
+   "C": "A value stream is a series of steps from demand to value, not a list of practices.",
+   "D": "Practices are still used; a value stream draws on them."
   },
   "pool": "daily",
   "lesson": "itil-m5"
@@ -6344,7 +6344,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "B",
-    "Each one must be assessed and authorized by a change authority before anyone is allowed to fulfil it"
+    "They are usually assessed by a change authority, which decides whether each one may go ahead"
    ],
    [
     "C",
@@ -6352,7 +6352,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "D",
-    "They are a normal, agreed part of the service, so they can follow set steps"
+    "They are a normal, agreed part of the service, so most can follow set, often automated, steps"
    ]
   ],
   "correct": "D",
@@ -6501,7 +6501,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-059",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Relationship management",
-  "prompt": "A city office's IT team meets each department head every quarter to understand their plans and agree which IT work matters most to them. Which practice is this?",
+  "prompt": "A bank's IT team keeps a list of its key stakeholders, what each one expects, and a plan for how to stay in touch with each. Which practice is this?",
   "options": [
    [
     "A",
@@ -6521,11 +6521,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "Relationship management builds and keeps the links between the organization and its stakeholders at a strategic and tactical level, such as understanding their plans and agreeing priorities.",
+  "explanation": "Relationship management establishes and nurtures the links between the organization and its stakeholders. It includes identifying, analysing, monitoring and improving those relationships.",
   "incorrect": {
-   "A": "Supplier management deals with outside suppliers, not internal department heads.",
+   "A": "Supplier management deals with outside suppliers and their contracts, not stakeholder relationships in general.",
    "B": "The service desk handles user contacts about incidents and requests.",
-   "D": "Service level management sets and reviews service targets, not wider plans and priorities."
+   "D": "Service level management sets and reviews service targets, not a plan for stakeholder relationships."
   },
   "pool": "daily",
   "lesson": "itil-m7"
@@ -6554,7 +6554,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "In the continual improvement model, after the vision comes \"Where are we now?\": an honest, measured view of the current state. It gives the baseline that later steps, including \"Did we get there?\", are compared with.",
+  "explanation": "In the ITIL 4 continual improvement model, which Version 5 refines, after the vision comes \"Where are we now?\": an honest, measured view of the current state. It gives the baseline that later steps, including \"Did we get there?\", are compared with.",
   "incorrect": {
    "A": "\"How do we get there?\" plans the improvement, after the target is set.",
    "B": "\"Did we get there?\" checks results after action is taken.",
@@ -6575,11 +6575,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "B",
-    "It starts only after a service has failed and the major incident that followed has been reviewed and closed"
+    "It is mostly triggered by failures, such as the review after a major incident"
    ],
    [
     "C",
-    "It belongs to one improvement team, which makes all the changes for everyone else"
+    "It is mainly led by an improvement team, with other staff taking part when asked"
    ],
    [
     "D",
@@ -6590,7 +6590,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "explanation": "Continual improvement is one of the five components of the ITIL Value System. It takes place in all areas of the organization and at every level, from strategy to daily work.",
   "incorrect": {
    "B": "Improvement is ongoing; it does not wait for failures.",
-   "C": "An organization may have people who lead it, but everyone contributes to improvement.",
+   "C": "Improvement is everyone's responsibility, not mainly one team's with others joining when asked.",
    "D": "Continual means ongoing, not a single project at go-live."
   },
   "pool": "daily",
@@ -6897,31 +6897,31 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-071",
   "certification": "ITIL",
   "domain": "Value and value co-creation · Digital experience",
-  "prompt": "How does PeopleCert describe digital experience in ITIL (Version 5)?",
+  "prompt": "A city's online permit service meets every target in its agreement, yet residents find the forms confusing and phone for help instead. Which focus, named by PeopleCert as core to ITIL (Version 5), is this service falling short on?",
   "options": [
    [
     "A",
-    "As a core focus of the framework"
+    "Digital experience"
    ],
    [
     "B",
-    "As an optional module taken after Foundation"
+    "Service level targets"
    ],
    [
     "C",
-    "As a topic for software developers only"
+    "Supplier contracts"
    ],
    [
     "D",
-    "As a replacement for service level management"
+    "Governance"
    ]
   ],
   "correct": "A",
-  "explanation": "PeopleCert states that digital experience is a core focus in Version 5, tied to how different stakeholders experience value.",
+  "explanation": "PeopleCert states that digital experience is a core focus in ITIL (Version 5). The targets are met, but residents' experience of the digital service is poor.",
   "incorrect": {
-   "B": "Digital experience is part of the core framework, not a separate module.",
-   "C": "It concerns everyone who designs, delivers and improves services.",
-   "D": "Service level management remains a practice; experience adds to it."
+   "B": "The targets are already met, so more targets would not show the problem.",
+   "C": "Nothing in the case involves a supplier.",
+   "D": "Nothing in the case is about how a governing body directs or controls the organization."
   },
   "pool": "mockA",
   "lesson": "itil-m2"
@@ -7016,7 +7016,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "Information and Technology covers information and knowledge, the technology that manages and protects it, and tools such as AI and automation.",
+  "explanation": "Information and Technology covers information and knowledge, the technology that manages and protects it, which can include AI.",
   "incorrect": {
    "A": "No contract or outside organization is the focus of the stem.",
    "B": "Staff skills and roles are not what the stem asks about.",
@@ -7074,7 +7074,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "C",
-    "It covers finance only, not how technology or AI is used"
+    "It covers finance only, not how technology is used"
    ],
    [
     "D",
@@ -7085,7 +7085,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "explanation": "Governance is the means by which an organization is directed and controlled. The governing body sets direction and checks results; management plans and runs the work within that direction.",
   "incorrect": {
    "A": "Running services day to day is management, not governance.",
-   "C": "Governance applies to every part of the Value System, including AI use.",
+   "C": "Governance applies to every part of the Value System, not only finance.",
    "D": "Governance is a component of the ITIL Value System, not a dimension."
   },
   "pool": "mockA",
@@ -7115,7 +7115,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "Direct means assigning responsibility for, and setting the direction of, strategy and policies.",
+  "explanation": "In ITIL 4, which Version 5 builds on, direct means assigning responsibility for, and setting the direction of, strategy and policies.",
   "incorrect": {
    "A": "Evaluate looks at strategy, performance and risks before direction is set.",
    "B": "Monitor checks performance and compliance after direction is set.",
@@ -7150,7 +7150,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "correct": "A",
   "explanation": "The ITIL Value System describes how all the parts of an organization work together to create value.",
   "incorrect": {
-   "B": "That is the product and service lifecycle, which the Value System contains.",
+   "B": "That describes the product and service lifecycle activities, not how the whole system works together.",
    "C": "That is one practice, incident management, not the whole system.",
    "D": "Those are the four dimensions, a separate model."
   },
@@ -7161,7 +7161,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-079",
   "certification": "ITIL",
   "domain": "The ITIL Value System · Value System components",
-  "prompt": "Which component of the ITIL Value System is the work that turns demand into value, viewed in Version 5 through the product and service lifecycle?",
+  "prompt": "Which component of the ITIL Value System is the work that turns demand into value?",
   "options": [
    [
     "A",
@@ -7181,7 +7181,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "PeopleCert lists value chain activities as a component of the Value System. Version 5 views that work through the product and service lifecycle.",
+  "explanation": "PeopleCert lists value chain activities as a component of the Value System. They are the work itself.",
   "incorrect": {
    "A": "Governance directs and controls; it does not do the work itself.",
    "B": "Guiding principles guide decisions; they are not the work.",
@@ -7260,31 +7260,31 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-082",
   "certification": "ITIL",
   "domain": "The seven guiding principles · Start where you are",
-  "prompt": "A bank's new operations manager reads reports saying the loan approval process is slow and plans to replace it. Which action best applies Start where you are?",
+  "prompt": "A bank's new operations manager wants to know how the loan approval process really works today. The written procedure for it is three years old. What does Start where you are recommend?",
   "options": [
    [
     "A",
-    "Replace the process at once, since the reports show it is slow"
+    "Follow the written procedure, since it is the approved version"
    ],
    [
     "B",
-    "Observe and measure the process, and keep the parts that work"
+    "Observe and measure the work as it is done today"
    ],
    [
     "C",
-    "Ask a supplier to design a new process from a blank page"
+    "Ask a consultant for a best-practice process to replace it"
    ],
    [
     "D",
-    "Automate the current process so that it runs faster"
+    "Automate the written procedure so it runs the same way every time"
    ]
   ],
   "correct": "B",
-  "explanation": "Start where you are asks you to look at what exists, observe it directly and measure it, and keep what works. Reports can mislead, so go and see the work.",
+  "explanation": "Start where you are asks you to observe the current state directly and measure it. Documents and reports can be out of date, so go and see the work before deciding what to keep.",
   "incorrect": {
-   "A": "Replacing without direct evidence discards what may already work.",
-   "C": "Starting from a blank page is the opposite of this principle.",
-   "D": "Automating before assessing makes a slow process run fast in the wrong way."
+   "A": "A three-year-old procedure may not match how the work is done now; observe it directly.",
+   "C": "Replacing the process before seeing it discards what may already work.",
+   "D": "Automating before assessing could make an out-of-date procedure run fast in the wrong way."
   },
   "pool": "mockA",
   "lesson": "itil-m4"
@@ -7326,7 +7326,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-084",
   "certification": "ITIL",
   "domain": "The seven guiding principles · Optimize and automate",
-  "prompt": "A shop plans to automate its refund approval chain exactly as it is, including two sign-offs that repeat the same check. Which guiding principle does this plan go against most directly?",
+  "prompt": "A shop's staff copy the same order details by hand from emails into the stock system dozens of times a day. The steps are already simple and nobody disputes them. Which guiding principle points to the next step?",
   "options": [
    [
     "A",
@@ -7346,10 +7346,10 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "Optimize and automate says to make the work as useful and efficient as possible first, then automate. Automating a messy chain makes a fast messy chain.",
+  "explanation": "Optimize and automate hands frequent, repetitive work to technology once the work is as simple as it can be, and keeps people for work that needs judgment. Copying the same details by hand many times a day fits that.",
   "incorrect": {
-   "A": "Value matters, but the stem is about automating before optimizing.",
-   "B": "The plan does reuse what exists; the gap is that it is not optimized first.",
+   "A": "Value matters, but the stem points to repetitive work that suits technology.",
+   "B": "The current work is already known and simple; the next step is to let technology take it on.",
    "D": "Nothing is hidden from stakeholders in the stem."
   },
   "pool": "mockA",
@@ -7359,7 +7359,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-085",
   "certification": "ITIL",
   "domain": "The seven guiding principles · Focus on value",
-  "prompt": "A school's IT team reports success as the number of tickets closed each month. Teachers still lose lesson time to broken projectors. Which principle should change how the team measures success?",
+  "prompt": "A council's IT team must choose between two upgrades for its library service. Before deciding, it asks library members which problems cost them the most time. Which guiding principle is it applying?",
   "options": [
    [
     "A",
@@ -7379,11 +7379,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "Focus on value links everything back to value for stakeholders. Success should be measured by outcomes for teachers, not by internal counts.",
+  "explanation": "Focus on value starts from what consumers value. Asking members which problems cost them most time ties the choice to their outcomes.",
   "incorrect": {
-   "A": "Nothing in the stem needs removing; the measure itself points the wrong way.",
-   "B": "Automation does not fix a measure of the wrong thing.",
-   "C": "The stem is about what counts as success, not the size of the steps."
+   "A": "Nothing in the stem is being removed or simplified.",
+   "B": "Nothing in the stem is about automation.",
+   "C": "The stem is about what to choose, not about splitting the work into smaller steps."
   },
   "pool": "mockA",
   "lesson": "itil-m4"
@@ -7491,7 +7491,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-089",
   "certification": "ITIL",
   "domain": "The product and service lifecycle · Order of the activities",
-  "prompt": "In the product and service lifecycle, which activity comes directly after Build?",
+  "prompt": "In the order ITIL lists the product and service lifecycle activities, which activity comes directly after Build?",
   "options": [
    [
     "A",
@@ -7511,11 +7511,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "The order is Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition moves what was built into live use.",
+  "explanation": "ITIL lists them as Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. They do not have to run in a fixed sequence, but in this list Transition follows Build.",
   "incorrect": {
-   "A": "Acquire comes before Build: it obtains the resources Build uses.",
-   "B": "Operate follows Transition, once the service is live.",
-   "D": "Deliver comes after Transition and Operate."
+   "A": "Acquire is listed before Build.",
+   "B": "Operate is listed after Transition.",
+   "D": "Deliver is listed after Transition and Operate."
   },
   "pool": "mockA",
   "lesson": "itil-m5"
@@ -7524,31 +7524,31 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-090",
   "certification": "ITIL",
   "domain": "The product and service lifecycle · Operate",
-  "prompt": "A bank's platform team applies security patches to its servers, watches their performance and checks that backups ran. Which lifecycle activity is this?",
+  "prompt": "For a city's new parking app, which piece of work belongs to the Operate lifecycle activity?",
   "options": [
    [
     "A",
-    "Transition"
+    "Training the parking staff and switching the app on for drivers"
    ],
    [
     "B",
-    "Support"
+    "Helping a driver who is locked out of the app"
    ],
    [
     "C",
-    "Build"
+    "Configuring and testing a new payment screen"
    ],
    [
     "D",
-    "Operate"
+    "Checking each night that the live servers are healthy"
    ]
   ],
   "correct": "D",
-  "explanation": "Operate keeps the live technology and components running as agreed: monitored, patched and backed up. Users rarely see it.",
+  "explanation": "In this course's plain-word reading, Operate keeps the live technology and components running as agreed: monitored, patched and backed up. Users rarely see it.",
   "incorrect": {
-   "A": "Transition moves new or changed services into live use; these servers are already live.",
-   "B": "Support helps users with a problem; no user is asking for help here.",
-   "C": "Build creates and tests new components before they go live."
+   "A": "Training and the first switch-on move the app into live use, which is Transition.",
+   "B": "Helping a user with a problem is Support.",
+   "C": "Configuring and testing a component before it goes live is Build."
   },
   "pool": "mockA",
   "lesson": "itil-m5"
@@ -7556,32 +7556,32 @@ export const examQuestions: ScenarioQuestion[] = [
  {
   "id": "q-itil-091",
   "certification": "ITIL",
-  "domain": "The product and service lifecycle · Acquire",
-  "prompt": "A school district signs a hosting contract with a cloud provider and hires a specialist with skills its staff lack. Which lifecycle activity is this?",
+  "domain": "The product and service lifecycle · Acquire and Build",
+  "prompt": "A school is setting up a new homework portal. Which piece of work belongs to Acquire rather than Build?",
   "options": [
    [
     "A",
-    "Acquire"
+    "Hiring a contractor with portal skills the staff lack"
    ],
    [
     "B",
-    "Build"
+    "Configuring the portal's class lists and testing them"
    ],
    [
     "C",
-    "Design"
+    "Setting up the portal's pages for each subject"
    ],
    [
     "D",
-    "Transition"
+    "Connecting the portal to the school's sign-in system and testing it"
    ]
   ],
   "correct": "A",
-  "explanation": "Acquire obtains the resources needed, from inside the organization or from partners and suppliers, including contracts, capacity and skills.",
+  "explanation": "Acquire obtains the resources needed, from inside the organization or from partners and suppliers, and that includes people with skills. Build then creates, configures and tests the components.",
   "incorrect": {
-   "B": "Build creates and tests components from resources already obtained.",
-   "C": "Design shapes the service; it does not obtain resources.",
-   "D": "Transition moves a built service into live use."
+   "B": "Configuring and testing is Build.",
+   "C": "Setting up pages creates part of the portal, which is Build.",
+   "D": "Connecting and testing components is Build."
   },
   "pool": "mockA",
   "lesson": "itil-m5"
@@ -7589,20 +7589,20 @@ export const examQuestions: ScenarioQuestion[] = [
  {
   "id": "q-itil-092",
   "certification": "ITIL",
-  "domain": "The product and service lifecycle · Discover",
-  "prompt": "A clothing shop studies why online customers leave before paying, and decides whether a new checkout is worth building. Which lifecycle activity is this?",
+  "domain": "The product and service lifecycle · Design",
+  "prompt": "A clothing shop has decided a new checkout is worth building. It now sets out the checkout's screens, payment options and how support will handle failed payments. Which lifecycle activity is this?",
   "options": [
    [
     "A",
-    "Design"
-   ],
-   [
-    "B",
     "Discover"
    ],
    [
+    "B",
+    "Design"
+   ],
+   [
     "C",
-    "Deliver"
+    "Build"
    ],
    [
     "D",
@@ -7610,10 +7610,10 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "Discover means understanding needs, demand and opportunities, and deciding what is worth doing.",
+  "explanation": "Design shapes the product or service, including how it will be used and supported. The decision that it is worth building was already made in Discover.",
   "incorrect": {
-   "A": "Design comes after the decision and shapes how the checkout will work.",
-   "C": "Deliver provides a live service to consumers.",
+   "A": "Discover decided the checkout was worth building; that is already done.",
+   "C": "Build creates and tests the components once the design is set.",
    "D": "Transition moves a finished change into live use."
   },
   "pool": "mockA",
@@ -7755,15 +7755,15 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-097",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Continual improvement model",
-  "prompt": "A team has agreed its vision and measured its current state. Which question of the continual improvement model comes next?",
+  "prompt": "In the ITIL 4 continual improvement model, which Version 5 refines, a team has just set a measurable target for where it wants to be. Which question comes next?",
   "options": [
    [
     "A",
-    "How do we get there?"
+    "Where are we now?"
    ],
    [
     "B",
-    "Where do we want to be?"
+    "How do we get there?"
    ],
    [
     "C",
@@ -7775,10 +7775,10 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "The order is: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going?",
+  "explanation": "In the ITIL 4 model the questions run: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? After the target comes planning the route.",
   "incorrect": {
-   "A": "Planning the route comes after setting a measurable target.",
-   "C": "Checking results comes after action has been taken.",
+   "A": "Where are we now? comes before the target is set.",
+   "C": "Did we get there? comes after action has been taken.",
    "D": "Keeping momentum is the last question in the model."
   },
   "pool": "mockA",
@@ -7788,31 +7788,31 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-098",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Release management",
-  "prompt": "A city office installed new software for its tax portal last week with the new features switched off. Today it makes those features available to residents. Which practice covers making them available?",
+  "prompt": "A bank moves a new build of its app onto the live servers on Tuesday. On Thursday it turns the new budgeting feature on for 10% of customers, then for everyone a week later. Which statement is correct?",
   "options": [
    [
     "A",
-    "Deployment management"
+    "Tuesday's step is release; Thursday's step is deployment"
    ],
    [
     "B",
-    "Change enablement"
+    "Both steps are deployment, because both happen in the live environment"
    ],
    [
     "C",
-    "Release management"
+    "Tuesday's step is deployment; the staged switch-on is release"
    ],
    [
     "D",
-    "Service request management"
+    "Both steps are change enablement and involve no other practice"
    ]
   ],
   "correct": "C",
-  "explanation": "Release management makes new and changed services and features available for use. Installing the software last week was deployment.",
+  "explanation": "Deployment management moves components into an environment, here the live servers on Tuesday. Release management makes features available for use, which here happens in stages from Thursday.",
   "incorrect": {
-   "A": "Deployment moved the software into the live environment last week.",
-   "B": "Change enablement assesses and authorizes changes; it does not make features available.",
-   "D": "No user is asking for a pre-defined service action."
+   "A": "It is the other way round: moving the build is deployment, making the feature available is release.",
+   "B": "Turning the feature on for customers makes it available for use, which is release.",
+   "D": "Change enablement authorizes the change, but moving the build and making the feature available are deployment and release."
   },
   "pool": "mockA",
   "lesson": "itil-m7"
@@ -7841,7 +7841,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "An exception event means something has failed or broken a threshold. It may open an incident automatically.",
+  "explanation": "In ITIL, an exception event means something has failed or broken a threshold. It may open an incident automatically.",
   "incorrect": {
    "A": "An informational event says all is well, such as a backup finishing.",
    "B": "A warning means a threshold is near; here the server has already failed.",
@@ -7878,7 +7878,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "incorrect": {
    "A": "The provider should not set targets alone or only measure what is easy.",
    "B": "One measure is never enough; combine targets with feedback on experience.",
-   "D": "Service levels are reviewed with the customer at set times."
+   "D": "Targets are reviewed regularly with the customer, not only at renewal."
   },
   "pool": "mockA",
   "lesson": "itil-m6"
@@ -7953,7 +7953,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-103",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Continual improvement register",
-  "prompt": "Where should a team record improvement ideas so that they can be compared and prioritized by value?",
+  "prompt": "A team has many suggestions for making its services better and wants to compare them by expected value and pick the most useful first. Where should it record them?",
   "options": [
    [
     "A",
@@ -8006,7 +8006,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "Flow efficiency is total work time divided by lead time. A low figure shows that items spend most of their time waiting.",
+  "explanation": "In value stream mapping, flow efficiency is total work time divided by lead time. A low figure shows that items spend most of their time waiting.",
   "incorrect": {
    "A": "Flow efficiency compares work time with lead time, not wait with work.",
    "B": "That is a count of output, not flow efficiency.",
@@ -8534,9 +8534,9 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "PeopleCert still lists value chain activities as one of the five components. Version 5 views that work through the product and service lifecycle; it did not remove them.",
+  "explanation": "PeopleCert's Version 5 page still lists value chain activities as one of the five components of the ITIL Value System.",
   "incorrect": {
-   "A": "The lifecycle is the view Version 5 uses for this work; value chain activities remain a component.",
+   "A": "No PeopleCert source says the lifecycle replaced them; value chain activities remain a component.",
    "B": "The four dimensions are Organizations and People, Information and Technology, Partners and Suppliers, and Value Streams and Processes.",
    "D": "Management practices are a separate component of the Value System."
   },
@@ -8831,7 +8831,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "Transition moves new or changed products and services into live use: final testing, authorized change, training, handover and switch-on.",
+  "explanation": "Transition moves new or changed products and services into live use, which is what training staff, authorizing the change and switching the app on do here.",
   "incorrect": {
    "A": "Build creates and tests the components; that work is already done.",
    "C": "Deliver provides the service to consumers once it is live.",
@@ -8844,7 +8844,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-130",
   "certification": "ITIL",
   "domain": "The product and service lifecycle · Order of the activities",
-  "prompt": "Which sequence of product and service lifecycle activities is in the correct order?",
+  "prompt": "Which list gives the first four product and service lifecycle activities in the order ITIL lists them?",
   "options": [
    [
     "A",
@@ -8864,11 +8864,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "The eight activities run Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support.",
+  "explanation": "ITIL lists the eight activities as Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. ITIL lists them in this order, but they do not have to run in a fixed sequence.",
   "incorrect": {
-   "A": "Discover comes before Design, and Acquire comes before Build.",
-   "C": "Design comes before Acquire: the need is shaped before resources are obtained.",
-   "D": "Acquire obtains the resources that Build then uses, so it comes first."
+   "A": "In ITIL's list, Discover comes before Design and Acquire before Build.",
+   "C": "In ITIL's list, Design comes before Acquire.",
+   "D": "In ITIL's list, Acquire comes before Build."
   },
   "pool": "mockB",
   "lesson": "itil-m5"
@@ -8897,10 +8897,10 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "C",
-  "explanation": "Practices supply the resources and know-how each activity needs. One practice can serve many activities, and one activity uses many practices.",
+  "explanation": "Practices supply the know-how that activities use. One practice can serve several activities, and one activity can use several practices.",
   "incorrect": {
    "A": "Practices are not tied to one activity; they serve many.",
-   "B": "Practices are used across the lifecycle, for example supplier management in Acquire.",
+   "B": "Practices are used across the lifecycle, not only in two activities.",
    "D": "Activities describe the purpose of the work; practices are still the capabilities used."
   },
   "pool": "mockB",
@@ -8910,7 +8910,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-132",
   "certification": "ITIL",
   "domain": "The product and service lifecycle · Value streams and lifecycle activities",
-  "prompt": "A gym adds a new class type to its online booking service. Which lifecycle activities does this value stream mainly use?",
+  "prompt": "A gym is adding a new class type to its online booking service. The work uses existing staff and systems only. Which lifecycle activities does the work of making the change mainly use before members can book it?",
   "options": [
    [
     "A",
@@ -8930,11 +8930,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "A value stream uses only the lifecycle activities its demand needs. A new feature needs the need understood, a design, a build and a move into live use.",
+  "explanation": "Making the change needs the need understood, a design, a build and a move into live use: Discover, Design, Build and Transition. Once members can book the class, Deliver takes over.",
   "incorrect": {
-   "A": "A member's booking mainly uses Deliver; adding a class type needs new work first.",
+   "A": "A member's booking comes after the change; adding a class type needs new work first.",
    "C": "These keep the service running and help users; they do not create the new class type.",
-   "D": "Nothing needs to be obtained, and Deliver alone does not create the new feature."
+   "D": "The work uses existing staff and systems, so nothing new is obtained, and Deliver comes after the change."
   },
   "pool": "mockB",
   "lesson": "itil-m5"
@@ -8951,7 +8951,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ],
    [
     "B",
-    "The activities for creating, delivering and improving products and services"
+    "The activities from discovery and design to operation, delivery and support"
    ],
    [
     "C",
@@ -8963,11 +8963,11 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "B",
-  "explanation": "The product and service lifecycle is Version 5's model for creating, delivering and continually improving products and services, made up of eight activities.",
+  "explanation": "PeopleCert describes the lifecycle through its management activities, from discovery and design to operation, delivery and support. ITIL lists eight of them.",
   "incorrect": {
    "A": "Practices are used across the lifecycle; they have no fixed order.",
    "C": "The improvement model is a separate set of seven questions.",
-   "D": "Evaluate, direct and monitor are governance activities, not lifecycle activities."
+   "D": "Evaluate, direct and monitor are ITIL 4 governance activities, not lifecycle activities."
   },
   "pool": "mockB",
   "lesson": "itil-m5"
@@ -8999,7 +8999,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "explanation": "PeopleCert's lifecycle mindset covers better decisions, anticipating change, reducing technical debt, improving service continuity and keeping teams aligned instead of working in silos.",
   "incorrect": {
    "B": "That creates silos, which the lifecycle mindset is meant to avoid.",
-   "C": "Change enablement still applies; the lifecycle does not remove it.",
+   "C": "Nothing in PeopleCert's description says live changes stop needing authorization.",
    "D": "PeopleCert still lists 34 practices."
   },
   "pool": "mockB",
@@ -9009,31 +9009,31 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-135",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Problem management",
-  "prompt": "In ITIL, what is the purpose of the problem management practice?",
+  "prompt": "A hospital wants fewer incidents in future, not just faster fixes when they happen. Which practice's purpose matches that aim?",
   "options": [
    [
     "A",
-    "To restore normal service as quickly as possible"
+    "Incident management"
    ],
    [
     "B",
-    "To reduce the likelihood and impact of incidents by finding their causes"
+    "Problem management"
    ],
    [
     "C",
-    "To handle all pre-defined, user-initiated requests in an agreed way"
+    "Service request management"
    ],
    [
     "D",
-    "To make sure the risks of changes are properly assessed and changes are authorized"
+    "Change enablement"
    ]
   ],
   "correct": "B",
   "explanation": "Problem management reduces the likelihood and impact of incidents by finding their actual and potential causes, and by managing workarounds and known errors.",
   "incorrect": {
-   "A": "That is the purpose of incident management.",
-   "C": "That is service request management.",
-   "D": "That is change enablement."
+   "A": "Incident management restores normal service as quickly as possible; it does not aim to stop incidents happening again.",
+   "C": "Service request management handles normal, pre-defined user requests.",
+   "D": "Change enablement assesses and authorizes changes; it does not look for the causes of incidents."
   },
   "pool": "mockB",
   "lesson": "itil-m6"
@@ -9095,7 +9095,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "D",
-  "explanation": "Events are informational, warning or exception. An informational event shows all is well, for example a backup that finished.",
+  "explanation": "In ITIL, events are usually sorted into informational, warning or exception. An informational event shows all is well, for example a backup that finished.",
   "incorrect": {
    "A": "A warning shows a threshold is near, such as a disk filling up.",
    "B": "An exception shows something has failed or broken a threshold.",
@@ -9273,7 +9273,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-143",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Continual improvement model",
-  "prompt": "A school cut laptop waiting times and confirmed it met its target. It now shares the results with staff and adds the next ideas to its improvement register. Which question of the continual improvement model is this?",
+  "prompt": "A school has cut laptop waiting times. It shares the results with staff and adds the next ideas to its improvement register so the effort carries on. Which question of the continual improvement model is it answering?",
   "options": [
    [
     "A",
@@ -9295,7 +9295,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "correct": "B",
   "explanation": "In the ITIL 4 model, which Version 5 refines, the last question is How do we keep the momentum going? Sharing success and lining up the next ideas keeps improvement going.",
   "incorrect": {
-   "A": "That question was answered when the school confirmed it met its target.",
+   "A": "Did we get there? checks results against the target; the stem is about carrying the effort on.",
    "C": "Take action is when the planned improvement is carried out.",
    "D": "The vision is set at the start, before measuring and acting."
   },
@@ -9306,7 +9306,7 @@ export const examQuestions: ScenarioQuestion[] = [
   "id": "q-itil-144",
   "certification": "ITIL",
   "domain": "Practices, improvement and value streams · Managing a value stream",
-  "prompt": "A city office manages the value stream for building permits. Where should it focus improvement first?",
+  "prompt": "A city office manages the value stream for building permits. Where should it look first for improvement?",
   "options": [
    [
     "A",
@@ -9326,7 +9326,7 @@ export const examQuestions: ScenarioQuestion[] = [
    ]
   ],
   "correct": "A",
-  "explanation": "Managing a value stream means finding the bottleneck, the step where work waits longest, and improving it before anything else.",
+  "explanation": "A good first place to look is where work waits longest, because waiting is usually most of the lead time.",
   "incorrect": {
    "B": "Staff numbers do not show where work is held up.",
    "C": "Every step sees every request; the bottleneck is where work waits.",
