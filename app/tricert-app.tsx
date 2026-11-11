@@ -2134,7 +2134,7 @@ function WeekendFocus({ item, block, ticks, saving, onTick, onLeave, onFinish }:
   }, [onLeave]);
   const done = new Set(ticks);
   return (
-    <div ref={dialog} tabIndex={-1} className="focus morning" role="dialog" aria-modal="true" aria-labelledby="weekend-title">
+    <div ref={dialog} tabIndex={-1} className="focus morning weekend" role="dialog" aria-modal="true" aria-labelledby="weekend-title">
       <header className="focus-bar">
         <span className="focus-where"><span className="live-dot" aria-hidden="true" />{block ? `${block.cert}, weekend block ${block.weekends.indexOf(item) + 1}` : 'Weekend block'}</span>
         <button className="ghost" onClick={onLeave}>Leave</button>

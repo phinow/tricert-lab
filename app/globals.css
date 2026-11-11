@@ -1204,6 +1204,8 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 /* A morning in focus mode: the bar, the step line, the part (it scrolls)
    and its actions, which stay in reach. */
 .focus.morning:not(.focus-reading) { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+/* A weekend lab has no step line: its steps scroll and Finish block stays in reach. */
+.focus.morning.weekend:not(.focus-reading) { grid-template-rows: auto minmax(0, 1fr) auto; }
 .step-line { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; width: min(700px, calc(100% - 40px)); margin: 14px auto 0; padding: 0; list-style: none; }
 .step-line li { display: grid; grid-template-columns: 16px minmax(0, 1fr); column-gap: 8px; align-items: center; min-width: 0; padding-top: 8px; border-top: 3px solid var(--surface-3); color: var(--text-3); }
 .step-line li.is-done, .step-line li.is-now { border-top-color: var(--fill); }
