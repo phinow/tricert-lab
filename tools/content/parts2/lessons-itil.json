@@ -646,6 +646,224 @@
      "a": "There are 34 management practices, organized into two groups: Product and Service management practices, and General management practices."
     }
    ]
+  },
+  {
+   "key": "itil-m7",
+   "summary": "Learn the purpose and key terms of eight more practices: change enablement, release management, deployment management, service configuration management, IT asset management, information security management, relationship management and supplier management.",
+   "read": [
+    {
+     "heading": "Change enablement",
+     "body": "A change is the addition, modification or removal of anything that could have a direct or indirect effect on services. Change enablement aims to maximize the number of successful changes by making sure risks are properly assessed, authorizing changes to proceed, and managing the change schedule.\n\nThree types of change:\n\n| Type | What it is | Example |\n|---|---|---|\n| Standard | Low risk, well understood, fully documented; pre-authorized, so it can be done without a new authorization each time | Setting up a laptop from the approved build |\n| Normal | Scheduled, assessed and authorized by the right change authority; the authority depends on the risk | Moving a website to a new hosting provider |\n| Emergency | Must be done as soon as possible, such as fixing an actively exploited security flaw; assessment and authorization are faster and may use a separate authority | Patching a payment page under attack |\n\nKey ideas:\n\n- Change authority: the person or group that authorizes a change. Low-risk normal changes can be authorized close to the work; high-risk ones go higher. Placing authority well keeps changes fast and safe.\n- Change schedule: the plan of upcoming changes, used to avoid clashes and to tell people what is coming.\n- Emergency changes still get assessed and recorded, just faster. Testing may be reduced, but the risk is still weighed.\n\nA common trap: a project board approving the scope of a piece of work is not the same as authorizing a change to the live service. At Kestrel, the change-control board approved unit-level counts for the bed dashboard as a scope decision; putting the new page into the live service still needs the change authority's authorization.\n\nA password reset is a service request, not a change. Do not confuse the two."
+    },
+    {
+     "heading": "Release management and deployment management",
+     "body": "A release is a version of a service or other configuration item, or a collection of them, that is made available for use. Release management aims to make new and changed services and features available for use.\n\nDeployment management moves new or changed hardware, software, documentation, processes or any other component to live environments, or to other environments such as testing.\n\nThe difference is the heart of most questions:\n\n- Deployment is a technical move: the component is placed in an environment.\n- Release is making it available to users.\n\nThey can happen at different times. A team can deploy new code to the live environment on Saturday with the feature switched off, then release it to users on Monday after final checks. Deployed but not released is normal and lowers risk, because the release can be switched on or off without another deployment.\n\nCommon deployment approaches:\n\n- Phased: deploy to part of the environment at a time, such as one site.\n- Continuous delivery: components are integrated, tested and deployed often, in small amounts.\n- Big bang: deploy to every target at the same time.\n- Pull: users download or install the component when they want it, often from a self-service catalogue.\n\nRelease management also decides what goes in each release, and prepares users and support teams with notes, training and knowledge, which ties it to Transition in the lifecycle."
+    },
+    {
+     "heading": "Configuration items and IT assets",
+     "body": "A configuration item (CI) is any component that needs to be managed in order to deliver an IT service. Service configuration management makes sure accurate and reliable information about the configuration of services, and the CIs that support them, is available when and where it is needed. That includes how CIs relate to each other.\n\n- CIs can be hardware, software, networks, buildings, people, suppliers and documents.\n- Relationships matter most: which servers, databases and network links a service depends on. When something breaks or changes, this information shows what else is affected.\n- The information is held in one or more configuration management systems and used by incident, problem and change work.\n\nAn IT asset is any financially valuable component that can contribute to delivering an IT product or service. IT asset management plans and manages the full lifecycle of IT assets, to help the organization maximize value, control costs, manage risks, support decisions about buying, reusing and retiring assets, and meet regulatory and contractual requirements.\n\n- It tracks ownership, cost, location, licences, warranty dates and disposal.\n- Software licences are a common focus: using more copies than paid for is a contract and legal risk.\n\nThe two overlap but ask different questions. Service configuration management asks: how does this component fit together with others to deliver the service? IT asset management asks: what is it worth, who owns it, what does it cost, and when should it be retired? A server can be both a CI and an asset. A process document can be a CI without being an asset."
+    },
+    {
+     "heading": "Information security management",
+     "body": "Information security management protects the information the organization needs to conduct its business. That means understanding and managing risks to:\n\n- Confidentiality: only authorized people can see the information.\n- Integrity: the information is accurate and complete and changed only by authorized people.\n- Availability: the information is there when it is needed.\n\nTwo further qualities often appear with these: authentication (proving someone is who they say they are) and non-repudiation (someone cannot later deny an action they took).\n\nSecurity needs a balance of three kinds of control:\n\n1. Prevention: stop incidents happening, for example access rights and encryption.\n2. Detection: find incidents quickly, for example monitoring and alerts.\n3. Correction: recover after an incident, for example backups and incident response.\n\nInformation security involves everyone, not only a security team. Desk staff verifying a caller's identity, developers writing safe code, and managers approving access all take part. It also links to other practices: a security incident is handled through incident management, and a security fix to live systems goes through change enablement.\n\nIn terms of lesson 1, security is part of warranty. A dashboard that shows the right data but lets anyone see confidential pages is not fit for use. Kestrel's rule that the dashboards use de-identified, aggregated data is a preventive control decided before any user signs in."
+    },
+    {
+     "heading": "Relationship management and supplier management",
+     "body": "Relationship management establishes and nurtures the links between the organization and its stakeholders, at strategic and tactical levels. It involves identifying, analysing, monitoring and improving those relationships.\n\n- It works with customers and other stakeholders to understand their needs and priorities, and how they experience value.\n- It handles competing demands, such as two departments wanting the same team's time, so that priorities are agreed rather than fought over.\n- It tracks satisfaction and the health of the relationship, not just service targets.\n\nSupplier management makes sure the organization's suppliers and their performance are managed properly, so the organization can provide quality products and services. It covers:\n\n- Choosing a sourcing approach: build inside, buy from a supplier, or work with a partner.\n- Agreeing contracts and the terms that matter, such as support hours, response times, data location and how to exit.\n- Monitoring supplier performance against the contract and acting on it.\n- Managing risk, such as depending on a single supplier.\n\nA partner works more closely than a supplier, often sharing goals and risks over a long period. A supplier provides agreed goods or services under contract terms. Both belong to the Partners and Suppliers dimension, and obtaining resources from them is the Acquire activity of the lifecycle.\n\nExam cue: a question about a vendor missing its contracted response time wants supplier management. A question about two business units both unhappy with how priorities are set wants relationship management."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Change",
+     "definition": "The addition, modification or removal of anything that could have a direct or indirect effect on services. Change enablement maximizes successful changes."
+    },
+    {
+     "term": "Standard, normal and emergency change",
+     "definition": "Standard: low risk, pre-authorized. Normal: assessed and authorized by the right change authority. Emergency: done as soon as possible with faster assessment and authorization."
+    },
+    {
+     "term": "Change authority",
+     "definition": "The person or group that authorizes a change. Authority sits closer to the work for low-risk changes and higher up for high-risk ones."
+    },
+    {
+     "term": "Release",
+     "definition": "A version of a service or other configuration item, or a collection of them, made available for use. Release management makes new and changed features available."
+    },
+    {
+     "term": "Deployment",
+     "definition": "Moving new or changed hardware, software, documentation, processes or other components to live or other environments. A component can be deployed before it is released."
+    },
+    {
+     "term": "Configuration item (CI)",
+     "definition": "Any component that needs to be managed in order to deliver an IT service. Service configuration management keeps accurate information on CIs and their relationships."
+    },
+    {
+     "term": "IT asset",
+     "definition": "Any financially valuable component that can contribute to delivering an IT product or service. IT asset management handles its value, cost, risk and full lifecycle."
+    },
+    {
+     "term": "Confidentiality, integrity and availability",
+     "definition": "The three qualities information security management protects: only authorized access, accurate and complete information, and information there when needed."
+    }
+   ],
+   "build": {
+    "goal": "Classify five requests for an online shop as standard, normal or emergency change, or not a change, then name the practice that leads each of eight steps in moving the shop to a new hosting provider.",
+    "steps": [
+     "Requests: (1) set up a new staff laptop from the approved, documented build; (2) patch a security flaw being actively exploited on the payment page; (3) move the shop to a new hosting provider; (4) a user asks for a password reset; (5) add a new sales chart to a live report used by managers.",
+     "Label each request standard, normal, emergency, or not a change. For each change, say who should authorize it.",
+     "Hosting move, steps a to d: (a) assess the risk and authorize the move; (b) sign the contract and track the host's response times; (c) record which servers, databases and links the shop depends on; (d) record the cost, owner and licence terms of each new server.",
+     "Hosting move, steps e to h: (e) copy the shop to the new host on Saturday with customers still on the old one; (f) switch customers to the new shop on Monday after checks; (g) confirm customer data is encrypted and access is limited; (h) agree the timing with the sales and marketing managers.",
+     "Name the leading practice for each step a to h, choosing from the eight practices in this lesson.",
+     "Compare with the model answer and write one line for any release versus deployment or CI versus asset mix-up."
+    ],
+    "modelAnswer": "| Request | Type | Authorized by |\n|---|---|---|\n| 1 Laptop from approved build | Standard change | Pre-authorized; no new authorization needed |\n| 2 Patch exploited payment flaw | Emergency change | Emergency change authority, assessed quickly |\n| 3 Move to new host | Normal change, high risk | A senior change authority |\n| 4 Password reset | Not a change: a service request | Handled by service request management |\n| 5 New chart on live report | Normal change, low risk | A change authority close to the work, unless the organization has made such changes standard |\n\nRequest 5 could become a standard change if the organization has documented and pre-authorized this kind of report change after doing it safely many times.\n\n| Step | Leading practice |\n|---|---|\n| a Assess risk, authorize | Change enablement |\n| b Contract and response times | Supplier management |\n| c Servers, databases, links | Service configuration management |\n| d Cost, owner, licence terms | IT asset management |\n| e Copy to new host on Saturday | Deployment management |\n| f Switch customers on Monday | Release management |\n| g Encryption and limited access | Information security management |\n| h Agree timing with managers | Relationship management |\n\nSteps e and f show the release and deployment split: the shop is deployed to the new host on Saturday but released to customers only on Monday. Steps c and d show the CI and asset split: the same servers are recorded once for how they fit together and once for their value, cost and ownership."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "A standard change is low risk and pre-authorized; a normal change is assessed and authorized by the right change authority; an emergency change is assessed and authorized faster because it must happen as soon as possible."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Deployment moves components into an environment; release makes them available for use. If a stem has code in live but switched off for users, it is deployed but not yet released."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "A project board approving scope is not authorization to change the live service. Releasing a change to production still needs the change authority's authorization."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Service configuration management is about how components fit together to deliver a service; IT asset management is about value, cost, ownership and lifecycle. One item can be both a CI and an asset."
+    }
+   ],
+   "pitfalls": [
+    "Treating an emergency change as one that skips assessment. It is still assessed and recorded, only faster.",
+    "Using release and deployment as the same word. A component can be deployed and not yet released.",
+    "Calling a password reset or new account a change. Those are service requests with pre-defined steps."
+   ],
+   "check": [
+    {
+     "q": "What makes a change a standard change, and why does it not need a new authorization each time?",
+     "a": "A standard change is low risk, well understood and fully documented. Its risk was assessed once and the change type pre-authorized, so each repeat can go ahead without a new authorization."
+    },
+    {
+     "q": "Explain the difference between deployment and release, with an example where a component is deployed but not yet released.",
+     "a": "Deployment moves a component into an environment; release makes it available for use. For example, a new app feature is deployed to the live servers switched off, then released to users a few days later by switching it on."
+    },
+    {
+     "q": "What is the difference between a configuration item and an IT asset? Can one thing be both?",
+     "a": "A configuration item is any component managed to deliver a service, tracked with its relationships. An IT asset is a financially valuable component, tracked for cost, ownership and lifecycle. Yes: a server is usually both."
+    }
+   ]
+  },
+  {
+   "key": "itil-m8",
+   "summary": "Learn continual improvement as both a Value System component and a practice, the continual improvement model, how to map a value stream with work and wait times and manage it for flow, and the exam technique and booking facts for ITIL Foundation (Version 5).",
+   "read": [
+    {
+     "heading": "Continual improvement everywhere",
+     "body": "Continual improvement appears twice in ITIL, and the exam expects you to know both:\n\n- As a component of the ITIL Value System: improvement happens at every level of the organization, in every part of the system, all the time.\n- As one of the 34 management practices: the practice that aligns the organization's practices and services with changing business needs by improving them continually.\n\nIt is everyone's responsibility, not a separate team's. A small improvement team can coach and coordinate, but the people doing the work find and make most improvements.\n\nImprovement ideas are recorded in a continual improvement register (CIR). The register holds each idea with its expected value, a rough size, an owner and a status. Ideas are compared and prioritized by value, so the most useful ones are done first and nothing good is lost. One register can serve a team; larger organizations may keep several.\n\nPeopleCert's objective asks you to learn how continual improvement is embedded within ITIL and the continual improvement model's step-by-step approach. The guiding principles shape every improvement: Start where you are (measure first), Progress iteratively with feedback (small steps), and Focus on value (improve what matters to stakeholders).\n\nThe example for this lesson is an everyday one: a new employee waiting for a laptop."
+    },
+    {
+     "heading": "The continual improvement model",
+     "body": "The continual improvement model asks seven questions in order. These are the ITIL 4 model, which Version 5 refines; learn the questions and their order.\n\n| Step | Question | Laptop example |\n|---|---|---|\n| 1 | What is the vision? | New employees can work from their first morning |\n| 2 | Where are we now? | Measure today: how long a laptop takes, and where it waits |\n| 3 | Where do we want to be? | A measurable target, such as ready within two working days |\n| 4 | How do we get there? | Plan the improvement: remove the slowest waits first |\n| 5 | Take action | Make the change, iteratively, with feedback |\n| 6 | Did we get there? | Measure again against the target |\n| 7 | How do we keep the momentum going? | Share the result, record what was learned, pick the next idea |\n\nPoints the exam likes:\n\n- The model starts with the vision and the current state before any action. Answers that jump to a new tool before measuring ignore step 2.\n- Step 3 needs measurable targets, so step 6 can answer yes or no.\n- Step 5 can be one big change or many small ones. Small iterations with feedback are usually safer.\n- Step 7 loops back. The model is a cycle, not a project with an end.\n\nThe model works at any size: a change to one form, a team's way of working, or a whole service."
+    },
+    {
+     "heading": "Mapping a value stream",
+     "body": "A value stream is the series of steps an organization takes to create and deliver products and services to consumers. Mapping one means drawing every step from the trigger (the demand) to the value (the outcome the consumer wanted), and measuring how work flows through it.\n\nFor each step, record:\n\n- Work time: hands-on effort while someone is actually working on the item.\n- Wait time: time the item sits in a queue before the step starts.\n- Percent complete and accurate (%C&A): the share of work the next step can use without asking for corrections.\n\nThen add it up:\n\n- Lead time = total work time + total wait time.\n- Flow efficiency = total work time divided by lead time.\n- Rolled %C&A = every step's %C&A multiplied together: the share of items that get through with no rework.\n\nAn illustrative example. A laptop request has six steps with 3 hours of work in total and 80 hours of waiting. Lead time is 83 hours and flow efficiency is 3 / 83, about 3.6%. Almost all the delay is waiting, not working.\n\nThis is the usual finding. Speeding up the work itself barely changes lead time. Removing a wait, an approval nobody needs, or a reason for rework changes it a lot. A poor rolled %C&A adds more waiting, because every correction sends the item back into a queue.\n\nGet the times by walking real items through the stream with the people who do the work. Ticket data usually shows lead time but not work time. Starting from observed facts is the guiding principle Start where you are."
+    },
+    {
+     "heading": "Managing a value stream",
+     "body": "PeopleCert's objective is to identify, map and manage value streams to improve flow, visibility and outcomes. Mapping is a picture at one moment. Management is the ongoing work of keeping the stream flowing.\n\nManaging a value stream means:\n\n- Naming an owner who is accountable for the whole stream, from trigger to value, not just one team's step.\n- Measuring flow regularly: lead time, flow efficiency, how much work is waiting, and how often items need rework.\n- Making work visible, for example on a shared board, so everyone sees where items pile up.\n- Finding the bottleneck, the step where work waits longest, and improving it before anything else.\n- Removing steps that add no value (Keep it simple and practical), and only then automating repetitive steps (Optimize and automate).\n- Recording ideas in the continual improvement register and running each through the improvement model.\n\nVersion 5's AI-native approach applies here too: AI can route requests, predict demand or answer routine questions. Treat it like any other automation: optimize the step first, then decide whether AI improves outcomes and experience at an acceptable risk.\n\nValue streams cross teams and practices, which is why they help with the guiding principle Think and work holistically. A laptop request touches the service desk, finance, purchasing, a supplier and the build team. No single team can fix the lead time alone, but one owner with a shared map can."
+    },
+    {
+     "heading": "Exam technique and booking",
+     "body": "The exam: 40 multiple-choice questions in 60 minutes, closed book. The pass mark is 65%, which is 26 of 40. That is 90 seconds a question. Online proctored delivery is available, and no training course is required first.\n\nA method that fits the time:\n\n1. Make one full pass in about 45 minutes. Answer what you know; mark what you do not.\n2. Use the last 15 minutes on the marked questions.\n3. Read each stem twice and find its key word: value, outcome, output, utility, warranty, principle, dimension, lifecycle activity, practice.\n4. Watch for negatives such as NOT or LEAST. They reverse the task.\n5. Remove options that are true but answer a different question.\n6. Prefer the option about value for the consumer over one about internal activity.\n7. Answer every question. A blank cannot score.\n\nWording traps: use lifecycle activity names, not ITIL 4 value chain activity names; there are 34 practices in two groups; utility is fit for purpose and warranty fit for use.\n\nBooking facts from PeopleCert's pages: rescheduling is free up to 48 hours before the exam, with a fee after that. A retake (Take2) can only be bought before the exam, not after a fail, and is valid for six months. The certificate carries a three-year renewal date, renewed through CPD points with a PeopleCert Plus membership, by passing another ITIL certification, or by retaking the exam."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Continual improvement",
+     "definition": "Both a component of the ITIL Value System (improvement at every level, all the time) and one of the 34 management practices. Everyone is responsible for it."
+    },
+    {
+     "term": "Continual improvement register (CIR)",
+     "definition": "A record of improvement ideas, each with expected value, size, owner and status, used to prioritize ideas by value so the most useful are done first."
+    },
+    {
+     "term": "Continual improvement model",
+     "definition": "Seven questions: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going?"
+    },
+    {
+     "term": "Value stream mapping",
+     "definition": "Drawing every step of a value stream from trigger to value and measuring work time, wait time and percent complete and accurate for each step."
+    },
+    {
+     "term": "Lead time",
+     "definition": "The total time from trigger to value: total work time plus total wait time. Most lead time is usually waiting, not working."
+    },
+    {
+     "term": "Flow efficiency",
+     "definition": "Total work time divided by lead time. A low figure shows that items spend most of their time waiting in queues."
+    },
+    {
+     "term": "Percent complete and accurate (%C&A)",
+     "definition": "The share of a step's output the next step can use without corrections. Multiplied across steps, it shows how many items get through with no rework."
+    },
+    {
+     "term": "Value stream management",
+     "definition": "The ongoing work of measuring and improving a value stream's flow, visibility and outcomes, with an owner accountable for the whole stream."
+    }
+   ],
+   "build": {
+    "goal": "Map a six-step value stream for a new employee's laptop with work and wait times, compute lead time, flow efficiency and rolled %C&A, then plan one improvement with the continual improvement model.",
+    "steps": [
+     "Steps 1 to 3 (illustrative figures: work time, wait before the step, %C&A): (1) manager submits the request on the portal, 0.25 h, 0 h, 70%; (2) service desk checks and routes it, 0.25 h, 16 h, 95%; (3) finance approves the budget, 0.1 h, 24 h, 100%.",
+     "Steps 4 to 6: (4) order from stock or the supplier, 0.5 h, 8 h, 100%; (5) build and configure the laptop, 1.5 h, 24 h, 90%; (6) hand over and test sign-in with the employee, 0.4 h, 8 h, 100%.",
+     "Draw the six steps in a line from trigger (a new hire is confirmed) to value (the employee works on day one). Write work and wait under each step.",
+     "Compute total work time, total wait time, lead time, flow efficiency and rolled %C&A.",
+     "Find the two longest waits and the step with the lowest %C&A. Propose one improvement for each and name the guiding principle behind it.",
+     "Write your top improvement through steps 1 to 3 and 6 of the continual improvement model, with a measurable target."
+    ],
+    "modelAnswer": "| Step | Work (h) | Wait before (h) | %C&A |\n|---|---|---|---|\n| 1 Manager submits | 0.25 | 0 | 70% |\n| 2 Desk checks and routes | 0.25 | 16 | 95% |\n| 3 Finance approves | 0.1 | 24 | 100% |\n| 4 Order | 0.5 | 8 | 100% |\n| 5 Build and configure | 1.5 | 24 | 90% |\n| 6 Hand over and test | 0.4 | 8 | 100% |\n\nTotals: work 3.0 h; wait 80 h; lead time 83 h (about three and a half days). Flow efficiency 3.0 / 83 = about 3.6%. Rolled %C&A = 0.70 x 0.95 x 1 x 1 x 0.90 x 1 = about 0.60, so only about 60% of requests get through with no rework.\n\nLongest waits: finance approval (24 h) and the build queue (24 h). Lowest %C&A: the manager's request (70%).\n\n- Finance approval: approve the laptop budget once when the hire is approved, and make the laptop a standard request with no separate approval. Principle: Keep it simple and practical.\n- Build queue: keep a small stock of laptops pre-built to the standard image, so step 5 becomes a quick personalization. Principle: Optimize and automate (after simplifying).\n- Incomplete requests: make the key fields required on the portal form (start date, role, location). Principle: Start where you are, using the observed 70% to target the form.\n\nContinual improvement model for the top idea, removing the separate finance approval:\n\n1. Vision: new employees can work from their first morning.\n2. Where are we now: lead time 83 h, of which 24 h waits for finance approval.\n3. Where do we want to be: lead time under 48 h for nine in ten requests within three months.\n6. Did we get there: measure lead time for every request for the next three months against that target, and record the result in the improvement register."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "The continual improvement model begins with the vision and Where are we now? before any action. Options that buy a tool or redesign before measuring the current state ignore the model and Start where you are."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Continual improvement is both a Value System component and a management practice, and it is everyone's responsibility. An option that leaves improvement to one team alone is weaker."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Lead time is work time plus wait time, and most of it is usually waiting. To shorten a value stream, remove waits, unneeded steps and rework before speeding up the work itself."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "40 questions in 60 minutes is 90 seconds each, and 26 correct passes. Make one full pass, return to marked questions, and answer every item."
+    }
+   ],
+   "pitfalls": [
+    "Jumping to Take action before measuring Where are we now? Without a baseline, Did we get there? cannot be answered.",
+    "Trying to shorten lead time by making people work faster. The work is usually a small share; the waiting is where the time goes.",
+    "Mapping a value stream once and filing it. Managing it means measuring flow again and improving the bottleneck, with an owner for the whole stream."
+   ],
+   "check": [
+    {
+     "q": "List the seven questions of the continual improvement model in order. Why does it ask Where are we now? before deciding what to do?",
+     "a": "What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? Measuring the current state first gives a baseline, so the target is realistic and success can be measured."
+    },
+    {
+     "q": "A process has 3 hours of work and 45 hours of waiting. What are its lead time and flow efficiency, and where should improvement start?",
+     "a": "Lead time is 48 hours (3 + 45). Flow efficiency is 3 / 48, about 6%. Improvement should start with the longest waits, unneeded steps and rework, because they make up almost all of the lead time."
+    },
+    {
+     "q": "What is the difference between mapping a value stream and managing it?",
+     "a": "Mapping draws the steps from trigger to value and measures work, wait and %C&A at one point in time. Managing is ongoing: an owner measures flow regularly, makes work visible, improves the bottleneck and runs the improvements through the continual improvement model."
+    }
+   ]
   }
  ]
 }
