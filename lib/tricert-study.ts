@@ -510,8 +510,9 @@ export const AREA_MAX_GAP = 10;
 export const DELAYED_MIN_ANSWERS = 20;
 export const DELAYED_TARGET = 80;
 
-function formName(form: string): string {
-  return /^[A-Z]$/.test(form) ? `Form ${form}` : 'A random exam';
+function formName(form: string, start = true): string {
+  if (/^[A-Z]$/.test(form)) return `${start ? 'Form' : 'form'} ${form}`;
+  return start ? 'A random exam' : 'a random exam';
 }
 
 function pooledAreas(results: ExamResult[]): { overall: number; areas: AreaScore[] } {
@@ -575,7 +576,7 @@ export function readyToBook(input: {
   let examsDetail: string;
   if (pair) {
     const [a, b] = pair;
-    examsDetail = `${formName(a.form)} ${percentOf(a.right, a.total)}% on ${a.date} and ${formName(b.form).toLowerCase()} ${percentOf(b.right, b.total)}% on ${b.date}, ${daysBetween(a.date, b.date)} days apart.`;
+    examsDetail = `${formName(a.form)} ${percentOf(a.right, a.total)}% on ${a.date} and ${formName(b.form, false)} ${percentOf(b.right, b.total)}% on ${b.date}, ${daysBetween(a.date, b.date)} days apart.`;
   } else if (passing.length > 0) {
     const best = [...passing].sort((x, y) => (x.date < y.date ? -1 : 1))[0];
     examsDetail = `${formName(best.form)} reached ${percentOf(best.right, best.total)}% on ${best.date}. Pass a different form at ${target}% or more on or after ${addDays(best.date, BOOKING_GAP_DAYS)}.`;
