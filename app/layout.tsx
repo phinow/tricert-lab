@@ -4,7 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'TriCert Lab | Learn through delivery',
   description:
-    'A 13-week, project-based PMP, PL-300, CISSP, and ITIL Foundation study and portfolio workspace.',
+    'ITIL Foundation, PL-300, PMP and CISSP, one exam at a time: weekday mornings, weekend labs and timed practice exams, with a project-based portfolio.',
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
