@@ -1,0 +1,1325 @@
+{
+  "type": "questions",
+  "items": [
+    {
+      "id": "q-itil-025",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Outputs and outcomes",
+      "prompt": "A bank's digital team reports that it released 12 new screens in the mobile app this quarter. The branch manager wants fewer customers queuing to ask about their balance. Which of these is an outcome?",
+      "options": [
+        [
+          "A",
+          "Fewer customers queue in branches to ask about their balance"
+        ],
+        [
+          "B",
+          "The 12 new screens released to the app store this quarter"
+        ],
+        [
+          "C",
+          "The release notes the team sent to every branch"
+        ],
+        [
+          "D",
+          "The test report produced for each new screen"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "An outcome is a result a stakeholder wants. An output is something an activity produces. Fewer customers queuing is the result the branch manager wants; screens, notes and test reports are things the team produced along the way.",
+      "incorrect": {
+        "B": "The screens are outputs of the team's work, not the result the manager wants.",
+        "C": "Release notes are an output that supports the change, not a result for the consumer.",
+        "D": "Test reports are outputs of testing, not a result the consumer wants."
+      },
+      "pool": "daily",
+      "lesson": "itil-m1"
+    },
+    {
+      "id": "q-itil-026",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Utility and warranty",
+      "prompt": "A city office's online permit service must stay available during office hours and keep applicants' personal data secure. What do these two requirements describe?",
+      "options": [
+        [
+          "A",
+          "Utility: what the service does for applicants, which makes it fit for purpose"
+        ],
+        [
+          "B",
+          "Outputs: the permits that the office produces for applicants"
+        ],
+        [
+          "C",
+          "Warranty: how well the service performs, which makes it fit for use"
+        ],
+        [
+          "D",
+          "Costs: what applicants must give up, in time and money, in order to use the service"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Warranty is the assurance that a service will meet agreed requirements, so it is fit for use. Availability, capacity, security and continuity are warranty. Utility is what the service does, such as letting a resident apply for a permit.",
+      "incorrect": {
+        "A": "Utility covers what the service does; availability and security describe how well it does it.",
+        "B": "Permits are outputs; the requirements in the question describe the quality of the service.",
+        "D": "Costs are what the consumer gives up; availability and security are about how the service performs."
+      },
+      "pool": "daily",
+      "lesson": "itil-m1"
+    },
+    {
+      "id": "q-itil-027",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Roles in a service relationship",
+      "prompt": "A school district's director of finance approves the budget for a new learning platform. Teachers decide what the platform must do, and pupils log in to it every day. What role does the director play?",
+      "options": [
+        [
+          "A",
+          "Customer"
+        ],
+        [
+          "B",
+          "User"
+        ],
+        [
+          "C",
+          "Sponsor"
+        ],
+        [
+          "D",
+          "Supplier"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "The sponsor authorizes budget for service consumption. The customer defines the requirements and is responsible for the outcomes, which here are the teachers. The user uses the service, which here are the pupils.",
+      "incorrect": {
+        "A": "The customer defines requirements; in this case that is the teachers, not the person approving the budget.",
+        "B": "The users are the pupils who log in each day.",
+        "D": "A supplier is an outside organization providing goods or services, not a role inside the consumer."
+      },
+      "pool": "daily",
+      "lesson": "itil-m1"
+    },
+    {
+      "id": "q-itil-028",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Costs and risks",
+      "prompt": "Which statement about costs and risks in a service relationship is correct?",
+      "options": [
+        [
+          "A",
+          "A good service moves every cost and every risk away from the consumer and over to the provider"
+        ],
+        [
+          "B",
+          "Costs matter to the consumer, but risks are a concern for the provider alone"
+        ],
+        [
+          "C",
+          "Costs and risks are fixed by the service offering, so they do not change the value of a service"
+        ],
+        [
+          "D",
+          "A service can remove some costs and risks from the consumer, and it can also bring new ones"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "Using a service takes some costs and risks off the consumer, but it also brings costs, such as fees or training, and risks, such as dependence on the provider. The consumer weighs both when judging the value of the service.",
+      "incorrect": {
+        "A": "No service removes all costs and risks; the consumer always takes on some.",
+        "B": "Consumers carry risks too, such as relying on a provider, and must weigh them.",
+        "C": "Costs and risks are part of how value is judged, so they do change it."
+      },
+      "pool": "daily",
+      "lesson": "itil-m1"
+    },
+    {
+      "id": "q-itil-029",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Service offerings",
+      "prompt": "A mobile phone shop sells a plan with a handset that the customer owns, monthly data, and access to a help line. Which part of this service offering is the handset?",
+      "options": [
+        [
+          "A",
+          "Access to resources"
+        ],
+        [
+          "B",
+          "Goods"
+        ],
+        [
+          "C",
+          "A service action"
+        ],
+        [
+          "D",
+          "A service relationship"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "A service offering can include goods, access to resources and service actions. Goods are supplied to the consumer, and ownership passes to them, like the handset. The monthly data is access to resources, and the help line is a service action.",
+      "incorrect": {
+        "A": "Access to resources is use of something the provider keeps, such as the mobile network and its data.",
+        "C": "Service actions are things the provider does for the consumer, such as answering the help line.",
+        "D": "A service relationship is the cooperation between provider and consumer, not one part of the offering."
+      },
+      "pool": "daily",
+      "lesson": "itil-m1"
+    },
+    {
+      "id": "q-itil-030",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · What value co-creation weighs",
+      "prompt": "In ITIL Foundation (Version 5), which set of factors do provider and consumer weigh when they co-create value?",
+      "options": [
+        [
+          "A",
+          "Utility, warranty, price, speed and scale"
+        ],
+        [
+          "B",
+          "Outcomes, costs, risks, experience and sustainability"
+        ],
+        [
+          "C",
+          "Inputs, activities, outputs, features and budget"
+        ],
+        [
+          "D",
+          "Requirements, design, build, test and release"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "ITIL Foundation (Version 5) describes value co-creation as collaboration between providers, consumers and other stakeholders, weighing outcomes, costs, risks, experience and sustainability.",
+      "incorrect": {
+        "A": "Utility and warranty describe a service; this list is not how ITIL describes what is weighed.",
+        "C": "Inputs, activities and outputs describe work done, not what the consumer weighs.",
+        "D": "These are delivery steps, not the factors weighed in value co-creation."
+      },
+      "pool": "daily",
+      "lesson": "itil-m2"
+    },
+    {
+      "id": "q-itil-031",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Experience",
+      "prompt": "An online shop's checkout always works and is always available. Customers say it asks for the same details three times, and many give up before paying. Which factor of value is weakest here?",
+      "options": [
+        [
+          "A",
+          "Warranty, because the checkout cannot cope with the number of customers"
+        ],
+        [
+          "B",
+          "Cost, because customers pay too much for the goods"
+        ],
+        [
+          "C",
+          "Sustainability, because the checkout wastes resources over time"
+        ],
+        [
+          "D",
+          "Experience, because using the checkout is frustrating for customers"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "Experience is how consumers find using a product or service. The checkout does its job and is available, so utility and warranty are not the issue. The repeated questions make it frustrating, and customers leave, so value is lost through poor experience.",
+      "incorrect": {
+        "A": "The stem says the checkout is always available, so warranty is not the problem.",
+        "B": "Nothing in the stem says the price is the reason customers give up.",
+        "C": "The complaint is about the customer's experience, not long-term use of resources."
+      },
+      "pool": "daily",
+      "lesson": "itil-m2"
+    },
+    {
+      "id": "q-itil-032",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Sustainability",
+      "prompt": "A city office compares two ways to run its parking-permit service. Both give residents the same outcomes at the same cost, but one uses far less energy and paper over the years. Which factor of value co-creation does this difference concern?",
+      "options": [
+        [
+          "A",
+          "Sustainability"
+        ],
+        [
+          "B",
+          "Warranty"
+        ],
+        [
+          "C",
+          "Customer experience"
+        ],
+        [
+          "D",
+          "Utility"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "Sustainability is one of the factors weighed in value co-creation in ITIL Foundation (Version 5). It looks at the longer-term effect of a product or service, such as the energy and materials it uses.",
+      "incorrect": {
+        "B": "Warranty is about availability, capacity, security and continuity, which the stem does not compare.",
+        "C": "The residents' experience is the same with both options.",
+        "D": "Both options do the same thing for residents, so utility is the same."
+      },
+      "pool": "daily",
+      "lesson": "itil-m2"
+    },
+    {
+      "id": "q-itil-033",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · Working with consumers",
+      "prompt": "A bank launched a budgeting tool in its app six months ago, and few customers use it. What is the best next step, based on the idea of value co-creation?",
+      "options": [
+        [
+          "A",
+          "Add more features so that the tool covers every type of account the bank offers"
+        ],
+        [
+          "B",
+          "Report how many releases the team has delivered since the launch"
+        ],
+        [
+          "C",
+          "Ask customers how they plan their money, and test changes with them"
+        ],
+        [
+          "D",
+          "Advertise the tool more widely, since its design is already finished"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Value is co-created: the provider cannot create it alone. When consumers do not use a service, the provider should work with them to learn what outcomes they want and act on their feedback.",
+      "incorrect": {
+        "A": "More features chosen by the provider alone may still miss what customers need.",
+        "B": "Counting releases measures outputs, not whether customers gain any value.",
+        "D": "More advertising does not fix a tool that may not meet customers' needs."
+      },
+      "pool": "daily",
+      "lesson": "itil-m2"
+    },
+    {
+      "id": "q-itil-034",
+      "certification": "ITIL",
+      "domain": "Value and value co-creation · AI in service work",
+      "prompt": "Which statement best describes how ITIL (Version 5) treats artificial intelligence (AI)?",
+      "options": [
+        [
+          "A",
+          "It names the AI products and platforms that every organization using ITIL should adopt"
+        ],
+        [
+          "B",
+          "AI is part of normal product and service work, used with oversight and accountability"
+        ],
+        [
+          "C",
+          "AI replaces the guiding principles as the base of the framework"
+        ],
+        [
+          "D",
+          "AI should stay outside product and service management until the technology is fully proven"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "ITIL (Version 5) is described as AI-native: its practices, value streams and roles are designed so AI can be part of normal work. It stays technology-agnostic and asks organizations to govern AI with oversight, accountability, risk management and trust.",
+      "incorrect": {
+        "A": "ITIL (Version 5) is technology-agnostic and does not tell organizations which AI products to use.",
+        "C": "The guiding principles remain part of the ITIL Value System.",
+        "D": "Version 5 builds AI into normal work rather than keeping it apart."
+      },
+      "pool": "daily",
+      "lesson": "itil-m2"
+    },
+    {
+      "id": "q-itil-035",
+      "certification": "ITIL",
+      "domain": "The four dimensions · Information and Technology",
+      "prompt": "A school's new homework app stores pupils' marks. Which dimension covers the decisions about what data the app keeps, where it is stored and which platform runs it?",
+      "options": [
+        [
+          "A",
+          "Organizations and People"
+        ],
+        [
+          "B",
+          "Information and Technology"
+        ],
+        [
+          "C",
+          "Partners and Suppliers"
+        ],
+        [
+          "D",
+          "Value Streams and Processes"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "The Information and Technology dimension covers the information a service needs and manages, and the technology that supports it, including where data is kept and how it is protected.",
+      "incorrect": {
+        "A": "Organizations and People covers roles, skills and culture, not data and platforms.",
+        "C": "Partners and Suppliers covers other organizations involved in the service.",
+        "D": "Value Streams and Processes covers how work flows, not what data is held."
+      },
+      "pool": "daily",
+      "lesson": "itil-m3"
+    },
+    {
+      "id": "q-itil-036",
+      "certification": "ITIL",
+      "domain": "The four dimensions · Value Streams and Processes",
+      "prompt": "A city office follows a resident's parking-permit request from application to issued permit and finds three hand-offs where the work waits. Which dimension is this work mainly about?",
+      "options": [
+        [
+          "A",
+          "Organizations and People"
+        ],
+        [
+          "B",
+          "Information and Technology"
+        ],
+        [
+          "C",
+          "Partners and Suppliers"
+        ],
+        [
+          "D",
+          "Value Streams and Processes"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "The Value Streams and Processes dimension looks at how the parts of the organization work together to turn demand into value, including the steps, hand-offs and waits along the way.",
+      "incorrect": {
+        "A": "The stem is about how the work flows, not about roles, skills or culture.",
+        "B": "No data or technology decision is being made here.",
+        "C": "No outside organization is involved in the waits described."
+      },
+      "pool": "daily",
+      "lesson": "itil-m3"
+    },
+    {
+      "id": "q-itil-037",
+      "certification": "ITIL",
+      "domain": "The four dimensions · Considering all four",
+      "prompt": "Which statement about the four dimensions of product and service management is correct?",
+      "options": [
+        [
+          "A",
+          "All four should be considered for every product and service"
+        ],
+        [
+          "B",
+          "Each dimension is owned by one department, which manages it without the others"
+        ],
+        [
+          "C",
+          "They are used only when a new service is designed, not once it is running"
+        ],
+        [
+          "D",
+          "Information and Technology comes first, and the other three dimensions follow from it"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "The four dimensions give a balanced view of a product or service. Leaving one out, such as the skills of the people who support it or the suppliers it depends on, can stop the service from creating the value expected.",
+      "incorrect": {
+        "B": "The dimensions cross department lines and must be looked at together.",
+        "C": "They apply across the whole lifecycle, including when the service is running.",
+        "D": "No dimension ranks above the others; all four need attention."
+      },
+      "pool": "daily",
+      "lesson": "itil-m3"
+    },
+    {
+      "id": "q-itil-038",
+      "certification": "ITIL",
+      "domain": "The ITIL Value System · Components",
+      "prompt": "An organization is reviewing the ITIL Value System. Which of these is NOT one of its components?",
+      "options": [
+        [
+          "A",
+          "Governance"
+        ],
+        [
+          "B",
+          "Management practices"
+        ],
+        [
+          "C",
+          "The four dimensions"
+        ],
+        [
+          "D",
+          "Continual improvement"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "The ITIL Value System brings together guiding principles, governance, value chain activities, management practices and continual improvement. The four dimensions are a separate model used to consider a product or service in a balanced way.",
+      "incorrect": {
+        "A": "Governance is one of the five components of the ITIL Value System.",
+        "B": "Management practices are one of the five components.",
+        "D": "Continual improvement is one of the five components."
+      },
+      "pool": "daily",
+      "lesson": "itil-m3"
+    },
+    {
+      "id": "q-itil-039",
+      "certification": "ITIL",
+      "domain": "The ITIL Value System · Governance activities",
+      "prompt": "A bank's board sets a policy that customer data must stay in the country, and each quarter it checks reports showing whether the IT teams follow it. Which governance activity is the quarterly check?",
+      "options": [
+        [
+          "A",
+          "Evaluate"
+        ],
+        [
+          "B",
+          "Direct"
+        ],
+        [
+          "C",
+          "Monitor"
+        ],
+        [
+          "D",
+          "Engage"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Governance evaluates the organization and its options, directs it by setting strategy and policies, and monitors performance and conformance against them. Checking each quarter that teams follow the policy is monitoring.",
+      "incorrect": {
+        "A": "Evaluating is reviewing the organization and its needs before direction is set.",
+        "B": "Directing is setting the policy itself, which the board had already done.",
+        "D": "Engage is not one of the governance activities of evaluate, direct and monitor."
+      },
+      "pool": "daily",
+      "lesson": "itil-m3"
+    },
+    {
+      "id": "q-itil-040",
+      "certification": "ITIL",
+      "domain": "The seven guiding principles · Names of the principles",
+      "prompt": "Which of these is NOT one of the seven ITIL guiding principles?",
+      "options": [
+        [
+          "A",
+          "Keep it simple and practical"
+        ],
+        [
+          "B",
+          "Start where you are"
+        ],
+        [
+          "C",
+          "Manage by exception"
+        ],
+        [
+          "D",
+          "Think and work holistically"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "The seven guiding principles are Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate. Manage by exception is a principle from another framework.",
+      "incorrect": {
+        "A": "Keep it simple and practical is one of the seven guiding principles.",
+        "B": "Start where you are is one of the seven guiding principles.",
+        "D": "Think and work holistically is one of the seven guiding principles."
+      },
+      "pool": "daily",
+      "lesson": "itil-m4"
+    },
+    {
+      "id": "q-itil-041",
+      "certification": "ITIL",
+      "domain": "The seven guiding principles · Keep it simple and practical",
+      "prompt": "A shop's returns process has eleven steps. Two of them record the same details the till already captures and nobody uses the copies. Which guiding principle most directly supports removing those two steps?",
+      "options": [
+        [
+          "A",
+          "Keep it simple and practical"
+        ],
+        [
+          "B",
+          "Optimize and automate"
+        ],
+        [
+          "C",
+          "Start where you are"
+        ],
+        [
+          "D",
+          "Progress iteratively with feedback"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "Keep it simple and practical asks for the fewest steps needed to reach the objective. A step that adds no value, such as recording details nobody uses, should be removed.",
+      "incorrect": {
+        "B": "Optimize and automate would speed up steps; it is not the principle about removing work that adds nothing.",
+        "C": "Start where you are is about assessing the current state before changing it.",
+        "D": "Progress iteratively with feedback is about working in small steps with feedback, not about removing steps."
+      },
+      "pool": "daily",
+      "lesson": "itil-m4"
+    },
+    {
+      "id": "q-itil-042",
+      "certification": "ITIL",
+      "domain": "The seven guiding principles · Collaborate and promote visibility",
+      "prompt": "A school IT team keeps its list of planned work to itself, so teachers find out about system changes only on the day they happen. Which guiding principle is the team ignoring?",
+      "options": [
+        [
+          "A",
+          "Progress iteratively with feedback"
+        ],
+        [
+          "B",
+          "Optimize and automate"
+        ],
+        [
+          "C",
+          "Start where you are"
+        ],
+        [
+          "D",
+          "Collaborate and promote visibility"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "Collaborate and promote visibility means working with the right stakeholders and making work and its progress visible to them. Hidden plans lead to surprises and poor decisions by the people affected.",
+      "incorrect": {
+        "A": "The problem is hidden plans, not the size of the steps or a lack of feedback loops.",
+        "B": "Nothing in the stem is about automation.",
+        "C": "The team is not ignoring the current state; it is keeping its work out of sight."
+      },
+      "pool": "daily",
+      "lesson": "itil-m4"
+    },
+    {
+      "id": "q-itil-043",
+      "certification": "ITIL",
+      "domain": "The seven guiding principles · Think and work holistically",
+      "prompt": "A city office upgrades its permit website without looking at the payment system and call-centre scripts that depend on it. Payments then fail and staff give wrong answers. Which guiding principle was not applied?",
+      "options": [
+        [
+          "A",
+          "Start where you are"
+        ],
+        [
+          "B",
+          "Think and work holistically"
+        ],
+        [
+          "C",
+          "Focus on value"
+        ],
+        [
+          "D",
+          "Progress iteratively with feedback"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "Think and work holistically means no service or component stands alone. A change to one part must consider the other parts it works with, here the payment system and the call centre.",
+      "incorrect": {
+        "A": "Start where you are is about assessing what exists before changing it; the failure here is ignoring connected parts.",
+        "C": "Focus on value is broader; the specific failure is treating the website as if it stood alone.",
+        "D": "Smaller steps might have shown the problem sooner, but the root failure is not seeing the whole system."
+      },
+      "pool": "daily",
+      "lesson": "itil-m4"
+    },
+    {
+      "id": "q-itil-044",
+      "certification": "ITIL",
+      "domain": "The seven guiding principles · Using the principles together",
+      "prompt": "Which statement about applying the seven guiding principles is correct?",
+      "options": [
+        [
+          "A",
+          "They must be applied one at a time, in the order in which they are listed"
+        ],
+        [
+          "B",
+          "Each principle belongs to one practice and is used only within that practice"
+        ],
+        [
+          "C",
+          "Only Focus on value is required, and the other six principles are optional"
+        ],
+        [
+          "D",
+          "They work together, and each situation decides which ones matter most"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "The guiding principles are universal recommendations that interact with each other. An organization considers them together and uses judgment about which matter most in a given situation.",
+      "incorrect": {
+        "A": "There is no fixed order for applying the principles.",
+        "B": "The principles apply across all practices and all work, not to one practice each.",
+        "C": "All seven principles apply; none is optional."
+      },
+      "pool": "daily",
+      "lesson": "itil-m4"
+    },
+    {
+      "id": "q-itil-045",
+      "certification": "ITIL",
+      "domain": "The product and service lifecycle · Design",
+      "prompt": "A bank agrees the screens, security controls and service levels for a new savings app before any code is written. Which product and service lifecycle activity is this?",
+      "options": [
+        [
+          "A",
+          "Discover"
+        ],
+        [
+          "B",
+          "Design"
+        ],
+        [
+          "C",
+          "Build"
+        ],
+        [
+          "D",
+          "Transition"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "Design turns what was learned about needs into a description of the product or service: what it does, how it is secured and what levels of service it must meet. It comes before building.",
+      "incorrect": {
+        "A": "Discover is finding out needs and opportunities, which comes before deciding the design.",
+        "C": "Build is creating the product, and no code has been written yet.",
+        "D": "Transition moves a built product into live use."
+      },
+      "pool": "daily",
+      "lesson": "itil-m5"
+    },
+    {
+      "id": "q-itil-046",
+      "certification": "ITIL",
+      "domain": "The product and service lifecycle · Build",
+      "prompt": "A school district creates and tests a new online enrolment form and its links to the pupil records system, ready to move into live use. Which lifecycle activity is this?",
+      "options": [
+        [
+          "A",
+          "Design"
+        ],
+        [
+          "B",
+          "Acquire"
+        ],
+        [
+          "C",
+          "Build"
+        ],
+        [
+          "D",
+          "Transition"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Build is where the product or service and its components are created and tested so they are ready for transition into live use.",
+      "incorrect": {
+        "A": "Design describes what to create; here the form is being created and tested.",
+        "B": "Acquire is obtaining resources from outside, such as licences or a supplier's services.",
+        "D": "Transition comes next, when the tested form moves into live use."
+      },
+      "pool": "daily",
+      "lesson": "itil-m5"
+    },
+    {
+      "id": "q-itil-047",
+      "certification": "ITIL",
+      "domain": "The product and service lifecycle · Support",
+      "prompt": "A shop's card readers stop working in two stores. Staff restore payments with a temporary fix, and a team starts looking for the cause. Which lifecycle activity is this work part of?",
+      "options": [
+        [
+          "A",
+          "Operate"
+        ],
+        [
+          "B",
+          "Transition"
+        ],
+        [
+          "C",
+          "Support"
+        ],
+        [
+          "D",
+          "Deliver"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Support covers resolving incidents and problems for consumers, using workarounds and known errors where needed. Restoring payments and finding the cause of the failures is support work.",
+      "incorrect": {
+        "A": "Operate is keeping components running as designed, such as monitoring and routine maintenance.",
+        "B": "Transition moves new or changed products into live use.",
+        "D": "Deliver covers consumers using the service and their requests, not fixing failures."
+      },
+      "pool": "daily",
+      "lesson": "itil-m5"
+    },
+    {
+      "id": "q-itil-048",
+      "certification": "ITIL",
+      "domain": "The product and service lifecycle · Deliver",
+      "prompt": "Residents use a city's online tax portal, ask for access to new features, and rate their visit in a short survey. Which lifecycle activity covers this contact with consumers using the service?",
+      "options": [
+        [
+          "A",
+          "Operate"
+        ],
+        [
+          "B",
+          "Deliver"
+        ],
+        [
+          "C",
+          "Discover"
+        ],
+        [
+          "D",
+          "Support"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "Deliver is where the service is provided to consumers as they use it: handling their requests and collecting their feedback. The portal being used, access requests and survey ratings are delivery work.",
+      "incorrect": {
+        "A": "Operate keeps the portal's components running; it is not the contact with residents using it.",
+        "C": "Discover looks for new needs and opportunities before design starts.",
+        "D": "Support resolves incidents and problems; nothing has failed here."
+      },
+      "pool": "daily",
+      "lesson": "itil-m5"
+    },
+    {
+      "id": "q-itil-049",
+      "certification": "ITIL",
+      "domain": "The product and service lifecycle · Lifecycle activities and value streams",
+      "prompt": "Which statement about product and service lifecycle activities and value streams is correct?",
+      "options": [
+        [
+          "A",
+          "A value stream can draw on several lifecycle activities and practices to turn a type of demand into value"
+        ],
+        [
+          "B",
+          "Each value stream uses exactly one lifecycle activity, and the practices are kept outside value streams"
+        ],
+        [
+          "C",
+          "The lifecycle activities must always run in the same fixed order, whatever the value stream and its demand"
+        ],
+        [
+          "D",
+          "Value streams replace the management practices, so practices are no longer needed"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "A value stream is the series of steps an organization takes to turn a type of demand into value. It combines the lifecycle activities and practices it needs, in the order that suits that demand.",
+      "incorrect": {
+        "B": "A value stream usually involves several activities and practices.",
+        "C": "Different value streams combine the activities in different ways and orders.",
+        "D": "Value streams use practices; they do not replace them."
+      },
+      "pool": "daily",
+      "lesson": "itil-m5"
+    },
+    {
+      "id": "q-itil-050",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Practice groups",
+      "prompt": "How are the ITIL management practices organized in ITIL (Version 5)?",
+      "options": [
+        [
+          "A",
+          "In three groups: general management, service management and technical management practices"
+        ],
+        [
+          "B",
+          "In eight groups, one for each product and service lifecycle activity"
+        ],
+        [
+          "C",
+          "In four groups, one for each of the four dimensions"
+        ],
+        [
+          "D",
+          "In two groups: product and service management, and general management"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "PeopleCert states that the 34 ITIL management practices stay largely the same in Version 5 and are now organized into two groups: product and service management practices, and general management practices.",
+      "incorrect": {
+        "A": "Three groups (general, service and technical) was the ITIL 4 arrangement.",
+        "B": "Practices are not grouped by lifecycle activity.",
+        "C": "Practices are not grouped by dimension; each practice uses all four dimensions."
+      },
+      "pool": "daily",
+      "lesson": "itil-m6"
+    },
+    {
+      "id": "q-itil-051",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Service desk",
+      "prompt": "What is the purpose of the service desk practice in ITIL management practices?",
+      "options": [
+        [
+          "A",
+          "To capture demand for incident resolution and service requests, as the single point of contact for users"
+        ],
+        [
+          "B",
+          "To reduce how often incidents happen, and their impact, by finding and managing their causes and workarounds"
+        ],
+        [
+          "C",
+          "To set business-based targets for service performance and report against them"
+        ],
+        [
+          "D",
+          "To move new or changed hardware and software into the live environment"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "The service desk is the entry point and single point of contact between the provider and its users. It captures demand for incident resolution and service requests.",
+      "incorrect": {
+        "B": "Finding and managing causes of incidents is problem management.",
+        "C": "Setting and reporting service targets is service level management.",
+        "D": "Moving components into live environments is deployment management."
+      },
+      "pool": "daily",
+      "lesson": "itil-m6"
+    },
+    {
+      "id": "q-itil-052",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Monitoring and event management",
+      "prompt": "A bank's systems raise an alert when a database's disk passes 90 percent full, so staff can act before customers are affected. Which practice is at work?",
+      "options": [
+        [
+          "A",
+          "Incident management"
+        ],
+        [
+          "B",
+          "Problem management"
+        ],
+        [
+          "C",
+          "Monitoring and event management"
+        ],
+        [
+          "D",
+          "Service configuration management"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Monitoring and event management observes services and their components and records and reports changes of state, called events. A warning threshold that lets staff act before any failure is a typical event.",
+      "incorrect": {
+        "A": "No service has been interrupted yet, so there is no incident to manage.",
+        "B": "Problem management looks for causes of incidents; this is a warning from monitoring.",
+        "D": "Service configuration management keeps records of components and their relationships; it does not raise alerts."
+      },
+      "pool": "daily",
+      "lesson": "itil-m6"
+    },
+    {
+      "id": "q-itil-053",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Incident management",
+      "prompt": "What is the purpose of the incident management practice in ITIL?",
+      "options": [
+        [
+          "A",
+          "To find and remove the root cause of every incident before normal service is restored to the affected users"
+        ],
+        [
+          "B",
+          "To minimize the negative impact of incidents by restoring normal service as quickly as possible"
+        ],
+        [
+          "C",
+          "To handle pre-defined user requests for information, access and standard items"
+        ],
+        [
+          "D",
+          "To record and report every change of state of each service component"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "Incident management aims to reduce the harm incidents cause by getting normal service back as quickly as possible. Finding causes is the job of problem management and does not hold up restoring service.",
+      "incorrect": {
+        "A": "Restoring service comes first; finding causes is problem management.",
+        "C": "Handling pre-defined user requests is service request management.",
+        "D": "Recording changes of state is monitoring and event management."
+      },
+      "pool": "daily",
+      "lesson": "itil-m6"
+    },
+    {
+      "id": "q-itil-054",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Service requests",
+      "prompt": "Which statement about service requests and how they are handled is correct?",
+      "options": [
+        [
+          "A",
+          "They are unplanned interruptions that reduce the quality of a service"
+        ],
+        [
+          "B",
+          "Each one must be assessed and authorized by a change authority before anyone is allowed to fulfil it"
+        ],
+        [
+          "C",
+          "They are raised by the provider when it plans work on a service"
+        ],
+        [
+          "D",
+          "They are a normal, agreed part of the service, so they can follow set steps"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "A service request is a request from a user, or someone acting for them, that starts an agreed action and is a normal part of service delivery. Because the requests are pre-defined, their fulfilment can follow a known procedure.",
+      "incorrect": {
+        "A": "An unplanned interruption or reduction in quality is an incident.",
+        "B": "Service requests are pre-agreed and do not need change authority assessment each time.",
+        "C": "Service requests come from users, not from the provider planning its own work."
+      },
+      "pool": "daily",
+      "lesson": "itil-m6"
+    },
+    {
+      "id": "q-itil-055",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Normal change",
+      "prompt": "A city office plans to move its payroll system to a new hosting provider. It has never made a change like this before. How should the change be handled?",
+      "options": [
+        [
+          "A",
+          "As a standard change, because moving a system to a new host is a routine task"
+        ],
+        [
+          "B",
+          "As a normal change, assessed and authorized by the right change authority"
+        ],
+        [
+          "C",
+          "As an emergency change, so that it can start before the next payroll run"
+        ],
+        [
+          "D",
+          "Without change control, because the work is done by the new hosting provider"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "A normal change is one that must be scheduled, assessed and authorized by a change authority before it goes ahead. A first-time move of a payroll system carries risk and has no tested procedure, so it is a normal change.",
+      "incorrect": {
+        "A": "Standard changes are low risk, well understood and pre-authorized; this one is new.",
+        "C": "Nothing in the stem calls for immediate action, so it is not an emergency change.",
+        "D": "Work by a supplier on a live service still goes through change control."
+      },
+      "pool": "daily",
+      "lesson": "itil-m7"
+    },
+    {
+      "id": "q-itil-056",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Deployment and release",
+      "prompt": "A shop's IT team installs new till software on every store computer over the weekend, but the new features stay switched off until Monday's launch. Which practice covers installing the software?",
+      "options": [
+        [
+          "A",
+          "Deployment management"
+        ],
+        [
+          "B",
+          "Release management"
+        ],
+        [
+          "C",
+          "Change enablement"
+        ],
+        [
+          "D",
+          "Service configuration management"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "Deployment management moves new or changed hardware, software and other components into live environments. Release management makes new features available for use, which here happens on Monday when they are switched on.",
+      "incorrect": {
+        "B": "Release management covers making the features available, which happens later.",
+        "C": "Change enablement assesses and authorizes the change; it does not install the software.",
+        "D": "Service configuration management keeps records of components; it does not move them."
+      },
+      "pool": "daily",
+      "lesson": "itil-m7"
+    },
+    {
+      "id": "q-itil-057",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Service configuration management",
+      "prompt": "Before approving a change to a bank's payment server, the change authority wants to know which services depend on that server. Which practice provides this information?",
+      "options": [
+        [
+          "A",
+          "IT asset management"
+        ],
+        [
+          "B",
+          "Relationship management"
+        ],
+        [
+          "C",
+          "Monitoring and event management"
+        ],
+        [
+          "D",
+          "Service configuration management"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "Service configuration management makes accurate and reliable information about services, configuration items and how they relate to each other available when and where it is needed, such as during a change assessment.",
+      "incorrect": {
+        "A": "IT asset management tracks the value, cost and life of assets, not service dependencies.",
+        "B": "Relationship management builds links with stakeholders; it does not hold component records.",
+        "C": "Monitoring and event management watches the state of components, not how they relate to services."
+      },
+      "pool": "daily",
+      "lesson": "itil-m7"
+    },
+    {
+      "id": "q-itil-058",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · IT asset management",
+      "prompt": "A school district wants to know how many laptops it owns, when each was bought, what its licences cost and when each laptop should be replaced. Which practice covers this?",
+      "options": [
+        [
+          "A",
+          "IT asset management"
+        ],
+        [
+          "B",
+          "Service configuration management"
+        ],
+        [
+          "C",
+          "Supplier management"
+        ],
+        [
+          "D",
+          "Deployment management"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "IT asset management plans and manages the full lifecycle of IT assets, so the organization knows what it owns, what it costs and when to replace it.",
+      "incorrect": {
+        "B": "Service configuration management records how components support services, not their purchase and replacement.",
+        "C": "Supplier management looks after the organization's suppliers, not its own assets.",
+        "D": "Deployment management moves components into live environments."
+      },
+      "pool": "daily",
+      "lesson": "itil-m7"
+    },
+    {
+      "id": "q-itil-059",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Relationship management",
+      "prompt": "A city office's IT team meets each department head every quarter to understand their plans and agree which IT work matters most to them. Which practice is this?",
+      "options": [
+        [
+          "A",
+          "Supplier management"
+        ],
+        [
+          "B",
+          "Service desk"
+        ],
+        [
+          "C",
+          "Relationship management"
+        ],
+        [
+          "D",
+          "Service level management"
+        ]
+      ],
+      "correct": "C",
+      "explanation": "Relationship management builds and keeps the links between the organization and its stakeholders at a strategic and tactical level, such as understanding their plans and agreeing priorities.",
+      "incorrect": {
+        "A": "Supplier management deals with outside suppliers, not internal department heads.",
+        "B": "The service desk handles user contacts about incidents and requests.",
+        "D": "Service level management sets and reviews service targets, not wider plans and priorities."
+      },
+      "pool": "daily",
+      "lesson": "itil-m7"
+    },
+    {
+      "id": "q-itil-060",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Continual improvement model",
+      "prompt": "A school wants to cut how long new teachers wait for laptops. It has agreed its vision and now measures how long the wait is today, from records. Which question of the continual improvement model is it answering?",
+      "options": [
+        [
+          "A",
+          "How do we get there?"
+        ],
+        [
+          "B",
+          "Did we get there?"
+        ],
+        [
+          "C",
+          "Where do we want to be?"
+        ],
+        [
+          "D",
+          "Where are we now?"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "In the continual improvement model, after the vision comes \"Where are we now?\": an honest, measured view of the current state. It gives the baseline that later steps, including \"Did we get there?\", are compared with.",
+      "incorrect": {
+        "A": "\"How do we get there?\" plans the improvement, after the target is set.",
+        "B": "\"Did we get there?\" checks results after action is taken.",
+        "C": "\"Where do we want to be?\" sets the target, which comes after measuring the current state."
+      },
+      "pool": "daily",
+      "lesson": "itil-m8"
+    },
+    {
+      "id": "q-itil-061",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Who improves",
+      "prompt": "Which statement about continual improvement in ITIL is correct?",
+      "options": [
+        [
+          "A",
+          "It applies at every level of the organization and is part of the ITIL Value System"
+        ],
+        [
+          "B",
+          "It starts only after a service has failed and the major incident that followed has been reviewed and closed"
+        ],
+        [
+          "C",
+          "It belongs to one improvement team, which makes all the changes for everyone else"
+        ],
+        [
+          "D",
+          "It is a one-time project carried out when a new service goes live"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "Continual improvement is one of the five components of the ITIL Value System. It takes place in all areas of the organization and at every level, from strategy to daily work.",
+      "incorrect": {
+        "B": "Improvement is ongoing; it does not wait for failures.",
+        "C": "An organization may have people who lead it, but everyone contributes to improvement.",
+        "D": "Continual means ongoing, not a single project at go-live."
+      },
+      "pool": "daily",
+      "lesson": "itil-m8"
+    },
+    {
+      "id": "q-itil-062",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Value stream mapping",
+      "prompt": "A bank maps the value stream for opening a business account, from the request to the first deposit. What is the main benefit of the map?",
+      "options": [
+        [
+          "A",
+          "It lists every IT asset the bank uses, for the yearly audit"
+        ],
+        [
+          "B",
+          "It shows where the work waits or repeats, so the flow can be improved"
+        ],
+        [
+          "C",
+          "It removes the need to agree service levels and targets with the bank's business customers"
+        ],
+        [
+          "D",
+          "It shows which team should be held responsible for each delay that customers report"
+        ]
+      ],
+      "correct": "B",
+      "explanation": "Mapping a value stream shows each step from demand to value, how long work spends in it and how long it waits between steps. That shows where to improve the flow for the consumer.",
+      "incorrect": {
+        "A": "A value stream map shows the flow of work, not a list of assets.",
+        "C": "Service levels are still needed; the map does not replace them.",
+        "D": "The aim is to improve the flow, not to assign blame."
+      },
+      "pool": "daily",
+      "lesson": "itil-m8"
+    },
+    {
+      "id": "q-itil-063",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Measuring flow",
+      "prompt": "A city office measures the total time from a resident submitting a permit request to the permit being issued. What is this measure called?",
+      "options": [
+        [
+          "A",
+          "Lead time"
+        ],
+        [
+          "B",
+          "Throughput"
+        ],
+        [
+          "C",
+          "Work in progress"
+        ],
+        [
+          "D",
+          "Availability"
+        ]
+      ],
+      "correct": "A",
+      "explanation": "Lead time is the total time from the moment demand arrives to the moment it is met, including waiting time. It is a common measure of how well work flows through a value stream.",
+      "incorrect": {
+        "B": "Throughput is how many items are completed in a period, not how long one item takes.",
+        "C": "Work in progress is how many items are started but not finished at one time.",
+        "D": "Availability is a warranty measure of whether a service can be used when needed."
+      },
+      "pool": "daily",
+      "lesson": "itil-m8"
+    },
+    {
+      "id": "q-itil-064",
+      "certification": "ITIL",
+      "domain": "Practices, improvement and value streams · Value stream management",
+      "prompt": "A shop has mapped the value stream for online orders, from checkout to delivery. What does managing this value stream involve from now on?",
+      "options": [
+        [
+          "A",
+          "Filing the map once the workshop is over, until the next yearly review"
+        ],
+        [
+          "B",
+          "Giving each team its own speed target, whatever the effect on the whole stream"
+        ],
+        [
+          "C",
+          "Automating every step on the map at once, before any of them are simplified"
+        ],
+        [
+          "D",
+          "Measuring its flow over time and improving the steps that hold work up"
+        ]
+      ],
+      "correct": "D",
+      "explanation": "Managing a value stream means watching how work flows through it end to end, using measures such as lead time and waiting time, and improving the steps that slow it down.",
+      "incorrect": {
+        "A": "A map that is filed away does not improve the flow.",
+        "B": "Local targets can make one team faster while the whole stream gets slower.",
+        "C": "Optimize and automate advises simplifying before automating."
+      },
+      "pool": "daily",
+      "lesson": "itil-m8"
+    }
+  ]
+}
