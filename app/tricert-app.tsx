@@ -2,10 +2,8 @@
 
 import { FormEvent, ReactNode, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  coverageRows,
   flashcards,
   labCards,
-  officialSources,
   portfolioChecklist,
   projects,
   questionsForDeliverable,
@@ -17,6 +15,27 @@ import {
   type StudyTask,
 } from '@/lib/tricert-content';
 import { examQuestions, extraFlashcards, glossary, guideIndex, lessonIndex, type DocGuide, type Lesson } from '@/lib/tricert-library';
+import { examBlocks, type BlockKey, type ExamBlock, type Morning, type WeekendBlock } from '@/lib/tricert-plan';
+import {
+  addDays,
+  answerCard,
+  areaOf,
+  cardQueue,
+  daysBetween,
+  estimateDates,
+  isCardRetired,
+  isQuestionRetired,
+  isStudyDate,
+  recordQuestionAnswer,
+  startCard,
+  weekday,
+  type CardGrade,
+  type CardQueueItem,
+  type DailyMode,
+  type QuestionResult,
+  type SrsRecord,
+} from '@/lib/tricert-study';
+import { allCards, makeUserCard, questionById, todaysCards, todaysQuestions, type BankCard, type UserCard } from '@/lib/tricert-bank';
 
 /* The long reading (65 lessons and 66 finished documents) loads on demand so
    the app opens fast. It starts loading as soon as the app mounts. */
@@ -64,26 +83,55 @@ type Profile = {
   display_name?: string;
   motivation?: string;
 };
-type ProgressRow = { item_key: string; status: string };
-type AttemptRow = { question_id: string; certification: string; domain: string; answer: string; correct: number; confidence: string; created_at: string };
+type ProgressRow = { item_key: string; status: string; updated_at?: string };
+type AttemptRow = { question_id: string; certification: string; domain: string; answer: string; correct: number; confidence: string; created_at: string; first_at?: string; tries?: number };
 type ArtifactRow = { artifact_key: string; status: string; evidence_text: string; reflection: string; updated_at?: string };
-type StudyState = { profile: Profile | null; progress: ProgressRow[]; attempts: AttemptRow[]; artifacts: ArtifactRow[] };
+/* One line per morning, short morning or weekend block (the log record). */
+type LogRow = { id: string; key: string; kind: string; block?: string; date: string; minutes: number; cards: number; questions: number; right: number };
+/* A practice exam result (the mocks record). Part 2 writes these. */
+type MockRow = { id: string; exam?: string; form: string; date: string; total?: number; right?: number; areas?: unknown[]; weekend?: string };
+type Records = { plan: { startDate?: string }; srs: SrsRecord; mocks: MockRow[]; log: LogRow[]; usercards: UserCard[] };
+type StudyState = { profile: Profile | null; progress: ProgressRow[]; attempts: AttemptRow[]; artifacts: ArtifactRow[]; records: Records };
 type View = 'today' | 'plan' | 'learn' | 'projects' | 'practice' | 'progress';
 type LearnTab = 'exams' | 'lessons' | 'documents' | 'glossary';
 type PracticeScreen = 'hub' | 'run' | 'flashcards' | 'labs' | 'review';
 type Notice = { text: string; kind: 'success' | 'error' } | null;
-type Timer = { key: string; startedAt: number; pausedAt: number | null; pausedTotal: number };
 type Theme = 'system' | 'light' | 'dark';
 type Accent = 'beacon' | 'rose' | 'canola' | 'glacier';
-type UiPrefs = { v?: number; project?: string; artifact?: string; timer?: Timer | null; rubric?: Record<string, number[]>; theme?: Theme; accent?: Accent };
-type Lab = (typeof labCards)[number];
-type WorkLink = { kind: 'artifact'; item: Deliverable } | { kind: 'lab'; lab: Lab } | { kind: 'practice' };
+type UiPrefs = { v?: number; project?: string; artifact?: string; rubric?: Record<string, number[]>; theme?: Theme; accent?: Accent };
 type ScoreParts = { coverage: number; evidence: number; judgment: number; recall: number; total: number };
 type Run = { kind: 'scenarios' | 'timed' | 'artifact'; title: string; questions: ScenarioQuestion[]; index: number; answered: number; correct: number };
-type Celebration = { task: StudyTask; week: number; minutes: number; weekDone: number };
+
+/* A morning in progress. It lives in this browser (see morningKey) so a
+   reload or a closed tab returns to the same part. Every answer is saved to
+   the server as it is given; the run only keeps his place and his writing. */
+type MorningMode = 'learn' | 'review' | 'repair' | 'short';
+type PartKey = 'cards' | 'learn' | 'questions' | 'mistakes' | 'reflect';
+type LearnStage = 'brief' | 'lesson' | 'build' | 'recall';
+type MorningAnswer = { choice: string; sure: boolean; correct: boolean; result: QuestionResult; seconds: number };
+type MorningRun = {
+  v: 1;
+  key: string; // the morning key, or short-<date>
+  morning: string | null; // the morning it completes; null for a short morning
+  mode: MorningMode;
+  block: BlockKey;
+  exam: Certification;
+  date: string;
+  part: number;
+  open: boolean;
+  spentMs: number;
+  cards: { queue: CardQueueItem[]; shown: boolean; reviewed: number; again: number };
+  learn: { stage: LearnStage; build: string; model: boolean; recall: boolean[] };
+  questions: { ids: string[]; index: number; answers: Record<string, MorningAnswer> };
+  mistakes: Record<string, string>;
+  savedCards: string[];
+  reflection: string;
+};
+type Finished = { title: string; detail: string; kind: string; minutes: number; cards?: number; questions?: number; right?: number };
 
 /* ==========================================================================
-   Programme structure: three projects, each ending at an exam gate.
+   Programme structure. The version 7 Kestrel sessions stay as the library
+   and still feed Progress until part 2 replaces it.
    ========================================================================== */
 
 const allTasks = studyWeeks.flatMap((week) => week.tasks);
@@ -99,8 +147,6 @@ const phases = [
   { project: 'r2', code: 'R2', from: sessionIndex(6, 5), to: sessionIndex(10, 3), gate: { at: sessionIndex(10, 3), label: 'PMP', certs: ['PMP'] as Certification[] } },
   { project: 'r3', code: 'R3', from: sessionIndex(10, 4), to: allTasks.length - 1, gate: { at: sessionIndex(13, 4), label: 'CISSP', certs: ['CISSP'] as Certification[] } },
 ];
-const gateAt = new Map(phases.map((phase) => [phase.gate.at, phase.gate]));
-const phaseFor = (index: number) => phases.find((phase) => index >= phase.from && index <= phase.to) || phases[0];
 const docNumber = (projectKey: string, index: number) => `${phases.find((phase) => phase.project === projectKey)?.code || 'NS'}-${String(index + 1).padStart(2, '0')}`;
 
 /* The four exams. They are named with plain text tags, never colours: the
@@ -124,8 +170,7 @@ const accents: Array<[Accent, string, string]> = [
   ['glacier', 'Glacier', '#3fd0db'],
 ];
 
-/* Five places. Project documents live in Learn, next to the lessons that
-   teach them. */
+/* Five places. Project documents live in Learn, next to the lessons. */
 const navItems: Array<[View, string]> = [
   ['today', 'Today'],
   ['plan', 'Plan'],
@@ -133,15 +178,6 @@ const navItems: Array<[View, string]> = [
   ['practice', 'Practice'],
   ['progress', 'Progress'],
 ];
-
-const cyberDomains = ['Security & risk', 'Asset security', 'Architecture', 'Network security', 'Identity & access', 'Assessment & testing', 'Security operations', 'Software security'];
-
-const certificationGuide = [
-  ['PMP', 'Plan and lead the work', 'People, timelines, risks, decisions, and business value.'],
-  ['PL-300', 'Turn data into decisions', 'Clean data, build a reliable model, and explain insights in Power BI.'],
-  ['CISSP', 'Protect the organization', 'Understand risk, secure access and systems, and prepare for incidents.'],
-  ['ITIL', 'Run and improve services', 'Create useful services, support users, measure outcomes, and keep improving.'],
-] as const;
 
 const conceptGlossary: Record<string, string> = {
   'Value delivery': 'Making sure the work produces a useful, measurable business result, not just a finished task.',
@@ -163,7 +199,19 @@ const conceptGlossary: Record<string, string> = {
 
 const disclosure = 'Kestrel Health Network and Project Beacon are fictional. Every patient visit, account, incident and figure in this case study is synthetic and created for learning.';
 const uiPrefsKey = 'tricert.ui.v3';
-const emptyState: StudyState = { profile: null, progress: [], attempts: [], artifacts: [] };
+const morningKey = 'tricert.morning.v1';
+const draftPrefix = 'tricert.draft.';
+const emptyRecords = (): Records => ({ plan: {}, srs: { cards: {}, questions: {} }, mocks: [], log: [], usercards: [] });
+const emptyState: StudyState = { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() };
+
+/* The parts of each kind of morning, with the minutes planned for each. */
+const morningParts: Record<MorningMode, Array<[PartKey, string, number]>> = {
+  learn: [['cards', 'Cards', 10], ['learn', 'Learn', 35], ['questions', 'Questions', 30], ['mistakes', 'Mistakes', 15]],
+  review: [['cards', 'Cards', 10], ['questions', 'Quiz', 40], ['mistakes', 'Mistakes', 20], ['reflect', 'Reflection', 20]],
+  repair: [['cards', 'Cards', 10], ['questions', 'Questions', 60], ['mistakes', 'Mistakes', 20]],
+  short: [['cards', 'Cards', 8], ['questions', 'Questions', 25], ['mistakes', 'Mistakes', 10]],
+};
+const MAX_CARDS = 40;
 
 /* ==========================================================================
    App
@@ -175,14 +223,12 @@ export default function TriCertApp() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [view, setView] = useState<View>('today');
-  const [selectedWeek, setSelectedWeek] = useState(1);
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [expandedWeek, setExpandedWeek] = useState(0);
   const [selectedProject, setSelectedProject] = useState(projects[0].key);
   const [selectedArtifact, setSelectedArtifact] = useState(projects[0].deliverables[0].key);
   const [docOpen, setDocOpen] = useState(false);
   const [artifactText, setArtifactText] = useState('');
   const [artifactReflection, setArtifactReflection] = useState('');
+  const [restoredNote, setRestoredNote] = useState('');
   const [rubricChecks, setRubricChecks] = useState<Record<string, number[]>>({});
   const [practiceScreen, setPracticeScreen] = useState<PracticeScreen>('hub');
   const [run, setRun] = useState<Run | null>(null);
@@ -192,19 +238,16 @@ export default function TriCertApp() {
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashRevealed, setFlashRevealed] = useState(false);
   const [progressTab, setProgressTab] = useState<'readiness' | 'portfolio'>('readiness');
-  /* Reflection writing is held per week, so leaving a week (to read one of
-     its lessons, or to open another week) never throws away unsaved text. */
-  const [retroDrafts, setRetroDrafts] = useState<Record<number, string>>({});
-  const [reflectionOpen, setReflectionOpen] = useState(false);
   const [itilLevelDraft, setItilLevelDraft] = useState('beginner');
   const [itilTargetDraft, setItilTargetDraft] = useState('');
-  const [timer, setTimer] = useState<Timer | null>(null);
-  const [focusOpen, setFocusOpen] = useState(false);
-  const [celebration, setCelebration] = useState<Celebration | null>(null);
-  const [now, setNow] = useState(nowMs);
+  const [morning, setMorning] = useState<MorningRun | null>(null);
+  const [morningOpen, setMorningOpen] = useState(false);
+  const [morningRestored, setMorningRestored] = useState(false);
+  const [weekendOpen, setWeekendOpen] = useState<string | null>(null);
+  const [finished, setFinished] = useState<Finished | null>(null);
   const [today] = useState(todayIso);
-  const [learnTab, setLearnTab] = useState<LearnTab>('documents');
-  const [lessonFrom, setLessonFrom] = useState<LessonFrom>('today');
+  const [learnTab, setLearnTab] = useState<LearnTab>('lessons');
+  const [lessonFrom, setLessonFrom] = useState<LessonFrom>('learn');
   const [learnItem, setLearnItem] = useState<string | null>(null);
   const [flashCert, setFlashCert] = useState<Certification | 'All'>('All');
   const [theme, setTheme] = useState<Theme>(() => (typeof window === 'undefined' ? 'dark' : savedTheme(readPrefs())));
@@ -214,6 +257,10 @@ export default function TriCertApp() {
   /* Browser Back and Forward move between a lesson and the screen it came
      from. The popstate listener is set once, so it reads this ref. */
   const lessonNav = useRef<{ open: boolean; leave: () => void; show: (key: string, from: LessonFrom) => void }>({ open: false, leave: () => {}, show: () => {} });
+  /* When the open morning was last brought to the front, for its minutes. */
+  const openedAt = useRef<number | null>(null);
+  const weekendStarted = useRef<number>(0);
+  const morningRef = useRef<MorningRun | null>(null);
 
   useEffect(() => {
     // Colour and appearance are interface preferences: this device only.
@@ -231,25 +278,29 @@ export default function TriCertApp() {
 
     fetch('/api/state')
       .then(async (response) => {
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Unable to load your study plan.');
+        const raw = await response.json();
+        if (!response.ok) throw new Error(raw.error || 'Unable to load your study plan.');
+        const data = normalizeState(raw);
         if (route) { setView(route.view); if (route.tab) setProgressTab(route.tab); if (route.learnTab) setLearnTab(route.learnTab); }
         // A reload on a lesson's history entry opens that lesson again.
         const entry = lessonEntry();
         if (entry && window.location.hash === `#${entry.from}`) { setLessonFrom(entry.from); setLearnTab('lessons'); setLearnItem(entry.lesson); setView('learn'); }
         setSelectedProject(restoredProject.key);
         setSelectedArtifact(restoredArtifact.key);
-        if (prefs.timer && allTasks.some((task) => task.key === prefs.timer?.key)) setTimer(prefs.timer);
         if (prefs.rubric) setRubricChecks(prefs.rubric);
         setState(data);
         setItilLevelDraft(data.profile?.itil_level || 'beginner');
         setItilTargetDraft(data.profile?.itil_target || '');
-        const saved = data.artifacts?.find((row: ArtifactRow) => row.artifact_key === restoredArtifact.key);
+        const saved = data.artifacts.find((row) => row.artifact_key === restoredArtifact.key);
         setArtifactText(saved?.evidence_text || restoredArtifact.template);
         setArtifactReflection(saved?.reflection || '');
-        const week = deriveCurrentWeek(data.progress || []);
-        setSelectedWeek(week);
-        setExpandedWeek(week);
+        // A morning left open comes back on the same part.
+        const kept = data.profile ? readMorning() : null;
+        if (kept) {
+          setMorning(kept);
+          setMorningRestored(true);
+          if (kept.open) { openedAt.current = Date.now(); setMorningOpen(true); }
+        }
       })
       .catch((error) => setNotice({ text: error.message, kind: 'error' }))
       .finally(() => setLoading(false));
@@ -266,7 +317,7 @@ export default function TriCertApp() {
       setView(next.view);
       if (next.tab) setProgressTab(next.tab);
       if (next.learnTab) { setLearnTab(next.learnTab); setLearnItem(null); }
-      else if (next.view === 'learn') { setLearnItem(null); setLearnTab((tab) => (tab === 'lessons' ? 'documents' : tab)); }
+      else if (next.view === 'learn') setLearnItem(null);
     };
     window.addEventListener('popstate', onPopState);
     window.addEventListener('hashchange', onHashChange);
@@ -275,11 +326,21 @@ export default function TriCertApp() {
 
   useEffect(() => {
     lessonNav.current = { open: view === 'learn' && learnTab === 'lessons' && Boolean(learnItem), leave: leaveLesson, show: showLesson };
+    morningRef.current = morning;
   });
 
+  /* The morning's place and writing are kept in this browser every two
+     seconds, and when the page is hidden or closed. */
   useEffect(() => {
-    if (!loading) writePrefs({ v: prefsVersion, project: selectedProject, artifact: selectedArtifact, timer, rubric: rubricChecks, theme, accent });
-  }, [loading, selectedProject, selectedArtifact, timer, rubricChecks, theme, accent]);
+    const flush = () => { const current = morningRef.current; if (current) writeMorning(withSpent(current, openedAt.current)); };
+    const handle = window.setInterval(flush, 2000);
+    window.addEventListener('pagehide', flush);
+    return () => { window.clearInterval(handle); window.removeEventListener('pagehide', flush); };
+  }, []);
+
+  useEffect(() => {
+    if (!loading) writePrefs({ v: prefsVersion, project: selectedProject, artifact: selectedArtifact, rubric: rubricChecks, theme, accent });
+  }, [loading, selectedProject, selectedArtifact, rubricChecks, theme, accent]);
 
   useEffect(() => {
     if (!notice || notice.kind !== 'success') return;
@@ -288,25 +349,18 @@ export default function TriCertApp() {
   }, [notice]);
 
   useEffect(() => {
-    if (!timer || timer.pausedAt) return;
-    const handle = window.setInterval(() => setNow(nowMs()), 1000);
-    return () => window.clearInterval(handle);
-  }, [timer]);
-
-  useEffect(() => {
     if (run?.kind !== 'timed' || mockSeconds <= 0) return;
     const handle = window.setInterval(() => setMockSeconds((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearInterval(handle);
   }, [run?.kind, mockSeconds]);
 
   useEffect(() => {
-    const locked = focusOpen || Boolean(celebration) || settingsOpen;
+    const locked = morningOpen || Boolean(weekendOpen) || Boolean(finished) || settingsOpen;
     document.documentElement.style.overflow = locked ? 'hidden' : '';
     return () => { document.documentElement.style.overflow = ''; };
-  }, [focusOpen, celebration, settingsOpen]);
+  }, [morningOpen, weekendOpen, finished, settingsOpen]);
 
   const completed = useMemo(() => new Set(state.progress.filter((row) => row.status === 'complete').map((row) => row.item_key)), [state.progress]);
-  const currentWeek = useMemo(() => deriveCurrentWeek(state.progress), [state.progress]);
   const currentIndex = useMemo(() => {
     const index = allTasks.findIndex((task) => !completed.has(task.key));
     return index === -1 ? allTasks.length - 1 : index;
@@ -334,37 +388,44 @@ export default function TriCertApp() {
     return { PMP: parts('PMP'), 'PL-300': parts('PL-300'), CISSP: parts('CISSP'), ITIL: parts('ITIL') } as Record<Certification, ScoreParts>;
   }, [completed, latestAttempts, state.artifacts]);
 
-  const weekData = studyWeeks[selectedWeek - 1];
-  const firstOpenDay = weekData.tasks.findIndex((task) => !completed.has(task.key));
-  const activeDay = selectedDay ?? (firstOpenDay === -1 ? weekData.tasks.length - 1 : firstOpenDay);
-  const activeTask = weekData.tasks[activeDay];
-  const activeIndex = sessionIndex(selectedWeek, activeDay + 1);
+  const records = state.records;
+  const srs = records.srs;
+  const block = currentBlock(completed);
+  const estimates = useMemo(() => {
+    const start = records.plan.startDate && isStudyDate(records.plan.startDate) ? records.plan.startDate : today;
+    return new Map(estimateDates({ blocks: examBlocks, startDate: start, done: completed, today }).map((item) => [item.key, item.date]));
+  }, [records.plan.startDate, completed, today]);
+  const dueCards = Object.values(srs.cards).filter((card) => !isCardRetired(card) && card.due <= today).length;
+  const dueQuestions = Object.values(srs.questions).filter((question) => !isQuestionRetired(question) && question.due <= today).length;
+  const reviewsDue = dueCards + dueQuestions;
+
   const project = projects.find((item) => item.key === selectedProject) || projects[0];
   const deliverable = project.deliverables.find((item) => item.key === selectedArtifact) || project.deliverables[0];
   const deliverableIndex = project.deliverables.findIndex((item) => item.key === deliverable.key);
   const artifactStatus = (key: string) => state.artifacts.find((row) => row.artifact_key === key)?.status;
   const deliverableStatus = artifactStatus(deliverable.key);
+  const savedDeliverable = state.artifacts.find((row) => row.artifact_key === deliverable.key);
   const projectDone = (key: string) => (projects.find((item) => item.key === key)?.deliverables || []).filter((item) => artifactStatus(item.key) === 'complete').length;
   const wrongAnswers = latestAttempts.filter((attempt) => !attempt.correct);
   const reviewQueue = latestAttempts.filter((attempt) => !attempt.correct || attempt.confidence === 'low');
-  const retroSaved = (week: number) => state.artifacts.some((row) => row.artifact_key === `retrospective-w${week}`);
-  const retroStored = (week: number) => state.artifacts.find((row) => row.artifact_key === `retrospective-w${week}`)?.evidence_text || retroTemplate;
-  const retroText = (week: number) => retroDrafts[week] ?? retroStored(week);
-  const retroUnsaved = (week: number) => week in retroDrafts && retroDrafts[week] !== retroStored(week);
   const draftArtifacts = state.artifacts
     .filter((row) => row.status === 'draft')
     .map((row) => allDeliverables.find((item) => item.key === row.artifact_key))
     .filter((item): item is Deliverable => Boolean(item));
-  const timerTask = timer ? allTasks.find((task) => task.key === timer.key) : undefined;
-  const timerIndex = timerTask ? allTasks.indexOf(timerTask) : -1;
-  const elapsedSeconds = timer ? Math.max(0, ((timer.pausedAt ?? now) - timer.startedAt - timer.pausedTotal) / 1000) : 0;
+
+  /* Writing in a document is kept in this browser every two seconds until it is saved. */
+  useDraftSaver(
+    view === 'projects' && docOpen ? `doc:${deliverable.key}` : null,
+    { work: artifactText, explain: artifactReflection },
+    { work: savedDeliverable?.evidence_text || deliverable.template, explain: savedDeliverable?.reflection || '' },
+  );
 
   function say(text: string) { setNotice({ text, kind: 'success' }); }
 
   function go(next: View) {
     if (next === 'projects') { openDocuments(); return; }
     // The Learn tab always opens the Learn index, on the section last used.
-    if (next === 'learn') { setLearnItem(null); if (learnTab === 'lessons') setLearnTab('documents'); }
+    if (next === 'learn') setLearnItem(null);
     setView(next);
     if (next === 'practice' && practiceScreen !== 'run') setPracticeScreen('hub');
     const hash = next === 'progress' && progressTab === 'portfolio' ? 'portfolio' : next;
@@ -378,7 +439,6 @@ export default function TriCertApp() {
   }
 
   function openLearn(tab: LearnTab, item: string | null = null) {
-    setFocusOpen(false);
     setLearnTab(tab);
     setLearnItem(item);
     setView('learn');
@@ -386,9 +446,8 @@ export default function TriCertApp() {
     window.scrollTo({ top: 0, behavior: scrollBehavior() });
   }
 
-  /* A lesson belongs to its session, so it opens from Plan or Today and
-     its back button returns there. Each lesson gets its own history entry
-     on that address, so browser Back returns there too. */
+  /* Each lesson gets its own history entry on the address of the screen it
+     came from, so browser Back returns there. */
   function openLesson(key: string, from: LessonFrom) {
     showLesson(key, from);
     window.history.pushState({ lesson: key, from } satisfies LessonEntry, '', `#${from}`);
@@ -396,7 +455,6 @@ export default function TriCertApp() {
   }
 
   function showLesson(key: string, from: LessonFrom) {
-    setFocusOpen(false);
     setLessonFrom(from);
     setLearnTab('lessons');
     setLearnItem(key);
@@ -409,66 +467,62 @@ export default function TriCertApp() {
   }
 
   function leaveLesson() {
-    const key = learnItem;
     setLearnItem(null);
-    setLearnTab('documents');
-    if (lessonFrom === 'plan' && key) {
-      const index = allTasks.findIndex((task) => task.key === key);
-      const week = Math.floor(Math.max(0, index) / 5) + 1;
-      expandWeek(week);
-      setView('plan');
-      window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: 'auto', block: 'start' }), 30);
-      return;
-    }
-    setView('today');
+    setLearnTab('lessons');
+    setView(lessonFrom === 'plan' ? 'plan' : lessonFrom === 'today' ? 'today' : 'learn');
     window.scrollTo({ top: 0 });
   }
 
-  async function update(body: Record<string, unknown>) {
+  async function update(body: Record<string, unknown>): Promise<StudyState | null> {
     setSaving(true);
     setNotice(null);
     try {
       const response = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to save your work.');
-      setState(data);
-      return true;
+      const next = normalizeState(data);
+      setState(next);
+      return next;
     } catch (error) {
       setNotice({ text: error instanceof Error ? error.message : 'Unable to save your work.', kind: 'error' });
-      return false;
+      return null;
     } finally {
       setSaving(false);
     }
   }
 
+  /* Setup asks three short steps. Fields it no longer asks keep their defaults. */
   async function submitProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const selectedDomains = cyberDomains.filter((domain) => form.getAll('cyberDomains').includes(domain));
+    const trainingDone = form.get('pmTrainingComplete') === 'yes';
+    const startDate = String(form.get('startDate') || '');
     const created = await update({
       action: 'save-profile',
       displayName: form.get('displayName'),
       motivation: form.get('motivation'),
       education: form.get('education'),
-      projectsLed: form.get('projectsLed'),
+      projectsLed: '',
       pmMonths: form.get('pmMonths'),
-      pmTrainingHours: form.get('pmTrainingHours'),
-      pmTrainingComplete: form.get('pmTrainingComplete') === 'yes',
+      pmTrainingHours: trainingDone ? 35 : 0,
+      pmTrainingComplete: trainingDone,
       cyberMonths: form.get('cyberMonths'),
-      cyberDomains: selectedDomains,
-      powerBiLevel: form.get('powerBiLevel'),
-      powerQueryLevel: form.get('powerQueryLevel'),
-      daxLevel: form.get('daxLevel'),
-      sqlLevel: form.get('sqlLevel'),
-      itilLevel: form.get('itilLevel'),
-      weeklyHours: form.get('weeklyHours'),
-      pmpTarget: form.get('pmpTarget'),
-      pl300Target: form.get('pl300Target'),
-      cisspTarget: form.get('cisspTarget'),
-      itilTarget: form.get('itilTarget'),
+      cyberDomains: [],
+      powerBiLevel: 'beginner',
+      powerQueryLevel: 'beginner',
+      daxLevel: 'beginner',
+      sqlLevel: 'beginner',
+      itilLevel: 'beginner',
+      weeklyHours: 11,
+      pmpTarget: '',
+      pl300Target: '',
+      cisspTarget: '',
+      itilTarget: '',
     });
+    if (!created) return;
+    if (isStudyDate(startDate)) await update({ action: 'patch-record', key: 'plan', patch: { startDate } });
     // The setup form is long on a phone: open the new plan at the top.
-    if (created) window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }
 
   async function savePersonal(name: string, why: string) {
@@ -480,34 +534,167 @@ export default function TriCertApp() {
     return update({ action: 'set-progress', itemKey: key, status: completed.has(key) ? 'not_started' : 'complete' });
   }
 
-  function startSession(task: StudyTask) {
-    if (timer?.key === task.key) { setFocusOpen(true); return; }
-    const startedAt = nowMs();
-    setNow(startedAt);
-    setTimer({ key: task.key, startedAt, pausedAt: null, pausedTotal: 0 });
-    setFocusOpen(true);
+  /* ---------------------------------------------------------- mornings */
+
+  function changeMorning(change: (current: MorningRun) => MorningRun, keep = true) {
+    setMorning((current) => {
+      if (!current) return current;
+      const next = change(current);
+      if (keep) writeMorning(withSpent(next, openedAt.current));
+      return next;
+    });
   }
 
-  function togglePause() {
-    if (!timer) return;
-    const at = nowMs();
-    setNow(at);
-    setTimer(timer.pausedAt ? { ...timer, pausedAt: null, pausedTotal: timer.pausedTotal + (at - timer.pausedAt) } : { ...timer, pausedAt: at });
+  function startMorning(item: Morning | null, mode: MorningMode) {
+    const owner = item ? examBlocks.find((candidate) => candidate.mornings.some((entry) => entry.key === item.key)) : block;
+    if (!owner) return;
+    const key = item ? item.key : `short-${today}`;
+    if (morning && morning.key === key) { resumeMorning(); return; }
+    const taught = owner.mornings.filter((entry) => entry.kind === 'learn' && completed.has(entry.key)).map((entry) => entry.lesson || entry.key);
+    const lesson = mode === 'learn' ? item?.lesson : undefined;
+    const engineMode: DailyMode = mode === 'short' ? 'short' : mode === 'learn' ? 'learn' : 'review';
+    const picks = todaysCards({ srs, today, lesson, usercards: records.usercards }).slice(0, MAX_CARDS);
+    const questions = todaysQuestions({ exam: owner.cert, srs, today, lesson, mode: engineMode, mocks: records.mocks, taught });
+    const next: MorningRun = {
+      v: 1, key, morning: item ? item.key : null, mode, block: owner.key, exam: owner.cert, date: today, part: 0, open: true, spentMs: 0,
+      cards: { queue: cardQueue(picks), shown: false, reviewed: 0, again: 0 },
+      learn: { stage: 'brief', build: '', model: false, recall: [] },
+      questions: { ids: questions.map((question) => question.id), index: 0, answers: {} },
+      mistakes: {}, savedCards: [], reflection: '',
+    };
+    openedAt.current = Date.now();
+    writeMorning(next);
+    setMorning(next);
+    setMorningRestored(false);
+    setMorningOpen(true);
   }
 
-  async function finishSession(task: StudyTask) {
-    const minutes = timer?.key === task.key ? Math.max(1, Math.round(elapsedSeconds / 60)) : 0;
-    const index = allTasks.indexOf(task);
-    const week = Math.floor(index / 5) + 1;
-    const saved = completed.has(task.key) ? true : await update({ action: 'set-progress', itemKey: task.key, status: 'complete' });
-    if (!saved) return;
-    if (timer?.key === task.key) setTimer(null);
-    setFocusOpen(false);
-    setSelectedDay(null);
-    const weekTasks = studyWeeks[week - 1].tasks;
-    const doneAfter = weekTasks.filter((item) => item.key === task.key || completed.has(item.key)).length;
-    setCelebration({ task, week, minutes, weekDone: doneAfter });
+  function resumeMorning() {
+    if (!morning) return;
+    openedAt.current = Date.now();
+    changeMorning((current) => ({ ...current, open: true }));
+    setMorningOpen(true);
   }
+
+  function leaveMorning() {
+    const spent = morning ? withSpent(morning, openedAt.current).spentMs : 0;
+    openedAt.current = null;
+    changeMorning((current) => ({ ...current, open: false, spentMs: spent }));
+    setMorningOpen(false);
+    setMorningRestored(false);
+  }
+
+  async function gradeMorningCard(grade: CardGrade) {
+    if (!morning) return;
+    const head = morning.cards.queue[0];
+    if (!head) return;
+    const result = answerCard(morning.cards.queue, srs.cards, grade, today);
+    if (!head.repeat) {
+      const saved = await update({ action: 'patch-record', key: 'srs', patch: { cards: { [head.id]: result.states[head.id] } } });
+      if (!saved) return;
+    }
+    changeMorning((current) => ({
+      ...current,
+      cards: { queue: result.queue, shown: false, reviewed: current.cards.reviewed + (head.repeat ? 0 : 1), again: current.cards.again + (grade === 'again' && !head.repeat ? 1 : 0) },
+    }));
+  }
+
+  async function answerMorningQuestion(question: ScenarioQuestion, choice: string, sure: boolean, seconds: number) {
+    const correct = choice === question.correct;
+    const result: QuestionResult = !correct ? 'wrong' : sure ? 'right' : 'guess';
+    const recorded = await update({ action: 'record-attempt', questionId: question.id, certification: question.certification, domain: question.domain, answer: choice, correct, confidence: sure ? 'high' : 'low' });
+    if (!recorded) return false;
+    const next = recordQuestionAnswer(recorded.records.srs, question, result, today);
+    const delayed = next.delayed?.[question.certification];
+    const saved = await update({ action: 'patch-record', key: 'srs', patch: { questions: { [question.id]: next.questions[question.id] }, ...(delayed ? { delayed: { [question.certification]: delayed } } : {}) } });
+    if (!saved) return false;
+    changeMorning((current) => ({ ...current, questions: { ...current.questions, answers: { ...current.questions.answers, [question.id]: { choice, sure, correct, result, seconds } } } }));
+    return true;
+  }
+
+  /* Each line he writes in Mistakes becomes one of his own cards, due tomorrow. */
+  async function saveMistakeCards(current: MorningRun): Promise<MorningRun | null> {
+    const pending = Object.entries(current.mistakes).filter(([id, line]) => line.trim() && !current.savedCards.includes(id));
+    if (!pending.length) return current;
+    const made: UserCard[] = [];
+    for (const [id, line] of pending) {
+      const question = questionById(id);
+      if (!question || question.certification === 'Intersection') continue;
+      const card = makeUserCard({ exam: question.certification, front: question.prompt, back: line, today, lesson: question.lesson, question: question.id });
+      if (!(await update({ action: 'append-record', key: 'usercards', item: card }))) return null;
+      made.push(card);
+    }
+    if (made.length && !(await update({ action: 'patch-record', key: 'srs', patch: { cards: Object.fromEntries(made.map((card) => [card.id, startCard(today)])) } }))) return null;
+    const next = { ...current, savedCards: [...current.savedCards, ...pending.map(([id]) => id)] };
+    writeMorning(withSpent(next, openedAt.current));
+    setMorning(next);
+    return next;
+  }
+
+  async function mistakesDone() {
+    if (!morning) return;
+    const next = await saveMistakeCards(morning);
+    if (next) changeMorning((current) => ({ ...current, savedCards: next.savedCards, part: current.part + 1 }));
+  }
+
+  async function finishMorning() {
+    if (!morning) return;
+    const current = await saveMistakeCards(morning);
+    if (!current) return;
+    const owner = examBlocks.find((item) => item.key === current.block);
+    const item = owner?.mornings.find((entry) => entry.key === current.morning);
+    const title = item ? item.title : 'Short morning';
+    if (current.mode === 'review' && current.reflection.trim()) {
+      const saved = await update({ action: 'save-artifact', artifactKey: `retrospective-${current.key}`, status: 'complete', evidenceText: current.reflection, reflection: `${title}: weekly reflection recorded.` });
+      if (!saved) return;
+    }
+    if (current.morning && !(await update({ action: 'set-progress', itemKey: current.morning, status: 'complete' }))) return;
+    const answers = Object.values(current.questions.answers);
+    const right = answers.filter((answer) => answer.correct).length;
+    const minutes = Math.max(1, Math.round(withSpent(current, openedAt.current).spentMs / 60000));
+    const logged = await update({
+      action: 'append-record',
+      key: 'log',
+      item: { id: `log-${current.key}-${Date.now().toString(36)}`, key: current.morning || 'short', kind: current.mode, block: current.block, date: today, minutes, cards: current.cards.reviewed, questions: answers.length, right } satisfies LogRow,
+    });
+    if (!logged) return;
+    clearMorning();
+    morningRef.current = null;
+    openedAt.current = null;
+    setMorning(null);
+    setMorningOpen(false);
+    setMorningRestored(false);
+    const where = owner && item ? `${owner.cert}, morning ${owner.mornings.indexOf(item) + 1} of ${owner.mornings.length}` : 'Due cards and questions only';
+    setFinished({ title: current.mode === 'short' ? 'Short morning done' : 'Morning done', detail: current.mode === 'short' ? where : `${where}: ${title}`, kind: current.mode, minutes, cards: current.cards.reviewed, questions: answers.length, right });
+  }
+
+  /* ----------------------------------------------------- weekend blocks */
+
+  function openWeekend(item: WeekendBlock) {
+    if (item.kind === 'mock') { startPracticeExam(item); return; }
+    weekendStarted.current = Date.now();
+    setWeekendOpen(item.key);
+  }
+
+  /* TODO(part 2): the practice exam runner. Until it lands, a practice exam
+     weekend block opens Practice. */
+  function startPracticeExam(item: WeekendBlock) {
+    void item;
+    setPracticeScreen('hub');
+    go('practice');
+  }
+
+  async function finishWeekend(item: WeekendBlock) {
+    const owner = examBlocks.find((candidate) => candidate.weekends.some((entry) => entry.key === item.key));
+    if (!(await update({ action: 'set-progress', itemKey: item.key, status: 'complete' }))) return;
+    const minutes = Math.max(1, Math.round((Date.now() - (weekendStarted.current || Date.now())) / 60000));
+    const logged = await update({ action: 'append-record', key: 'log', item: { id: `log-${item.key}-${Date.now().toString(36)}`, key: item.key, kind: item.kind, block: owner?.key, date: today, minutes, cards: 0, questions: 0, right: 0 } satisfies LogRow });
+    if (!logged) return;
+    setWeekendOpen(null);
+    setFinished({ title: 'Weekend block done', detail: item.title, kind: item.kind, minutes });
+  }
+
+  /* ---------------------------------------------------------- documents */
 
   async function saveItilBaseline() {
     if (!state.profile) return;
@@ -539,7 +726,7 @@ export default function TriCertApp() {
 
   async function saveArtifact(status: 'draft' | 'complete') {
     const saved = await update({ action: 'save-artifact', artifactKey: deliverable.key, status, evidenceText: artifactText, reflection: artifactReflection });
-    if (saved) say(status === 'complete' ? `${deliverable.title} marked complete.` : 'Draft saved.');
+    if (saved) { clearDraft(`doc:${deliverable.key}`); setRestoredNote(''); say(status === 'complete' ? `${deliverable.title} marked complete.` : 'Draft saved.'); }
   }
 
   function chooseProject(key: string) {
@@ -553,45 +740,25 @@ export default function TriCertApp() {
     if (owner) setSelectedProject(owner.key);
     setSelectedArtifact(item.key);
     const saved = state.artifacts.find((row) => row.artifact_key === item.key);
-    setArtifactText(saved?.evidence_text || item.template);
-    setArtifactReflection(saved?.reflection || '');
+    const base = { work: saved?.evidence_text || item.template, explain: saved?.reflection || '' };
+    const draft = readDraft(`doc:${item.key}`);
+    if (draft && (draft.value.work !== base.work || draft.value.explain !== base.explain)) {
+      setArtifactText(draft.value.work ?? base.work);
+      setArtifactReflection(draft.value.explain ?? base.explain);
+      setRestoredNote(`Restored your unsaved writing from ${formatTime(draft.at)}.`);
+    } else {
+      setArtifactText(base.work);
+      setArtifactReflection(base.explain);
+      setRestoredNote('');
+    }
     setDocOpen(true);
     window.scrollTo({ top: 0, behavior: scrollBehavior() });
   }
 
-  function showWeek(number: number, day: number | null = null) {
-    const bounded = Math.min(studyWeeks.length, Math.max(1, number));
-    setSelectedWeek(bounded);
-    setSelectedDay(day);
-  }
-
-  /* Plan opens one week at a time. Its reflection lives inside it. Coming
-     back to the open week keeps the reflection as it was, and a reflection
-     with unsaved writing opens with its week. */
-  function expandWeek(number: number, reflect = false) {
-    if (number !== expandedWeek) setReflectionOpen(reflect || retroUnsaved(number));
-    else if (reflect) setReflectionOpen(true);
-    setExpandedWeek(number);
-  }
-
-  function openReflection(week: number) {
-    expandWeek(week, true);
-    go('plan');
-    window.setTimeout(() => document.getElementById(`reflection-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' }), 60);
-  }
-
-  function openSession(index: number) {
-    showWeek(Math.floor(index / 5) + 1, index % 5);
-    go('today');
-  }
-
-  function openWork(link: WorkLink) {
-    setFocusOpen(false);
-    if (link.kind === 'artifact') { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(link.item); return; }
-    if (link.kind === 'lab') { setPracticeScreen('labs'); setView('practice'); window.history.pushState(null, '', '#practice'); window.setTimeout(() => { const fold = document.getElementById(`lab-${link.lab.key}`); if (fold instanceof HTMLDetailsElement) fold.open = true; fold?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }); }, 60); return; }
-    setView('practice');
-    window.history.pushState(null, '', '#practice');
-    startScenarios();
+  function openDocument(item: Deliverable) {
+    setView('projects');
+    window.history.pushState(null, '', '#projects');
+    openArtifact(item);
   }
 
   function toggleRubric(index: number) {
@@ -606,6 +773,8 @@ export default function TriCertApp() {
     const content = `# ${deliverable.title}\n\n${artifactText}\n\n## Teach-back reflection\n\n${artifactReflection}\n\n---\nKestrel Health Network and Project Beacon are fictional. All data is synthetic.`;
     downloadFile(`${deliverable.key}.md`, content, 'text/markdown');
   }
+
+  /* ----------------------------------------------- practice (part 2) */
 
   function startScenarios() {
     const ordered = [...practiceBank.slice(scenarioCursor), ...practiceBank.slice(0, scenarioCursor)];
@@ -642,7 +811,7 @@ export default function TriCertApp() {
       confidence,
     });
     if (saved) setRun({ ...run, answered: run.answered + 1, correct: run.correct + (choice === question.correct ? 1 : 0) });
-    return saved;
+    return Boolean(saved);
   }
 
   async function advance() {
@@ -671,23 +840,12 @@ export default function TriCertApp() {
     setPracticeScreen('hub');
   }
 
-  async function saveRetrospective(week: number) {
-    const saved = await update({
-      action: 'save-artifact',
-      artifactKey: `retrospective-w${week}`,
-      status: 'complete',
-      evidenceText: retroText(week),
-      reflection: `Week ${week} teach-back and improvement commitment recorded.`,
-    });
-    if (saved) say(`Week ${week} reflection saved.`);
-  }
-
   if (loading) {
     return <main className="boot" aria-live="polite"><BrandMark size={44} /><p>Loading your plan</p></main>;
   }
 
   if (!state.profile) {
-    return <Onboarding notice={notice} saving={saving} onSubmit={submitProfile} />;
+    return <Onboarding notice={notice} saving={saving} today={today} onSubmit={submitProfile} />;
   }
 
   const profile = state.profile;
@@ -705,35 +863,38 @@ export default function TriCertApp() {
   const explainShort = Math.max(0, 40 - artifactReflection.trim().length);
   const completeBlockers = [workShort ? `${workShort} more characters of work` : '', explainShort ? `${explainShort} more characters of explanation` : ''].filter(Boolean);
   const programmeDone = allTasks.filter((task) => completed.has(task.key)).length;
-  const weeksDone = studyWeeks.map((week) => week.tasks.filter((task) => completed.has(task.key)).length);
   const displayName = (profile.display_name || '').trim();
   const firstName = displayName.split(/\s+/)[0] || '';
   const initials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('');
   const hour = new Date().getHours();
   const greeting = `${hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'}${firstName ? `, ${firstName}` : ''}`;
-  const toGate = nextPhase.gate.at - currentIndex;
-  const standing = programmeDone === allTasks.length
-    ? 'All 65 sessions are done. Finish the handover package on Progress.'
-    : `Week ${currentWeek} of 13. ${toGate === 0 ? `Your ${nextPhase.gate.label} gate is next.` : `${countWord(toGate)} ${toGate === 1 ? 'session' : 'sessions'}, then your ${nextPhase.gate.label} gate.`}`;
   const readingLesson = view === 'learn' && learnTab === 'lessons' && Boolean(learnItem);
   const navActive: View = view === 'projects' ? 'learn' : readingLesson ? lessonFrom : view;
   const gatesMet = gates.filter((gate) => gate.met).length;
-
-  const isNext = activeIndex === currentIndex && !completed.has(activeTask.key);
-  const activeGate = gateAt.has(activeIndex);
   const inRun = view === 'practice' && practiceScreen === 'run';
-  const openTimer = () => { showWeek(Math.floor(timerIndex / 5) + 1, timerIndex % 5); setFocusOpen(true); };
   const nextGateWeek = Math.floor(nextPhase.gate.at / 5) + 1;
   const nextGateDay = (nextPhase.gate.at % 5) + 1;
-  /* The newest finished week that still has no reflection. */
-  const reflectWeek = [...studyWeeks].reverse().find((week) => weeksDone[week.number - 1] === 5 && !retroSaved(week.number))?.number ?? 0;
 
-  /* Today keeps a short list of things already started: answers to review,
-     drafts, and the reflection for a week that is finished. */
+  /* Today: the next item of the current block. Weekdays get the next
+     morning; Saturday and Sunday get the next weekend block when one is open. */
+  const nextMorning = block ? block.mornings.find((item) => !completed.has(item.key) && morningGate(block, item, completed).open) : undefined;
+  const nextWeekend = block ? block.weekends.find((item) => !completed.has(item.key)) : undefined;
+  const weekendGate = block && nextWeekend ? weekendState(block, nextWeekend, completed, records, today) : null;
+  const isWeekend = [0, 6].includes(weekday(today));
+  const showWeekend = Boolean(block && nextWeekend && weekendGate?.open && (isWeekend || !nextMorning));
+  const morningsDone = block ? block.mornings.filter((item) => completed.has(item.key)).length : 0;
+  const examEstimate = block ? estimates.get(`${block.key}-exam`) : null;
+  const shortRun = morning?.mode === 'short' ? morning : null;
+  const standing = block
+    ? `${block.title}. ${examEstimate ? `Exam about ${formatDate(examEstimate)} at five mornings and one weekend block a week.` : 'Every morning and weekend block is done.'}`
+    : 'Every exam block that is ready is done. The next one is being built.';
+  const openPlan = () => go('plan');
+
+  /* Today keeps a short list of things already started: drafts and reviews due. */
   const waiting: Array<{ title: string; detail: string; go: () => void }> = [];
-  if (reviewQueue.length) waiting.push({ title: `Review ${reviewQueue.length} ${reviewQueue.length === 1 ? 'answer' : 'answers'}`, detail: 'Wrong or guessed', go: () => { setPracticeScreen('review'); setView('practice'); window.history.pushState(null, '', '#practice'); window.scrollTo({ top: 0 }); } });
-  draftArtifacts.slice(0, 2).forEach((item) => waiting.push({ title: item.title, detail: `Draft, ${docNumberFor(item)}`, go: () => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); } }));
-  if (reflectWeek >= 1) waiting.push({ title: `Week ${reflectWeek} reflection`, detail: 'The week is done. Write what you learned.', go: () => openReflection(reflectWeek) });
+  draftArtifacts.slice(0, 2).forEach((item) => waiting.push({ title: item.title, detail: `Draft, ${docNumberFor(item)}`, go: () => openDocument(item) }));
+  // TODO(part 2): open Today's review on Practice.
+  if (reviewsDue) waiting.push({ title: `${dueCards} ${dueCards === 1 ? 'card' : 'cards'} and ${dueQuestions} ${dueQuestions === 1 ? 'question' : 'questions'} due for review`, detail: 'Spaced review. A morning starts with them.', go: () => go('practice') });
 
   const documentsPanel = (
     <div className="projects">
@@ -771,13 +932,21 @@ export default function TriCertApp() {
 
   /* While an overlay is open the page behind it is inert, so keyboard focus
      stays inside the overlay. Messages sit outside and stay reachable. */
-  const overlayOpen = (focusOpen && Boolean(timer && timerTask)) || Boolean(celebration) || settingsOpen;
-  const timerChip = timer && timerTask && !focusOpen ? (
-    <button className="live-chip" onClick={openTimer} aria-label={`${timer.pausedAt ? 'Paused' : 'In session'}, ${formatClock(elapsedSeconds)}. Back to your session`}>
-      <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
-      <Digits value={formatClock(elapsedSeconds)} />
+  const weekendItem = weekendOpen ? examBlocks.flatMap((item) => item.weekends).find((item) => item.key === weekendOpen) : undefined;
+  const overlayOpen = (morningOpen && Boolean(morning)) || Boolean(weekendItem) || Boolean(finished) || settingsOpen;
+  const morningPart = morning ? morningParts[morning.mode][Math.min(morning.part, morningParts[morning.mode].length - 1)][1] : '';
+  const morningChip = morning && !morningOpen ? (
+    <button className="live-chip" onClick={resumeMorning} aria-label={`Back to your morning, ${morningPart}`}>
+      <span className="live-dot paused" aria-hidden="true" />
+      <span>{morningPart}</span>
     </button>
   ) : null;
+  const heroMain = (label: string, action: () => void) => (
+    <button className="primary play" onClick={action}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+      <span className="play-label">{label}</span>
+    </button>
+  );
 
   return (
     <>
@@ -786,19 +955,19 @@ export default function TriCertApp() {
           <a className="brand" href="#today" aria-label="TriCert Lab, Today" title="TriCert Lab" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark /><span className="brand-name">TriCert Lab</span></a>
           <nav className="nav" aria-label="Main navigation">
             {navItems.map(([key, label]) => {
-              const badge = key === 'practice' && reviewQueue.length > 0 ? reviewQueue.length : 0;
+              const badge = key === 'practice' && reviewsDue > 0 ? reviewsDue : 0;
               return (
-                <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} aria-label={badge ? `${label}, ${badge} to review` : undefined} onClick={() => go(key)}>
+                <button key={key} className={navActive === key ? 'active' : ''} aria-current={navActive === key ? 'page' : undefined} aria-label={badge ? `${label}, ${badge} due for review` : undefined} onClick={() => go(key)}>
                   <span className="nav-glyph"><NavIcon name={key} />{badge > 0 && <span className="nav-badge" aria-hidden="true">{badge > 99 ? '99+' : badge}</span>}</span>
                   <span className="nav-label">{label}</span>
                 </button>
               );
             })}
           </nav>
-          {timer && timerTask && !focusOpen && (
-            <button className="live-pill" onClick={openTimer}>
-              <span className={timer.pausedAt ? 'live-dot paused' : 'live-dot'} aria-hidden="true" />
-              <span className="live-text"><span className="live-clock"><Digits value={formatClock(elapsedSeconds)} /></span><span className="live-name">{timer.pausedAt ? 'Paused, back to it' : 'Back to your session'}</span></span>
+          {morning && !morningOpen && (
+            <button className="live-pill" onClick={resumeMorning}>
+              <span className="live-dot paused" aria-hidden="true" />
+              <span className="live-text"><span className="live-clock">{morningPart}</span><span className="live-name">Back to your morning</span></span>
             </button>
           )}
           <div className="rail-foot">
@@ -814,7 +983,7 @@ export default function TriCertApp() {
           <header className="topbar">
             <a className="brand" href="#today" aria-label="TriCert Lab, Today" onClick={(event) => { event.preventDefault(); go('today'); }}><BrandMark size={28} /><span className="brand-name">TriCert Lab</span></a>
             <span className="topbar-end">
-              {timerChip}
+              {morningChip}
               <button className="avatar-button" onClick={() => setSettingsOpen(true)} aria-label="Make it yours: your name, why, colour and appearance">
                 <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
               </button>
@@ -834,58 +1003,60 @@ export default function TriCertApp() {
                     : <button className="text-link why-add" onClick={() => setSettingsOpen(true)}>Add why you are doing this</button>}
                 </div>
                 <dl className="tally" aria-label="Your progress">
-                  <div className="tally-main"><dt>Sessions done</dt><dd><strong>{programmeDone}</strong><span>/{allTasks.length}</span></dd><span className="tally-bar" aria-hidden="true"><span style={{ width: `${Math.round((programmeDone / Math.max(1, allTasks.length)) * 100)}%` }} /></span></div>
-                  {nextExam && <div><dt>{nextExam.days === 1 ? 'Day' : 'Days'} to {nextExam.label}</dt><dd><strong>{nextExam.days}</strong></dd></div>}
+                  {block && <div className="tally-main"><dt>Mornings done</dt><dd><strong>{morningsDone}</strong><span>/{block.mornings.length}</span></dd><span className="tally-bar" aria-hidden="true"><span style={{ width: `${Math.round((morningsDone / Math.max(1, block.mornings.length)) * 100)}%` }} /></span></div>}
+                  <div><dt>Reviews due</dt><dd><strong>{reviewsDue}</strong></dd></div>
                 </dl>
               </header>
 
-              <section className={completed.has(activeTask.key) ? 'hero-session is-done' : 'hero-session'} aria-labelledby="session-title">
-                <div className="hero-top">
-                  <p className="hero-when-line">
-                    <span className="hero-label">{completed.has(activeTask.key) ? 'Done' : timer?.key === activeTask.key ? 'In session' : isNext ? 'Up next' : activeGate ? 'Exam gate' : 'Later'}</span>
-                    <span className="hero-when">Week {selectedWeek}, {activeTask.day}{activeGate ? ', exam gate' : ''}</span>
-                  </p>
-                  <span className="hero-tags">{activeTask.certifications.map((cert) => <Tag key={cert}>{examLabel(cert)}</Tag>)}</span>
-                </div>
-                <h2 id="session-title">{keepTogether(activeTask.title)}</h2>
-                <p className="hero-sub"><span>{formatMinutes(taskMinutes(activeTask.meta))}</span><span>{taskOutput(activeTask.meta)}</span></p>
-                <div className="hero-actions">
-                  {completed.has(activeTask.key)
-                    ? <Status kind="done">Done</Status>
-                    : (
-                      <button className="primary play" onClick={() => startSession(activeTask)}>
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
-                        <span className="play-label">{timer?.key === activeTask.key ? <>Resume, <Digits value={formatClock(elapsedSeconds)} /></> : 'Start session'}</span>
-                      </button>
-                    )}
-                  {lessonIndex[activeTask.key] && <button className="secondary hero-lesson" onClick={() => openLesson(activeTask.key, 'today')}><BookIcon /> Read the lesson</button>}
-                  {completed.has(activeTask.key)
-                    ? <button className="ghost push" onClick={() => toggleProgress(activeTask.key)} disabled={saving}>Mark as not done</button>
-                    : <button className="ghost push" onClick={() => finishSession(activeTask)} disabled={saving}>Mark done</button>}
-                </div>
-                <div className="week-strip" aria-label={`Week ${selectedWeek}`}>
-                  <div className="strip-head">
-                    <button className="arrow" onClick={() => showWeek(selectedWeek - 1)} disabled={selectedWeek === 1} aria-label="Previous week"><Chevron dir="left" /></button>
-                    <p className="strip-title"><strong>Week {selectedWeek}</strong> <span>{keepTogether(weekData.theme)}</span></p>
-                    <button className="arrow" onClick={() => showWeek(selectedWeek + 1)} disabled={selectedWeek === studyWeeks.length} aria-label="Next week"><Chevron dir="right" /></button>
+              {!block && (
+                <section className="hero-session is-done" aria-labelledby="session-title">
+                  <h2 id="session-title">All ready blocks are done</h2>
+                  <p className="hero-sub"><span>The next exam block is being built. Keep your reviews going in Practice.</span></p>
+                  <div className="hero-actions">{heroMain('Open the plan', openPlan)}</div>
+                </section>
+              )}
+
+              {block && showWeekend && nextWeekend && (
+                <section className="hero-session" aria-labelledby="session-title">
+                  <div className="hero-top">
+                    <p className="hero-when-line"><span className="hero-label">{isWeekend ? 'This weekend' : 'Up next'}</span><span className="hero-when">{block.cert}, weekend block {block.weekends.indexOf(nextWeekend) + 1} of {block.weekends.length}</span></p>
+                    <span className="hero-tags"><Tag>{nextWeekend.kind === 'lab' ? 'Lab' : 'Practice exam'}</Tag></span>
                   </div>
-                  <ol className="days">
-                    {weekData.tasks.map((task, index) => {
-                      const done = completed.has(task.key);
-                      const gate = gateAt.has(sessionIndex(selectedWeek, index + 1));
-                      return (
-                        <li key={task.key}>
-                          <button className={index === activeDay ? 'day is-active' : 'day'} onClick={() => setSelectedDay(index)} aria-pressed={index === activeDay} aria-label={`${task.day}: ${task.title}${done ? ', done' : ''}${gate ? ', exam gate' : ''}`}>
-                            <DayMark done={done} gate={gate} running={timer?.key === task.key} />
-                            <span className="day-name">{task.day}</span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                  {selectedWeek !== currentWeek && <button className="text-link" onClick={() => showWeek(currentWeek)}>Back to this week</button>}
-                </div>
-              </section>
+                  <h2 id="session-title">{keepTogether(nextWeekend.title)}</h2>
+                  <p className="hero-sub"><span>{formatMinutes(nextWeekend.minutes)}</span><span>{nextWeekend.kind === 'lab' ? `${nextWeekend.steps.length} steps in a real tool` : `${block.exam.questions} questions in ${block.exam.minutes} minutes`}</span></p>
+                  <div className="hero-actions">{heroMain(nextWeekend.kind === 'lab' ? 'Start lab' : 'Start practice exam', () => openWeekend(nextWeekend))}</div>
+                  {nextMorning && <button className="text-link hero-link" onClick={() => startMorning(nextMorning, modeFor(nextMorning))}>{morning?.key === nextMorning.key ? 'Resume your morning instead' : 'Do a morning instead'}</button>}
+                </section>
+              )}
+
+              {block && !showWeekend && nextMorning && (
+                <section className="hero-session" aria-labelledby="session-title">
+                  <div className="hero-top">
+                    <p className="hero-when-line"><span className="hero-label">{morning?.key === nextMorning.key ? 'In progress' : 'Up next'}</span><span className="hero-when">{block.cert}, morning {block.mornings.indexOf(nextMorning) + 1} of {block.mornings.length}</span></p>
+                    <span className="hero-tags"><Tag>{kindLabel(nextMorning.kind)}</Tag></span>
+                  </div>
+                  <h2 id="session-title">{keepTogether(nextMorning.title)}</h2>
+                  <p className="hero-sub">
+                    <span>{formatMinutes(morningParts[modeFor(nextMorning)].reduce((sum, [, , minutes]) => sum + minutes, 0))}</span>
+                    <span>{morningParts[modeFor(nextMorning)].map(([, label]) => label).join(', ')}</span>
+                    {nextMorning.brief && <span>Brief from {nextMorning.brief.from}</span>}
+                  </p>
+                  {isWeekend && weekendGate && !weekendGate.open && <p className="hint hero-note">No weekend block is open yet. {nextWeekend?.title}: {lowerFirst(weekendGate.reason)}.</p>}
+                  <div className="hero-actions">{heroMain(morning?.key === nextMorning.key ? `Resume morning, ${morningPart.toLowerCase()}` : 'Start morning', () => startMorning(nextMorning, modeFor(nextMorning)))}</div>
+                  <button className="text-link hero-link" onClick={() => startMorning(null, 'short')}>{shortRun ? 'Resume the short morning' : 'Short morning (45 minutes)'}</button>
+                </section>
+              )}
+
+              {block && !showWeekend && !nextMorning && (
+                <section className="hero-session is-done" aria-labelledby="session-title">
+                  <div className="hero-top">
+                    <p className="hero-when-line"><span className="hero-label">Waiting</span><span className="hero-when">{block.cert}</span></p>
+                  </div>
+                  <h2 id="session-title">{nextWeekend ? keepTogether(nextWeekend.title) : 'Book your exam'}</h2>
+                  <p className="hero-sub"><span>{nextWeekend && weekendGate ? `${weekendGate.reason}.` : 'Every morning and weekend block is done. Check Ready to book on Progress.'}</span></p>
+                  <div className="hero-actions">{heroMain(shortRun ? 'Resume the short morning' : 'Short morning (45 minutes)', () => startMorning(null, 'short'))}</div>
+                </section>
+              )}
 
               {waiting.length > 0 && (
                 <section className="waiting" aria-labelledby="waiting-title">
@@ -899,92 +1070,17 @@ export default function TriCertApp() {
           )}
 
           {view === 'plan' && (
-            <div className="plan">
-              <header className="screen-head">
-                <h1>Plan</h1>
-                <p className="lede">Week {currentWeek} of 13. {programmeDone} of {allTasks.length} sessions done across three releases of Project Beacon, each ending at an exam gate.</p>
-              </header>
-              <section className="plan-track" aria-label="Your 13 weeks">
-                <WeekTrack weeks={weeksDone} selected={expandedWeek || undefined} current={currentWeek} onSelect={(week) => { expandWeek(week); window.setTimeout(() => document.getElementById(`week-${week}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' }), 30); }} />
-              </section>
-              {phases.map((phase, phaseIndex) => {
-                const phaseProject = projects.find((item) => item.key === phase.project) || projects[0];
-                const weeks = studyWeeks.filter((week) => phaseFor(sessionIndex(week.number, 1)) === phase);
-                const gateWeek = Math.floor(phase.gate.at / 5) + 1;
-                const gateDay = (phase.gate.at % 5) + 1;
-                const gateDates = phase.gate.certs.map((cert) => exams.find((exam) => exam.cert === cert)).filter((exam) => exam?.date).map((exam) => `${exam?.label} ${formatDate(exam?.date || '')}`).join(', ');
-                return (
-                  <section className="phase" key={phase.project} aria-labelledby={`phase-${phase.project}`}>
-                    <header className="phase-head">
-                      <span className="eyebrow"><span>Release {phaseIndex + 1}</span><span>Weeks {weeks[0].number} to {weeks[weeks.length - 1].number}</span></span>
-                      <h2 id={`phase-${phase.project}`}>{phaseProject.title}</h2>
-                    </header>
-                    <ul className="list weeks">
-                      {weeks.map((week) => {
-                        const done = week.tasks.filter((task) => completed.has(task.key)).length;
-                        const open = expandedWeek === week.number;
-                        const current = week.number === currentWeek;
-                        return (
-                          <li key={week.number} id={`week-${week.number}`} className={[current ? 'is-current' : '', open ? 'is-open' : ''].filter(Boolean).join(' ') || undefined}>
-                            <button className="week-row" aria-expanded={open} onClick={() => (open ? setExpandedWeek(0) : expandWeek(week.number))}>
-                              <span className="week-text"><small>Week {week.number}{current ? ', this week' : ''}</small><strong>{keepTogether(week.theme)}</strong></span>
-                              <Status kind={done === 5 ? 'done' : done > 0 ? 'progress' : 'none'}>{done === 5 ? 'Done' : `${done} of 5`}</Status>
-                              <FoldMark />
-                            </button>
-                            {open && (
-                              <div className="week-detail">
-                                <p>{week.outcome}</p>
-                                <ol>
-                                  {week.tasks.map((task, index) => {
-                                    const idx = sessionIndex(week.number, index + 1);
-                                    return (
-                                      <li key={task.key}>
-                                        <button onClick={() => (lessonIndex[task.key] ? openLesson(task.key, 'plan') : openSession(idx))}>
-                                          <span className={completed.has(task.key) ? 'tick is-done' : gateAt.has(idx) ? 'tick is-gate' : 'tick'} aria-hidden="true">{completed.has(task.key) && <Check />}</span>
-                                          <span className="wd-title"><small>{task.day}{gateAt.has(idx) ? ', exam gate' : ''}</small><span>{keepTogether(task.title)}</span>{completed.has(task.key) && <span className="sr-only">, done</span>}</span>
-                                          <span className="wd-time">{formatMinutes(taskMinutes(task.meta))}</span>
-                                          <Chevron dir="right" />
-                                        </button>
-                                      </li>
-                                    );
-                                  })}
-                                </ol>
-                                {(week.number <= currentWeek || done > 0 || retroSaved(week.number)) && (
-                                  <details id={`reflection-${week.number}`} className="reflect" open={reflectionOpen} onToggle={(event) => setReflectionOpen(event.currentTarget.open)}>
-                                    <summary className="row"><span className="row-text"><strong>Week {week.number} reflection</strong><small>{retroUnsaved(week.number) ? (retroSaved(week.number) ? 'Changes not saved' : 'Draft not saved') : retroSaved(week.number) ? 'Saved' : 'Not written yet'}</small></span><FoldMark /></summary>
-                                    <div className="reflect-body">
-                                      <label className="field" htmlFor={`retro-${week.number}`}>What can you now defend, what still needs notes, and what will you change?</label>
-                                      <textarea id={`retro-${week.number}`} value={retroText(week.number)} onChange={(event) => { const text = event.target.value; setRetroDrafts((drafts) => ({ ...drafts, [week.number]: text })); }} />
-                                      <div className="row-actions">
-                                        <button className="primary" onClick={() => saveRetrospective(week.number)} disabled={saving || retroText(week.number).trim().length < 100}>Save reflection</button>
-                                        <span className="hint">{retroText(week.number).trim().length < 100 ? `${100 - retroText(week.number).trim().length} more characters` : 'Ready to save'}</span>
-                                      </div>
-                                    </div>
-                                  </details>
-                                )}
-                              </div>
-                            )}
-                          </li>
-                        );
-                      })}
-                      <li className="gate-row">
-                        <span className="gate-mark" aria-hidden="true" />
-                        <span className="gate-text"><small>Exam gate, week {gateWeek}, day {gateDay}</small><strong>{keepTogether(phase.gate.label)}</strong></span>
-                        <span className="gate-when">{gateDates ? keepTogether(gateDates) : 'No date set'}</span>
-                      </li>
-                    </ul>
-                  </section>
-                );
-              })}
-              <details className="fold reference">
-                <summary className="row"><span className="row-text"><strong>How the four certifications connect</strong><small>One project, four exams</small></span><FoldMark /></summary>
-                <div className="reference-body">
-                  <div className="guide">{certificationGuide.map(([name, title, copy]) => <div key={name}><Tag>{examLabel(name)}</Tag><strong>{title}</strong><p>{copy}</p></div>)}</div>
-                  <div className="table-scroll"><table><thead><tr><th>Activity</th><th>PMP</th><th>PL-300</th><th>CISSP</th><th>ITIL V5</th></tr></thead><tbody>{coverageRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
-                  <p className="hint source-links">Official exam guides: {officialSources.map(([label, url], index) => <span key={label}>{index > 0 && ', '}<a href={url} target="_blank" rel="noreferrer">{label}</a></span>)}</p>
-                </div>
-              </details>
-            </div>
+            <PlanView
+              completed={completed}
+              records={records}
+              estimates={estimates}
+              today={today}
+              current={block}
+              runKey={morning?.key}
+              nextMorning={nextMorning?.key}
+              onMorning={(item) => startMorning(item, modeFor(item))}
+              onWeekend={openWeekend}
+            />
           )}
 
           {(view === 'learn' || (view === 'projects' && !docOpen)) && (
@@ -992,8 +1088,10 @@ export default function TriCertApp() {
               tab={view === 'projects' ? 'documents' : learnTab}
               item={view === 'projects' ? null : learnItem}
               lessonFrom={lessonFrom}
+              block={block}
               onLeaveLesson={backFromLesson}
-              onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); window.scrollTo({ top: 0 }); }}
+              onTab={(tab) => { setView('learn'); setLearnTab(tab); setLearnItem(null); if (window.location.hash !== '#learn') window.history.pushState(null, '', '#learn'); window.scrollTo({ top: 0 }); }}
+              onOpenLesson={(key) => openLesson(key, 'learn')}
               onItem={(item) => {
                 setLearnItem(item);
                 // Previous and Next keep the lesson's history entry on the lesson shown.
@@ -1003,8 +1101,7 @@ export default function TriCertApp() {
               }}
               completed={completed}
               documents={documentsPanel}
-              onStart={(task) => { showWeek(Math.floor(allTasks.indexOf(task) / 5) + 1, allTasks.indexOf(task) % 5); startSession(task); }}
-              onOpenDoc={(item) => { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(item); }}
+              onOpenDoc={openDocument}
             />
           )}
 
@@ -1016,6 +1113,7 @@ export default function TriCertApp() {
                 <h1 id="doc-title">{deliverable.title}</h1>
                 <p className="lede">{keepTogether(deliverable.summary)}</p>
               </header>
+              {restoredNote && <p className="hint restored" role="status">{restoredNote}</p>}
               <div className="folds">
                 {reading?.docGuides[deliverable.key] ? (
                   <>
@@ -1123,7 +1221,7 @@ export default function TriCertApp() {
               run={run}
               saving={saving}
               seconds={run.kind === 'timed' ? mockSeconds : null}
-              timerChip={timerChip}
+              timerChip={morningChip}
               onAnswer={answer}
               onNext={advance}
               onClose={endRun}
@@ -1199,7 +1297,7 @@ export default function TriCertApp() {
               </header>
               <ReviewList queue={reviewQueue} onOpen={(key) => {
                 const found = allDeliverables.find((item) => item.key === key);
-                if (found) { setView('projects'); window.history.pushState(null, '', '#projects'); openArtifact(found); }
+                if (found) openDocument(found);
               }} />
             </div>
           )}
@@ -1307,25 +1405,33 @@ export default function TriCertApp() {
 
       {notice && <div className={notice.kind === 'error' ? 'toast is-error' : 'toast'} role={notice.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{notice.kind === 'error' ? '!' : <Check />}</span><span>{notice.text}</span><button onClick={() => setNotice(null)} aria-label="Dismiss message">×</button></div>}
 
-      {focusOpen && timer && timerTask && (
-        <FocusSession
-          task={timerTask}
-          index={timerIndex}
-          timer={timer}
-          elapsed={elapsedSeconds}
-          links={workFor(timerTask)}
-          artifactStatus={artifactStatus}
+      {morningOpen && morning && (
+        <MorningFocus
+          run={morning}
+          restored={morningRestored}
           saving={saving}
-          onPause={togglePause}
-          onMinimise={() => setFocusOpen(false)}
-          onFinish={() => finishSession(timerTask)}
-          onDiscard={() => { setTimer(null); setFocusOpen(false); }}
-          onOpenWork={openWork}
-          lesson={reading?.lessons[timerTask.key]}
+          lesson={reading ? reading.lessons[examBlocks.find((item) => item.key === morning.block)?.mornings.find((entry) => entry.key === morning.morning)?.lesson || ''] || null : undefined}
+          usercards={records.usercards}
+          onChange={changeMorning}
+          onLeave={leaveMorning}
+          onGrade={gradeMorningCard}
+          onAnswer={answerMorningQuestion}
+          onMistakesDone={mistakesDone}
+          onFinish={finishMorning}
         />
       )}
 
-      {celebration && <Celebrate celebration={celebration} programmeDone={programmeDone} onDone={() => setCelebration(null)} />}
+      {weekendItem && (
+        <WeekendFocus
+          item={weekendItem}
+          block={examBlocks.find((candidate) => candidate.weekends.includes(weekendItem))}
+          saving={saving}
+          onLeave={() => setWeekendOpen(null)}
+          onFinish={() => finishWeekend(weekendItem)}
+        />
+      )}
+
+      {finished && <FinishedScreen finished={finished} onDone={() => setFinished(null)} />}
 
       {settingsOpen && (
         <MakeItYours
@@ -1343,6 +1449,7 @@ export default function TriCertApp() {
     </>
   );
 }
+
 
 /* ==========================================================================
    Overlays: focus moves in when one opens and goes back when it closes.
@@ -1375,19 +1482,21 @@ function useOverlayFocus(target: RefObject<HTMLElement | null>, fallbacks: strin
   }, [target, key]);
 }
 
-function Celebrate({ celebration, programmeDone, onDone }: { celebration: Celebration; programmeDone: number; onDone: () => void }) {
+/* The completion screen: what the morning or weekend block added up to. */
+function FinishedScreen({ finished, onDone }: { finished: Finished; onDone: () => void }) {
   const done = useRef<HTMLButtonElement>(null);
-  useOverlayFocus(done, ['.hero-session .play', '.hero-session .hero-lesson', '#main']);
+  useOverlayFocus(done, ['.hero-session .play', '#main']);
+  const stats: Array<[string, number]> = finished.questions === undefined
+    ? [['Minutes', finished.minutes]]
+    : [['Cards', finished.cards ?? 0], ['Questions', finished.questions], ['Right', finished.right ?? 0], ['Minutes', finished.minutes]];
   return (
     <div className="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title">
       <div className="celebrate-inner">
         <span className="celebrate-badge" aria-hidden="true"><Check /></span>
-        <h2 id="celebrate-title">{celebration.weekDone === 5 ? `Week ${celebration.week} complete` : 'Session complete'}</h2>
-        <p>Week {celebration.week}, {celebration.task.day}: {celebration.task.title}</p>
-        <dl className="celebrate-stats">
-          <div><dt>Studied</dt><dd>{celebration.minutes ? formatMinutes(celebration.minutes) : 'Not timed'}</dd></div>
-          <div><dt>This week</dt><dd>{celebration.weekDone} of 5</dd><Pips done={celebration.weekDone} /></div>
-          <div><dt>Programme</dt><dd>{programmeDone} of {allTasks.length}</dd></div>
+        <h2 id="celebrate-title">{finished.title}</h2>
+        <p>{keepTogether(finished.detail)}</p>
+        <dl className={`celebrate-stats count-${stats.length}`}>
+          {stats.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
         </dl>
         <button ref={done} className="primary wide" onClick={onDone}>Done</button>
       </div>
@@ -1396,56 +1505,507 @@ function Celebrate({ celebration, programmeDone, onDone }: { celebration: Celebr
 }
 
 /* ==========================================================================
+   A morning, in focus mode: a step line, then one part at a time, each
+   with one main button at the bottom.
+   ========================================================================== */
+
+type MorningChange = (change: (current: MorningRun) => MorningRun, keep?: boolean) => void;
+
+function MorningFocus({ run, restored, saving, lesson, usercards, onChange, onLeave, onGrade, onAnswer, onMistakesDone, onFinish }: {
+  run: MorningRun; restored: boolean; saving: boolean; lesson: Lesson | null | undefined; usercards: UserCard[];
+  onChange: MorningChange; onLeave: () => void; onGrade: (grade: CardGrade) => void;
+  onAnswer: (question: ScenarioQuestion, choice: string, sure: boolean, seconds: number) => Promise<boolean>;
+  onMistakesDone: () => void; onFinish: () => void;
+}) {
+  const parts = morningParts[run.mode];
+  const index = Math.min(run.part, parts.length - 1);
+  const part = parts[index][0];
+  const owner = examBlocks.find((item) => item.key === run.block);
+  const item = owner?.mornings.find((entry) => entry.key === run.morning);
+  const dialog = useRef<HTMLDivElement>(null);
+  const step = `${index}-${run.learn.stage}-${run.questions.index}`;
+  useOverlayFocus(dialog, ['.hero-session .play', '#main'], step);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onLeave(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onLeave]);
+  const nextPart = () => onChange((current) => ({ ...current, part: current.part + 1 }));
+  const nextLabel = parts[index + 1] ? `Continue to ${parts[index + 1][1].toLowerCase()}` : 'Finish morning';
+  const where = owner && item ? `${owner.cert}, morning ${owner.mornings.indexOf(item) + 1}` : `${run.exam}, short morning`;
+  const shared = { run, restored: restored && index === run.part, saving, step };
+  return (
+    <div ref={dialog} tabIndex={-1} className="focus morning" role="dialog" aria-modal="true" aria-labelledby="morning-title">
+      <header className="focus-bar">
+        <span className="focus-where"><span className="live-dot" aria-hidden="true" />{where}</span>
+        <button className="ghost" onClick={onLeave}>Leave</button>
+      </header>
+      <ol className="step-line" aria-label="Parts of this morning">
+        {parts.map(([key, name, minutes], position) => (
+          <li key={key} className={position < index ? 'is-done' : position === index ? 'is-now' : undefined} aria-current={position === index ? 'step' : undefined}>
+            <span className="step-mark" aria-hidden="true">{position < index && <Check />}</span>
+            <span className="step-name">{name}</span>
+            <span className="step-min">{minutes} min<span className="sr-only">{position < index ? ', done' : ''}</span></span>
+          </li>
+        ))}
+      </ol>
+      {part === 'cards' && <CardsPane {...shared} usercards={usercards} nextLabel={nextLabel} onChange={onChange} onGrade={onGrade} onNext={nextPart} />}
+      {part === 'learn' && <LearnPane {...shared} item={item} lesson={lesson} nextLabel={nextLabel} onChange={onChange} onNext={nextPart} />}
+      {part === 'questions' && <QuestionsPane {...shared} pace={owner?.exam.secondsPerQuestion || 90} nextLabel={nextLabel} onChange={onChange} onAnswer={onAnswer} onNext={nextPart} />}
+      {part === 'mistakes' && <MistakesPane {...shared} finalLabel={run.mode === 'review' ? nextLabel : 'Finish morning'} onChange={onChange} onDone={run.mode === 'review' ? onMistakesDone : onFinish} />}
+      {part === 'reflect' && <ReflectPane {...shared} onChange={onChange} onFinish={onFinish} />}
+    </div>
+  );
+}
+
+/* One part's body (it scrolls) and its actions (they stay in reach). */
+function Pane({ step, restored, children, foot }: { step: string; restored?: boolean; children: ReactNode; foot: ReactNode }) {
+  const body = useRef<HTMLDivElement>(null);
+  useEffect(() => { body.current?.scrollTo({ top: 0 }); }, [step]);
+  return (
+    <>
+      <div className="morning-body" ref={body}>
+        <div className="morning-col">
+          {restored && <p className="hint restored" role="status">Back where you left off.</p>}
+          {children}
+        </div>
+      </div>
+      <footer className="morning-foot"><div className="morning-actions">{foot}</div></footer>
+    </>
+  );
+}
+
+type PaneProps = { run: MorningRun; restored: boolean; saving: boolean; step: string };
+
+function CardsPane({ run, restored, saving, step, usercards, nextLabel, onChange, onGrade, onNext }: PaneProps & {
+  usercards: UserCard[]; nextLabel: string; onChange: MorningChange; onGrade: (grade: CardGrade) => void; onNext: () => void;
+}) {
+  const cards = useMemo(() => new Map<string, BankCard>(allCards(usercards).map((card) => [card.id, card])), [usercards]);
+  const head = run.cards.queue[0];
+  const card = head ? cards.get(head.id) : undefined;
+  const left = run.cards.queue.length;
+  const skip = () => onChange((current) => ({ ...current, cards: { ...current.cards, queue: current.cards.queue.slice(1), shown: false } }));
+  const foot = !head
+    ? <button className="primary wide" onClick={onNext}>{nextLabel}</button>
+    : !card
+      ? <button className="primary wide" onClick={skip}>Skip this card</button>
+      : !run.cards.shown
+        ? <button className="primary wide" onClick={() => onChange((current) => ({ ...current, cards: { ...current.cards, shown: true } }))}>Show answer</button>
+        : <><button className="secondary grade" onClick={() => onGrade('again')} disabled={saving}>Again</button><button className="primary grade" onClick={() => onGrade('good')} disabled={saving}>Good</button></>;
+  return (
+    <Pane step={`${step}-${head?.id || 'end'}-${left}`} restored={restored} foot={foot}>
+      <p className="eyebrow">Cards</p>
+      <h2 id="morning-title" className="m-title">{head ? 'Say the answer, then check it' : run.cards.reviewed ? 'Cards done' : 'No cards due'}</h2>
+      <p className="hint" aria-live="polite">{head ? `${left} ${left === 1 ? 'card' : 'cards'} left${head.repeat ? '. This one comes back once after Again.' : ''}` : run.cards.reviewed ? `${run.cards.reviewed} reviewed, ${run.cards.again} to see again tomorrow.` : 'Nothing is due this morning and there are no new cards for it.'}</p>
+      {head && card && (
+        <div className={run.cards.shown ? 'm-card is-shown' : 'm-card'}>
+          <p className="m-card-meta"><Tag>{examLabel(card.exam)}</Tag>{card.source === 'mine' && <span>Your card</span>}</p>
+          <p className="m-card-front">{keepTogether(card.front)}</p>
+          {run.cards.shown && <p className="m-card-back">{keepTogether(card.back)}</p>}
+        </div>
+      )}
+      {head && !card && <p className="hint">This card is no longer in the deck.</p>}
+    </Pane>
+  );
+}
+
+function LearnPane({ run, restored, step, item, lesson, nextLabel, onChange, onNext }: PaneProps & {
+  item: Morning | undefined; lesson: Lesson | null | undefined; nextLabel: string; onChange: MorningChange; onNext: () => void;
+}) {
+  const stage = run.learn.stage;
+  const to = (next: LearnStage) => onChange((current) => ({ ...current, learn: { ...current.learn, stage: next } }));
+  const brief = item?.brief;
+  const missing = lesson === null ? <p className="hint">This lesson is not in the library yet.</p> : !lesson ? <p className="hint loading-note">Opening the lesson</p> : null;
+  if (stage === 'brief') {
+    return (
+      <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={() => to('lesson')}>Read the lesson</button>}>
+        <p className="eyebrow">Learn, the brief</p>
+        <h2 id="morning-title" className="m-title">{item?.title || 'Today’s lesson'}</h2>
+        {brief && (
+          <figure className="brief-note">
+            <blockquote><p>{keepTogether(brief.text)}</p></blockquote>
+            <figcaption><strong>{brief.from}</strong>, {brief.role}</figcaption>
+            <p className="brief-ask"><span>Your task</span>{keepTogether(brief.ask)}</p>
+          </figure>
+        )}
+      </Pane>
+    );
+  }
+  if (stage === 'lesson') {
+    return (
+      <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={() => to('build')} disabled={!lesson}>Do the step yourself</button>}>
+        <p className="eyebrow">Learn, the lesson</p>
+        <h2 id="morning-title" className="m-title">{item?.title || 'Today’s lesson'}</h2>
+        {missing || (lesson && <LessonBody lesson={lesson} idPrefix="ml" parts="read" />)}
+      </Pane>
+    );
+  }
+  if (stage === 'build') {
+    return (
+      <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={() => to('recall')}>Go to recall</button>}>
+        <p className="eyebrow">Learn, your turn</p>
+        <h2 id="morning-title" className="m-title">{lesson ? keepTogether(lesson.build.goal) : 'Your turn'}</h2>
+        {missing || (lesson && (
+          <>
+            <ol className="steps">{lesson.build.steps.map((line) => <li key={line}>{keepTogether(line)}</li>)}</ol>
+            <label className="field" htmlFor="build-answer">Your answer</label>
+            <textarea id="build-answer" className="writing-short" value={run.learn.build} maxLength={6000} onChange={(event) => { const text = event.target.value; onChange((current) => ({ ...current, learn: { ...current.learn, build: text } }), false); }} placeholder="Write it before you look at the model answer" />
+            {lesson.build.modelAnswer && (run.learn.model
+              ? <section className="model-answer" aria-label="Model answer"><h3>Model answer</h3><RichText text={lesson.build.modelAnswer} /></section>
+              : <button className="secondary reveal" onClick={() => onChange((current) => ({ ...current, learn: { ...current.learn, model: true } }))}>Reveal the model answer</button>)}
+          </>
+        ))}
+      </Pane>
+    );
+  }
+  const prompts = lesson ? lesson.check.slice(0, 3) : [];
+  return (
+    <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onNext}>{nextLabel}</button>}>
+      <p className="eyebrow">Learn, recall</p>
+      <h2 id="morning-title" className="m-title">Answer from memory, then reveal</h2>
+      {missing || (
+        <ol className="recall">
+          {prompts.map((prompt, position) => (
+            <li key={prompt.q}>
+              <p className="recall-q">{keepTogether(prompt.q)}</p>
+              {run.learn.recall[position]
+                ? <div className="recall-a"><RichText text={prompt.a} /></div>
+                : <button className="secondary reveal" onClick={() => onChange((current) => { const shown = [...current.learn.recall]; shown[position] = true; return { ...current, learn: { ...current.learn, recall: shown } }; })} aria-label={`Reveal answer ${position + 1}`}>Reveal</button>}
+            </li>
+          ))}
+        </ol>
+      )}
+    </Pane>
+  );
+}
+
+function QuestionsPane({ run, restored, saving, step, pace, nextLabel, onChange, onAnswer, onNext }: PaneProps & {
+  pace: number; nextLabel: string; onChange: MorningChange; onAnswer: (question: ScenarioQuestion, choice: string, sure: boolean, seconds: number) => Promise<boolean>; onNext: () => void;
+}) {
+  const questions = run.questions.ids.map((id) => questionById(id)).filter((question): question is ScenarioQuestion => Boolean(question));
+  const position = Math.min(run.questions.index, Math.max(0, questions.length - 1));
+  const question = questions[position];
+  if (!question) {
+    return (
+      <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onNext}>{nextLabel}</button>}>
+        <p className="eyebrow">Questions</p>
+        <h2 id="morning-title" className="m-title">No questions due</h2>
+        <p className="lede">Nothing is due for review and there are no new questions for this morning.</p>
+      </Pane>
+    );
+  }
+  const last = position >= questions.length - 1;
+  return (
+    <QuestionStep
+      key={question.id}
+      question={question}
+      number={position + 1}
+      total={questions.length}
+      pace={pace}
+      saved={run.questions.answers[question.id]}
+      saving={saving}
+      restored={restored}
+      nextLabel={last ? nextLabel : 'Next question'}
+      onAnswer={onAnswer}
+      onNext={() => (last ? onNext() : onChange((current) => ({ ...current, questions: { ...current.questions, index: position + 1 } })))}
+    />
+  );
+}
+
+/* One question at the exam's pace. The clock only informs. */
+function QuestionStep({ question, number, total, pace, saved, saving, restored, nextLabel, onAnswer, onNext }: {
+  question: ScenarioQuestion; number: number; total: number; pace: number; saved?: MorningAnswer; saving: boolean; restored: boolean; nextLabel: string;
+  onAnswer: (question: ScenarioQuestion, choice: string, sure: boolean, seconds: number) => Promise<boolean>; onNext: () => void;
+}) {
+  const [choice, setChoice] = useState(saved?.choice ?? '');
+  const [sure, setSure] = useState<'' | 'sure' | 'guess'>(saved ? (saved.sure ? 'sure' : 'guess') : '');
+  const [started] = useState(nowMs);
+  const [seconds, setSeconds] = useState(saved?.seconds ?? 0);
+  useEffect(() => {
+    if (saved) return;
+    const handle = window.setInterval(() => setSeconds(Math.floor((nowMs() - started) / 1000)), 1000);
+    return () => window.clearInterval(handle);
+  }, [saved, started]);
+  const answered = Boolean(saved);
+  useEffect(() => {
+    if (!answered) return;
+    const handle = window.setTimeout(() => document.getElementById(`sheet-${question.id}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' }), 40);
+    return () => window.clearTimeout(handle);
+  }, [answered, question.id]);
+  const shown = saved ? saved.seconds : seconds;
+  const over = !saved && seconds > pace;
+  async function check() {
+    if (!choice || !sure || saved || saving) return;
+    await onAnswer(question, choice, sure === 'sure', seconds);
+  }
+  const foot = saved
+    ? <button className="primary wide" onClick={onNext} autoFocus>{nextLabel}</button>
+    : <button className="primary wide" onClick={check} disabled={!choice || !sure || saving}>Check</button>;
+  return (
+    <Pane step={question.id} restored={restored} foot={foot}>
+      <div className="q-head">
+        <p className="quiz-meta"><span>Question {number} of {total}</span><span>{areaOf(question.domain)}</span></p>
+        <p className={over ? 'q-clock is-over' : 'q-clock'}><Digits value={formatClock(shown)} /><span className="q-pace">of {formatClock(pace)}{over ? ', past the exam pace' : ''}</span></p>
+      </div>
+      <h2 id="morning-title" className="quiz-q">{keepTogether(question.prompt)}</h2>
+      <div className="answers" role="radiogroup" aria-label="Answers">
+        {question.options.map(([key, text]) => {
+          const look = saved ? (key === question.correct ? 'is-right' : key === saved.choice ? 'is-wrong' : 'is-muted') : choice === key ? 'is-picked' : '';
+          return (
+            <label key={key} className={`answer ${look}`}>
+              <input type="radio" name={`q-${question.id}`} value={key} checked={choice === key} disabled={Boolean(saved)} onChange={() => setChoice(key)} />
+              <span className="answer-key" aria-hidden="true">{key}</span>
+              <span>{keepTogether(text)}</span>
+            </label>
+          );
+        })}
+      </div>
+      {!saved && (
+        <fieldset className="sure">
+          <legend>Sure or guess?</legend>
+          <div className="sure-options">
+            {([['sure', 'Sure'], ['guess', 'Guess']] as const).map(([key, label]) => (
+              <label key={key} className={sure === key ? 'active' : ''}><input type="radio" name={`s-${question.id}`} value={key} checked={sure === key} onChange={() => setSure(key)} />{label}</label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      {saved && (
+        <section id={`sheet-${question.id}`} className={saved.correct ? 'sheet is-right' : 'sheet is-wrong'} role="status">
+          <strong className="sheet-title"><span className="sheet-icon" aria-hidden="true">{saved.correct ? <Check /> : '×'}</span>{saved.correct ? (saved.sure ? 'Right' : 'Right, but a guess. It comes back in two days.') : `The answer is ${question.correct}`}</strong>
+          <p>{keepTogether(question.explanation)}</p>
+          <h3 className="sheet-sub">Why the other answers are wrong</h3>
+          <ul className="why-wrong">
+            {question.options.filter(([key]) => key !== question.correct).map(([key]) => (
+              <li key={key}><span className="why-key" aria-hidden="true">{key}</span><span><span className="sr-only">{key}: </span>{keepTogether(question.incorrect[key] || 'It does not answer what the question asks.')}</span></li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Pane>
+  );
+}
+
+function MistakesPane({ run, restored, saving, step, finalLabel, onChange, onDone }: PaneProps & { finalLabel: string; onChange: MorningChange; onDone: () => void }) {
+  const missed = run.questions.ids.filter((id) => run.questions.answers[id] && run.questions.answers[id].result !== 'right');
+  return (
+    <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onDone} disabled={saving}>{finalLabel}</button>}>
+      <p className="eyebrow">Mistakes</p>
+      <h2 id="morning-title" className="m-title">{missed.length ? `${missed.length} to write up` : 'Nothing to write up'}</h2>
+      <p className="lede">{missed.length ? 'For each wrong or guessed question, write the rule you missed in one line. Each line becomes one of your flashcards, due tomorrow.' : 'Every answer this morning was right and sure.'}</p>
+      {missed.length > 0 && (
+        <ol className="mistakes">
+          {missed.map((id) => {
+            const question = questionById(id);
+            const given = run.questions.answers[id];
+            if (!question) return null;
+            const saved = run.savedCards.includes(id);
+            return (
+              <li key={id}>
+                <p className="mistake-q">{keepTogether(question.prompt)}</p>
+                <p className="hint">{given.correct ? `Guessed. ${given.choice} was right.` : `You chose ${given.choice}. The answer is ${question.correct}.`}</p>
+                <label className="field" htmlFor={`rule-${id}`}>The rule you missed</label>
+                <input id={`rule-${id}`} value={run.mistakes[id] || ''} maxLength={300} disabled={saved} placeholder="One line, in your own words" onChange={(event) => { const text = event.target.value; onChange((current) => ({ ...current, mistakes: { ...current.mistakes, [id]: text } }), false); }} />
+                {saved && <p className="hint">Saved as a card.</p>}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </Pane>
+  );
+}
+
+function ReflectPane({ run, restored, saving, step, onChange, onFinish }: PaneProps & { onChange: MorningChange; onFinish: () => void }) {
+  const short = Math.max(0, 100 - run.reflection.trim().length);
+  return (
+    <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onFinish} disabled={saving || short > 0}>Finish morning</button>}>
+      <p className="eyebrow">Reflection</p>
+      <h2 id="morning-title" className="m-title">Your week</h2>
+      <div className="reflect-body">
+        <label className="field" htmlFor="reflection">What can you now explain without notes, what still needs notes, and what will you change next week?</label>
+        <textarea id="reflection" value={run.reflection} maxLength={6000} onChange={(event) => { const text = event.target.value; onChange((current) => ({ ...current, reflection: text }), false); }} />
+        <p className="hint" aria-live="polite">{short ? `${short} more characters` : 'Ready to save'}</p>
+      </div>
+    </Pane>
+  );
+}
+
+/* A weekend lab: the steps in a real tool, then Finish lab. */
+function WeekendFocus({ item, block, saving, onLeave, onFinish }: { item: WeekendBlock; block?: ExamBlock; saving: boolean; onLeave: () => void; onFinish: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
+  useOverlayFocus(dialog, ['.hero-session .play', '#main']);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onLeave(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onLeave]);
+  return (
+    <div ref={dialog} tabIndex={-1} className="focus morning" role="dialog" aria-modal="true" aria-labelledby="weekend-title">
+      <header className="focus-bar">
+        <span className="focus-where"><span className="live-dot" aria-hidden="true" />{block ? `${block.cert}, weekend block ${block.weekends.indexOf(item) + 1}` : 'Weekend block'}</span>
+        <button className="ghost" onClick={onLeave}>Leave</button>
+      </header>
+      <Pane step={item.key} foot={<button className="primary wide" onClick={onFinish} disabled={saving}>Finish lab</button>}>
+        <p className="eyebrow">Lab, {formatMinutes(item.minutes)}</p>
+        <h2 id="weekend-title" className="m-title">{keepTogether(item.title)}</h2>
+        <ol className="steps lab-steps">{item.steps.map((line) => <li key={line}>{keepTogether(line)}</li>)}</ol>
+      </Pane>
+    </div>
+  );
+}
+
+/* ==========================================================================
+   Plan: the four exam blocks in order, with estimated dates.
+   ========================================================================== */
+
+function PlanView({ completed, records, estimates, today, current, runKey, nextMorning, onMorning, onWeekend }: {
+  completed: Set<string>; records: Records; estimates: Map<string, string | null>; today: string; current?: ExamBlock; runKey?: string; nextMorning?: string;
+  onMorning: (item: Morning) => void; onWeekend: (item: WeekendBlock) => void;
+}) {
+  const start = records.plan.startDate && isStudyDate(records.plan.startDate) && records.plan.startDate > today ? records.plan.startDate : '';
+  return (
+    <div className="plan">
+      <header className="screen-head">
+        <h1>Plan</h1>
+        <p className="lede">Four exams, one at a time. Dates are estimates at five mornings and one weekend block a week, counted from {start ? `your start date, ${formatDate(start)}` : 'today'}.</p>
+      </header>
+      <ol className="blocks">
+        {examBlocks.map((item, position) => {
+          const isCurrent = current?.key === item.key;
+          const done = item.status === 'ready' && blockFinished(item, completed);
+          const exam = estimates.get(`${item.key}-exam`);
+          const status = item.status === 'building' ? 'Being built' : done ? 'Done' : isCurrent ? 'Now' : 'Ready';
+          return (
+            <li key={item.key} id={`block-${item.key}`} className={isCurrent ? 'block is-current' : 'block'}>
+              <header className="block-head">
+                <p className="eyebrow"><span>Exam {position + 1} of {examBlocks.length}</span><span className={isCurrent ? 'block-now' : undefined}>{status}</span></p>
+                <h2>{keepTogether(item.title)}</h2>
+                {exam && <p className="block-when">Exam about {formatDate(exam)}</p>}
+              </header>
+              {item.status === 'building' && <p className="block-line">Being built. {keepTogether(item.summary)}</p>}
+              {item.status === 'ready' && !isCurrent && <p className="block-line">{done ? 'Every morning and weekend block is done.' : keepTogether(item.summary)}</p>}
+              {isCurrent && (
+                <div className="block-body">
+                  <p className="block-line">{keepTogether(item.summary)}</p>
+                  <h3 className="section-title">Mornings</h3>
+                  <ul className="list plan-items" aria-label={`${item.cert} mornings`}>
+                    {item.mornings.map((entry, number) => {
+                      const isDone = completed.has(entry.key);
+                      const gate = morningGate(item, entry, completed);
+                      const date = estimates.get(entry.key);
+                      const now = runKey === entry.key;
+                      const next = !now && entry.key === nextMorning;
+                      const state = now ? 'In progress' : isDone ? 'Done' : next ? 'Next' : !gate.open ? gate.reason : date ? shortDate(date) : '';
+                      return <PlanRow key={entry.key} mark={isDone ? 'done' : now || next ? 'next' : 'none'} label={`Morning ${number + 1}, ${kindLabel(entry.kind).toLowerCase()}${(next || now) && date ? `, ${shortDate(date)}` : ''}`} title={entry.title} state={state} onOpen={gate.open || isDone ? () => onMorning(entry) : undefined} />;
+                    })}
+                  </ul>
+                  <h3 className="section-title">Weekend blocks</h3>
+                  <ul className="list plan-items" aria-label={`${item.cert} weekend blocks`}>
+                    {item.weekends.map((entry, number) => {
+                      const isDone = completed.has(entry.key);
+                      const gate = weekendState(item, entry, completed, records, today);
+                      const date = estimates.get(entry.key);
+                      const state = isDone ? 'Done' : !gate.open ? gate.reason : date ? shortDate(date) : 'Open';
+                      return <PlanRow key={entry.key} mark={isDone ? 'done' : gate.open ? 'next' : 'none'} label={`Weekend ${number + 1}, ${entry.kind === 'lab' ? 'lab' : 'practice exam'}, ${formatMinutes(entry.minutes)}`} title={entry.title} state={state} onOpen={gate.open ? () => onWeekend(entry) : undefined} />;
+                    })}
+                  </ul>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function PlanRow({ mark, label, title, state, onOpen }: { mark: 'done' | 'next' | 'none'; label: string; title: string; state: string; onOpen?: () => void }) {
+  const inner = (
+    <>
+      <span className={mark === 'done' ? 'tick is-done' : mark === 'next' ? 'tick is-next' : 'tick'} aria-hidden="true">{mark === 'done' && <Check />}</span>
+      <span className="pi-text"><small>{label}</small><strong>{keepTogether(title)}</strong></span>
+      <span className={mark === 'next' ? 'pi-state is-next' : 'pi-state'}>{state}</span>
+      {onOpen ? <Chevron dir="right" /> : <span aria-hidden="true" />}
+    </>
+  );
+  return <li>{onOpen ? <button className="plan-item" onClick={onOpen}>{inner}</button> : <div className="plan-item is-waiting">{inner}</div>}</li>;
+}
+
+/* ==========================================================================
    Learn: everything to read, inside the app.
    ========================================================================== */
 
-/* The 65 lessons live with their sessions on Plan and Today. Learn holds
-   the rest of the library. */
-const learnTabs: Array<[LearnTab, string]> = [['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
+const learnTabs: Array<[LearnTab, string]> = [['lessons', 'Lessons'], ['documents', 'Documents'], ['exams', 'Exams'], ['glossary', 'Glossary']];
 
-function LearnView({ tab: chosenTab, item, lessonFrom, onLeaveLesson, onTab, onItem, completed, documents, onStart, onOpenDoc }: {
-  tab: LearnTab; item: string | null; lessonFrom: LessonFrom; onLeaveLesson: () => void; onTab: (tab: LearnTab) => void; onItem: (item: string | null) => void;
-  completed: Set<string>; documents: ReactNode;
-  onStart: (task: StudyTask) => void; onOpenDoc: (item: Deliverable) => void;
+function LearnView({ tab: chosenTab, item, lessonFrom, block, onLeaveLesson, onTab, onOpenLesson, onItem, completed, documents, onOpenDoc }: {
+  tab: LearnTab; item: string | null; lessonFrom: LessonFrom; block?: ExamBlock; onLeaveLesson: () => void; onTab: (tab: LearnTab) => void;
+  onOpenLesson: (key: string) => void; onItem: (item: string | null) => void; completed: Set<string>; documents: ReactNode; onOpenDoc: (item: Deliverable) => void;
 }) {
   const [query, setQuery] = useState('');
   const [termCert, setTermCert] = useState<Certification | 'General' | 'All'>('All');
   const reading = useReading();
   const lessons = reading?.lessons;
-  const backLabel = lessonFrom === 'plan' ? 'Plan' : 'Today';
+  const backLabel = lessonFrom === 'plan' ? 'Plan' : lessonFrom === 'today' ? 'Today' : 'Learn';
   if (item && chosenTab === 'lessons' && !reading) {
     return <div className="reader"><button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button><p className="hint loading-note">Opening the reading</p></div>;
   }
-  const tab: LearnTab = chosenTab === 'lessons' && !(item && lessons?.[item]) ? 'documents' : chosenTab;
+  const tab: LearnTab = chosenTab === 'lessons' && item && !lessons?.[item] ? 'lessons' : chosenTab;
 
   if (tab === 'lessons' && item && lessons?.[item]) {
+    const owner = examBlocks.find((entry) => entry.mornings.some((morning) => morning.lesson === item));
+    if (owner) {
+      const taught = owner.mornings.filter((morning) => morning.kind === 'learn' && morning.lesson);
+      const position = taught.findIndex((morning) => morning.lesson === item);
+      const morning = taught[position];
+      const prev = taught[position - 1];
+      const next = taught[position + 1];
+      return (
+        <div className="reader-layout">
+          <article className="reader" aria-labelledby="reader-title">
+            <button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button>
+            <header className="reader-head">
+              <p className="eyebrow">{owner.cert}, morning {owner.mornings.indexOf(morning) + 1} of {owner.mornings.length}{completed.has(morning.key) ? ', done' : ''}</p>
+              <h1 id="reader-title">{keepTogether(morning.title)}</h1>
+              <p className="reader-meta"><Tag>{examLabel(owner.cert)}</Tag><span className="meta-time">35 min</span></p>
+            </header>
+            <LessonBody lesson={lessons[item]} idPrefix="ls" />
+            <nav className="reader-nav" aria-label="Other lessons">
+              {prev?.lesson ? <button onClick={() => onItem(prev.lesson || null)}><small><Chevron dir="left" /> Previous</small><span>{prev.title}</span></button> : <span />}
+              {next?.lesson ? <button className="next" onClick={() => onItem(next.lesson || null)}><small>Next <Chevron dir="right" /></small><span>{next.title}</span></button> : <span />}
+            </nav>
+          </article>
+          <LessonToc key={item} lesson={lessons[item]} idPrefix="ls" />
+        </div>
+      );
+    }
     const index = allTasks.findIndex((task) => task.key === item);
     const task = allTasks[index];
-    const prev = allTasks[index - 1];
-    const next = allTasks[index + 1];
-    const week = Math.floor(index / 5) + 1;
-    return (
-      <div className="reader-layout">
-        <article className="reader" aria-labelledby="reader-title">
-          <button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button>
-          <header className="reader-head">
-            <p className="eyebrow">Week {week}, {task.day}{completed.has(task.key) ? ', done' : ''}</p>
-            <h1 id="reader-title">{keepTogether(task.title)}</h1>
-            <p className="reader-meta">{task.certifications.map((cert) => <Tag key={cert}>{examLabel(cert)}</Tag>)}<span className="meta-time">{formatMinutes(taskMinutes(task.meta))}</span></p>
-          </header>
-          <LessonBody lesson={lessons[item]} task={task} onOpenDoc={onOpenDoc} idPrefix="ls" />
-          <div className="reader-actions">
-            {!completed.has(task.key) && <button className="primary" onClick={() => onStart(task)}><svg className="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>Start this session</button>}
-            {task.docs.map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry)).map((entry) => <button key={entry.key} className="secondary" onClick={() => onOpenDoc(entry)}>Write {lowerFirst(entry.title)}</button>)}
-          </div>
-          <nav className="reader-nav" aria-label="Other lessons">
-            {prev && lessonIndex[prev.key] ? <button onClick={() => onItem(prev.key)}><small><Chevron dir="left" /> Previous</small><span>{prev.title}</span></button> : <span />}
-            {next && lessonIndex[next.key] ? <button className="next" onClick={() => onItem(next.key)}><small>Next <Chevron dir="right" /></small><span>{next.title}</span></button> : <span />}
-          </nav>
-        </article>
-        <LessonToc key={item} lesson={lessons[item]} idPrefix="ls" />
-      </div>
-    );
+    if (task) {
+      const prev = allTasks[index - 1];
+      const next = allTasks[index + 1];
+      const week = Math.floor(index / 5) + 1;
+      const docs = task.docs.map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry));
+      return (
+        <div className="reader-layout">
+          <article className="reader" aria-labelledby="reader-title">
+            <button className="back" onClick={onLeaveLesson}><Chevron dir="left" /> {backLabel}</button>
+            <header className="reader-head">
+              <p className="eyebrow">Kestrel library, week {week}, {task.day}</p>
+              <h1 id="reader-title">{keepTogether(task.title)}</h1>
+              <p className="reader-meta">{task.certifications.map((cert) => <Tag key={cert}>{examLabel(cert)}</Tag>)}<span className="meta-time">{formatMinutes(taskMinutes(task.meta))}</span></p>
+            </header>
+            <LessonBody lesson={lessons[item]} task={task} onOpenDoc={onOpenDoc} idPrefix="ls" />
+            {docs.length > 0 && <div className="reader-actions">{docs.map((entry) => <button key={entry.key} className="secondary" onClick={() => onOpenDoc(entry)}>Write {lowerFirst(entry.title)}</button>)}</div>}
+            <nav className="reader-nav" aria-label="Other lessons">
+              {prev && lessonIndex[prev.key] ? <button onClick={() => onItem(prev.key)}><small><Chevron dir="left" /> Previous</small><span>{prev.title}</span></button> : <span />}
+              {next && lessonIndex[next.key] ? <button className="next" onClick={() => onItem(next.key)}><small>Next <Chevron dir="right" /></small><span>{next.title}</span></button> : <span />}
+            </nav>
+          </article>
+          <LessonToc key={item} lesson={lessons[item]} idPrefix="ls" />
+        </div>
+      );
+    }
   }
 
   if (tab === 'exams' && item) {
@@ -1462,16 +2022,56 @@ function LearnView({ tab: chosenTab, item, lessonFrom, onLeaveLesson, onTab, onI
 
   const needle = query.trim().toLowerCase();
   const terms = glossary.filter((term) => (termCert === 'All' || term.cert === termCert) && (!needle || term.term.toLowerCase().includes(needle) || term.definition.toLowerCase().includes(needle)));
+  const blockLessons = block ? block.mornings.filter((morning) => morning.kind === 'learn' && morning.lesson && lessonIndex[morning.lesson]) : [];
+  const kestrelCount = allTasks.filter((task) => lessonIndex[task.key]).length;
 
   return (
     <div className="learn">
       <header className="screen-head">
         <h1>Learn</h1>
-        <p className="lede">The {Object.keys(guideIndex).length} project documents with finished examples, the {countWord(examGuides.length).toLowerCase()} exam guides and {glossary.length} terms. Each session’s lesson opens from Plan.</p>
+        <p className="lede">{block ? `The lessons for ${block.title} first, then the Kestrel library: ` : 'The Kestrel library: '}{kestrelCount} lessons, {Object.keys(guideIndex).length} project documents with finished examples, {examGuides.length} exam guides and {glossary.length} terms.</p>
       </header>
       <div className="segmented" role="tablist" aria-label="Learn sections">
         {learnTabs.map(([key, label]) => <button key={key} role="tab" aria-selected={tab === key} className={tab === key ? 'active' : ''} onClick={() => onTab(key)}>{label}</button>)}
       </div>
+
+      {tab === 'lessons' && (
+        <div className="lesson-library">
+          {block && blockLessons.length > 0 && (
+            <section aria-labelledby="block-lessons">
+              <h2 id="block-lessons" className="section-title">{block.title}</h2>
+              <ul className="list block-lessons">
+                {blockLessons.map((morning) => (
+                  <li key={morning.key}>
+                    <button className="row" onClick={() => onOpenLesson(morning.lesson || morning.key)}>
+                      <span className="lesson-no" aria-hidden="true">{block.mornings.indexOf(morning) + 1}</span>
+                      <span className="row-text"><strong>{keepTogether(morning.title)}</strong><small>Morning {block.mornings.indexOf(morning) + 1}{morning.brief ? `, brief from ${morning.brief.from}` : ''}</small></span>
+                      <Status kind={completed.has(morning.key) ? 'done' : 'none'}>{completed.has(morning.key) ? 'Done' : 'Not yet'}</Status>
+                      <Chevron dir="right" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          <section aria-labelledby="kestrel-lessons">
+            <h2 id="kestrel-lessons" className="section-title">Kestrel library</h2>
+            <p className="hint library-note">{kestrelCount} lessons from Project Beacon, by week. Open one when a document or a question sends you there.</p>
+            <div className="list lesson-weeks">
+              {studyWeeks.map((week) => (
+                <details key={week.number} className="week-fold" id={`library-week-${week.number}`}>
+                  <summary className="row"><span className="row-text"><strong>Week {week.number}</strong><small>{keepTogether(week.theme)}</small></span><FoldMark /></summary>
+                  <ul className="week-lessons">
+                    {week.tasks.filter((task) => lessonIndex[task.key]).map((task) => (
+                      <li key={task.key}><button className="row" onClick={() => onOpenLesson(task.key)}><span className="row-text"><strong>{keepTogether(task.title)}</strong><small>{task.day}</small></span><Chevron dir="right" /></button></li>
+                    ))}
+                  </ul>
+                </details>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
 
       {tab === 'documents' && documents}
 
@@ -1512,8 +2112,10 @@ function LearnView({ tab: chosenTab, item, lessonFrom, onLeaveLesson, onTab, onI
   );
 }
 
-function LessonBody({ lesson, task, onOpenDoc, idPrefix }: { lesson: Lesson; task: StudyTask; onOpenDoc?: (item: Deliverable) => void; idPrefix: string }) {
-  const docs = task.docs.map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry));
+/* A lesson. In a morning only the reading parts show ("read"): the step he
+   does himself and the recall prompts come after it, one at a time. */
+function LessonBody({ lesson, task, onOpenDoc, idPrefix, parts = 'all' }: { lesson: Lesson; task?: StudyTask; onOpenDoc?: (item: Deliverable) => void; idPrefix: string; parts?: 'all' | 'read' }) {
+  const docs = (task?.docs || []).map((key) => allDeliverables.find((entry) => entry.key === key)).filter((entry): entry is Deliverable => Boolean(entry));
   const docGuides = useReading()?.docGuides || {};
   const id = (part: string) => `${idPrefix}-${part}`;
   return (
@@ -1529,24 +2131,26 @@ function LessonBody({ lesson, task, onOpenDoc, idPrefix }: { lesson: Lesson; tas
         <h3>Key terms</h3>
         <dl className="key-terms">{lesson.keyTerms.map((term) => <div key={term.term}><dt>{keepTogether(term.term)}</dt><dd>{keepTogether(term.definition)}</dd></div>)}</dl>
       </section>
-      <section className="build" aria-label="Build today" id={id('build')}>
-        <h3>Build today</h3>
-        <p className="build-goal">{keepTogether(lesson.build.goal)}</p>
-        <ol className="steps">{lesson.build.steps.map((step) => <li key={step}>{keepTogether(step)}</li>)}</ol>
-        {lesson.build.modelAnswer && (
-          <details className="finished" open={docs.length === 0}>
-            <summary>{docs.length ? 'What good looks like' : 'Model answer'}<FoldMark /></summary>
-            <RichText text={lesson.build.modelAnswer} />
-          </details>
-        )}
-        {docs.filter((entry) => docGuides[entry.key]).map((entry) => (
-          <details key={entry.key} className="finished">
-            <summary>See the finished {lowerFirst(entry.title)}<FoldMark /></summary>
-            <RichText text={docGuides[entry.key].modelDocument} />
-            {onOpenDoc && <button className="secondary" onClick={() => onOpenDoc(entry)}>Write your own version</button>}
-          </details>
-        ))}
-      </section>
+      {parts === 'all' && (
+        <section className="build" aria-label="Build today" id={id('build')}>
+          <h3>Build today</h3>
+          <p className="build-goal">{keepTogether(lesson.build.goal)}</p>
+          <ol className="steps">{lesson.build.steps.map((step) => <li key={step}>{keepTogether(step)}</li>)}</ol>
+          {lesson.build.modelAnswer && (
+            <details className="finished" open={docs.length === 0}>
+              <summary>{docs.length ? 'What good looks like' : 'Model answer'}<FoldMark /></summary>
+              <RichText text={lesson.build.modelAnswer} />
+            </details>
+          )}
+          {docs.filter((entry) => docGuides[entry.key]).map((entry) => (
+            <details key={entry.key} className="finished">
+              <summary>See the finished {lowerFirst(entry.title)}<FoldMark /></summary>
+              <RichText text={docGuides[entry.key].modelDocument} />
+              {onOpenDoc && <button className="secondary" onClick={() => onOpenDoc(entry)}>Write your own version</button>}
+            </details>
+          ))}
+        </section>
+      )}
       <section aria-label="On the exam" id={id('exam')}>
         <h3>On the exam</h3>
         <ul className="tips">{lesson.examTips.map((tip) => <li key={tip.tip}><Tag>{examLabel(tip.cert)}</Tag><p>{keepTogether(tip.tip)}</p></li>)}</ul>
@@ -1555,17 +2159,19 @@ function LessonBody({ lesson, task, onOpenDoc, idPrefix }: { lesson: Lesson; tas
         <h3>Watch out for</h3>
         <ul className="pitfalls">{lesson.pitfalls.map((pitfall) => <li key={pitfall}>{keepTogether(pitfall)}</li>)}</ul>
       </section>
-      <section aria-label="Check yourself" id={id('check')}>
-        <h3>Check yourself</h3>
-        <ol className="self-check">
-          {lesson.check.map((item) => (
-            <li key={item.q}>
-              <p>{keepTogether(item.q)}</p>
-              <details><summary>Show the answer</summary><p>{keepTogether(item.a)}</p></details>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {parts === 'all' && (
+        <section aria-label="Check yourself" id={id('check')}>
+          <h3>Check yourself</h3>
+          <ol className="self-check">
+            {lesson.check.map((item) => (
+              <li key={item.q}>
+                <p>{keepTogether(item.q)}</p>
+                <details><summary>Show the answer</summary><p>{keepTogether(item.a)}</p></details>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
     </div>
   );
 }
@@ -1695,91 +2301,6 @@ function ExamGuideBody({ guide }: { guide: ExamGuide }) {
 
 function DownloadIcon() {
   return <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" /></svg>;
-}
-
-function BookIcon() {
-  return <svg className="book-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" /></svg>;
-}
-
-/* ==========================================================================
-   Focus session: full screen, one thing to do.
-   ========================================================================== */
-
-function FocusSession({ task, index, timer, elapsed, links, artifactStatus, saving, onPause, onMinimise, onFinish, onDiscard, onOpenWork, lesson }: {
-  task: StudyTask; index: number; timer: Timer; elapsed: number; links: WorkLink[]; artifactStatus: (key: string) => string | undefined; saving: boolean;
-  onPause: () => void; onMinimise: () => void; onFinish: () => void; onDiscard: () => void; onOpenWork: (link: WorkLink) => void; lesson?: Lesson;
-}) {
-  const [reading, setReading] = useState(false);
-  const dialog = useRef<HTMLDivElement>(null);
-  useOverlayFocus(dialog, ['#main'], reading);
-  const planned = taskMinutes(task.meta) * 60;
-  const fraction = Math.min(1, elapsed / planned);
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') { if (reading) setReading(false); else onMinimise(); } };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onMinimise, reading]);
-  if (reading && lesson) {
-    return (
-      <div ref={dialog} tabIndex={-1} className="focus focus-reading" role="dialog" aria-modal="true" aria-labelledby="focus-lesson-title">
-        <header className="focus-bar">
-          <button className="ghost" onClick={() => setReading(false)}><Chevron dir="left" /> Timer</button>
-          <span className={timer.pausedAt ? 'focus-mini paused' : 'focus-mini'}><span className="live-dot" aria-hidden="true" /><Digits value={formatClock(elapsed)} /></span>
-        </header>
-        <div className="focus-read">
-          <p className="eyebrow">Week {Math.floor(index / 5) + 1}, {task.day} lesson</p>
-          <h2 id="focus-lesson-title">{keepTogether(task.title)}</h2>
-          <LessonBody lesson={lesson} task={task} onOpenDoc={(item) => onOpenWork({ kind: 'artifact', item })} idPrefix="fl" />
-          <button className="primary wide" onClick={() => setReading(false)}>Back to the timer</button>
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div ref={dialog} tabIndex={-1} className={timer.pausedAt ? 'focus is-paused' : 'focus'} role="dialog" aria-modal="true" aria-labelledby="focus-title">
-      <header className="focus-bar">
-        <span className="focus-where"><span className="live-dot" aria-hidden="true" />Week {Math.floor(index / 5) + 1}, {task.day}</span>
-        <button className="ghost" onClick={onMinimise}>Minimise</button>
-      </header>
-      <div className="focus-body">
-        <div className="focus-top">
-          <p className="focus-state">{timer.pausedAt ? 'Paused' : 'In session'}</p>
-          <div className="focus-clock">
-            <span className="clock"><Digits value={formatClock(elapsed)} /></span>
-          </div>
-          <div className="focus-meter">
-            <Meter value={fraction} label={`${Math.round(fraction * 100)}% of the planned time`} />
-            <span className="of">of {formatMinutes(planned / 60)}</span>
-          </div>
-        </div>
-        <h2 id="focus-title">{keepTogether(task.title)}</h2>
-        <p className="focus-explain">{keepTogether(lesson?.summary || plainTaskExplanation(task.title))}</p>
-        <p className="focus-output"><span>Finish with</span> {taskOutput(task.meta).toLowerCase()}</p>
-        {lesson && <button className="focus-lesson" onClick={() => setReading(true)}><BookIcon /> Read the lesson</button>}
-        {links.length > 0 && (
-          <ul className="focus-work">
-            {links.map((link) => (
-              <li key={workKey(link)}>
-                <button onClick={() => onOpenWork(link)}>
-                  <span className="fw-kind">{link.kind === 'artifact' ? docNumberFor(link.item) : link.kind === 'lab' ? 'Lab' : 'Practice'}</span>
-                  <span className="fw-name">{link.kind === 'artifact' ? link.item.title : link.kind === 'lab' ? link.lab.title : 'Scenario practice'}</span>
-                  <span className="fw-status">{link.kind === 'artifact' && <DocStatus status={artifactStatus(link.item.key)} />}</span>
-                  <Chevron dir="right" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <footer className="focus-actions">
-        <button className="round" onClick={onPause} aria-label={timer.pausedAt ? 'Resume timer' : 'Pause timer'}>
-          {timer.pausedAt ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" /></svg>}
-        </button>
-        <button className="finish" onClick={onFinish} disabled={saving}>Finish session</button>
-        <button className="ghost" onClick={onDiscard}>Discard timer</button>
-      </footer>
-    </div>
-  );
 }
 
 /* ==========================================================================
@@ -1931,12 +2452,12 @@ function MakeItYours({ name, why, theme, accent, saving, onTheme, onAccent, onSa
 }
 
 /* ==========================================================================
-   Onboarding: five short steps.
+   Setup: three short steps.
    ========================================================================== */
 
-const onboardingSteps = ['You', 'Leadership', 'Security', 'Skills', 'Dates'];
+const onboardingSteps = ['You', 'Background', 'Rhythm'];
 
-function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+function Onboarding({ notice, saving, today, onSubmit }: { notice: Notice; saving: boolean; today: string; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
   const [step, setStep] = useState(0);
   const last = step === onboardingSteps.length - 1;
   return (
@@ -1944,18 +2465,23 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
       <section className="onboard-intro">
         <div className="brand"><BrandMark /><span className="brand-name">TriCert Lab</span></div>
         <div className="onboard-pitch">
-          <h1><span>Four certifications.</span> <span>Thirteen weeks.</span> <span>One session at a time.</span></h1>
-          <p className="onboard-note">You build one fictional programme, Project Beacon, and every session teaches the exams through it. Each bar below is a week of five sessions. The marked weeks are your exam gates.</p>
-          <p className="onboard-short">Build one fictional programme, Project Beacon, and learn all four exams through it.</p>
-          <WeekTrack weeks={[5, 5, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]} current={4} />
-          <ul className="onboard-certs">{certs.map((item) => <li key={item.cert}><strong>{item.label}</strong><span>{item.name}</span></li>)}</ul>
+          <h1><span>Four exams.</span> <span>One at a time.</span> <span>Ninety minutes a morning.</span></h1>
+          <p className="onboard-note">Each weekday morning has four parts: cards, a short lesson, questions at the exam’s pace and your mistakes. One weekend block a week is a lab in a real tool or a full practice exam. Earlier exams stay fresh through spaced review.</p>
+          <p className="onboard-short">Four exams, one at a time, ninety minutes a morning.</p>
+          <ol className="onboard-blocks">
+            {examBlocks.map((item, index) => <li key={item.key}><strong>{index + 1}. {examLabel(item.cert)}</strong><span>{item.status === 'ready' ? item.title : `${item.title}, being built`}</span></li>)}
+          </ol>
         </div>
       </section>
       <section className="onboard-form" aria-labelledby="setup-title">
         <div className="steps-bar" aria-hidden="true">{onboardingSteps.map((name, index) => <span key={name} className={index <= step ? 'on' : ''} />)}</div>
         <p className="eyebrow">Step {step + 1} of {onboardingSteps.length}</p>
-        <h2 id="setup-title">{['About you', 'Your project leadership', 'Your security experience', 'Your skills and time', 'Your exam dates'][step]}</h2>
-        <p className="lede">{['This is your plan. Tell it who it is for and why you are doing it. You can change both later.', 'PMP needs project leadership within the last 10 years: 36 months with a bachelor’s degree, 48 with an associate’s, 60 with secondary school, or 24 with a GAC-accredited degree. Plus 35 training hours, or an active CAPM.', 'CISSP needs five years of paid work across at least two of its eight domains. A four-year degree or an approved credential waives one year. With less, passing earns the Associate of ISC2.', 'This sets how hard practice pushes. The plan averages about 14 hours of sessions a week.', 'Optional. Dates drive your countdowns. PL-300 and ITIL fall in week 6, PMP in week 10, CISSP in week 13.'][step]}</p>
+        <h2 id="setup-title">{['About you', 'Your background', 'Your rhythm'][step]}</h2>
+        <p className="lede">{[
+          'This is your plan. Tell it who it is for and why you are doing it. You can change both later.',
+          'PMP and CISSP ask for experience. PMP needs 36 months leading projects with a bachelor’s degree (48 with an associate’s, 60 with secondary school) and 35 training hours. CISSP needs five years of paid security work.',
+          'Five mornings a week and one weekend block. Plan estimates every date from the day you start.',
+        ][step]}</p>
         <form onSubmit={(event) => { if (!last) { event.preventDefault(); setStep(step + 1); return; } onSubmit(event); }}>
           <fieldset hidden={step !== 0}>
             <legend className="sr-only">About you</legend>
@@ -1965,42 +2491,24 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
             </div>
           </fieldset>
           <fieldset hidden={step !== 1}>
-            <legend className="sr-only">Project leadership</legend>
+            <legend className="sr-only">Your background</legend>
             <div className="form-grid">
-              <div><label className="field" htmlFor="education">Highest education</label><select id="education" name="education" defaultValue="bachelor"><option value="secondary">Secondary school</option><option value="associate">Associate or vocational diploma</option><option value="bachelor">Bachelor’s or higher</option><option value="gac">PMI GAC-accredited degree</option></select></div>
+              <div className="wide"><label className="field" htmlFor="education">Highest education</label><select id="education" name="education" defaultValue="bachelor"><option value="secondary">Secondary school</option><option value="associate">Associate or vocational diploma</option><option value="bachelor">Bachelor’s or higher</option><option value="gac">PMI GAC-accredited degree</option></select></div>
               <div><label className="field" htmlFor="pmMonths">Months leading projects</label><input id="pmMonths" name="pmMonths" type="number" min="0" max="240" defaultValue="0" /></div>
-              <div className="wide"><label className="field" htmlFor="projectsLed">Projects led in the past 10 years</label><textarea id="projectsLed" name="projectsLed" placeholder="One per line: project, dates, your role, outcome" /></div>
-              <div><label className="field" htmlFor="pmTrainingHours">Training hours</label><input id="pmTrainingHours" name="pmTrainingHours" type="number" min="0" max="500" defaultValue="0" /></div>
-              <label className="tickbox"><input name="pmTrainingComplete" type="checkbox" value="yes" /><span className="box" aria-hidden="true"><Check /></span><span>All 35 hours done</span></label>
+              <div><label className="field" htmlFor="cyberMonths">Months of security work</label><input id="cyberMonths" name="cyberMonths" type="number" min="0" max="240" defaultValue="0" /></div>
+              <label className="tickbox wide"><input name="pmTrainingComplete" type="checkbox" value="yes" /><span className="box" aria-hidden="true"><Check /></span><span>The 35 PMP training hours are done</span></label>
             </div>
           </fieldset>
           <fieldset hidden={step !== 2}>
-            <legend className="sr-only">Security experience</legend>
+            <legend className="sr-only">Your rhythm</legend>
             <div className="form-grid">
-              <div><label className="field" htmlFor="cyberMonths">Months of paid security work</label><input id="cyberMonths" name="cyberMonths" type="number" min="0" max="240" defaultValue="0" /></div>
+              <div><label className="field" htmlFor="startDate">Start date</label><input id="startDate" name="startDate" type="date" defaultValue={today} required={last} /></div>
             </div>
-            <p className="field">Domains your work covered</p>
-            <div className="chips">{cyberDomains.map((domain) => <label className="chip" key={domain}><input type="checkbox" name="cyberDomains" value={domain} /><span>{domain}</span></label>)}</div>
-          </fieldset>
-          <fieldset hidden={step !== 3}>
-            <legend className="sr-only">Skills and time</legend>
-            <div className="form-grid">
-              <SkillSelect name="powerBiLevel" label="Power BI" />
-              <SkillSelect name="powerQueryLevel" label="Power Query" />
-              <SkillSelect name="daxLevel" label="DAX" />
-              <SkillSelect name="sqlLevel" label="SQL" />
-              <SkillSelect name="itilLevel" label="Service management" />
-              <div><label className="field" htmlFor="weeklyHours">Hours a week</label><input id="weeklyHours" name="weeklyHours" type="number" min="1" max="60" defaultValue="18" /></div>
-            </div>
-          </fieldset>
-          <fieldset hidden={step !== 4}>
-            <legend className="sr-only">Exam dates</legend>
-            <div className="form-grid">
-              <div><label className="field" htmlFor="pl300Target">PL-300</label><input id="pl300Target" name="pl300Target" type="date" /></div>
-              <div><label className="field" htmlFor="itilTarget">ITIL V5</label><input id="itilTarget" name="itilTarget" type="date" /></div>
-              <div><label className="field" htmlFor="pmpTarget">PMP</label><input id="pmpTarget" name="pmpTarget" type="date" /></div>
-              <div><label className="field" htmlFor="cisspTarget">CISSP</label><input id="cisspTarget" name="cisspTarget" type="date" /></div>
-            </div>
+            <ul className="hint rhythm">
+              <li>Monday to Friday: one 90-minute morning.</li>
+              <li>Saturday or Sunday: one block of 2 to 4 hours, a lab or a practice exam.</li>
+              <li>Short on time? A short morning takes 45 minutes and keeps your reviews going.</li>
+            </ul>
           </fieldset>
           {notice && <p className="toast is-error" role="alert">{notice.text}</p>}
           <div className="row-actions form-actions">
@@ -2013,54 +2521,9 @@ function Onboarding({ notice, saving, onSubmit }: { notice: Notice; saving: bool
   );
 }
 
-function SkillSelect({ name, label }: { name: string; label: string }) {
-  return <div><label className="field" htmlFor={name}>{label}</label><select id={name} name={name} defaultValue="beginner"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>;
-}
-
 /* ==========================================================================
    Visual pieces
    ========================================================================== */
-
-/* The 13 weeks as one row of bars, one per week of five sessions. Each bar
-   fills as its sessions are done, and the three exam gates carry a small
-   diamond under the bar. With onSelect each week is a button. On a phone the row wraps
-   into seven and six so every week stays a full-size target. */
-const trackGates: Record<number, string> = { 6: 'PL-300 and ITIL', 10: 'PMP', 13: 'CISSP' };
-
-function WeekTrack({ weeks, selected, current, onSelect }: { weeks: number[]; selected?: number; current?: number; onSelect?: (week: number) => void }) {
-  const total = weeks.reduce((sum, done) => sum + Math.min(5, done), 0);
-  return (
-    <div className={onSelect ? 'track track-interactive' : 'track track-static'} role={onSelect ? 'group' : 'img'} aria-label={onSelect ? 'Your 13 weeks' : `${total} of ${weeks.length * 5} sessions done${current ? `, week ${current} of ${weeks.length} in progress` : ''}. Exam gates in weeks 6, 10 and 13.`}>
-      <ol className="track-row" aria-hidden={onSelect ? undefined : true}>
-        {weeks.map((done, index) => {
-          const week = index + 1;
-          const gate = trackGates[week];
-          const classes = [done >= 5 ? 'is-full' : done > 0 ? 'is-partial' : '', gate ? 'is-gate' : '', week === selected ? 'is-selected' : '', week === current ? 'is-current' : ''].filter(Boolean).join(' ');
-          const inner = (
-            <>
-              <span className="track-num">{week}</span>
-              <span className="track-bar"><span style={{ width: `${(Math.min(5, done) / 5) * 100}%` }} /></span>
-              <span className="track-gate" aria-hidden="true">{gate && <span className="track-diamond" />}</span>
-            </>
-          );
-          return (
-            <li key={week}>
-              {onSelect
-                ? <button className={`track-week ${classes}`} onClick={() => onSelect(week)} aria-pressed={week === selected} aria-label={`Week ${week}: ${done} of 5 sessions done${gate ? `, ${gate} exam gate` : ''}`}>{inner}</button>
-                : <span className={`track-cell ${classes}`}>{inner}</span>}
-            </li>
-          );
-        })}
-      </ol>
-      <p className="track-legend" aria-hidden="true"><span className="track-diamond" /><span>Exam gates: week 6 <span className="nobr">PL-300</span> and <span className="nobr">ITIL V5</span>, week 10 PMP, week 13 CISSP</span></p>
-    </div>
-  );
-}
-
-/* Five short marks for the five sessions of a week. */
-function Pips({ done }: { done: number }) {
-  return <span className="pips" aria-hidden="true">{[0, 1, 2, 3, 4].map((index) => <i key={index} className={index < done ? 'on' : ''} />)}</span>;
-}
 
 /* The flame from the mark, used where there is no name to show. */
 const FLAME_OUTER = 'M0 0C-12 0-16-9-14-18C-12-27-3-30 2-44C6-33 15-26 15-16C15-7 11 0 0 0Z';
@@ -2071,14 +2534,6 @@ function Flame({ size = 24 }: { size?: number }) {
     <svg className="flame" width={size} height={size} viewBox="-24 -50 48 56" aria-hidden="true">
       <path d={FLAME_OUTER} fill="currentColor" />
     </svg>
-  );
-}
-
-function DayMark({ done, gate, running }: { done: boolean; gate: boolean; running: boolean }) {
-  return (
-    <span className={['day-mark', done ? 'is-done' : '', gate ? 'is-gate' : '', running ? 'is-running' : ''].filter(Boolean).join(' ')} aria-hidden="true">
-      {done ? <Check /> : gate ? <span className="diamond" /> : null}
-    </span>
   );
 }
 
@@ -2294,33 +2749,131 @@ function gateResults(state: StudyState, completed: Set<string>, latestAttempts: 
   ];
 }
 
-/* ==========================================================================
-   Session-to-work mapping
-   ========================================================================== */
-
-function workFor(task: StudyTask): WorkLink[] {
-  const title = task.title.toLowerCase();
-  const links: WorkLink[] = task.docs
-    .map((key) => allDeliverables.find((item) => item.key === key))
-    .filter((item): item is Deliverable => Boolean(item))
-    .slice(0, 2)
-    .map((item) => ({ kind: 'artifact', item }));
-  const lab = labCards.find((candidate) =>
-    (candidate.key === 'lab-power-query' && /power query|profile/.test(title))
-    || (candidate.key === 'lab-dax' && /measures|dax/.test(title))
-    || (candidate.key === 'lab-ms-project' && /schedule|wbs/.test(title))
-    || (candidate.key === 'lab-architecture' && /architecture|threat-model/.test(title))
-    || (candidate.key === 'lab-sql' && /source-to-target|reconcil/.test(title))
-    || (candidate.key === 'lab-itil-value-stream' && /value stream/.test(title)));
-  if (lab) links.push({ kind: 'lab', lab });
-  if (/mock|gate|practice|repair weak|people:|process:|business environment:/.test(title)) links.push({ kind: 'practice' });
-  return links.slice(0, 3);
-}
-
-function workKey(link: WorkLink) { return link.kind === 'artifact' ? link.item.key : link.kind === 'lab' ? link.lab.key : 'practice'; }
 function docNumberFor(item: Deliverable) {
   const owner = projects.find((candidate) => candidate.deliverables.some((artifact) => artifact.key === item.key));
   return owner ? docNumber(owner.key, owner.deliverables.findIndex((artifact) => artifact.key === item.key)) : 'Doc';
+}
+
+/* ==========================================================================
+   Plan rules for the screens. Everything about what is due, grading,
+   scheduling and dates comes from lib/tricert-study.ts.
+   ========================================================================== */
+
+/* The first block that is ready and not finished. */
+function currentBlock(done: Set<string>) {
+  return examBlocks.find((item) => item.status === 'ready' && !blockFinished(item, done));
+}
+function blockFinished(item: ExamBlock, done: Set<string>) {
+  return [...item.mornings, ...item.weekends].every((entry) => done.has(entry.key));
+}
+function modeFor(item: Morning): MorningMode {
+  return item.kind === 'learn' ? 'learn' : item.kind === 'review' ? 'review' : 'repair';
+}
+function kindLabel(kind: string) {
+  return kind === 'learn' ? 'Learn' : kind === 'review' ? 'Review' : kind === 'repair' ? 'Repair' : kind === 'lab' ? 'Lab' : kind === 'mock' ? 'Practice exam' : kind;
+}
+function titleIn(item: ExamBlock, key: string) {
+  return [...item.mornings, ...item.weekends].find((entry) => entry.key === key)?.title || key;
+}
+/* A repair morning waits for the block's first practice exam. */
+function morningGate(item: ExamBlock, morning: Morning, done: Set<string>) {
+  if (morning.kind === 'repair') {
+    const mock = item.weekends.find((entry) => entry.kind === 'mock');
+    if (mock && !done.has(mock.key)) return { open: false, reason: `Opens after ${mock.title}` };
+  }
+  return { open: true, reason: '' };
+}
+/* A weekend block opens once its morning is done, and practice exam B at
+   least seven days after practice exam A (the plan's minDaysAfter). */
+function weekendState(item: ExamBlock, weekend: WeekendBlock, done: Set<string>, records: Records, today: string) {
+  if (done.has(weekend.key)) return { open: false, reason: 'Done' };
+  if (!done.has(weekend.after)) return { open: false, reason: `Opens after ${titleIn(item, weekend.after)}` };
+  if (weekend.minDaysAfter) {
+    const { key, days } = weekend.minDaysAfter;
+    if (!done.has(key)) return { open: false, reason: `Opens ${days} days after ${titleIn(item, key)}` };
+    const on = [...records.log.filter((row) => row.key === key).map((row) => row.date), ...records.mocks.filter((row) => row.weekend === key).map((row) => row.date)].filter(isStudyDate).sort().pop();
+    if (on && daysBetween(on, today) < days) return { open: false, reason: `Opens on ${formatDate(addDays(on, days))}` };
+  }
+  return { open: true, reason: '' };
+}
+
+/* ==========================================================================
+   Saved state, the morning in this browser, and drafts
+   ========================================================================== */
+
+function normalizeState(raw: unknown): StudyState {
+  const data = (raw && typeof raw === 'object' ? raw : {}) as Partial<Omit<StudyState, 'records'>> & { records?: Partial<Records> };
+  const kept = data.records && typeof data.records === 'object' ? data.records : {};
+  const srs = (kept.srs && typeof kept.srs === 'object' ? kept.srs : {}) as Partial<SrsRecord>;
+  const list = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+  return {
+    profile: data.profile ?? null,
+    progress: list<ProgressRow>(data.progress),
+    attempts: list<AttemptRow>(data.attempts),
+    artifacts: list<ArtifactRow>(data.artifacts),
+    records: {
+      plan: kept.plan && typeof kept.plan === 'object' ? kept.plan : {},
+      srs: { ...srs, cards: srs.cards || {}, questions: srs.questions || {} },
+      mocks: list<MockRow>(kept.mocks),
+      log: list<LogRow>(kept.log),
+      usercards: list<UserCard>(kept.usercards),
+    },
+  };
+}
+
+function readMorning(): MorningRun | null {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(morningKey) || 'null') as MorningRun | null;
+    return parsed && parsed.v === 1 && typeof parsed.key === 'string' && morningParts[parsed.mode] && parsed.cards && parsed.questions ? parsed : null;
+  } catch { return null; }
+}
+function writeMorning(value: MorningRun) {
+  try { window.localStorage.setItem(morningKey, JSON.stringify(value)); } catch { /* storage unavailable; the morning still runs */ }
+}
+function clearMorning() {
+  try { window.localStorage.removeItem(morningKey); } catch { /* storage unavailable */ }
+}
+/* Minutes count only while the morning is on screen. */
+function withSpent(value: MorningRun, openedAt: number | null): MorningRun {
+  return value.open && openedAt ? { ...value, spentMs: value.spentMs + Math.max(0, nowMs() - openedAt) } : value;
+}
+
+type Draft = { value: Record<string, string>; at: number };
+function readDraft(key: string): Draft | null {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(draftPrefix + key) || 'null') as Draft | null;
+    return parsed && typeof parsed.at === 'number' && parsed.value && typeof parsed.value === 'object' ? parsed : null;
+  } catch { return null; }
+}
+function writeDraft(key: string, value: Record<string, string>) {
+  try { window.localStorage.setItem(draftPrefix + key, JSON.stringify({ value, at: nowMs() })); } catch { /* storage unavailable */ }
+}
+function clearDraft(key: string) {
+  try { window.localStorage.removeItem(draftPrefix + key); } catch { /* storage unavailable */ }
+}
+/* Keeps unsaved writing in this browser every two seconds, and drops it once
+   it matches what is saved. */
+function useDraftSaver(key: string | null, value: Record<string, string>, saved: Record<string, string>) {
+  const latest = useRef({ key, value, saved });
+  const written = useRef('');
+  useEffect(() => { latest.current = { key, value, saved }; });
+  useEffect(() => {
+    const flush = () => {
+      const { key: current, value: text, saved: stored } = latest.current;
+      if (!current) return;
+      const body = JSON.stringify(text);
+      if (body === JSON.stringify(stored)) {
+        if (written.current !== `${current}|saved`) { clearDraft(current); written.current = `${current}|saved`; }
+        return;
+      }
+      if (written.current === `${current}|${body}`) return;
+      writeDraft(current, text);
+      written.current = `${current}|${body}`;
+    };
+    const handle = window.setInterval(flush, 2000);
+    window.addEventListener('pagehide', flush);
+    return () => { window.clearInterval(handle); window.removeEventListener('pagehide', flush); };
+  }, []);
 }
 
 /* ==========================================================================
@@ -2337,13 +2890,19 @@ function keepTogether(text: string): ReactNode {
 /* "MFA and SSO recommendation" keeps its capitals; "Business case" reads
    "business case" mid-sentence. */
 function lowerFirst(title: string) { return /^.[a-z]/.test(title) ? title.charAt(0).toLowerCase() + title.slice(1) : title; }
-function countWord(value: number) { const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']; return words[value] || String(value); }
 function ratio(numerator: number, denominator: number) { return denominator ? Math.min(1, numerator / denominator) : 0; }
 function safeDomains(value: string) { try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : []; } catch { return []; } }
 function strongMocks(artifacts: ArtifactRow[], cert?: Certification) { return artifacts.filter((artifact) => { if (!artifact.artifact_key.startsWith('mock-')) return false; try { const evidence = JSON.parse(artifact.evidence_text); return Number(evidence.score) >= 80 && (!cert || evidence.certification === cert); } catch { return false; } }).length; }
 function mockArtifactKey(cert: Certification) { return `mock-${cert.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now()}`; }
 function nowMs() { return Date.now(); }
-function todayIso() { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
+/* Today's date. The browser checks can set it (window.__tricertToday) so they
+   do not depend on the real calendar. */
+function todayIso() {
+  const forced = (globalThis as { __tricertToday?: unknown }).__tricertToday;
+  if (typeof forced === 'string' && isStudyDate(forced)) return forced;
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
 function daysUntil(target: string, today: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(target)) return null;
   return Math.round((Date.parse(`${target}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000);
@@ -2366,24 +2925,27 @@ function formatMinutes(minutes: number) {
   return hours ? `${hours} h${rest ? ` ${rest} min` : ''}` : `${whole} min`;
 }
 function taskMinutes(meta: string) { const match = meta.match(/(\d+)\s*min/); return match ? Number(match[1]) : 60; }
-function taskOutput(meta: string) { const parts = meta.split('·').map((part) => part.trim()).filter(Boolean); const rest = parts.slice(1).join(', '); return rest ? rest.charAt(0).toUpperCase() + rest.slice(1) : 'Session notes'; }
-function statusLabel(status?: string) { return status === 'complete' ? 'Complete' : status === 'draft' ? 'Draft' : 'Not started'; }
-function deriveCurrentWeek(progress: ProgressRow[]) {
-  const done = new Set(progress.filter((row) => row.status === 'complete').map((row) => row.item_key));
-  const week = studyWeeks.find((candidate) => candidate.tasks.some((task) => !done.has(task.key)));
-  return week ? week.number : studyWeeks.length;
+function shortDate(value: string) {
+  const parsed = new Date(`${value}T12:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
+function formatTime(at: number) {
+  const date = new Date(at);
+  const sameDay = date.toDateString() === new Date().toDateString();
+  return sameDay ? date.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' }) : date.toLocaleString('en-CA', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+function statusLabel(status?: string) { return status === 'complete' ? 'Complete' : status === 'draft' ? 'Draft' : 'Not started'; }
 function scrollBehavior(): ScrollBehavior {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }
-type LessonFrom = 'today' | 'plan';
+type LessonFrom = 'today' | 'plan' | 'learn';
 type LessonEntry = { lesson: string; from: LessonFrom };
 /* The lesson recorded on the current history entry, if any. */
 function lessonEntry(): LessonEntry | null {
   const value: unknown = window.history.state;
   if (!value || typeof value !== 'object') return null;
   const { lesson, from } = value as Partial<LessonEntry>;
-  return typeof lesson === 'string' && lessonIndex[lesson] && (from === 'today' || from === 'plan') ? { lesson, from } : null;
+  return typeof lesson === 'string' && lessonIndex[lesson] && (from === 'today' || from === 'plan' || from === 'learn') ? { lesson, from } : null;
 }
 function routeFromHash(): { view: View; tab?: 'readiness' | 'portfolio'; learnTab?: LearnTab } | null {
   const hash = window.location.hash.replace('#', '');
@@ -2406,43 +2968,6 @@ function readPrefs(): UiPrefs {
 function writePrefs(prefs: UiPrefs) {
   try { window.localStorage.setItem(uiPrefsKey, JSON.stringify(prefs)); } catch { /* storage unavailable; preferences are optional */ }
 }
-function plainTaskExplanation(title: string) {
-  const value = title.toLowerCase();
-  if (value.includes('blueprint')) return 'Read how each exam is built and see where Beacon practises every domain.';
-  if (value.includes('coverage review')) return 'Compare what you have studied against the exam outline and list the weakest domains first.';
-  if (value.includes('profile') || value.includes('data quality')) return 'Inspect the source data and record quality problems before you trust any report or decision.';
-  if (value.includes('business case')) return 'Explain why the project matters, compare options, and define the result the business should receive.';
-  if (value.includes('charter')) return 'Agree on the purpose, scope, authority, key people, and definition of success.';
-  if (value.includes('requirement')) return 'Translate stakeholder needs into clear statements that can be built, tested, and approved.';
-  if (value.includes('interview')) return 'Plan who to ask, what to ask, and how you will record needs so nothing is lost between conversations.';
-  if (value.includes('classify')) return 'Decide how sensitive each kind of data is, who owns it, and how long it is kept.';
-  if (value.includes('gate') || value.includes('sit ')) return 'Check the five readiness checks on Progress. Book or sit the exam only if they are met; otherwise repair the weakest area.';
-  if (value.includes('schedule') || value.includes('microsoft project') || value.includes('wbs')) return 'Put the work in order, show dependencies and owners, and set realistic dates in Microsoft Project.';
-  if (value.includes('estimate') || value.includes('cost')) return 'Estimate effort and cost with a stated basis, and hold reserves for the risks you have identified.';
-  if (value.includes('risk') || value.includes('raid')) return 'Record threats, issues, assumptions, decisions, and owners before they disrupt the work.';
-  if (value.includes('power query')) return 'Build repeatable cleaning steps so the same data problems are fixed consistently every time.';
-  if (value.includes('star schema') || value.includes('model') || value.includes('fact and dimension')) return 'Organize facts, descriptive tables, and relationships so analysis stays accurate and easy to use.';
-  if (value.includes('date table') || value.includes('relationships')) return 'Create one marked date table and set relationship direction and cardinality on purpose.';
-  if (value.includes('dax')) return 'Turn business definitions into measures that calculate results consistently.';
-  if (value.includes('dashboard') || value.includes('report') || value.includes('pages')) return 'Create a focused view that helps someone understand the evidence and make a decision.';
-  if (value.includes('segregation')) return 'Find permission combinations that let one person control a whole sensitive process, and decide how to break or watch them.';
-  if (value.includes('iam') || value.includes('access') || value.includes('rbac') || value.includes('mfa') || value.includes('jml')) return 'Give people the access they need, prevent unnecessary access, and prove the controls work.';
-  if (value.includes('uat') || value.includes('test') || value.includes('accessibility')) return 'Verify that the solution meets the need and behaves safely before it is accepted.';
-  if (value.includes('mock') || value.includes('drill') || value.includes('scenario') || value.includes('practice')) return 'Practice choosing the best action under uncertainty, then explain why the other choices are weaker.';
-  if (value.includes('incident') || value.includes('playbook') || value.includes('escalation')) return 'Decide the response roles, communication, and actions before a real incident creates pressure.';
-  if (value.includes('bia') || value.includes('rto') || value.includes('rpo') || value.includes('recovery') || value.includes('dr plan')) return 'Prioritize important services and agree on how quickly systems and data must be restored.';
-  if (value.includes('vendor') || value.includes('supplier') || value.includes('procurement')) return 'Evaluate a third party’s performance, value, and risk before relying on its service.';
-  if (value.includes('communication') || value.includes('stakeholder') || value.includes('training')) return 'Match each audience to the message, channel, owner, and timing that will actually reach them.';
-  if (value.includes('change')) return 'Walk a change through impact assessment, approval, and baseline update so nothing changes silently.';
-  if (value.includes('threat') || value.includes('architecture') || value.includes('network') || value.includes('logging')) return 'Draw the trust boundaries and data flows, then choose controls for the threats that matter most.';
-  if (value.includes('vulnerab')) return 'Rank flaws by exploitability, exposure, and business impact, then assign owners and dates.';
-  if (value.includes('review') || value.includes('lesson') || value.includes('retrospective') || value.includes('improvement')) return 'Learn from the result, identify the next useful change, and decide how you will measure it.';
-  if (value.includes('portfolio') || value.includes('publish')) return 'Assemble the evidence package from Progress, Portfolio and label every dataset as synthetic.';
-  if (value.includes('governance') || value.includes('deployment') || value.includes('refresh')) return 'Decide who can release, refresh, and monitor the solution, and how to roll back safely.';
-  return 'Complete the activity, save the result, and explain the decision in your own words.';
-}
 function downloadFile(name: string, content: string, type: string) { const url = URL.createObjectURL(new Blob([content], { type })); const link = document.createElement('a'); link.href = url; link.download = name; link.click(); URL.revokeObjectURL(url); }
 
 const demoScript = `# Project Beacon portfolio demonstration\n\n## 0:00 to 0:30 · Problem\nKestrel Health Network (fictional) ran patient flow from emailed spreadsheets, clinicians waited days for access, and nobody had tested a restore of the clinical information system. All data in this case study is synthetic.\n\n## 0:30 to 1:30 · Release 1: trusted patient-flow analytics\nShow the data-quality findings, the star schema, the reconciliation to expected totals and the core measures. Explain why privacy and grain were settled before any visual.\n\n## 1:30 to 2:30 · Release 2: safe clinician access\nShow the role matrix, the RLS tests and the access-request value stream. Explain how least privilege, negative testing and service measures fit together.\n\n## 2:30 to 3:30 · Release 3: cyber resilience\nShow the security-operations dashboard and the restore tests. Explain how the business impact analysis set RTO and RPO and the recovery order.\n\n## 3:30 to 4:30 · Programme evidence\nShow the charter, schedule, RAID log, change decisions, earned value and service reviews. Name one trade-off and who accepted the remaining risk.\n\n## Close\nSummarize the measurable outcomes, the limits of the evidence and the next step.`;
-
-const retroTemplate = `Decision I can now defend\n\nEvidence that changed my mind\n\nConcept I still cannot explain without notes\n\nError pattern from practice\n\nAdjustment for next week\n\nArtifact I will update`;

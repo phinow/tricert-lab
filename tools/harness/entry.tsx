@@ -2,12 +2,18 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 // Resolved through the esbuild alias "@app" to the version under test.
 import TriCertApp from '@app/tricert-app';
-import { projects, studyWeeks, scenarioBank } from '@/lib/tricert-content';
+import { projects } from '@/lib/tricert-content';
+import { cardsForLesson, makeUserCard, questionsForLesson } from '@/lib/tricert-bank';
 
 type Row = Record<string, unknown>;
 
 const params = new URLSearchParams(window.location.search);
 const fixture = params.get('state') || 'midway';
+// The checks set today's date (?today=YYYY-MM-DD) so they do not depend on
+// the real calendar. Wednesday 18 November 2026 by default.
+(window as unknown as { __tricertToday?: string }).__tricertToday = params.get('today') || '2026-11-18';
+// With ?keep=1 the fake server keeps its state in this tab across reloads.
+const keepKey = params.get('keep') ? `harness.state.${fixture}` : '';
 
 const profile = {
   education: 'bachelor',
@@ -22,7 +28,7 @@ const profile = {
   dax_level: 'beginner',
   sql_level: 'intermediate',
   itil_level: 'beginner',
-  weekly_hours: 18,
+  weekly_hours: 11,
   pmp_target: '2027-03-15',
   pl300_target: '2026-12-10',
   cissp_target: '',
@@ -31,19 +37,16 @@ const profile = {
   motivation: 'Pass all four, then lead the projects I used to support.',
 };
 
+/* Midway: the ITIL block with mornings 1 to 4 and review 1 done (started
+   Monday 9 November), seven cards and eight questions due on 18 November,
+   one card of his own, and practice exam A not taken yet. */
 function midwayState() {
-  const progress: Row[] = [];
-  studyWeeks.forEach((week) => {
-    week.tasks.forEach((task, index) => {
-      const done = week.number <= 5 || (week.number === 6 && index < 2);
-      if (done) progress.push({ item_key: task.key, status: 'complete' });
-    });
-  });
-  progress.push({ item_key: 'lab-sql', status: 'complete' });
+  const done = ['itil-m1', 'itil-m2', 'itil-m3', 'itil-m4', 'itil-r1'];
+  const dates = ['2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13'];
+  const progress: Row[] = done.map((key, index) => ({ item_key: key, status: 'complete', updated_at: `${dates[index]}T07:30:00Z` }));
   progress.push({ item_key: 'portfolio-readme', status: 'complete' });
   const artifacts: Row[] = [];
-  const first = projects[0].deliverables;
-  first.slice(0, 6).forEach((item, index) => {
+  projects[0].deliverables.slice(0, 6).forEach((item, index) => {
     artifacts.push({
       artifact_key: item.key,
       status: index < 5 ? 'complete' : 'draft',
@@ -52,18 +55,40 @@ function midwayState() {
       updated_at: '2026-10-08T21:14:00Z',
     });
   });
-  artifacts.push({ artifact_key: 'retrospective-w5', status: 'complete', evidence_text: 'Decision I can now defend\nGrain before visuals.', reflection: 'Week 5 teach-back recorded.' });
-  artifacts.push({ artifact_key: 'mock-pl300-1759900000000', status: 'complete', evidence_text: JSON.stringify({ certification: 'PL-300', score: 75, answered: 16, durationMinutes: 15 }), reflection: 'Timed original scenario drill.' });
-  const attempts: Row[] = scenarioBank.slice(0, 9).map((question, index) => ({
-    question_id: question.id,
-    certification: question.certification,
-    domain: question.domain,
-    answer: index % 3 === 0 ? (question.correct === 'A' ? 'B' : 'A') : question.correct,
-    correct: index % 3 === 0 ? 0 : 1,
-    confidence: index % 4 === 1 ? 'low' : 'medium',
-    created_at: '2026-10-09T18:00:00Z',
-  }));
-  return { profile, progress, attempts, artifacts, records: emptyRecords() };
+  artifacts.push({ artifact_key: 'retrospective-itil-r1', status: 'complete', evidence_text: 'I can explain outputs against outcomes without notes. Governance still needs notes.', reflection: 'Review: mornings 1 to 4: weekly reflection recorded.' });
+
+  const cards: Record<string, Row> = {};
+  cardsForLesson('itil-m1').forEach((card, index) => { cards[card.id] = index < 3 ? { stage: 1, due: '2026-11-18', first: '2026-11-09' } : { stage: 2, due: '2026-11-24', first: '2026-11-09' }; });
+  cardsForLesson('itil-m2').forEach((card, index) => { cards[card.id] = index < 4 ? { stage: 1, due: '2026-11-17', first: '2026-11-10' } : { stage: 2, due: '2026-11-25', first: '2026-11-10' }; });
+  cardsForLesson('itil-m3').forEach((card) => { cards[card.id] = { stage: 1, due: '2026-11-19', first: '2026-11-11' }; });
+  cardsForLesson('itil-m4').forEach((card) => { cards[card.id] = { stage: 1, due: '2026-11-20', first: '2026-11-12' }; });
+
+  const questions: Record<string, Row> = {};
+  const attempts: Row[] = [];
+  ['itil-m1', 'itil-m2', 'itil-m3', 'itil-m4'].forEach((lesson, lessonIndex) => {
+    const first = dates[lessonIndex];
+    questionsForLesson(lesson, []).forEach((question, index) => {
+      const missed = index < 2;
+      questions[question.id] = missed ? { stage: 1, due: index === 0 ? '2026-11-16' : '2026-11-18', last: dates[lessonIndex + 1], first } : { stage: 3, due: '2026-12-05', last: first, first };
+      attempts.push({
+        question_id: question.id, certification: question.certification, domain: question.domain,
+        answer: missed && index === 0 ? (question.correct === 'A' ? 'B' : 'A') : question.correct,
+        correct: missed && index === 0 ? 0 : 1, confidence: missed ? 'low' : 'high',
+        created_at: `${missed ? dates[lessonIndex + 1] : first}T07:40:00Z`, first_at: `${first}T07:40:00Z`, tries: missed ? 2 : 1,
+      });
+    });
+  });
+  attempts.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+
+  const own = questionsForLesson('itil-m2', [])[0];
+  const mine = makeUserCard({ exam: 'ITIL', front: own.prompt, back: 'Value is judged by the consumer, from outcomes, costs and risks together.', today: '2026-11-10', lesson: 'itil-m2', question: own.id });
+  cards[mine.id] = { stage: 1, due: '2026-11-21' };
+  const log: Row[] = done.map((key, index) => ({ id: `log-${key}-fixture`, key, kind: key.endsWith('r1') ? 'review' : 'learn', block: 'itil', date: dates[index], minutes: 88 + index, cards: 8 + index, questions: 20, right: 15 + index }));
+
+  return {
+    profile, progress, attempts, artifacts,
+    records: { plan: { startDate: '2026-11-09' }, srs: { cards, questions, delayed: { ITIL: { total: 6, right: 4 } } }, mocks: [], log, usercards: [mine] },
+  };
 }
 
 type Records = { plan: Row; srs: Row; mocks: Row[]; log: Row[]; usercards: Row[] };
@@ -82,8 +107,12 @@ function merge(target: Row, patch: Row, depth = 1): Row {
   return out;
 }
 
-let state: { profile: Row | null; progress: Row[]; attempts: Row[]; artifacts: Row[]; records: Records } =
-  fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() } : midwayState();
+type State = { profile: Row | null; progress: Row[]; attempts: Row[]; artifacts: Row[]; records: Records };
+function kept(): State | null {
+  if (!keepKey) return null;
+  try { return JSON.parse(sessionStorage.getItem(keepKey) || 'null'); } catch { return null; }
+}
+let state: State = kept() || (fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() } : (midwayState() as unknown as State));
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -134,14 +163,19 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       };
       break;
     case 'record-attempt':
+    {
+      // Like the real copies: the latest row per question, with the first answer's time and the number of answers.
+      const before = state.attempts.find((row) => row.question_id === body.questionId);
+      const at = new Date().toISOString();
       state = {
         ...state,
         attempts: [
-          { question_id: body.questionId, certification: body.certification, domain: body.domain, answer: body.answer, correct: body.correct ? 1 : 0, confidence: body.confidence, created_at: new Date().toISOString() },
-          ...state.attempts,
+          { question_id: body.questionId, certification: body.certification, domain: body.domain, answer: body.answer, correct: body.correct ? 1 : 0, confidence: body.confidence, created_at: at, first_at: before?.first_at || before?.created_at || at, tries: Number(before?.tries || (before ? 1 : 0)) + 1 },
+          ...state.attempts.filter((row) => row.question_id !== body.questionId),
         ],
       };
       break;
+    }
     case 'save-artifact':
       state = {
         ...state,
@@ -169,6 +203,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     default:
       return json({ error: 'Unsupported study action.' }, 400);
   }
+  if (keepKey) sessionStorage.setItem(keepKey, JSON.stringify(state));
   return json(state);
 };
 
