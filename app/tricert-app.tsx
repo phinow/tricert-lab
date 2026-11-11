@@ -1041,7 +1041,7 @@ export default function TriCertApp() {
                     <span>{morningParts[modeFor(nextMorning)].map(([, label]) => label).join(', ')}</span>
                     {nextMorning.brief && <span>Brief from {nextMorning.brief.from}</span>}
                   </p>
-                  {isWeekend && weekendGate && !weekendGate.open && <p className="hint hero-note">No weekend block is open yet. {nextWeekend?.title}: {lowerFirst(weekendGate.reason)}.</p>}
+                  {isWeekend && weekendGate && !weekendGate.open && <p className="hint hero-note">No weekend block is open yet. The next one {lowerFirst(weekendGate.reason)}.</p>}
                   <div className="hero-actions">{heroMain(morning?.key === nextMorning.key ? `Resume morning, ${morningPart.toLowerCase()}` : 'Start morning', () => startMorning(nextMorning, modeFor(nextMorning)))}</div>
                   <button className="text-link hero-link" onClick={() => startMorning(null, 'short')}>{shortRun ? 'Resume the short morning' : 'Short morning (45 minutes)'}</button>
                 </section>
