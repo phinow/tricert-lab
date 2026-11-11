@@ -428,6 +428,224 @@
      "a": "Collaborate and promote visibility. Following it would mean sharing the delay, its cause and the recovery plan with stakeholders now, so they can make good decisions and trust the team."
     }
    ]
+  },
+  {
+   "key": "itil-m5",
+   "summary": "Learn the purpose of each product and service lifecycle activity, from Discover to Support, how to tell Operate, Deliver and Support apart, and how the lifecycle relates to value chain activities and value streams.",
+   "read": [
+    {
+     "heading": "One lifecycle for products and services",
+     "body": "PeopleCert describes ITIL Foundation (Version 5) as a way to view digital product and service management through a complete lifecycle model, for the creation, delivery and continual improvement of products and services. Its learning objective asks you to know the purpose of each product and service lifecycle management activity, from discovery and design to operation, delivery and support, and how they work together to create value.\n\nNotice the word: activities. Call them lifecycle activities, the word PeopleCert uses. There are eight:\n\n1. Discover\n2. Design\n3. Acquire\n4. Build\n5. Transition\n6. Operate\n7. Deliver\n8. Support\n\nLearn them in this order. A simple memory line: two that decide what to make (Discover, Design), two that get it ready (Acquire, Build), one that moves it into use (Transition), and three that keep value flowing once it is live (Operate, Deliver, Support).\n\nVersion 5 brings products and services into one lifecycle. The product is what the provider builds and runs; the service is how consumers get value from it. One lifecycle stops product teams and service teams from working as separate silos, which PeopleCert calls a lifecycle mindset.\n\nThe example for this lesson is an everyday one: a city library launching an online service for booking study rooms."
+    },
+    {
+     "heading": "The eight activities and their purpose",
+     "body": "The purposes below are written in plain words. Learn the idea of each activity rather than a fixed sentence.\n\n| Activity | Purpose in plain words | Library room booking |\n|---|---|---|\n| Discover | Understand needs, demand and opportunities, and decide what is worth doing | Learn why some rooms sit empty while members are turned away |\n| Design | Shape the product or service to meet the needs, including how it will be used, supported and kept secure | Booking rules, screens, opening hours, who helps when it fails |\n| Acquire | Obtain the resources needed, from inside the organization or from partners and suppliers | Contract for a booking platform; agreement with the cleaning firm |\n| Build | Create, configure and test the components | Configure the platform, load the rooms, test bookings |\n| Transition | Move new or changed products and services into live use | Train front-desk staff; switch the booking pages on |\n| Operate | Keep the live technology and components running as agreed | Monitor the platform, apply updates, check backups |\n| Deliver | Provide the service to consumers so they get value from it | A member books a room and gets a confirmation |\n| Support | Help users and restore normal use when something goes wrong | A member cannot sign in; staff restore access |\n\nEach activity has a clear purpose, so exam stems often describe one piece of work and ask which activity it belongs to. Find the verb: understand needs (Discover), shape (Design), obtain (Acquire), create and test (Build), move into live use (Transition), keep running (Operate), provide to consumers (Deliver), help and restore (Support)."
+    },
+    {
+     "heading": "Operate, Deliver and Support, and other close pairs",
+     "body": "Three pairs of activities cause most wrong answers.\n\nOperate, Deliver and Support. All three happen while the service is live, so they are easy to mix up.\n\n- Operate faces the technology and components: keeping them running, monitored, patched and backed up at the agreed level. Users rarely see it.\n- Deliver faces the consumer: the service actually being provided and used, request by request. A member booking a room is Deliver.\n- Support faces the user with a problem: help, fixes and restoring normal use. A member who cannot sign in gets Support.\n\nDesign and Build. Design decides what the product or service should be and how it will work. Build creates and tests it. Drawing the booking screens is Design; configuring them in the platform and testing them is Build.\n\nAcquire and Build. Acquire obtains resources, such as a supplier contract, cloud capacity, hardware or people with a skill. Build makes something from those resources. Buying the platform licence is Acquire; configuring it is Build. Acquire often involves partners and suppliers, the dimension from lesson 3.\n\nTransition sits between building and running. Testing in the live environment, training staff, the change being authorized and the switch-on all belong to Transition. Acceptance testing of a new service before go-live is a classic Transition answer.\n\nThe activities are not a one-way line. Support may find a fault that sends work back to Design. Discover goes on throughout the life of a product, as needs change."
+    },
+    {
+     "heading": "Lifecycle, value chain activities and value streams",
+     "body": "The ITIL Value System still lists value chain activities as one of its five components: the work that turns demand into value. Version 5 views that work through the product and service lifecycle. For the exam, use the lifecycle activity names. If an option uses ITIL 4 value chain activity names as if they were the current Version 5 terms, treat it with suspicion.\n\nA value stream is the series of steps an organization takes to create and deliver products and services to consumers. It starts with demand (a trigger) and ends with value for the consumer. A value stream does not have to pass through all eight lifecycle activities. It uses the activities it needs, in the order it needs them.\n\n| Value stream | Lifecycle activities it mainly uses |\n|---|---|\n| Launch the room booking service | All eight, from Discover to Support |\n| A member books a room | Deliver, with Operate keeping the platform running underneath |\n| A member cannot sign in | Support, then Deliver once access works |\n| Add a new room type | Discover, Design, Build, Transition |\n\nManagement practices sit inside this picture. They supply the resources and know-how each activity needs. Incident management works mostly in Support; change enablement and release management in Transition; supplier management in Acquire. One practice can serve many activities, and one activity uses many practices.\n\nSo: the lifecycle describes the purpose of each kind of work; a value stream is one path through that work for one kind of demand; practices are the capabilities used along the way."
+    },
+    {
+     "heading": "Lifecycle thinking",
+     "body": "PeopleCert describes a lifecycle mindset: making better decisions, anticipating change, reducing technical debt, improving service continuity and keeping teams aligned instead of working in silos. In practice it means asking, at every activity, what the later activities will need.\n\n- In Discover and Design, ask how the service will be operated and supported. A design with no plan for support creates incidents nobody can fix.\n- In Acquire, check that supplier contracts cover the whole life, including support hours and how to exit the contract.\n- In Build, write the knowledge that Support will need, and test what Operate will monitor.\n- In Transition, hand over with training, knowledge and agreed service levels, not just working code.\n- In Operate, Deliver and Support, feed what you learn back into Discover and Design.\n\nTechnical debt is the future cost of quick choices made now: a shortcut in Build that Operate and Support pay for later. Lifecycle thinking makes that cost visible when the choice is made.\n\nA short exam check: when an option makes one activity faster by pushing work or risk onto a later activity, it ignores the lifecycle. The stronger answer considers the whole life of the product or service, which is also the guiding principle Think and work holistically."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Product and service lifecycle",
+     "definition": "The Version 5 lifecycle model for creating, delivering and continually improving products and services, made up of eight lifecycle activities."
+    },
+    {
+     "term": "Lifecycle activities",
+     "definition": "The eight activities in order: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. PeopleCert calls them lifecycle management activities."
+    },
+    {
+     "term": "Discover and Design",
+     "definition": "Discover understands needs, demand and opportunities and decides what is worth doing. Design shapes the product or service, including how it is used, supported and secured."
+    },
+    {
+     "term": "Acquire and Build",
+     "definition": "Acquire obtains the resources needed, from inside or from partners and suppliers. Build creates, configures and tests the components from those resources."
+    },
+    {
+     "term": "Transition",
+     "definition": "Moving new or changed products and services into live use: final testing, authorized change, training, handover and switch-on."
+    },
+    {
+     "term": "Operate, Deliver and Support",
+     "definition": "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers. Support helps users and restores normal use when things go wrong."
+    },
+    {
+     "term": "Value stream",
+     "definition": "The series of steps an organization takes to create and deliver products and services to consumers, from demand to value. It uses only the lifecycle activities it needs."
+    },
+    {
+     "term": "Technical debt",
+     "definition": "The future cost of quick choices made now, such as a shortcut in Build that Operate and Support must pay for later."
+    }
+   ],
+   "build": {
+    "goal": "Place ten pieces of work for launching a library's online room-booking service into the eight lifecycle activities, then trace two value streams and name the activities each one uses.",
+    "steps": [
+     "Work items 1 to 5: (1) survey members about why rooms sit empty while others are turned away; (2) draw the booking rules and screens; (3) sign the contract for a booking platform; (4) configure the platform and test fifty bookings; (5) train front-desk staff and switch the pages on.",
+     "Work items 6 to 10: (6) monitor the platform and apply security updates; (7) a member books a room and gets a confirmation; (8) a member cannot sign in and staff restore access; (9) agree with the cleaning firm to check rooms between bookings; (10) write the help text staff will use for sign-in problems.",
+     "Label each item with one lifecycle activity. Write the verb in the item that decided it.",
+     "Trace value stream A, a member books a room, from trigger to value. List its steps and the activities they use.",
+     "Trace value stream B, the library adds a new kind of room for group study. List the activities it uses, in order.",
+     "Compare with the model answer. For any wrong label, write which close pair you confused (Operate, Deliver, Support; Design, Build; Acquire, Build)."
+    ],
+    "modelAnswer": "| Item | Activity | Deciding verb |\n|---|---|---|\n| 1 Survey members | Discover | understand needs |\n| 2 Draw rules and screens | Design | shape |\n| 3 Sign platform contract | Acquire | obtain from a supplier |\n| 4 Configure and test | Build | create and test |\n| 5 Train staff, switch on | Transition | move into live use |\n| 6 Monitor and update platform | Operate | keep running |\n| 7 Member books a room | Deliver | service provided |\n| 8 Restore a member's access | Support | restore normal use |\n| 9 Agreement with cleaning firm | Acquire | obtain a resource from a partner |\n| 10 Write help text for sign-in problems | Build | create a component (knowledge) before launch |\n\nItem 10 could be argued as Transition, because knowledge is handed over at go-live. Writing it is creating a component, so Build fits best; handing it to staff with training is Transition.\n\nValue stream A, member books a room. Trigger: a member wants a quiet room tomorrow. Steps: sign in, choose time and room, receive confirmation, arrive and use the room. Activities: Deliver throughout, with Operate keeping the platform running underneath. If sign-in fails, Support restores access and the stream returns to Deliver. It does not touch Discover, Design, Acquire or Build, because nothing new is made.\n\nValue stream B, add group study rooms. Discover (do members want them, how many), Design (rules, sizes, screens), Acquire (furniture, possibly more platform licences), Build (configure the new room type, test), Transition (train staff, switch on), then Operate, Deliver and Support as for any room."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "Version 5 questions use the lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. If an option uses ITIL 4 value chain activity names as if they were current, treat it with suspicion."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Operate keeps the technology running; Deliver provides the service to consumers; Support helps users and restores normal use. Find whether the stem faces the technology, the consumer, or a user with a problem."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Obtaining resources from suppliers, partners or inside the organization is Acquire. Testing, training and switching on a new or changed service is Transition."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "A value stream uses only the lifecycle activities its demand needs. A routine request mainly uses Deliver; launching a new service uses all eight."
+    }
+   ],
+   "pitfalls": [
+    "Calling the lifecycle items stages. PeopleCert calls them lifecycle activities, and they are not a one-way sequence.",
+    "Mixing up Operate and Deliver. Operate looks after the technology; Deliver is the service reaching the consumer.",
+    "Assuming every value stream passes through all eight activities. Each uses only the activities it needs."
+   ],
+   "check": [
+    {
+     "q": "Name the eight product and service lifecycle activities in order and give the purpose of Transition in one line.",
+     "a": "Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition moves new or changed products and services into live use, with testing, authorized change, training and handover."
+    },
+    {
+     "q": "What is the difference between Operate, Deliver and Support? Use one example from a service you use.",
+     "a": "For online banking: Operate keeps the servers and app running and patched; Deliver is the service reaching you, such as making a payment; Support helps you and restores normal use when, for example, you are locked out."
+    },
+    {
+     "q": "How does a value stream relate to the lifecycle activities, and why does a routine request not pass through all eight?",
+     "a": "A value stream is one path from demand to value that uses the lifecycle activities it needs, in the order it needs them. A routine request uses an existing service, so nothing new is discovered, designed, acquired or built; it mainly uses Deliver, with Operate underneath."
+    }
+   ]
+  },
+  {
+   "key": "itil-m6",
+   "summary": "Learn what a management practice is, that there are 34 practices in two groups, and the purpose and key terms of six practices: service desk, incident management, service request management, problem management, service level management, and monitoring and event management.",
+   "read": [
+    {
+     "heading": "Practices: 34 in two groups",
+     "body": "A management practice is a set of organizational resources designed for performing work or reaching an objective. Each practice draws on all four dimensions: people and skills, information and technology, partners and suppliers, and the value streams and processes it takes part in. Practices supply the know-how that lifecycle activities and value streams use.\n\nPeopleCert states that Version 5 has 34 ITIL management practices, which remain largely the same as in ITIL 4 with some adjustments, and that they are now organized into two groups:\n\n1. Product and Service management practices\n2. General management practices\n\nLearn the number and both group names. Foundation does not expect you to know all 34 in detail. This lesson and the next cover the practices most likely to appear in questions; continual improvement comes in lesson 8.\n\nThe purposes in these lessons are written in plain words. Learn what each practice is for and its key terms, and match a scenario to the practice it describes.\n\nThis lesson follows a working day at Kestrel's service desk, run by Grace Liu, from the first call to the monthly service review. Six practices meet there:\n\n- Service desk\n- Incident management\n- Service request management\n- Problem management\n- Service level management\n- Monitoring and event management"
+    },
+    {
+     "heading": "Service desk",
+     "body": "The service desk captures demand for incident resolution and service requests. It is the entry point and single point of contact between the service provider and all its users.\n\nWhat that means in practice:\n\n- Channels: phone, chat, a self-service portal, email, walk-up. Many users never speak to a person; the portal and automation are part of the desk.\n- It does not have to fix everything itself. It records, sorts and resolves what it can, and routes the rest to the right team.\n- Its people need more than technical skill. Understanding the business, empathy, clear communication and knowing who to involve matter as much.\n- Knowledge makes it work. Good knowledge articles let the desk resolve more contacts at first contact and let users help themselves.\n\nTwo kinds of escalation appear in questions. Functional escalation passes the work to more expertise, such as the network team. Hierarchical escalation goes up the management line, for example when a customer is unhappy or a decision needs authority.\n\nAt Kestrel, the desk takes a call from a charge nurse whose dashboard will not load, a portal request for a new clinician account, and an email asking how to export a report. All three arrive at the same place. The desk's job is to recognize which kind of demand each one is and route it to the right practice."
+    },
+    {
+     "heading": "Incident management and service request management",
+     "body": "An incident is an unplanned interruption to a service, or a reduction in its quality. Incident management aims to minimize the negative impact of incidents by restoring normal service operation as quickly as possible.\n\n- Restoring service comes first; finding the cause is problem management's job.\n- Incidents are prioritized by impact (how much harm to the business) and urgency (how fast it gets worse). Email down for a whole floor is high on both; one flickering monitor with a spare laptop nearby is low on both.\n- A major incident has significant business impact and gets its own procedure: a clear lead, faster communication and more people working together.\n- Incidents should be logged and managed so the target resolution times agreed with the customer are met.\n\nA service request is a request from a user, or the user's authorized representative, that starts a service action agreed as a normal part of service delivery. Service request management supports the agreed quality of a service by handling these pre-defined, user-initiated requests in a consistent, user-friendly way.\n\n- Typical requests: a new account, access to a system, a password reset, information such as how to export a report, a standard piece of equipment, and feedback or compliments.\n- Requests are normal and expected, so they follow standard, often automated, workflows with known steps and approvals.\n\nThe test that separates them: is something broken or degraded? That is an incident. Is the user asking for something normal that the service offers? That is a service request. Exam options often swap the two."
+    },
+    {
+     "heading": "Problem management",
+     "body": "A problem is a cause, or potential cause, of one or more incidents. Problem management reduces the likelihood and impact of incidents by finding their actual and potential causes and by managing workarounds and known errors.\n\nThree key terms:\n\n- Known error: a problem that has been analysed but has not been resolved.\n- Workaround: a way to reduce or remove the impact of an incident or problem for which a full resolution is not yet available.\n- Error control: managing known errors, including recording workarounds and deciding whether a permanent fix is worth its cost.\n\nProblem management has three phases:\n\n1. Problem identification: spotting problems from trends in incidents, repeated incidents, major incidents, information from suppliers and developers, and testing.\n2. Problem control: analysing the problem, and documenting workarounds and known errors.\n3. Error control: managing known errors, reviewing workarounds, and judging permanent fixes. A fix to the live service usually goes through change enablement.\n\nAt Kestrel, the desk logs twelve incidents in a month for the same printer jamming on one unit. Each incident is resolved by clearing the jam. That pattern is a problem. Analysis finds a firmware fault; the vendor's fix is due next month. Until then the known error record tells the desk the workaround: use the second paper tray.\n\nIncident management restores service now. Problem management stops the incidents coming back. Questions that ask how to stop repeat incidents want problem management, not faster incident handling."
+    },
+    {
+     "heading": "Service levels, monitoring and events",
+     "body": "Service level management sets clear, business-based targets for service performance, so that the delivery of a service can be properly assessed, monitored and managed against them.\n\n- A service level agreement (SLA) is a documented agreement between a service provider and a customer that identifies the services required and the expected level of service.\n- Good targets reflect outcomes the customer cares about, are written in plain language, and are agreed with the customer, not set by the provider alone.\n- One measure is never enough. Combine targets such as availability and resolution time with feedback on experience, and review them with the customer at set times. Lesson 2's watermelon effect is the warning.\n\nMonitoring and event management systematically observes services and their components, and records and reports selected changes of state identified as events.\n\n- An event is any change of state that has significance for the management of a service or one of its components.\n- Events are usually sorted into three kinds: informational (all is well, for example a backup finished), warning (a threshold is near, for example a disk at 85% and rising) and exception (something has failed or broken a threshold, for example a server down).\n- A warning lets the team act before users notice. An exception may open an incident automatically.\n\nAt Kestrel, monitoring raises a warning that the dashboard's data refresh is running slow at 05:30. The team acts before the 06:00 deadline, and the morning's service level holds. No user ever calls the desk."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Management practice",
+     "definition": "A set of organizational resources designed for performing work or reaching an objective. Version 5 has 34, in two groups: Product and Service management, and General management."
+    },
+    {
+     "term": "Service desk",
+     "definition": "The practice that captures demand for incident resolution and service requests. It is the single point of contact between the provider and all its users."
+    },
+    {
+     "term": "Incident",
+     "definition": "An unplanned interruption to a service, or a reduction in its quality. Incident management restores normal service as quickly as possible."
+    },
+    {
+     "term": "Service request",
+     "definition": "A request from a user or their authorized representative that starts a service action agreed as a normal part of service delivery, such as new access."
+    },
+    {
+     "term": "Problem",
+     "definition": "A cause, or potential cause, of one or more incidents. Problem management finds causes and manages workarounds and known errors."
+    },
+    {
+     "term": "Known error and workaround",
+     "definition": "A known error is a problem analysed but not resolved. A workaround reduces or removes the impact of an incident or problem until a full fix exists."
+    },
+    {
+     "term": "Service level agreement (SLA)",
+     "definition": "A documented agreement between a service provider and a customer that identifies the services required and the expected level of service."
+    },
+    {
+     "term": "Event",
+     "definition": "Any change of state that has significance for the management of a service or component. Events are informational, warning or exception."
+    }
+   ],
+   "build": {
+    "goal": "Sort eight service desk tickets into incident, service request, problem or event, name the practice that leads each one, and set a priority for each incident from its impact and urgency.",
+    "steps": [
+     "Tickets 1 to 4: (1) email is down for the whole finance floor at month end; (2) a new nurse starts Monday and needs an account; (3) the same printer has jammed every day and twelve incidents are logged this month; (4) monitoring reports the nightly backup finished normally.",
+     "Tickets 5 to 8: (5) a database server disk is at 85% and rising; (6) a user asks how to export a report to PDF; (7) the printer jams are traced to a firmware fault, the vendor fix is due next month, and staff use tray 2 meanwhile; (8) one user's monitor flickers, but they can work on a spare laptop.",
+     "Label each ticket: incident, service request, problem, known error or event (and the kind of event).",
+     "Name the practice that leads each ticket.",
+     "For each incident, rate impact and urgency as high or low and give a priority: high, medium or low. Say whether any is a major incident.",
+     "Compare with the model answer and write one line for each ticket you labelled differently."
+    ],
+    "modelAnswer": "| Ticket | Type | Leading practice | Priority |\n|---|---|---|---|\n| 1 Email down for finance floor at month end | Incident | Incident management | High: high impact, high urgency; likely a major incident |\n| 2 Account for new nurse | Service request | Service request management | Not prioritized as an incident; due by Monday |\n| 3 Same printer jams daily, 12 incidents | Problem | Problem management | Not applicable |\n| 4 Backup finished normally | Event, informational | Monitoring and event management | No action |\n| 5 Disk at 85% and rising | Event, warning | Monitoring and event management | Act before it becomes an exception |\n| 6 How to export to PDF | Service request (information) | Service request management, often from a knowledge article | Not applicable |\n| 7 Firmware fault, fix due, use tray 2 | Known error with a workaround | Problem management (error control) | Not applicable |\n| 8 One monitor flickers, spare laptop works | Incident | Incident management | Low: low impact, low urgency |\n\nEvery ticket arrives through the service desk, which records it, resolves what it can at first contact (ticket 6 from a knowledge article) and routes the rest.\n\nTicket 3 tempts you to call it an incident because each jam is one. The twelve repeats point to a shared cause, so the record that matters is a problem. Ticket 7 is the same problem after analysis: it is now a known error, and tray 2 is its workaround. The permanent fix (the vendor's firmware) will go through change enablement.\n\nTicket 5 is not yet an incident, because nothing has failed. Acting on the warning prevents one."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "An incident means something is broken or degraded; a service request is a normal, pre-defined request such as new access or a password reset. Exam options often swap the two."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Incident management restores service as quickly as possible; problem management finds causes and manages known errors and workarounds. To stop repeat incidents, choose problem management."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "PeopleCert states there are 34 ITIL management practices, organized into two groups: Product and Service management practices, and General management practices."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "The service desk is the single point of contact for users. It does not have to fix everything; it captures demand, resolves what it can and routes the rest."
+    }
+   ],
+   "pitfalls": [
+    "Treating a password reset or new account as an incident. Nothing is broken; it is a service request.",
+    "Trying to find the root cause while users are still down. Restore service first; problem management finds the cause.",
+    "Setting service level targets without the customer, or relying on one measure. Targets are agreed with the customer and combined with experience feedback."
+   ],
+   "check": [
+    {
+     "q": "What is the difference between an incident and a service request? Give one example of each.",
+     "a": "An incident is an unplanned interruption or reduction in quality, such as a website that will not load. A service request is a normal, pre-defined request the service offers, such as asking for access to a shared folder."
+    },
+    {
+     "q": "What is a known error, and how does a workaround help while a problem stays open?",
+     "a": "A known error is a problem that has been analysed but not yet resolved. A workaround reduces or removes the impact of the related incidents, so users can keep working until a permanent fix is made or judged not worth its cost."
+    },
+    {
+     "q": "How many ITIL management practices are there in Version 5, and what are the two groups called?",
+     "a": "There are 34 management practices, organized into two groups: Product and Service management practices, and General management practices."
+    }
+   ]
   }
  ]
 }
