@@ -1,18 +1,29 @@
-"""Merge content/parts/*.json into after/lib/tricert-library.ts."""
-import json, glob, os, sys
+"""Merge tools/content/parts2/*.json into lib/tricert-library.ts and lib/tricert-reading.ts."""
+import json, glob, os, re, sys
 here = os.path.dirname(os.path.abspath(__file__))
 out = os.path.join(here, '..', '..', 'lib', 'tricert-library.ts')
 merged = {'lessons': [], 'docguides': [], 'glossary': [], 'flashcards': [], 'questions': []}
-for path in sorted(glob.glob(os.path.join(here, 'parts2', '*.json'))):
+# Sorted by name without .json, so flashcards.json comes before flashcards-itil.json and additions land after the existing items.
+for path in sorted(glob.glob(os.path.join(here, 'parts2', '*.json')), key=lambda p: os.path.basename(p)[:-5]):
     data = json.load(open(path, encoding='utf-8'))
     merged[data['type']].extend(data['items'])
 lessons = {item['key']: {k: v for k, v in item.items() if k != 'key'} for item in merged['lessons']}
 guides = {item['key']: {k: v for k, v in item.items() if k != 'key'} for item in merged['docguides']}
 glossary = sorted(merged['glossary'], key=lambda item: item['term'].lower())
-cards = [[c['cert'], c['front'], c['back']] for c in merged['flashcards']]
+cards = [[c['cert'], c['front'], c['back'], c.get('lesson', '')] for c in merged['flashcards']]
 questions = [q for q in merged['questions'] if q.get('certification') != 'Intersection']
-order = lambda k: (int(k.split('-')[0][1:]), int(k.split('-')[1][1:]))
+# Kestrel lessons (w1-s1) by week and session, then block lessons (itil-m1) by block, in plan order, and number.
+BLOCKS = ['itil', 'pl300', 'pmp', 'cissp']
+def order(key):
+    session = re.fullmatch(r'w(\d+)-s(\d+)', key)
+    if session:
+        return (0, int(session.group(1)), int(session.group(2)))
+    block = re.fullmatch(r'([a-z0-9]+)-m(\d+)', key)
+    if not block or block.group(1) not in BLOCKS:
+        sys.exit(f'Unknown lesson key: {key}')
+    return (1, BLOCKS.index(block.group(1)), int(block.group(2)))
 lessons = dict(sorted(lessons.items(), key=lambda kv: order(kv[0])))
+kestrel = sum(1 for key in lessons if order(key)[0] == 0)
 dump = lambda v: json.dumps(v, ensure_ascii=False, indent=1)
 reading_out = os.path.join(here, '..', '..', 'lib', 'tricert-reading.ts')
 lesson_index = {k: v['summary'] for k, v in lessons.items()}
@@ -33,7 +44,7 @@ export type Lesson = {{
 export type DocGuide = {{ purpose: string; sections: {{ heading: string; guidance: string }}[]; modelDocument: string; mistakes: string[] }};
 export type GlossaryTerm = {{ term: string; cert: Certification | 'General'; definition: string }};
 
-/** Session key to lesson summary. */
+/** Lesson key to lesson summary: the 65 Kestrel sessions (w1-s1), then the exam block lessons (itil-m1). */
 export const lessonIndex: Record<string, string> = {dump(lesson_index)};
 
 /** Document key to writing-guide purpose. */
@@ -41,7 +52,8 @@ export const guideIndex: Record<string, string> = {dump(guide_index)};
 
 export const glossary: GlossaryTerm[] = {dump(glossary)};
 
-export const extraFlashcards: [Certification, string, string][] = {dump(cards)};
+/** [exam, front, back, lesson key or ""]. Cards with a lesson come from an exam block (flashcards-itil.json). */
+export const extraFlashcards: [Certification, string, string, string][] = {dump(cards)};
 
 export const examQuestions: ScenarioQuestion[] = {dump(questions)};
 """
@@ -54,4 +66,5 @@ export const docGuides: Record<string, DocGuide> = {dump(guides)};
 """
 open(out, 'w', encoding='utf-8').write(ts)
 open(reading_out, 'w', encoding='utf-8').write(reading)
-print(f'lessons {len(lessons)}/65, guides {len(guides)}/66, glossary {len(glossary)}, flashcards {len(cards)}, questions {len(questions)} -> library {os.path.getsize(out)//1024} KB, reading {os.path.getsize(reading_out)//1024} KB')
+pooled = sum(1 for q in questions if q.get('pool'))
+print(f'lessons {kestrel}/65 + block {len(lessons) - kestrel}, guides {len(guides)}/66, glossary {len(glossary)}, flashcards {len(cards)} ({sum(1 for c in cards if c[3])} by lesson), questions {len(questions)} ({pooled} in a pool) -> library {os.path.getsize(out)//1024} KB, reading {os.path.getsize(reading_out)//1024} KB')

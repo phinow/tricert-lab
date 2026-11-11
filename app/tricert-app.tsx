@@ -2224,7 +2224,7 @@ function ReviewList({ queue, onOpen }: { queue: AttemptRow[]; onOpen: (key: stri
             <span className={attempt.correct ? 'flag is-guess' : 'flag'}>{attempt.correct ? 'Guessed' : 'Wrong'}</span>
             <strong>{keepTogether(question?.prompt || attempt.domain)}</strong>
             <p>{keepTogether(question?.explanation || 'Reopen the connected document and explain the governing concept without notes.')}</p>
-            {question && <button className="text-link" onClick={() => onOpen(question.artifactKey)}>Open the document</button>}
+            {question?.artifactKey && <button className="text-link" onClick={() => onOpen(question.artifactKey!)}>Open the document</button>}
           </li>
         );
       })}

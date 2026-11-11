@@ -46,8 +46,15 @@ export type ScenarioQuestion = {
   correct: string;
   explanation: string;
   incorrect: Record<string, string>;
-  artifactKey: string;
+  /** The Project Beacon document the question belongs to. Exam block questions (version 8) may have none. */
+  artifactKey?: string;
+  /** Exam block questions: 'daily' for the daily set, 'mockA' or 'mockB' for a fixed practice exam form. */
+  pool?: QuestionPool;
+  /** Exam block questions: the learn morning that teaches it, such as 'itil-m3'. */
+  lesson?: string;
 };
+
+export type QuestionPool = 'daily' | 'mockA' | 'mockB';
 
 /* The case: Project Beacon at Kestrel Health Network, a fictional Alberta
    health network. One programme, three releases, all four exams in every

@@ -6858,6 +6858,862 @@ export const lessons: Record<string, Lesson> = {
     "a": "It shows the forecast once exceeded total authorized funding of CAD 1,320,000 by CAD 22,500. The report must explain what changed, list every management reserve draw with its approver, and give the final variance against the CAD 1,200,000 BAC using finance's figures."
    }
   ]
+ },
+ "itil-m1": {
+  "summary": "Learn the words every ITIL question builds on: value, products and services, outputs and outcomes, costs and risks, utility and warranty, the provider and consumer, the customer, user and sponsor roles, and service offerings and relationships.",
+  "read": [
+   {
+    "heading": "Value, products and services",
+    "body": "ITIL starts from one question: who gets value from this work, and how? Every later topic, from the guiding principles to the practices, comes back to it, so the words in this lesson appear in almost every exam question.\n\nThe core definitions below are the ones ITIL 4 used. Version 5 keeps the same ideas, so learn what each word means rather than memorising a sentence.\n\n- Value: the perceived benefits, usefulness and importance of something. Perceived matters. Value is judged by the stakeholder, not by the provider. A report the provider is proud of has no value to a manager who never opens it. Value is also more than money.\n- Organization: a person or a group of people with its own functions, responsibilities and authority to reach its objectives. A two-person team and a national company are both organizations.\n- Product: a configuration of an organization's resources designed to offer value for a consumer. The resources are people, information, technology, partners and money. The provider owns and builds the product: the configured software, the trained staff, the supplier contracts.\n- Service: a means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks.\n\nRead the service definition slowly. A service does not hand value over; it makes outcomes possible. And it takes some costs and risks off the customer.\n\nVersion 5 manages digital products and services together, across one lifecycle. The product is what the provider builds and runs; the services are how consumers get value from it. PeopleCert calls the whole subject digital product and service management."
+   },
+   {
+    "heading": "Outputs and outcomes, costs and risks",
+    "body": "An output is a tangible or intangible deliverable of an activity: a report page, a repaired laptop, a new account. An outcome is a result for a stakeholder, made possible by one or more outputs: a manager who decides earlier, a nurse who can start her shift. Outputs are what the provider makes. Outcomes are what people get. When an exam option talks about outputs and another talks about outcomes, the ITIL answer usually points to the outcome.\n\nTake Kestrel's patient-flow dashboards. The output is a set of report pages refreshed before 06:00. The outcome is that the Director of Patient Flow sees bed pressure before the morning huddle and acts on it.\n\nEvery service also changes the consumer's costs and risks, in both directions:\n\n| Effect | Dashboard example |\n|---|---|\n| Cost removed | Analysts no longer build Excel extracts each morning |\n| Cost imposed | Licences, training time, a support contract |\n| Risk removed | No more extracts with patient detail sent by email |\n| Risk imposed | Dependence on the provider: if the refresh fails, the huddle has no numbers |\n\nA consumer judges a service by weighing the outcomes it supports against the costs and risks it removes and adds. A service that removes one cost but imposes a larger risk may not be worth having. Lesson 2 adds two more things to weigh: experience and sustainability."
+   },
+   {
+    "heading": "Utility and warranty",
+    "body": "Utility is the functionality a product or service offers to meet a particular need. In short: what it does, or fit for purpose. Utility either supports a performance (helps the consumer do something better) or removes a constraint (takes a blocker away).\n\nWarranty is the assurance that a product or service will meet agreed requirements. In short: how well it does it, or fit for use. Warranty usually covers availability, capacity, security, continuity and performance against agreed service levels.\n\nA service needs both to create value. Utility without warranty is a good idea that fails when people need it. Warranty without utility is a reliable service that does not do what people need.\n\n| Situation | What is missing |\n|---|---|\n| The dashboard shows the right measures but is down two mornings a week | Warranty (availability) |\n| The dashboard is always up but does not show the waits leaders ask about | Utility |\n| The dashboard is fast, but staff without a need can see confidential pages | Warranty (security) |\n| The dashboard slows to a crawl when every site opens it at 07:00 | Warranty (capacity) |\n| No one can restore the dashboard after a server failure | Warranty (continuity) |\n\nExam stems often describe a complaint and ask which one is lacking. Ask yourself: does it do the right thing (utility), and does it do it reliably, safely and at the agreed level (warranty)?"
+   },
+   {
+    "heading": "Providers, consumers and three roles",
+    "body": "A service provider is the organization that provides services. A service consumer is the organization that receives them. Most organizations are both at once. Kestrel's IT team provides the dashboards to the patient-flow team, and at the same time consumes cloud hosting from a supplier.\n\nInside the consumer, ITIL separates three roles:\n\n- Customer: defines the requirements for a service and takes responsibility for the outcomes of using it.\n- User: uses the service.\n- Sponsor: authorizes the budget for using the service.\n\nThese are roles, not job titles, and one person can hold more than one. At home you are customer, user and sponsor of your phone plan. At work they are often different people. For the dashboards, the Director of Patient Flow is the customer, a charge nurse is a user, and the executive who signs the budget is the sponsor.\n\nExam questions test which role does what:\n\n- Who should agree the targets for a service? The customer.\n- Who reports that a screen is confusing? A user.\n- Who approves the spending? The sponsor.\n\nStakeholders go wider than these three roles. They include employees, partners and suppliers, funders or shareholders, and society. Value has to make sense for each of them, which is why ITIL speaks of value for stakeholders, not only for customers. A service that pleases customers but burns out the staff who run it is not creating value for every stakeholder."
+   },
+   {
+    "heading": "Service offerings and service relationships",
+    "body": "A service offering is a description of one or more services, designed to address the needs of a target consumer group. An offering can include three kinds of thing:\n\n- Goods: ownership passes to the consumer, who becomes responsible for them. A phone a new employee keeps.\n- Access to resources: the consumer may use them under agreed terms, but ownership stays with the provider. A licence to the dashboards, access to the network.\n- Service actions: work the provider does to meet the consumer's need. A support call, a training session, a password reset.\n\nOne service can be packaged into several offerings for different groups. A basic offering for occasional users and a fuller one with training and faster support for managers both draw on the same product.\n\nA service relationship is a cooperation between a service provider and a service consumer. It has three parts:\n\n1. Service provision: what the provider does to provide the service, including managing its resources and the actions it performs.\n2. Service consumption: what the consumer does, including managing its own resources and using the service.\n3. Service relationship management: the joint work that keeps value being co-created, such as agreeing needs, reviewing performance and acting on feedback.\n\nRelationships chain together. A consumer often turns what it receives into part of its own offering. The IT team consumes hosting from a supplier, and that hosting becomes one of the resources behind what it offers clinicians. Value comes from the whole relationship, not from a single handover."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Value",
+    "definition": "The perceived benefits, usefulness and importance of something. It is judged by the stakeholder, not by the provider, and it is more than money."
+   },
+   {
+    "term": "Product",
+    "definition": "A configuration of an organization's resources (people, information, technology, partners, money) designed to offer value for a consumer. The provider owns and builds it."
+   },
+   {
+    "term": "Service",
+    "definition": "A means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks."
+   },
+   {
+    "term": "Output and outcome",
+    "definition": "An output is a deliverable of an activity, such as a report. An outcome is a result for a stakeholder made possible by outputs, such as an earlier, better decision."
+   },
+   {
+    "term": "Utility",
+    "definition": "The functionality a product or service offers to meet a particular need: what it does, or fit for purpose. It supports a performance or removes a constraint."
+   },
+   {
+    "term": "Warranty",
+    "definition": "The assurance that a product or service will meet agreed requirements: how well it does it, or fit for use. Covers availability, capacity, security and continuity."
+   },
+   {
+    "term": "Customer, user and sponsor",
+    "definition": "Three consumer roles. The customer defines requirements and owns outcomes, the user uses the service, the sponsor authorizes the budget. One person can hold several."
+   },
+   {
+    "term": "Service relationship",
+    "definition": "A cooperation between a provider and a consumer, made up of service provision, service consumption and service relationship management."
+   }
+  ],
+  "build": {
+   "goal": "Classify ten statements about a home internet service as output, outcome, utility, warranty, cost or risk, or customer, user or sponsor, then explain in two sentences the value the service creates.",
+   "steps": [
+    "Read statements 1 to 4: (1) the router is delivered and set up; (2) you can work from home instead of commuting; (3) the connection stays up 99.9% of the month; (4) the plan streams video at full speed.",
+    "Read statements 5 to 7: (5) you no longer pay for extra mobile data; (6) you now depend on one company for every device in the house; (7) your teenager streams lessons on it every evening.",
+    "Read statements 8 to 10: (8) your partner chose the plan and its speed after listing what the house needs; (9) your employer pays the monthly bill; (10) the provider keeps your account details safe.",
+    "Label each statement with one word: output, outcome, utility, warranty, cost removed, risk imposed, user, customer or sponsor. Some could fit two labels; pick the best and note why.",
+    "Write two sentences on the value the service creates for your household: the main outcome it supports, one cost it removes and one risk it adds.",
+    "Compare with the model answer. For each label you got wrong, write the rule you missed in one line."
+   ],
+   "modelAnswer": "| Statement | Label | Why |\n|---|---|---|\n| 1 Router delivered and set up | Output | A deliverable of the provider's activity |\n| 2 Work from home instead of commuting | Outcome | The result you actually want |\n| 3 Up 99.9% of the month | Warranty | Availability: how well it works |\n| 4 Streams at full speed | Utility | What it does for your need |\n| 5 No extra mobile data to buy | Cost removed | The service takes a cost away |\n| 6 Depend on one company | Risk imposed | A new risk you now carry |\n| 7 Teenager streams lessons | User | Uses the service |\n| 8 Partner chose plan and speed | Customer | Defines requirements and owns outcomes |\n| 9 Employer pays the bill | Sponsor | Authorizes the budget |\n| 10 Account details kept safe | Warranty | Security is part of warranty |\n\nStatement 4 could tempt you towards warranty because speed sounds like performance. Here it describes what the plan offers to meet a need (streaming), so utility fits best. If the statement had said the plan reaches its promised speed at busy times, that would be warranty.\n\nValue in two sentences: The service lets the household work and study from home, which is the outcome that matters, and it removes the cost of extra mobile data. In return the household depends on one provider, so an outage stops work and lessons at the same time."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "A service enables outcomes and takes some costs and risks off the customer. An option saying the provider delivers value on its own is wrong: value is co-created with the consumer."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Utility is fit for purpose (what it does); warranty is fit for use (availability, capacity, security, continuity). A service that gives correct results but is often down or insecure has a warranty problem."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Customer defines requirements and owns outcomes, user uses, sponsor authorizes budget. When asked who should agree service targets or define requirements, choose the customer."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Outputs are deliverables; outcomes are results stakeholders want. When the options mix them, the ITIL answer usually points to the outcome."
+   }
+  ],
+  "pitfalls": [
+   "Treating value as whatever the provider delivers. Value is perceived by the stakeholder; a finished deliverable nobody uses has no value.",
+   "Calling availability or security a feature, and so utility. They are warranty, even when users are the ones asking for them.",
+   "Assuming customer, user and sponsor are always different people. They are roles, and one person can hold two or all three."
+  ],
+  "check": [
+   {
+    "q": "A reporting service delivers every report on time, yet managers keep deciding from their own spreadsheets. Using output, outcome and value, explain what is wrong.",
+    "a": "The provider is producing outputs (reports on time) but not the outcome the customer wants (decisions made from the reports). Value is perceived by the stakeholder, so reports nobody uses create no value however punctual they are."
+   },
+   {
+    "q": "A video call service has every feature users want but drops one call in five. Is this a utility or a warranty problem, and why does the service still fail to create value?",
+    "a": "It is a warranty problem: the service is fit for purpose but not fit for use, because its availability and reliability are poor. Value needs both utility and warranty, so a full feature set cannot make up for calls that drop."
+   },
+   {
+    "q": "Who should agree the targets in a service level agreement: the customer, a user or the sponsor? Explain using the definition of each role.",
+    "a": "The customer, because the customer defines the requirements for a service and takes responsibility for its outcomes. Users use the service and can give feedback; the sponsor authorizes the budget but does not set requirements."
+   }
+  ]
+ },
+ "itil-m2": {
+  "summary": "See how providers and consumers create value together, and what a consumer weighs: outcomes, costs, risks, experience and sustainability. Learn why digital experience is a core focus of Version 5 and how it treats AI as part of normal service work.",
+  "read": [
+   {
+    "heading": "Value is co-created",
+    "body": "Older thinking said a provider creates value and delivers it to a passive consumer. ITIL rejects that. Value is co-created: it comes from active collaboration between providers, consumers and other stakeholders.\n\nThe consumer contributes as much as the provider:\n\n- Time and attention: people learn the service and change how they work.\n- Information: they describe their needs, share data and report what goes wrong.\n- Resources: their own devices, staff and budgets.\n- Feedback: they say what works, which shapes the next change.\n\nTake Kestrel's plan to move password resets from the phone line to a self-service page. The service desk can build the page, but value appears only when staff register their recovery details, use the page instead of calling, and say where it confuses them. If staff never register, the page is an output with no outcome.\n\nThis is why exam questions on low use rarely want more features. When consumers are not getting value, the ITIL answer usually involves the consumers: ask them, watch them work, and act on what they say.\n\nCo-creation also means the provider cannot define value alone. A provider that decides what consumers need, without asking, is guessing. A provider and consumer that agree the outcomes together, and review them, are co-creating. The service relationship from lesson 1 is where that happens: provision, consumption and the joint work of managing the relationship."
+   },
+   {
+    "heading": "What a consumer weighs",
+    "body": "PeopleCert describes value co-creation as collaboration between service providers, consumers and stakeholders, while weighing outcomes, costs, risks, experience and sustainability. Learn those five words as a set.\n\n| Factor | Question the consumer asks | Self-service reset example |\n|---|---|---|\n| Outcomes | Does it get me the result I need? | Staff are back at work in minutes, any hour |\n| Costs | What does it take away, and what does it add? | Fewer calls to the desk; a licence and set-up time added |\n| Risks | What risk goes away, and what new risk appears? | Less waiting; new risk of someone resetting another person's account |\n| Experience | How does it feel to use, before, during and after? | Four clear screens, or a maze of security questions |\n| Sustainability | Can the value last, and at what wider cost? | Desk staff freed for harder work; no extra hardware |\n\nNo single factor decides. A service with the best outcome but an unacceptable risk is not good value. A cheap option that frustrates people every day costs more in lost time than it saves.\n\nIn exam questions, watch for options that judge a service on one factor only, usually cost or a single target. The stronger answer balances the factors and starts from the consumer's outcomes."
+   },
+   {
+    "heading": "Experience and digital experience",
+    "body": "Experience is how a stakeholder perceives every contact with a product or service: how easy it is, how long it takes, how clear the information is, and whether they trust it. Customers, users and the staff who run the service all have an experience, and each shapes the value they see.\n\nPeopleCert states that digital experience is a core focus in Version 5. It helps professionals design, deliver and improve digital products and services with greater visibility, better collaboration and a clear understanding of how different stakeholders experience value. Put simply: most contact with services is now through screens, apps and automated steps, so the quality of that digital contact is part of the value, not decoration.\n\nExperience can be poor while every target is met. The desk answers 95% of calls in 60 seconds, so the report is green, yet users hate calling because they repeat their story three times. This gap is sometimes called the watermelon effect: green outside, red inside. Service targets alone do not prove value.\n\nWays to see experience:\n\n- Ask users about a recent contact, soon after it.\n- Watch someone use the service and note where they hesitate.\n- Measure effort: how many steps, screens or handoffs it took.\n- Read complaints and compliments for patterns, not just counts.\n\nFor the self-service page, the experience measure might be the share of staff who finish a reset without calling the desk, plus a one-question rating at the end."
+   },
+   {
+    "heading": "Sustainability: value that lasts",
+    "body": "Sustainability asks two questions. Can the value last? And what does producing it cost over time, beyond this year's budget: in energy and hardware, in people's workload, in money in later years?\n\nA choice can look good today and fail this test:\n\n- A fix that needs one expert to repeat it by hand every week depends on a person who may leave or burn out.\n- A tool that needs new hardware every two years adds cost and waste that a simpler option avoids.\n- A quick change that skips documentation leaves rework for whoever comes next.\n\nPeopleCert's own wording links Version 5 to sustainable business results and lists sustainability among the things weighed in value co-creation. For the exam, treat it as one of the five factors: an option that creates value now while building up cost or harm for later is weaker than one whose value lasts.\n\nFor the self-service page, sustainability points to two checks. First, will the desk keep the page's help text current, or will it drift out of date within a year? Second, does the page reduce the load on a small team in a way they can keep up, or does it add a new manual task, such as reviewing every reset by hand?"
+   },
+   {
+    "heading": "Working together, and AI as normal work",
+    "body": "Co-creation needs steady habits, not a single meeting:\n\n1. Agree outcomes with the customer before choosing a solution.\n2. Involve users early, in design and testing, not only at launch.\n3. Share what you know: performance, problems and plans, including bad news.\n4. Collect feedback at the point of use and act on it visibly, so people see that speaking up changes things.\n5. Review value together at set times, using outcome and experience measures as well as targets.\n\nVersion 5 is described as AI-native. PeopleCert explains that the framework was designed with AI in mind from the outset: its practices, value streams, roles and ways of working are structured so AI can be built in to automate work, support decisions, predict outcomes and improve performance. For Foundation, treat AI as one more way of doing normal service work. An AI chat assistant on the reset page is judged by the same five factors: does it improve outcomes and experience, what does it cost, what risks does it add, and can the value last?\n\nPeopleCert also describes governing AI responsibly through oversight, accountability, risk management and trust. That topic has its own module, ITIL AI Governance, so at Foundation level you only need to know that AI use must be governed like any other part of a service."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Value co-creation",
+    "definition": "Creating value through active collaboration between providers, consumers and other stakeholders, rather than a provider delivering value to a passive consumer."
+   },
+   {
+    "term": "Stakeholder",
+    "definition": "A person or organization with an interest in a service: customers, users, sponsors, employees, partners and suppliers, funders and society."
+   },
+   {
+    "term": "Experience",
+    "definition": "How a stakeholder perceives every contact with a product or service: ease, speed, clarity and trust. It shapes the value they see, even when targets are met."
+   },
+   {
+    "term": "Digital experience",
+    "definition": "The quality of people's contact with digital products and services. PeopleCert names it a core focus of Version 5, tied to how different stakeholders experience value."
+   },
+   {
+    "term": "Sustainability (in value)",
+    "definition": "Whether value can last, and what producing it costs over time in energy, hardware, workload and future money. One of the five factors weighed in co-creation."
+   },
+   {
+    "term": "Watermelon effect",
+    "definition": "Service reports that are green on every target while users are unhappy. It shows that targets alone do not prove value; experience must be measured too."
+   },
+   {
+    "term": "AI-native",
+    "definition": "PeopleCert's description of Version 5: designed with AI in mind from the outset, so practices, value streams and roles can include AI to automate work and support decisions."
+   }
+  ],
+  "build": {
+   "goal": "Weigh two options for replacing phone password resets at a workplace across the five value factors, name what consumers must contribute, and recommend one option with one experience measure.",
+   "steps": [
+    "Option A: a self-service reset page open around the clock, with identity checked by a code sent to the person's registered phone. Option B: keep phone resets and extend desk hours to 22:00.",
+    "Draw a table with five rows (outcomes, costs, risks, experience, sustainability) and two columns (A and B). Write one short line in each cell.",
+    "List three things staff must do for option A to create value. These are their part in co-creation.",
+    "Recommend one option in two sentences, naming the factor that decided it and the factor you accept as a weakness.",
+    "Name one experience measure you would report next to the call-handling target, and say why the target alone is not enough.",
+    "Compare with the model answer and note any factor you judged on cost alone."
+   ],
+   "modelAnswer": "| Factor | Option A: self-service page | Option B: longer desk hours |\n|---|---|---|\n| Outcomes | Back to work in minutes, any hour, including night shifts | Faster than now, but nothing after 22:00 |\n| Costs | Licence and set-up; far fewer reset calls | Extra staff hours every week, with no end date |\n| Risks | Someone could reset another person's account if a phone is stolen; needs good identity checks | Callers can be impersonated too; fewer new risks overall |\n| Experience | Quick if registered; frustrating if not registered or the code does not arrive | Familiar, but users wait on hold and repeat details |\n| Sustainability | Frees desk staff for harder work; load stays low as staff numbers grow | Cost grows with staff numbers; tiring evening shifts |\n\nWhat staff must contribute for option A: register a recovery phone before they need it; use the page instead of calling; report steps that confuse them so the page can improve.\n\nRecommendation: Option A. Outcomes and sustainability decide it: night-shift staff get back to work at any hour and the desk's load stops growing. The weakness accepted is the new identity risk, which is reduced by requiring registration in person or through the manager, and by alerting the person by email after each reset.\n\nExperience measure: the share of resets finished on the page without a call to the desk, shown with a one-question rating at the end. The call target (for example answering 90% of calls within 60 seconds) can stay green while users are failing on the page and giving up, so it cannot show on its own whether the change created value."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "PeopleCert describes value co-creation as weighing outcomes, costs, risks, experience and sustainability. An option that judges a service on one of these alone, usually cost, is weaker than one that balances them."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Questions often contrast a provider deciding what consumers need with provider and consumer defining outcomes together. Pick the collaborative answer tied to the consumer's outcomes and feedback."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Green targets do not prove value. If users are unhappy while every target is met, the answer usually involves measuring experience and talking to users, not adding more targets."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "AI-native means Version 5 was designed with AI in mind. Judge an AI option like any other: does it improve outcomes and experience at an acceptable cost and risk, and is its use governed?"
+   }
+  ],
+  "pitfalls": [
+   "Treating consumers as passive receivers. Value appears only when they use the service and contribute their time, information and feedback.",
+   "Judging an option by cost alone. Outcomes, risks, experience and sustainability can outweigh a saving.",
+   "Reading a page of green service targets as proof of value. Experience can be poor while every target is met."
+  ],
+  "check": [
+   {
+    "q": "Why can a provider not create value on its own? Give one example of what the consumer must contribute.",
+    "a": "Value is co-created through active collaboration: it appears only when the consumer uses the service to reach an outcome. For example, staff must register their details and use a self-service page, and give feedback, before it saves them any time."
+   },
+   {
+    "q": "Name the five things PeopleCert says are weighed in value co-creation, and give one question to ask for each.",
+    "a": "Outcomes: does it get the result needed? Costs: what does it remove and add? Risks: which risks go away and which appear? Experience: how does it feel to use? Sustainability: can the value last, and at what wider cost over time?"
+   },
+   {
+    "q": "A service meets all its targets, yet users say it is slow and confusing. Which idea explains the gap, and what should the provider do first?",
+    "a": "Experience: targets measure what the provider controls, not how users perceive the service (the watermelon effect). The provider should first talk to and observe users to see where the experience fails, then add an experience measure."
+   }
+  ]
+ },
+ "itil-m3": {
+  "summary": "Learn the four dimensions of product and service management and the five components of the ITIL Value System, including governance, so you can say which dimension or component a situation is about.",
+  "read": [
+   {
+    "heading": "Why four dimensions",
+    "body": "A product or service can fail even when its technology is excellent. Staff were never trained, a supplier contract left out night support, or nobody agreed who approves what. ITIL guards against this with four dimensions that must all be considered for every product and service, and for the Value System as a whole.\n\nThe four dimensions are:\n\n1. Organizations and People\n2. Information and Technology\n3. Partners and Suppliers\n4. Value Streams and Processes\n\nThey are not steps done in order and not teams. They are four views of the same thing. Looking through all four is how ITIL puts the guiding principle Think and work holistically into practice: neglect one dimension and the gap shows up later as delay, cost or risk.\n\nAn exam question may describe a project that went wrong and ask which dimension was overlooked. Another may describe a concern, such as a contract or a skills gap, and ask which dimension it belongs to. Both need the same skill: hearing the key words in the stem.\n\nTake one example through this lesson: Kestrel's new mobile app that lets nurses swap shifts, with managers approving the swaps."
+   },
+   {
+    "heading": "The four dimensions in detail",
+    "body": "| Dimension | What it covers | Shift-swap app example |\n|---|---|---|\n| Organizations and People | Structure, roles and responsibilities, culture, skills and competencies, leadership, communication | Charge nurses trained to approve swaps; managers accept that staff arrange swaps themselves |\n| Information and Technology | Information and knowledge, the technology that manages it, how it is protected and kept, tools such as AI and automation | The app reads rosters from the HR system; swap records kept for one year and protected |\n| Partners and Suppliers | Relationships with other organizations involved in designing, delivering and supporting services; contracts and sourcing choices | A vendor hosts the app under a contract with night support within one hour |\n| Value Streams and Processes | How the parts work together: the steps, activities, workflows, controls and procedures that turn demand into value | Request swap, check rules, manager approves, roster updated, both nurses told |\n\nKey words help:\n\n- Culture, roles, skills, training, structure: Organizations and People.\n- Data, knowledge, tools, platforms, security of information: Information and Technology.\n- Contracts, vendors, outsourcing, other organizations: Partners and Suppliers.\n- Workflow, handoffs, steps, sequence, how work flows: Value Streams and Processes.\n\nSome situations touch two dimensions. A supplier's tool holding your data is both Partners and Suppliers and Information and Technology. Pick the one the question stresses: the contract, or the data."
+   },
+   {
+    "heading": "Outside forces",
+    "body": "The four dimensions sit inside a wider world the organization does not control. ITIL 4 grouped these outside influences under six headings, often remembered as PESTLE:\n\n- Political: government priorities and funding decisions.\n- Economic: budgets, prices, the job market.\n- Social: what people expect, how they like to work.\n- Technological: new tools and threats, such as AI.\n- Legal: laws and regulations, such as privacy law.\n- Environmental: energy use, climate and physical risks.\n\nThese factors constrain or shape every dimension. A privacy law limits what Information and Technology may hold. A tight job market affects Organizations and People. A rule that health data must stay in the country shapes Partners and Suppliers.\n\nFor the shift-swap app, a collective agreement on overtime is a legal factor: the app's rules must not let a swap break it. Recognizing an outside factor helps you separate it from the four dimensions. When a stem describes a new law, a market change or public expectations, it is describing an outside influence that the dimensions must respond to, not a dimension itself."
+   },
+   {
+    "heading": "The ITIL Value System",
+    "body": "The ITIL Value System describes how all the parts of an organization work together to create value. PeopleCert lists its components as guiding principles, governance, value chain activities, management practices and continual improvement.\n\n| Component | What it does |\n|---|---|\n| Guiding principles | Recommendations that guide decisions in every situation (lesson 4) |\n| Governance | Directs and controls the organization (next section) |\n| Value chain activities | The work that turns demand into value; Version 5 views this work through a complete product and service lifecycle (lesson 5) |\n| Management practices | Sets of organizational resources for a type of work, such as incident management (lessons 6 and 7) |\n| Continual improvement | Ongoing improvement at every level, everywhere in the system (lesson 8) |\n\nIn ITIL 4, which Version 5 builds on, the Value System has inputs and an output. Opportunity and demand go in. Opportunity means options to add value for stakeholders or to improve the organization. Demand means the need or desire for products and services from consumers inside and outside. Value comes out.\n\nThe point of a system is that the parts work together. Practices that each perform well but never share information create silos: the desk does not know about a release, the release team does not know the desk's top complaints. The Value System exists to join them up around value. In the exam, an answer that improves one team in isolation is usually weaker than one that links the components."
+   },
+   {
+    "heading": "Governance",
+    "body": "Governance is the means by which an organization is directed and controlled. It sits with a governing body, such as a board of directors, that is accountable for the organization's performance and compliance.\n\nGovernance has three activities:\n\n1. Evaluate: look at the organization, its strategy, performance and risks, and how they may change.\n2. Direct: assign responsibility for, and set the direction of, strategy and policies.\n3. Monitor: check performance and compliance against the direction set.\n\nGovernance is not management. The governing body sets direction and checks results; management plans and runs the work within that direction. A board that sets a policy that patient data must stay in Canada is governing. The team that chooses a hosting supplier in Canada and runs the contract is managing.\n\nFor the shift-swap app:\n\n- Governance: the board's policy that staff data stays in Canada, and its quarterly review of whether the policy is met.\n- Management: the project choosing the vendor, the desk supporting nurses, the manager approving swaps.\n\nGovernance applies to every part of the Value System, including how AI is used. In exam questions, words such as directs, controls, policy, accountability, evaluate and monitor point to governance. Words such as plans, builds, runs and supports point to management practices."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Four dimensions",
+    "definition": "Four views that must all be considered for every product and service: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes."
+   },
+   {
+    "term": "Organizations and People",
+    "definition": "The dimension covering structure, roles, culture, skills, leadership and communication. Training gaps and resistance to change belong here."
+   },
+   {
+    "term": "Information and Technology",
+    "definition": "The dimension covering information and knowledge, and the technology that manages and protects it, including tools such as AI and automation."
+   },
+   {
+    "term": "Partners and Suppliers",
+    "definition": "The dimension covering relationships with other organizations involved in designing, delivering and supporting services, including contracts and sourcing choices."
+   },
+   {
+    "term": "Value Streams and Processes",
+    "definition": "The dimension covering how the parts work together: the steps, workflows, controls and procedures that turn demand into value."
+   },
+   {
+    "term": "ITIL Value System",
+    "definition": "How the organization's parts work together to create value. Components: guiding principles, governance, value chain activities, management practices, continual improvement."
+   },
+   {
+    "term": "Governance",
+    "definition": "The means by which an organization is directed and controlled. A governing body evaluates, directs and monitors; management runs the work within that direction."
+   },
+   {
+    "term": "Opportunity and demand",
+    "definition": "The Value System's inputs in ITIL 4. Opportunity is an option to add value or improve; demand is the need for products and services from consumers."
+   }
+  ],
+  "build": {
+   "goal": "Sort eight statements about launching a staff shift-swap app into the four dimensions or an outside factor, then match five more statements to the five components of the ITIL Value System.",
+   "steps": [
+    "Dimensions, statements 1 to 4: (1) charge nurses need training to approve swaps; (2) the app reads rosters from the HR system; (3) a vendor hosts the app under a contract; (4) the steps from swap request to updated roster are drawn out.",
+    "Dimensions, statements 5 to 8: (5) managers must accept that staff arrange their own swaps; (6) swap records are kept one year and protected; (7) a collective agreement limits overtime; (8) the vendor must answer night calls within one hour.",
+    "Label each of the eight with a dimension, or as an outside factor, and underline the key word that decided it.",
+    "Components: (a) the board rules that staff data stays in Canada; (b) Keep it simple and practical is used to cut approval steps; (c) the service desk and change enablement support the app; (d) a list of improvement ideas is reviewed monthly; (e) the work of designing, building and running the app.",
+    "Match a to e with guiding principles, governance, value chain activities, management practices or continual improvement.",
+    "Compare with the model answer and write one line for any you missed."
+   ],
+   "modelAnswer": "| Statement | Answer | Key word |\n|---|---|---|\n| 1 Nurses need training | Organizations and People | training, skills |\n| 2 App reads rosters from HR system | Information and Technology | data from a system |\n| 3 Vendor hosts under contract | Partners and Suppliers | vendor, contract |\n| 4 Steps from request to roster | Value Streams and Processes | steps, flow |\n| 5 Managers accept staff arrange swaps | Organizations and People | culture |\n| 6 Records kept and protected | Information and Technology | information, protection |\n| 7 Collective agreement on overtime | Outside factor (legal) | agreement the organization must obey |\n| 8 Night calls answered within one hour | Partners and Suppliers | supplier's contracted support |\n\nStatement 8 is about support, so you might think of Value Streams and Processes. The key fact is that another organization has promised it in a contract, so Partners and Suppliers fits best.\n\n| Statement | Component |\n|---|---|\n| a Board rules data stays in Canada | Governance |\n| b Keep it simple and practical used | Guiding principles |\n| c Service desk and change enablement | Management practices |\n| d Improvement ideas reviewed monthly | Continual improvement |\n| e Designing, building and running the app | Value chain activities (lesson 5 shows how Version 5 describes this work as lifecycle activities) |\n\nStatement a is governance because it is a direction set by the governing body. If the statement had been the project choosing a Canadian vendor, that would be management carrying out the direction."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "The four dimensions must be considered for every product and service. Contracts or vendors point to Partners and Suppliers; culture or skills to Organizations and People; data or tools to Information and Technology; steps or handoffs to Value Streams and Processes."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "The ITIL Value System components are guiding principles, governance, value chain activities, management practices and continual improvement. A question about which component directs and controls the organization wants governance."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Governance evaluates, directs and monitors; management plans and runs the work. If an option has the governing body running daily operations, or a team setting the organization's policy, it mixes the two."
+   }
+  ],
+  "pitfalls": [
+   "Treating the four dimensions as teams or as steps done in order. They are four views of the same product or service, all considered together.",
+   "Calling a new law or market change a dimension. It is an outside factor that the dimensions must respond to.",
+   "Confusing governance with management. The governing body sets direction and checks it; managers run the work."
+  ],
+  "check": [
+   {
+    "q": "A new system has excellent software and good data, but staff were never trained and no supplier contract covers support. Which dimensions were neglected, and why does ITIL insist on all four?",
+    "a": "Organizations and People (no training) and Partners and Suppliers (no support contract). ITIL says all four dimensions must be considered for every product and service, because a gap in any one shows up later as delay, cost or risk, however good the technology is."
+   },
+   {
+    "q": "List the five components of the ITIL Value System and say in one line what each contributes.",
+    "a": "Guiding principles guide decisions in every situation; governance directs and controls; value chain activities are the work that turns demand into value; management practices are resources for types of work; continual improvement improves everything, at every level."
+   },
+   {
+    "q": "What is the difference between governance and management? Give one example of each.",
+    "a": "Governance directs and controls the organization by evaluating, directing and monitoring, for example a board setting a data policy and checking it is met. Management plans and runs the work within that direction, for example a team choosing a supplier that meets the policy."
+   }
+  ]
+ },
+ "itil-m4": {
+  "summary": "Learn the seven guiding principles, what each one asks of you, how they work together, and how to pick the principle a scenario is testing from the key words in the question.",
+  "read": [
+   {
+    "heading": "What a guiding principle is",
+    "body": "A guiding principle is a recommendation that guides an organization in all circumstances, whatever changes in its goals, strategies, type of work or management structure. The principles are universal and lasting. They are not steps and not rules to follow in order; they are questions to ask before you decide.\n\nVersion 5 keeps the seven titles unchanged from ITIL 4:\n\n1. Focus on value\n2. Start where you are\n3. Progress iteratively with feedback\n4. Collaborate and promote visibility\n5. Think and work holistically\n6. Keep it simple and practical\n7. Optimize and automate\n\nThree things to remember about using them:\n\n- They interact. Starting where you are often leads to progressing iteratively. Keeping it simple comes before automating.\n- Not every principle applies to every decision, and none is applied alone. Use judgment.\n- They guide the whole Value System, including how practices are adapted to the organization.\n\nIn exam questions, the stem describes a situation and asks which principle is being applied, ignored or best fits. This lesson gives each principle its key words, then shows how to separate principles that look alike.\n\nThe example running through the lesson: a service desk replacing its ticket tool."
+   },
+   {
+    "heading": "Focus on value; Start where you are",
+    "body": "Focus on value. Everything the organization does should link back, directly or indirectly, to value for itself, its customers and other stakeholders. That means knowing who the consumer is, what they value, and how they experience the service. It applies at every step, not only at the start.\n\n- Key words: who benefits, outcomes, what the customer values, experience.\n- Ticket tool: choose features because they shorten the time users wait, not because they are new.\n- Breaking it: counting pages built or tickets closed instead of outcomes for users.\n\nStart where you are. Do not start from nothing. Look at what already exists, measure it and observe it directly, and keep what works. Reports and opinions can mislead, so go and see the work. Starting over is right only when what exists truly cannot be used, and that conclusion should come from evidence.\n\n- Key words: current state, baseline, reuse, assess, observe directly.\n- Ticket tool: export a year of tickets, see which categories and scripts work, and carry them over.\n- Breaking it: a new manager throwing out every process and tool in week one.\n\nExam options that discard everything and begin again are usually wrong. Options that measure the current state first are usually right."
+   },
+   {
+    "heading": "Progress iteratively with feedback; Collaborate and promote visibility",
+    "body": "Progress iteratively with feedback. Do not try to do everything at once. Break work into smaller pieces that can be finished and used, and gather feedback before, during and after each one. Each piece must still deliver something of value. Feedback lets you change direction early, when it is cheap.\n\n- Key words: pilot, small steps, phases, feedback loop, adjust.\n- Ticket tool: move one team first, learn from its first month, then move the rest.\n- Breaking it: an 18-month project with a single launch at the end and no user contact in between.\n\nCollaborate and promote visibility. Work across boundaries with the right people in the right roles, and make work, decisions and progress visible. Hidden work and hidden problems lead to poor decisions and low trust. Collaboration includes users and customers, not only other teams; how much each group is involved depends on its relationship to the work.\n\n- Key words: involve, share, transparent, visible, stakeholders, silos.\n- Ticket tool: show the backlog and the migration plan to the business, including the delays.\n- Breaking it: hiding a backlog from the business because it looks bad.\n\nThese two often appear together: a pilot shared openly with users uses both. When a question stresses small steps, pick Progress iteratively. When it stresses sharing or involving people, pick Collaborate and promote visibility."
+   },
+   {
+    "heading": "Holistic, simple, then automated",
+    "body": "Think and work holistically. No service, practice or component stands alone. Results suffer unless the organization works on the whole, not just the parts. Use the four dimensions to see the whole.\n\n- Key words: end to end, whole, interfaces, all four dimensions, effect on other parts.\n- Ticket tool: plan the change with the teams that receive tickets, the reporting team and the supplier, not just the desk.\n- Breaking it: the network team changing a firewall without considering the applications behind it.\n\nKeep it simple and practical. Use the fewest steps needed to reach the objective. If a process, service, action or measure provides no value or useful outcome, remove it. Think in outcomes, and design rules that are easy to follow.\n\n- Key words: remove, eliminate, fewest steps, unnecessary, practical.\n- Ticket tool: cut 30 ticket categories to 12 that people actually choose correctly.\n- Breaking it: 40 report measures where nobody can name the three that drive decisions.\n\nOptimize and automate. Make work as useful and efficient as it can be, and use technology to take on frequent, repetitive work. Optimize first, then automate: automating a messy process makes a fast messy process. Keep people where they truly add value, such as judgment and empathy.\n\n- Key words: automate, efficiency, repetitive, tool, AI.\n- Ticket tool: after simplifying categories, route tickets automatically.\n- Breaking it: building a chatbot before knowing which questions users ask most."
+   },
+   {
+    "heading": "Choosing between principles in a question",
+    "body": "Several principles can seem to fit a scenario. Pick the one the stem's key words point to, and test it against the others.\n\n| Situation | Best fit | Why not the obvious alternative |\n|---|---|---|\n| Automating an approval chain nobody has reviewed | Optimize and automate (optimize first) | Keep it simple is close, but the stem is about automation |\n| Replacing a tool before checking how it is used | Start where you are | Focus on value matters, but the missing step is the assessment |\n| One big launch after a year of silent work | Progress iteratively with feedback | Collaborate is close, but the stem is about the size of the steps |\n| A team keeps bad news from stakeholders | Collaborate and promote visibility | Focus on value is too general |\n| A change in one team breaks another team's service | Think and work holistically | Collaborate is close, but the failure is not seeing the whole |\n| A report with measures nobody uses | Keep it simple and practical | Focus on value is close, but the action is removing |\n| Success measured by features shipped | Focus on value | The stem is about what counts as success |\n\nA short method:\n\n1. Underline the verb in the stem: assess, pilot, share, remove, automate.\n2. Match it to the principle that owns that verb.\n3. Check the options for one that names a principle but answers a different problem.\n\nQuestions about applying a principle often ask what the team should do next. The answer is the action the principle recommends, such as measuring the current state, starting with a pilot or removing a step."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Guiding principle",
+    "definition": "A recommendation that guides an organization in all circumstances, regardless of changes in its goals, strategies, type of work or management structure."
+   },
+   {
+    "term": "Focus on value",
+    "definition": "Everything the organization does should link back to value for stakeholders. Know the consumer, what they value and how they experience the service."
+   },
+   {
+    "term": "Start where you are",
+    "definition": "Assess and observe what already exists, measure it and reuse what works, rather than starting from nothing. Base any decision to replace on evidence."
+   },
+   {
+    "term": "Progress iteratively with feedback",
+    "definition": "Break work into smaller pieces that each deliver value, and use feedback before, during and after each piece to adjust direction early."
+   },
+   {
+    "term": "Collaborate and promote visibility",
+    "definition": "Work across boundaries with the right people, including users and customers, and make work, decisions and problems visible to support good decisions."
+   },
+   {
+    "term": "Think and work holistically",
+    "definition": "No service or component stands alone. Work on the whole, end to end, using all four dimensions, because results suffer when only parts are improved."
+   },
+   {
+    "term": "Keep it simple and practical",
+    "definition": "Use the fewest steps needed to reach the objective. Remove any process, action or measure that provides no value or useful outcome."
+   },
+   {
+    "term": "Optimize and automate",
+    "definition": "Make work as useful and efficient as possible, then use technology for frequent, repetitive work. Optimize first; keep people where they add value."
+   }
+  ],
+  "build": {
+   "goal": "Read eight short workplace situations, name the guiding principle each one tests (or breaks), and write the key word that decided it and the action the principle recommends.",
+   "steps": [
+    "Situations 1 to 3: (1) a new manager wants to replace the ticket tool before anyone checks how it is used; (2) a team plans an 18-month redesign with one launch at the end; (3) a monthly report has 40 measures and nobody can say which drive decisions.",
+    "Situations 4 to 6: (4) the network team changes a firewall without telling the application team, and an app breaks; (5) a team wants a chatbot to answer every question before checking which questions are common; (6) the desk hides its backlog from the business.",
+    "Situations 7 and 8: (7) a project counts success by features shipped, not by whether users' work got easier; (8) before buying a new tool, a team lists which existing scripts and reports already work.",
+    "For each situation write three things: the principle, the key word in the situation, and the next action the principle recommends, in one line.",
+    "For two situations of your choice, name a second principle that also applies and explain why it is not the best answer.",
+    "Compare with the model answer and note any pair of principles you confused."
+   ],
+   "modelAnswer": "| Situation | Principle | Key word | Next action |\n|---|---|---|---|\n| 1 Replace tool before checking use | Start where you are | before anyone checks | Measure and observe the current tool and keep what works |\n| 2 One launch after 18 months | Progress iteratively with feedback | one launch | Split into releases that each deliver value; get feedback after each |\n| 3 Forty unused measures | Keep it simple and practical | nobody can say | Keep the few measures that drive decisions; remove the rest |\n| 4 Firewall change breaks app | Think and work holistically | without telling | Assess changes end to end, across every affected service |\n| 5 Chatbot first | Optimize and automate | before checking | Find and simplify the common questions first, then automate |\n| 6 Hidden backlog | Collaborate and promote visibility | hides | Show the backlog and plan openly, including delays |\n| 7 Features shipped | Focus on value | counts success | Measure outcomes for users, such as time saved |\n| 8 List what already works | Start where you are | already work | Reuse the working scripts and reports in the new tool |\n\nSecond principles:\n\n- Situation 4 also touches Collaborate and promote visibility, because the teams did not talk. The failure the stem stresses is changing one part without seeing its effect on the whole, so Think and work holistically is the better answer.\n- Situation 5 also touches Start where you are, because nobody measured the questions. The stem's action is automation, and the rule broken is to optimize before automating, so Optimize and automate is the better answer.\n- Situation 3 also touches Focus on value. The action the stem points to is removing what adds nothing, which belongs to Keep it simple and practical."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "Start where you are: before replacing a process or tool, assess and observe what exists and reuse what works. An answer that discards everything and starts fresh is usually wrong."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Optimize and automate: simplify and optimize first, then automate. An answer that automates a tangled process before removing steps is weaker than one that simplifies first."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Collaborate and promote visibility: answers that make work, risks and progress visible to stakeholders beat answers that keep information inside the team, even when the news is bad."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "When two principles both seem to fit, find the verb in the stem (assess, pilot, share, remove, automate) and pick the principle that owns that verb."
+   }
+  ],
+  "pitfalls": [
+   "Treating the principles as steps in a fixed order. They interact and are applied together, with judgment about which matter most.",
+   "Reading Progress iteratively with feedback as permission to deliver nothing whole. Each piece must still deliver value.",
+   "Automating before simplifying. Automation of a poor process makes poor results faster."
+  ],
+  "check": [
+   {
+    "q": "A team wants to automate a seven-step approval process that has never been reviewed. Which two principles should guide them first, and in what order?",
+    "a": "Start where you are (observe and measure the current process) and Keep it simple and practical (remove steps that add no value). Only then Optimize and automate, because automating an unreviewed process makes a poor process faster."
+   },
+   {
+    "q": "Why should the guiding principles be applied together rather than one at a time? Give an example where two interact.",
+    "a": "They interact and none covers every concern, so using one alone gives a partial answer. For example, a pilot with one team (Progress iteratively with feedback) works best when its results are shared openly with users (Collaborate and promote visibility)."
+   },
+   {
+    "q": "A manager hides a delayed project from stakeholders until it is fixed. Which principle does this break, and what would following it look like?",
+    "a": "Collaborate and promote visibility. Following it would mean sharing the delay, its cause and the recovery plan with stakeholders now, so they can make good decisions and trust the team."
+   }
+  ]
+ },
+ "itil-m5": {
+  "summary": "Learn the purpose of each product and service lifecycle activity, from Discover to Support, how to tell Operate, Deliver and Support apart, and how the lifecycle relates to value chain activities and value streams.",
+  "read": [
+   {
+    "heading": "One lifecycle for products and services",
+    "body": "PeopleCert describes ITIL Foundation (Version 5) as a way to view digital product and service management through a complete lifecycle model, for the creation, delivery and continual improvement of products and services. Its learning objective asks you to know the purpose of each product and service lifecycle management activity, from discovery and design to operation, delivery and support, and how they work together to create value.\n\nNotice the word: activities. Call them lifecycle activities, the word PeopleCert uses. There are eight:\n\n1. Discover\n2. Design\n3. Acquire\n4. Build\n5. Transition\n6. Operate\n7. Deliver\n8. Support\n\nLearn them in this order. A simple memory line: two that decide what to make (Discover, Design), two that get it ready (Acquire, Build), one that moves it into use (Transition), and three that keep value flowing once it is live (Operate, Deliver, Support).\n\nVersion 5 brings products and services into one lifecycle. The product is what the provider builds and runs; the service is how consumers get value from it. One lifecycle stops product teams and service teams from working as separate silos, which PeopleCert calls a lifecycle mindset.\n\nThe example for this lesson is an everyday one: a city library launching an online service for booking study rooms."
+   },
+   {
+    "heading": "The eight activities and their purpose",
+    "body": "The purposes below are written in plain words. Learn the idea of each activity rather than a fixed sentence.\n\n| Activity | Purpose in plain words | Library room booking |\n|---|---|---|\n| Discover | Understand needs, demand and opportunities, and decide what is worth doing | Learn why some rooms sit empty while members are turned away |\n| Design | Shape the product or service to meet the needs, including how it will be used, supported and kept secure | Booking rules, screens, opening hours, who helps when it fails |\n| Acquire | Obtain the resources needed, from inside the organization or from partners and suppliers | Contract for a booking platform; agreement with the cleaning firm |\n| Build | Create, configure and test the components | Configure the platform, load the rooms, test bookings |\n| Transition | Move new or changed products and services into live use | Train front-desk staff; switch the booking pages on |\n| Operate | Keep the live technology and components running as agreed | Monitor the platform, apply updates, check backups |\n| Deliver | Provide the service to consumers so they get value from it | A member books a room and gets a confirmation |\n| Support | Help users and restore normal use when something goes wrong | A member cannot sign in; staff restore access |\n\nEach activity has a clear purpose, so exam stems often describe one piece of work and ask which activity it belongs to. Find the verb: understand needs (Discover), shape (Design), obtain (Acquire), create and test (Build), move into live use (Transition), keep running (Operate), provide to consumers (Deliver), help and restore (Support)."
+   },
+   {
+    "heading": "Operate, Deliver and Support, and other close pairs",
+    "body": "Three pairs of activities cause most wrong answers.\n\nOperate, Deliver and Support. All three happen while the service is live, so they are easy to mix up.\n\n- Operate faces the technology and components: keeping them running, monitored, patched and backed up at the agreed level. Users rarely see it.\n- Deliver faces the consumer: the service actually being provided and used, request by request. A member booking a room is Deliver.\n- Support faces the user with a problem: help, fixes and restoring normal use. A member who cannot sign in gets Support.\n\nDesign and Build. Design decides what the product or service should be and how it will work. Build creates and tests it. Drawing the booking screens is Design; configuring them in the platform and testing them is Build.\n\nAcquire and Build. Acquire obtains resources, such as a supplier contract, cloud capacity, hardware or people with a skill. Build makes something from those resources. Buying the platform licence is Acquire; configuring it is Build. Acquire often involves partners and suppliers, the dimension from lesson 3.\n\nTransition sits between building and running. Testing in the live environment, training staff, the change being authorized and the switch-on all belong to Transition. Acceptance testing of a new service before go-live is a classic Transition answer.\n\nThe activities are not a one-way line. Support may find a fault that sends work back to Design. Discover goes on throughout the life of a product, as needs change."
+   },
+   {
+    "heading": "Lifecycle, value chain activities and value streams",
+    "body": "The ITIL Value System still lists value chain activities as one of its five components: the work that turns demand into value. Version 5 views that work through the product and service lifecycle. For the exam, use the lifecycle activity names. If an option uses ITIL 4 value chain activity names as if they were the current Version 5 terms, treat it with suspicion.\n\nA value stream is the series of steps an organization takes to create and deliver products and services to consumers. It starts with demand (a trigger) and ends with value for the consumer. A value stream does not have to pass through all eight lifecycle activities. It uses the activities it needs, in the order it needs them.\n\n| Value stream | Lifecycle activities it mainly uses |\n|---|---|\n| Launch the room booking service | All eight, from Discover to Support |\n| A member books a room | Deliver, with Operate keeping the platform running underneath |\n| A member cannot sign in | Support, then Deliver once access works |\n| Add a new room type | Discover, Design, Build, Transition |\n\nManagement practices sit inside this picture. They supply the resources and know-how each activity needs. Incident management works mostly in Support; change enablement and release management in Transition; supplier management in Acquire. One practice can serve many activities, and one activity uses many practices.\n\nSo: the lifecycle describes the purpose of each kind of work; a value stream is one path through that work for one kind of demand; practices are the capabilities used along the way."
+   },
+   {
+    "heading": "Lifecycle thinking",
+    "body": "PeopleCert describes a lifecycle mindset: making better decisions, anticipating change, reducing technical debt, improving service continuity and keeping teams aligned instead of working in silos. In practice it means asking, at every activity, what the later activities will need.\n\n- In Discover and Design, ask how the service will be operated and supported. A design with no plan for support creates incidents nobody can fix.\n- In Acquire, check that supplier contracts cover the whole life, including support hours and how to exit the contract.\n- In Build, write the knowledge that Support will need, and test what Operate will monitor.\n- In Transition, hand over with training, knowledge and agreed service levels, not just working code.\n- In Operate, Deliver and Support, feed what you learn back into Discover and Design.\n\nTechnical debt is the future cost of quick choices made now: a shortcut in Build that Operate and Support pay for later. Lifecycle thinking makes that cost visible when the choice is made.\n\nA short exam check: when an option makes one activity faster by pushing work or risk onto a later activity, it ignores the lifecycle. The stronger answer considers the whole life of the product or service, which is also the guiding principle Think and work holistically."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Product and service lifecycle",
+    "definition": "The Version 5 lifecycle model for creating, delivering and continually improving products and services, made up of eight lifecycle activities."
+   },
+   {
+    "term": "Lifecycle activities",
+    "definition": "The eight activities in order: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. PeopleCert calls them lifecycle management activities."
+   },
+   {
+    "term": "Discover and Design",
+    "definition": "Discover understands needs, demand and opportunities and decides what is worth doing. Design shapes the product or service, including how it is used, supported and secured."
+   },
+   {
+    "term": "Acquire and Build",
+    "definition": "Acquire obtains the resources needed, from inside or from partners and suppliers. Build creates, configures and tests the components from those resources."
+   },
+   {
+    "term": "Transition",
+    "definition": "Moving new or changed products and services into live use: final testing, authorized change, training, handover and switch-on."
+   },
+   {
+    "term": "Operate, Deliver and Support",
+    "definition": "Operate keeps live technology and components running as agreed. Deliver provides the service to consumers. Support helps users and restores normal use when things go wrong."
+   },
+   {
+    "term": "Value stream",
+    "definition": "The series of steps an organization takes to create and deliver products and services to consumers, from demand to value. It uses only the lifecycle activities it needs."
+   },
+   {
+    "term": "Technical debt",
+    "definition": "The future cost of quick choices made now, such as a shortcut in Build that Operate and Support must pay for later."
+   }
+  ],
+  "build": {
+   "goal": "Place ten pieces of work for launching a library's online room-booking service into the eight lifecycle activities, then trace two value streams and name the activities each one uses.",
+   "steps": [
+    "Work items 1 to 5: (1) survey members about why rooms sit empty while others are turned away; (2) draw the booking rules and screens; (3) sign the contract for a booking platform; (4) configure the platform and test fifty bookings; (5) train front-desk staff and switch the pages on.",
+    "Work items 6 to 10: (6) monitor the platform and apply security updates; (7) a member books a room and gets a confirmation; (8) a member cannot sign in and staff restore access; (9) agree with the cleaning firm to check rooms between bookings; (10) write the help text staff will use for sign-in problems.",
+    "Label each item with one lifecycle activity. Write the verb in the item that decided it.",
+    "Trace value stream A, a member books a room, from trigger to value. List its steps and the activities they use.",
+    "Trace value stream B, the library adds a new kind of room for group study. List the activities it uses, in order.",
+    "Compare with the model answer. For any wrong label, write which close pair you confused (Operate, Deliver, Support; Design, Build; Acquire, Build)."
+   ],
+   "modelAnswer": "| Item | Activity | Deciding verb |\n|---|---|---|\n| 1 Survey members | Discover | understand needs |\n| 2 Draw rules and screens | Design | shape |\n| 3 Sign platform contract | Acquire | obtain from a supplier |\n| 4 Configure and test | Build | create and test |\n| 5 Train staff, switch on | Transition | move into live use |\n| 6 Monitor and update platform | Operate | keep running |\n| 7 Member books a room | Deliver | service provided |\n| 8 Restore a member's access | Support | restore normal use |\n| 9 Agreement with cleaning firm | Acquire | obtain a resource from a partner |\n| 10 Write help text for sign-in problems | Build | create a component (knowledge) before launch |\n\nItem 10 could be argued as Transition, because knowledge is handed over at go-live. Writing it is creating a component, so Build fits best; handing it to staff with training is Transition.\n\nValue stream A, member books a room. Trigger: a member wants a quiet room tomorrow. Steps: sign in, choose time and room, receive confirmation, arrive and use the room. Activities: Deliver throughout, with Operate keeping the platform running underneath. If sign-in fails, Support restores access and the stream returns to Deliver. It does not touch Discover, Design, Acquire or Build, because nothing new is made.\n\nValue stream B, add group study rooms. Discover (do members want them, how many), Design (rules, sizes, screens), Acquire (furniture, possibly more platform licences), Build (configure the new room type, test), Transition (train staff, switch on), then Operate, Deliver and Support as for any room."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "Version 5 questions use the lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. If an option uses ITIL 4 value chain activity names as if they were current, treat it with suspicion."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Operate keeps the technology running; Deliver provides the service to consumers; Support helps users and restores normal use. Find whether the stem faces the technology, the consumer, or a user with a problem."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Obtaining resources from suppliers, partners or inside the organization is Acquire. Testing, training and switching on a new or changed service is Transition."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "A value stream uses only the lifecycle activities its demand needs. A routine request mainly uses Deliver; launching a new service uses all eight."
+   }
+  ],
+  "pitfalls": [
+   "Calling the lifecycle items stages. PeopleCert calls them lifecycle activities, and they are not a one-way sequence.",
+   "Mixing up Operate and Deliver. Operate looks after the technology; Deliver is the service reaching the consumer.",
+   "Assuming every value stream passes through all eight activities. Each uses only the activities it needs."
+  ],
+  "check": [
+   {
+    "q": "Name the eight product and service lifecycle activities in order and give the purpose of Transition in one line.",
+    "a": "Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition moves new or changed products and services into live use, with testing, authorized change, training and handover."
+   },
+   {
+    "q": "What is the difference between Operate, Deliver and Support? Use one example from a service you use.",
+    "a": "For online banking: Operate keeps the servers and app running and patched; Deliver is the service reaching you, such as making a payment; Support helps you and restores normal use when, for example, you are locked out."
+   },
+   {
+    "q": "How does a value stream relate to the lifecycle activities, and why does a routine request not pass through all eight?",
+    "a": "A value stream is one path from demand to value that uses the lifecycle activities it needs, in the order it needs them. A routine request uses an existing service, so nothing new is discovered, designed, acquired or built; it mainly uses Deliver, with Operate underneath."
+   }
+  ]
+ },
+ "itil-m6": {
+  "summary": "Learn what a management practice is, that there are 34 practices in two groups, and the purpose and key terms of six practices: service desk, incident management, service request management, problem management, service level management, and monitoring and event management.",
+  "read": [
+   {
+    "heading": "Practices: 34 in two groups",
+    "body": "A management practice is a set of organizational resources designed for performing work or reaching an objective. Each practice draws on all four dimensions: people and skills, information and technology, partners and suppliers, and the value streams and processes it takes part in. Practices supply the know-how that lifecycle activities and value streams use.\n\nPeopleCert states that Version 5 has 34 ITIL management practices, which remain largely the same as in ITIL 4 with some adjustments, and that they are now organized into two groups:\n\n1. Product and Service management practices\n2. General management practices\n\nLearn the number and both group names. Foundation does not expect you to know all 34 in detail. This lesson and the next cover the practices most likely to appear in questions; continual improvement comes in lesson 8.\n\nThe purposes in these lessons are written in plain words. Learn what each practice is for and its key terms, and match a scenario to the practice it describes.\n\nThis lesson follows a working day at Kestrel's service desk, run by Grace Liu, from the first call to the monthly service review. Six practices meet there:\n\n- Service desk\n- Incident management\n- Service request management\n- Problem management\n- Service level management\n- Monitoring and event management"
+   },
+   {
+    "heading": "Service desk",
+    "body": "The service desk captures demand for incident resolution and service requests. It is the entry point and single point of contact between the service provider and all its users.\n\nWhat that means in practice:\n\n- Channels: phone, chat, a self-service portal, email, walk-up. Many users never speak to a person; the portal and automation are part of the desk.\n- It does not have to fix everything itself. It records, sorts and resolves what it can, and routes the rest to the right team.\n- Its people need more than technical skill. Understanding the business, empathy, clear communication and knowing who to involve matter as much.\n- Knowledge makes it work. Good knowledge articles let the desk resolve more contacts at first contact and let users help themselves.\n\nTwo kinds of escalation appear in questions. Functional escalation passes the work to more expertise, such as the network team. Hierarchical escalation goes up the management line, for example when a customer is unhappy or a decision needs authority.\n\nAt Kestrel, the desk takes a call from a charge nurse whose dashboard will not load, a portal request for a new clinician account, and an email asking how to export a report. All three arrive at the same place. The desk's job is to recognize which kind of demand each one is and route it to the right practice."
+   },
+   {
+    "heading": "Incident management and service request management",
+    "body": "An incident is an unplanned interruption to a service, or a reduction in its quality. Incident management aims to minimize the negative impact of incidents by restoring normal service operation as quickly as possible.\n\n- Restoring service comes first; finding the cause is problem management's job.\n- Incidents are prioritized by impact (how much harm to the business) and urgency (how fast it gets worse). Email down for a whole floor is high on both; one flickering monitor with a spare laptop nearby is low on both.\n- A major incident has significant business impact and gets its own procedure: a clear lead, faster communication and more people working together.\n- Incidents should be logged and managed so the target resolution times agreed with the customer are met.\n\nA service request is a request from a user, or the user's authorized representative, that starts a service action agreed as a normal part of service delivery. Service request management supports the agreed quality of a service by handling these pre-defined, user-initiated requests in a consistent, user-friendly way.\n\n- Typical requests: a new account, access to a system, a password reset, information such as how to export a report, a standard piece of equipment, and feedback or compliments.\n- Requests are normal and expected, so they follow standard, often automated, workflows with known steps and approvals.\n\nThe test that separates them: is something broken or degraded? That is an incident. Is the user asking for something normal that the service offers? That is a service request. Exam options often swap the two."
+   },
+   {
+    "heading": "Problem management",
+    "body": "A problem is a cause, or potential cause, of one or more incidents. Problem management reduces the likelihood and impact of incidents by finding their actual and potential causes and by managing workarounds and known errors.\n\nThree key terms:\n\n- Known error: a problem that has been analysed but has not been resolved.\n- Workaround: a way to reduce or remove the impact of an incident or problem for which a full resolution is not yet available.\n- Error control: managing known errors, including recording workarounds and deciding whether a permanent fix is worth its cost.\n\nProblem management has three phases:\n\n1. Problem identification: spotting problems from trends in incidents, repeated incidents, major incidents, information from suppliers and developers, and testing.\n2. Problem control: analysing the problem, and documenting workarounds and known errors.\n3. Error control: managing known errors, reviewing workarounds, and judging permanent fixes. A fix to the live service usually goes through change enablement.\n\nAt Kestrel, the desk logs twelve incidents in a month for the same printer jamming on one unit. Each incident is resolved by clearing the jam. That pattern is a problem. Analysis finds a firmware fault; the vendor's fix is due next month. Until then the known error record tells the desk the workaround: use the second paper tray.\n\nIncident management restores service now. Problem management stops the incidents coming back. Questions that ask how to stop repeat incidents want problem management, not faster incident handling."
+   },
+   {
+    "heading": "Service levels, monitoring and events",
+    "body": "Service level management sets clear, business-based targets for service performance, so that the delivery of a service can be properly assessed, monitored and managed against them.\n\n- A service level agreement (SLA) is a documented agreement between a service provider and a customer that identifies the services required and the expected level of service.\n- Good targets reflect outcomes the customer cares about, are written in plain language, and are agreed with the customer, not set by the provider alone.\n- One measure is never enough. Combine targets such as availability and resolution time with feedback on experience, and review them with the customer at set times. Lesson 2's watermelon effect is the warning.\n\nMonitoring and event management systematically observes services and their components, and records and reports selected changes of state identified as events.\n\n- An event is any change of state that has significance for the management of a service or one of its components.\n- Events are usually sorted into three kinds: informational (all is well, for example a backup finished), warning (a threshold is near, for example a disk at 85% and rising) and exception (something has failed or broken a threshold, for example a server down).\n- A warning lets the team act before users notice. An exception may open an incident automatically.\n\nAt Kestrel, monitoring raises a warning that the dashboard's data refresh is running slow at 05:30. The team acts before the 06:00 deadline, and the morning's service level holds. No user ever calls the desk."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Management practice",
+    "definition": "A set of organizational resources designed for performing work or reaching an objective. Version 5 has 34, in two groups: Product and Service management, and General management."
+   },
+   {
+    "term": "Service desk",
+    "definition": "The practice that captures demand for incident resolution and service requests. It is the single point of contact between the provider and all its users."
+   },
+   {
+    "term": "Incident",
+    "definition": "An unplanned interruption to a service, or a reduction in its quality. Incident management restores normal service as quickly as possible."
+   },
+   {
+    "term": "Service request",
+    "definition": "A request from a user or their authorized representative that starts a service action agreed as a normal part of service delivery, such as new access."
+   },
+   {
+    "term": "Problem",
+    "definition": "A cause, or potential cause, of one or more incidents. Problem management finds causes and manages workarounds and known errors."
+   },
+   {
+    "term": "Known error and workaround",
+    "definition": "A known error is a problem analysed but not resolved. A workaround reduces or removes the impact of an incident or problem until a full fix exists."
+   },
+   {
+    "term": "Service level agreement (SLA)",
+    "definition": "A documented agreement between a service provider and a customer that identifies the services required and the expected level of service."
+   },
+   {
+    "term": "Event",
+    "definition": "Any change of state that has significance for the management of a service or component. Events are informational, warning or exception."
+   }
+  ],
+  "build": {
+   "goal": "Sort eight service desk tickets into incident, service request, problem or event, name the practice that leads each one, and set a priority for each incident from its impact and urgency.",
+   "steps": [
+    "Tickets 1 to 4: (1) email is down for the whole finance floor at month end; (2) a new nurse starts Monday and needs an account; (3) the same printer has jammed every day and twelve incidents are logged this month; (4) monitoring reports the nightly backup finished normally.",
+    "Tickets 5 to 8: (5) a database server disk is at 85% and rising; (6) a user asks how to export a report to PDF; (7) the printer jams are traced to a firmware fault, the vendor fix is due next month, and staff use tray 2 meanwhile; (8) one user's monitor flickers, but they can work on a spare laptop.",
+    "Label each ticket: incident, service request, problem, known error or event (and the kind of event).",
+    "Name the practice that leads each ticket.",
+    "For each incident, rate impact and urgency as high or low and give a priority: high, medium or low. Say whether any is a major incident.",
+    "Compare with the model answer and write one line for each ticket you labelled differently."
+   ],
+   "modelAnswer": "| Ticket | Type | Leading practice | Priority |\n|---|---|---|---|\n| 1 Email down for finance floor at month end | Incident | Incident management | High: high impact, high urgency; likely a major incident |\n| 2 Account for new nurse | Service request | Service request management | Not prioritized as an incident; due by Monday |\n| 3 Same printer jams daily, 12 incidents | Problem | Problem management | Not applicable |\n| 4 Backup finished normally | Event, informational | Monitoring and event management | No action |\n| 5 Disk at 85% and rising | Event, warning | Monitoring and event management | Act before it becomes an exception |\n| 6 How to export to PDF | Service request (information) | Service request management, often from a knowledge article | Not applicable |\n| 7 Firmware fault, fix due, use tray 2 | Known error with a workaround | Problem management (error control) | Not applicable |\n| 8 One monitor flickers, spare laptop works | Incident | Incident management | Low: low impact, low urgency |\n\nEvery ticket arrives through the service desk, which records it, resolves what it can at first contact (ticket 6 from a knowledge article) and routes the rest.\n\nTicket 3 tempts you to call it an incident because each jam is one. The twelve repeats point to a shared cause, so the record that matters is a problem. Ticket 7 is the same problem after analysis: it is now a known error, and tray 2 is its workaround. The permanent fix (the vendor's firmware) will go through change enablement.\n\nTicket 5 is not yet an incident, because nothing has failed. Acting on the warning prevents one."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "An incident means something is broken or degraded; a service request is a normal, pre-defined request such as new access or a password reset. Exam options often swap the two."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Incident management restores service as quickly as possible; problem management finds causes and manages known errors and workarounds. To stop repeat incidents, choose problem management."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "PeopleCert states there are 34 ITIL management practices, organized into two groups: Product and Service management practices, and General management practices."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "The service desk is the single point of contact for users. It does not have to fix everything; it captures demand, resolves what it can and routes the rest."
+   }
+  ],
+  "pitfalls": [
+   "Treating a password reset or new account as an incident. Nothing is broken; it is a service request.",
+   "Trying to find the root cause while users are still down. Restore service first; problem management finds the cause.",
+   "Setting service level targets without the customer, or relying on one measure. Targets are agreed with the customer and combined with experience feedback."
+  ],
+  "check": [
+   {
+    "q": "What is the difference between an incident and a service request? Give one example of each.",
+    "a": "An incident is an unplanned interruption or reduction in quality, such as a website that will not load. A service request is a normal, pre-defined request the service offers, such as asking for access to a shared folder."
+   },
+   {
+    "q": "What is a known error, and how does a workaround help while a problem stays open?",
+    "a": "A known error is a problem that has been analysed but not yet resolved. A workaround reduces or removes the impact of the related incidents, so users can keep working until a permanent fix is made or judged not worth its cost."
+   },
+   {
+    "q": "How many ITIL management practices are there in Version 5, and what are the two groups called?",
+    "a": "There are 34 management practices, organized into two groups: Product and Service management practices, and General management practices."
+   }
+  ]
+ },
+ "itil-m7": {
+  "summary": "Learn the purpose and key terms of eight more practices: change enablement, release management, deployment management, service configuration management, IT asset management, information security management, relationship management and supplier management.",
+  "read": [
+   {
+    "heading": "Change enablement",
+    "body": "A change is the addition, modification or removal of anything that could have a direct or indirect effect on services. Change enablement aims to maximize the number of successful changes by making sure risks are properly assessed, authorizing changes to proceed, and managing the change schedule.\n\nThree types of change:\n\n| Type | What it is | Example |\n|---|---|---|\n| Standard | Low risk, well understood, fully documented; pre-authorized, so it can be done without a new authorization each time | Setting up a laptop from the approved build |\n| Normal | Scheduled, assessed and authorized by the right change authority; the authority depends on the risk | Moving a website to a new hosting provider |\n| Emergency | Must be done as soon as possible, such as fixing an actively exploited security flaw; assessment and authorization are faster and may use a separate authority | Patching a payment page under attack |\n\nKey ideas:\n\n- Change authority: the person or group that authorizes a change. Low-risk normal changes can be authorized close to the work; high-risk ones go higher. Placing authority well keeps changes fast and safe.\n- Change schedule: the plan of upcoming changes, used to avoid clashes and to tell people what is coming.\n- Emergency changes still get assessed and recorded, just faster. Testing may be reduced, but the risk is still weighed.\n\nA common trap: a project board approving the scope of a piece of work is not the same as authorizing a change to the live service. At Kestrel, the change-control board approved unit-level counts for the bed dashboard as a scope decision; putting the new page into the live service still needs the change authority's authorization.\n\nA password reset is a service request, not a change. Do not confuse the two."
+   },
+   {
+    "heading": "Release management and deployment management",
+    "body": "A release is a version of a service or other configuration item, or a collection of them, that is made available for use. Release management aims to make new and changed services and features available for use.\n\nDeployment management moves new or changed hardware, software, documentation, processes or any other component to live environments, or to other environments such as testing.\n\nThe difference is the heart of most questions:\n\n- Deployment is a technical move: the component is placed in an environment.\n- Release is making it available to users.\n\nThey can happen at different times. A team can deploy new code to the live environment on Saturday with the feature switched off, then release it to users on Monday after final checks. Deployed but not released is normal and lowers risk, because the release can be switched on or off without another deployment.\n\nCommon deployment approaches:\n\n- Phased: deploy to part of the environment at a time, such as one site.\n- Continuous delivery: components are integrated, tested and deployed often, in small amounts.\n- Big bang: deploy to every target at the same time.\n- Pull: users download or install the component when they want it, often from a self-service catalogue.\n\nRelease management also decides what goes in each release, and prepares users and support teams with notes, training and knowledge, which ties it to Transition in the lifecycle."
+   },
+   {
+    "heading": "Configuration items and IT assets",
+    "body": "A configuration item (CI) is any component that needs to be managed in order to deliver an IT service. Service configuration management makes sure accurate and reliable information about the configuration of services, and the CIs that support them, is available when and where it is needed. That includes how CIs relate to each other.\n\n- CIs can be hardware, software, networks, buildings, people, suppliers and documents.\n- Relationships matter most: which servers, databases and network links a service depends on. When something breaks or changes, this information shows what else is affected.\n- The information is held in one or more configuration management systems and used by incident, problem and change work.\n\nAn IT asset is any financially valuable component that can contribute to delivering an IT product or service. IT asset management plans and manages the full lifecycle of IT assets, to help the organization maximize value, control costs, manage risks, support decisions about buying, reusing and retiring assets, and meet regulatory and contractual requirements.\n\n- It tracks ownership, cost, location, licences, warranty dates and disposal.\n- Software licences are a common focus: using more copies than paid for is a contract and legal risk.\n\nThe two overlap but ask different questions. Service configuration management asks: how does this component fit together with others to deliver the service? IT asset management asks: what is it worth, who owns it, what does it cost, and when should it be retired? A server can be both a CI and an asset. A process document can be a CI without being an asset."
+   },
+   {
+    "heading": "Information security management",
+    "body": "Information security management protects the information the organization needs to conduct its business. That means understanding and managing risks to:\n\n- Confidentiality: only authorized people can see the information.\n- Integrity: the information is accurate and complete and changed only by authorized people.\n- Availability: the information is there when it is needed.\n\nTwo further qualities often appear with these: authentication (proving someone is who they say they are) and non-repudiation (someone cannot later deny an action they took).\n\nSecurity needs a balance of three kinds of control:\n\n1. Prevention: stop incidents happening, for example access rights and encryption.\n2. Detection: find incidents quickly, for example monitoring and alerts.\n3. Correction: recover after an incident, for example backups and incident response.\n\nInformation security involves everyone, not only a security team. Desk staff verifying a caller's identity, developers writing safe code, and managers approving access all take part. It also links to other practices: a security incident is handled through incident management, and a security fix to live systems goes through change enablement.\n\nIn terms of lesson 1, security is part of warranty. A dashboard that shows the right data but lets anyone see confidential pages is not fit for use. Kestrel's rule that the dashboards use de-identified, aggregated data is a preventive control decided before any user signs in."
+   },
+   {
+    "heading": "Relationship management and supplier management",
+    "body": "Relationship management establishes and nurtures the links between the organization and its stakeholders, at strategic and tactical levels. It involves identifying, analysing, monitoring and improving those relationships.\n\n- It works with customers and other stakeholders to understand their needs and priorities, and how they experience value.\n- It handles competing demands, such as two departments wanting the same team's time, so that priorities are agreed rather than fought over.\n- It tracks satisfaction and the health of the relationship, not just service targets.\n\nSupplier management makes sure the organization's suppliers and their performance are managed properly, so the organization can provide quality products and services. It covers:\n\n- Choosing a sourcing approach: build inside, buy from a supplier, or work with a partner.\n- Agreeing contracts and the terms that matter, such as support hours, response times, data location and how to exit.\n- Monitoring supplier performance against the contract and acting on it.\n- Managing risk, such as depending on a single supplier.\n\nA partner works more closely than a supplier, often sharing goals and risks over a long period. A supplier provides agreed goods or services under contract terms. Both belong to the Partners and Suppliers dimension, and obtaining resources from them is the Acquire activity of the lifecycle.\n\nExam cue: a question about a vendor missing its contracted response time wants supplier management. A question about two business units both unhappy with how priorities are set wants relationship management."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Change",
+    "definition": "The addition, modification or removal of anything that could have a direct or indirect effect on services. Change enablement maximizes successful changes."
+   },
+   {
+    "term": "Standard, normal and emergency change",
+    "definition": "Standard: low risk, pre-authorized. Normal: assessed and authorized by the right change authority. Emergency: done as soon as possible with faster assessment and authorization."
+   },
+   {
+    "term": "Change authority",
+    "definition": "The person or group that authorizes a change. Authority sits closer to the work for low-risk changes and higher up for high-risk ones."
+   },
+   {
+    "term": "Release",
+    "definition": "A version of a service or other configuration item, or a collection of them, made available for use. Release management makes new and changed features available."
+   },
+   {
+    "term": "Deployment",
+    "definition": "Moving new or changed hardware, software, documentation, processes or other components to live or other environments. A component can be deployed before it is released."
+   },
+   {
+    "term": "Configuration item (CI)",
+    "definition": "Any component that needs to be managed in order to deliver an IT service. Service configuration management keeps accurate information on CIs and their relationships."
+   },
+   {
+    "term": "IT asset",
+    "definition": "Any financially valuable component that can contribute to delivering an IT product or service. IT asset management handles its value, cost, risk and full lifecycle."
+   },
+   {
+    "term": "Confidentiality, integrity and availability",
+    "definition": "The three qualities information security management protects: only authorized access, accurate and complete information, and information there when needed."
+   }
+  ],
+  "build": {
+   "goal": "Classify five requests for an online shop as standard, normal or emergency change, or not a change, then name the practice that leads each of eight steps in moving the shop to a new hosting provider.",
+   "steps": [
+    "Requests: (1) set up a new staff laptop from the approved, documented build; (2) patch a security flaw being actively exploited on the payment page; (3) move the shop to a new hosting provider; (4) a user asks for a password reset; (5) add a new sales chart to a live report used by managers.",
+    "Label each request standard, normal, emergency, or not a change. For each change, say who should authorize it.",
+    "Hosting move, steps a to d: (a) assess the risk and authorize the move; (b) sign the contract and track the host's response times; (c) record which servers, databases and links the shop depends on; (d) record the cost, owner and licence terms of each new server.",
+    "Hosting move, steps e to h: (e) copy the shop to the new host on Saturday with customers still on the old one; (f) switch customers to the new shop on Monday after checks; (g) confirm customer data is encrypted and access is limited; (h) agree the timing with the sales and marketing managers.",
+    "Name the leading practice for each step a to h, choosing from the eight practices in this lesson.",
+    "Compare with the model answer and write one line for any release versus deployment or CI versus asset mix-up."
+   ],
+   "modelAnswer": "| Request | Type | Authorized by |\n|---|---|---|\n| 1 Laptop from approved build | Standard change | Pre-authorized; no new authorization needed |\n| 2 Patch exploited payment flaw | Emergency change | Emergency change authority, assessed quickly |\n| 3 Move to new host | Normal change, high risk | A senior change authority |\n| 4 Password reset | Not a change: a service request | Handled by service request management |\n| 5 New chart on live report | Normal change, low risk | A change authority close to the work, unless the organization has made such changes standard |\n\nRequest 5 could become a standard change if the organization has documented and pre-authorized this kind of report change after doing it safely many times.\n\n| Step | Leading practice |\n|---|---|\n| a Assess risk, authorize | Change enablement |\n| b Contract and response times | Supplier management |\n| c Servers, databases, links | Service configuration management |\n| d Cost, owner, licence terms | IT asset management |\n| e Copy to new host on Saturday | Deployment management |\n| f Switch customers on Monday | Release management |\n| g Encryption and limited access | Information security management |\n| h Agree timing with managers | Relationship management |\n\nSteps e and f show the release and deployment split: the shop is deployed to the new host on Saturday but released to customers only on Monday. Steps c and d show the CI and asset split: the same servers are recorded once for how they fit together and once for their value, cost and ownership."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "A standard change is low risk and pre-authorized; a normal change is assessed and authorized by the right change authority; an emergency change is assessed and authorized faster because it must happen as soon as possible."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Deployment moves components into an environment; release makes them available for use. If a stem has code in live but switched off for users, it is deployed but not yet released."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "A project board approving scope is not authorization to change the live service. Releasing a change to production still needs the change authority's authorization."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Service configuration management is about how components fit together to deliver a service; IT asset management is about value, cost, ownership and lifecycle. One item can be both a CI and an asset."
+   }
+  ],
+  "pitfalls": [
+   "Treating an emergency change as one that skips assessment. It is still assessed and recorded, only faster.",
+   "Using release and deployment as the same word. A component can be deployed and not yet released.",
+   "Calling a password reset or new account a change. Those are service requests with pre-defined steps."
+  ],
+  "check": [
+   {
+    "q": "What makes a change a standard change, and why does it not need a new authorization each time?",
+    "a": "A standard change is low risk, well understood and fully documented. Its risk was assessed once and the change type pre-authorized, so each repeat can go ahead without a new authorization."
+   },
+   {
+    "q": "Explain the difference between deployment and release, with an example where a component is deployed but not yet released.",
+    "a": "Deployment moves a component into an environment; release makes it available for use. For example, a new app feature is deployed to the live servers switched off, then released to users a few days later by switching it on."
+   },
+   {
+    "q": "What is the difference between a configuration item and an IT asset? Can one thing be both?",
+    "a": "A configuration item is any component managed to deliver a service, tracked with its relationships. An IT asset is a financially valuable component, tracked for cost, ownership and lifecycle. Yes: a server is usually both."
+   }
+  ]
+ },
+ "itil-m8": {
+  "summary": "Learn continual improvement as both a Value System component and a practice, the continual improvement model, how to map a value stream with work and wait times and manage it for flow, and the exam technique and booking facts for ITIL Foundation (Version 5).",
+  "read": [
+   {
+    "heading": "Continual improvement everywhere",
+    "body": "Continual improvement appears twice in ITIL, and the exam expects you to know both:\n\n- As a component of the ITIL Value System: improvement happens at every level of the organization, in every part of the system, all the time.\n- As one of the 34 management practices: the practice that aligns the organization's practices and services with changing business needs by improving them continually.\n\nIt is everyone's responsibility, not a separate team's. A small improvement team can coach and coordinate, but the people doing the work find and make most improvements.\n\nImprovement ideas are recorded in a continual improvement register (CIR). The register holds each idea with its expected value, a rough size, an owner and a status. Ideas are compared and prioritized by value, so the most useful ones are done first and nothing good is lost. One register can serve a team; larger organizations may keep several.\n\nPeopleCert's objective asks you to learn how continual improvement is embedded within ITIL and the continual improvement model's step-by-step approach. The guiding principles shape every improvement: Start where you are (measure first), Progress iteratively with feedback (small steps), and Focus on value (improve what matters to stakeholders).\n\nThe example for this lesson is an everyday one: a new employee waiting for a laptop."
+   },
+   {
+    "heading": "The continual improvement model",
+    "body": "The continual improvement model asks seven questions in order. These are the ITIL 4 model, which Version 5 refines; learn the questions and their order.\n\n| Step | Question | Laptop example |\n|---|---|---|\n| 1 | What is the vision? | New employees can work from their first morning |\n| 2 | Where are we now? | Measure today: how long a laptop takes, and where it waits |\n| 3 | Where do we want to be? | A measurable target, such as ready within two working days |\n| 4 | How do we get there? | Plan the improvement: remove the slowest waits first |\n| 5 | Take action | Make the change, iteratively, with feedback |\n| 6 | Did we get there? | Measure again against the target |\n| 7 | How do we keep the momentum going? | Share the result, record what was learned, pick the next idea |\n\nPoints the exam likes:\n\n- The model starts with the vision and the current state before any action. Answers that jump to a new tool before measuring ignore step 2.\n- Step 3 needs measurable targets, so step 6 can answer yes or no.\n- Step 5 can be one big change or many small ones. Small iterations with feedback are usually safer.\n- Step 7 loops back. The model is a cycle, not a project with an end.\n\nThe model works at any size: a change to one form, a team's way of working, or a whole service."
+   },
+   {
+    "heading": "Mapping a value stream",
+    "body": "A value stream is the series of steps an organization takes to create and deliver products and services to consumers. Mapping one means drawing every step from the trigger (the demand) to the value (the outcome the consumer wanted), and measuring how work flows through it.\n\nFor each step, record:\n\n- Work time: hands-on effort while someone is actually working on the item.\n- Wait time: time the item sits in a queue before the step starts.\n- Percent complete and accurate (%C&A): the share of work the next step can use without asking for corrections.\n\nThen add it up:\n\n- Lead time = total work time + total wait time.\n- Flow efficiency = total work time divided by lead time.\n- Rolled %C&A = every step's %C&A multiplied together: the share of items that get through with no rework.\n\nAn illustrative example. A laptop request has six steps with 3 hours of work in total and 80 hours of waiting. Lead time is 83 hours and flow efficiency is 3 / 83, about 3.6%. Almost all the delay is waiting, not working.\n\nThis is the usual finding. Speeding up the work itself barely changes lead time. Removing a wait, an approval nobody needs, or a reason for rework changes it a lot. A poor rolled %C&A adds more waiting, because every correction sends the item back into a queue.\n\nGet the times by walking real items through the stream with the people who do the work. Ticket data usually shows lead time but not work time. Starting from observed facts is the guiding principle Start where you are."
+   },
+   {
+    "heading": "Managing a value stream",
+    "body": "PeopleCert's objective is to identify, map and manage value streams to improve flow, visibility and outcomes. Mapping is a picture at one moment. Management is the ongoing work of keeping the stream flowing.\n\nManaging a value stream means:\n\n- Naming an owner who is accountable for the whole stream, from trigger to value, not just one team's step.\n- Measuring flow regularly: lead time, flow efficiency, how much work is waiting, and how often items need rework.\n- Making work visible, for example on a shared board, so everyone sees where items pile up.\n- Finding the bottleneck, the step where work waits longest, and improving it before anything else.\n- Removing steps that add no value (Keep it simple and practical), and only then automating repetitive steps (Optimize and automate).\n- Recording ideas in the continual improvement register and running each through the improvement model.\n\nVersion 5's AI-native approach applies here too: AI can route requests, predict demand or answer routine questions. Treat it like any other automation: optimize the step first, then decide whether AI improves outcomes and experience at an acceptable risk.\n\nValue streams cross teams and practices, which is why they help with the guiding principle Think and work holistically. A laptop request touches the service desk, finance, purchasing, a supplier and the build team. No single team can fix the lead time alone, but one owner with a shared map can."
+   },
+   {
+    "heading": "Exam technique and booking",
+    "body": "The exam: 40 multiple-choice questions in 60 minutes, closed book. The pass mark is 65%, which is 26 of 40. That is 90 seconds a question. Online proctored delivery is available, and no training course is required first.\n\nA method that fits the time:\n\n1. Make one full pass in about 45 minutes. Answer what you know; mark what you do not.\n2. Use the last 15 minutes on the marked questions.\n3. Read each stem twice and find its key word: value, outcome, output, utility, warranty, principle, dimension, lifecycle activity, practice.\n4. Watch for negatives such as NOT or LEAST. They reverse the task.\n5. Remove options that are true but answer a different question.\n6. Prefer the option about value for the consumer over one about internal activity.\n7. Answer every question. A blank cannot score.\n\nWording traps: use lifecycle activity names, not ITIL 4 value chain activity names; there are 34 practices in two groups; utility is fit for purpose and warranty fit for use.\n\nBooking facts from PeopleCert's pages: rescheduling is free up to 48 hours before the exam, with a fee after that. A retake (Take2) can only be bought before the exam, not after a fail, and is valid for six months. The certificate carries a three-year renewal date, renewed through CPD points with a PeopleCert Plus membership, by passing another ITIL certification, or by retaking the exam."
+   }
+  ],
+  "keyTerms": [
+   {
+    "term": "Continual improvement",
+    "definition": "Both a component of the ITIL Value System (improvement at every level, all the time) and one of the 34 management practices. Everyone is responsible for it."
+   },
+   {
+    "term": "Continual improvement register (CIR)",
+    "definition": "A record of improvement ideas, each with expected value, size, owner and status, used to prioritize ideas by value so the most useful are done first."
+   },
+   {
+    "term": "Continual improvement model",
+    "definition": "Seven questions: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going?"
+   },
+   {
+    "term": "Value stream mapping",
+    "definition": "Drawing every step of a value stream from trigger to value and measuring work time, wait time and percent complete and accurate for each step."
+   },
+   {
+    "term": "Lead time",
+    "definition": "The total time from trigger to value: total work time plus total wait time. Most lead time is usually waiting, not working."
+   },
+   {
+    "term": "Flow efficiency",
+    "definition": "Total work time divided by lead time. A low figure shows that items spend most of their time waiting in queues."
+   },
+   {
+    "term": "Percent complete and accurate (%C&A)",
+    "definition": "The share of a step's output the next step can use without corrections. Multiplied across steps, it shows how many items get through with no rework."
+   },
+   {
+    "term": "Value stream management",
+    "definition": "The ongoing work of measuring and improving a value stream's flow, visibility and outcomes, with an owner accountable for the whole stream."
+   }
+  ],
+  "build": {
+   "goal": "Map a six-step value stream for a new employee's laptop with work and wait times, compute lead time, flow efficiency and rolled %C&A, then plan one improvement with the continual improvement model.",
+   "steps": [
+    "Steps 1 to 3 (illustrative figures: work time, wait before the step, %C&A): (1) manager submits the request on the portal, 0.25 h, 0 h, 70%; (2) service desk checks and routes it, 0.25 h, 16 h, 95%; (3) finance approves the budget, 0.1 h, 24 h, 100%.",
+    "Steps 4 to 6: (4) order from stock or the supplier, 0.5 h, 8 h, 100%; (5) build and configure the laptop, 1.5 h, 24 h, 90%; (6) hand over and test sign-in with the employee, 0.4 h, 8 h, 100%.",
+    "Draw the six steps in a line from trigger (a new hire is confirmed) to value (the employee works on day one). Write work and wait under each step.",
+    "Compute total work time, total wait time, lead time, flow efficiency and rolled %C&A.",
+    "Find the two longest waits and the step with the lowest %C&A. Propose one improvement for each and name the guiding principle behind it.",
+    "Write your top improvement through steps 1 to 3 and 6 of the continual improvement model, with a measurable target."
+   ],
+   "modelAnswer": "| Step | Work (h) | Wait before (h) | %C&A |\n|---|---|---|---|\n| 1 Manager submits | 0.25 | 0 | 70% |\n| 2 Desk checks and routes | 0.25 | 16 | 95% |\n| 3 Finance approves | 0.1 | 24 | 100% |\n| 4 Order | 0.5 | 8 | 100% |\n| 5 Build and configure | 1.5 | 24 | 90% |\n| 6 Hand over and test | 0.4 | 8 | 100% |\n\nTotals: work 3.0 h; wait 80 h; lead time 83 h (about three and a half days). Flow efficiency 3.0 / 83 = about 3.6%. Rolled %C&A = 0.70 x 0.95 x 1 x 1 x 0.90 x 1 = about 0.60, so only about 60% of requests get through with no rework.\n\nLongest waits: finance approval (24 h) and the build queue (24 h). Lowest %C&A: the manager's request (70%).\n\n- Finance approval: approve the laptop budget once when the hire is approved, and make the laptop a standard request with no separate approval. Principle: Keep it simple and practical.\n- Build queue: keep a small stock of laptops pre-built to the standard image, so step 5 becomes a quick personalization. Principle: Optimize and automate (after simplifying).\n- Incomplete requests: make the key fields required on the portal form (start date, role, location). Principle: Start where you are, using the observed 70% to target the form.\n\nContinual improvement model for the top idea, removing the separate finance approval:\n\n1. Vision: new employees can work from their first morning.\n2. Where are we now: lead time 83 h, of which 24 h waits for finance approval.\n3. Where do we want to be: lead time under 48 h for nine in ten requests within three months.\n6. Did we get there: measure lead time for every request for the next three months against that target, and record the result in the improvement register."
+  },
+  "examTips": [
+   {
+    "cert": "ITIL",
+    "tip": "The continual improvement model begins with the vision and Where are we now? before any action. Options that buy a tool or redesign before measuring the current state ignore the model and Start where you are."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Continual improvement is both a Value System component and a management practice, and it is everyone's responsibility. An option that leaves improvement to one team alone is weaker."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "Lead time is work time plus wait time, and most of it is usually waiting. To shorten a value stream, remove waits, unneeded steps and rework before speeding up the work itself."
+   },
+   {
+    "cert": "ITIL",
+    "tip": "40 questions in 60 minutes is 90 seconds each, and 26 correct passes. Make one full pass, return to marked questions, and answer every item."
+   }
+  ],
+  "pitfalls": [
+   "Jumping to Take action before measuring Where are we now? Without a baseline, Did we get there? cannot be answered.",
+   "Trying to shorten lead time by making people work faster. The work is usually a small share; the waiting is where the time goes.",
+   "Mapping a value stream once and filing it. Managing it means measuring flow again and improving the bottleneck, with an owner for the whole stream."
+  ],
+  "check": [
+   {
+    "q": "List the seven questions of the continual improvement model in order. Why does it ask Where are we now? before deciding what to do?",
+    "a": "What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? Measuring the current state first gives a baseline, so the target is realistic and success can be measured."
+   },
+   {
+    "q": "A process has 3 hours of work and 45 hours of waiting. What are its lead time and flow efficiency, and where should improvement start?",
+    "a": "Lead time is 48 hours (3 + 45). Flow efficiency is 3 / 48, about 6%. Improvement should start with the longest waits, unneeded steps and rework, because they make up almost all of the lead time."
+   },
+   {
+    "q": "What is the difference between mapping a value stream and managing it?",
+    "a": "Mapping draws the steps from trigger to value and measures work, wait and %C&A at one point in time. Managing is ongoing: an owner measures flow regularly, makes work visible, improves the bottleneck and runs the improvements through the continual improvement model."
+   }
+  ]
  }
 };
 
