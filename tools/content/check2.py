@@ -20,6 +20,18 @@ for week_block in re.finditer(r"makeTasks\((\d+), \[(.*?)\]\),\n  \}", src, re.S
         if not docs.strip():
             NO_DOC_SESSIONS.add(f'w{week}-s{index + 1}')
 
+# Version 8 exam blocks (lib/tricert-plan.ts): every learn morning names its lesson key, such as itil-m1.
+PLAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'lib', 'tricert-plan.ts')
+plan_src = open(PLAN, encoding='utf-8').read()
+BLOCK_CERT = {'itil': 'ITIL', 'pl300': 'PL-300', 'pmp': 'PMP', 'cissp': 'CISSP'}
+BLOCK_LESSON_KEYS = {key for key in re.findall(r"\blesson: '([^']+)'", plan_src) if key.split('-')[0] in BLOCK_CERT}
+ITIL_AREAS = re.findall(r"'([^']+)'", re.search(r"itilAreas = \[(.*?)\]", plan_src, re.S).group(1))
+AREAS = {'ITIL': set(ITIL_AREAS)}
+POOLS = {'daily', 'mockA', 'mockB'}
+
+def block_cert(key):
+    return BLOCK_CERT.get(str(key).split('-')[0])
+
 CERTS = {'PMP', 'PL-300', 'CISSP', 'ITIL'}
 BANNED = ['delve', 'delves', 'delving', 'tapestry', 'landscape', 'landscapes', 'spearhead', 'spearheaded', 'seamless', 'seamlessly', 'navigating', 'fostering', 'foster', 'comprehensive', 'comprehensively', 'transformative', 'pivotal', 'successfully', 'effectively', 'carefully', 'strategically', 'proactively']
 BANNED_RE = re.compile(r'\b(' + '|'.join(BANNED) + r')\b', re.I)
@@ -64,28 +76,37 @@ def strs(v, lo, hi, path, minlen=1):
 def check_item(kind, it, p):
     if kind == 'lessons':
         key = it.get('key')
-        need(key in SESSION_KEYS, f'{p}.key invalid: {key}')
+        block = key in BLOCK_LESSON_KEYS
+        need(key in SESSION_KEYS or block, f'{p}.key invalid: {key}')
         need(isinstance(it.get('summary'), str) and 60 <= len(it['summary']) <= 400, f'{p}.summary 60-400 chars')
         read = it.get('read')
         ok = isinstance(read, list) and 4 <= len(read) <= 8 and all(isinstance(x, dict) and isinstance(x.get('heading'), str) and isinstance(x.get('body'), str) and len(x['body']) >= 300 for x in read)
         need(ok, f'{p}.read: 4-8 sections of {{heading, body>=300}}')
         if ok:
             need(sum(len(x['body']) for x in read) >= 3500, f'{p}.read: total teaching text must be >= 3500 chars (is {sum(len(x["body"]) for x in read)})')
+            if block:
+                # A block lesson is sized for a 35-minute Learn part.
+                words = sum(len(x['body'].split()) for x in read)
+                need(4 <= len(read) <= 6, f'{p}.read: a block lesson has 4-6 sections (has {len(read)})')
+                need(1000 <= words <= 1400, f'{p}.read: a block lesson has 1000-1400 words of reading (has {words})')
         terms = it.get('keyTerms')
-        need(isinstance(terms, list) and 3 <= len(terms) <= 8 and all(isinstance(x, dict) and isinstance(x.get('term'), str) and isinstance(x.get('definition'), str) and len(x['definition']) >= 40 for x in terms), f'{p}.keyTerms: 3-8 of {{term, definition>=40}}')
+        lo_terms, hi_terms = (6, 10) if block else (3, 8)
+        need(isinstance(terms, list) and lo_terms <= len(terms) <= hi_terms and all(isinstance(x, dict) and isinstance(x.get('term'), str) and isinstance(x.get('definition'), str) and len(x['definition']) >= 40 for x in terms), f'{p}.keyTerms: {lo_terms}-{hi_terms} of {{term, definition>=40}}')
         build = it.get('build')
         need(isinstance(build, dict), f'{p}.build missing')
         if isinstance(build, dict):
             need(isinstance(build.get('goal'), str) and len(build['goal']) >= 60, f'{p}.build.goal >= 60 chars')
             strs(build.get('steps'), 4, 8, f'{p}.build.steps', 30)
             answer = build.get('modelAnswer')
-            if key in NO_DOC_SESSIONS:
-                need(isinstance(answer, str) and len(answer) >= 800, f'{p}.build.modelAnswer >= 800 chars required (this session builds no document)')
+            if key in NO_DOC_SESSIONS or block:
+                need(isinstance(answer, str) and len(answer) >= 800, f'{p}.build.modelAnswer >= 800 chars required (this lesson builds no document)')
             else:
                 need(answer is None or (isinstance(answer, str) and len(answer) >= 200), f'{p}.build.modelAnswer optional, but >= 200 chars if present')
         t = it.get('examTips')
-        need(isinstance(t, list) and 2 <= len(t) <= 4 and all(isinstance(x, dict) and x.get('cert') in CERTS and isinstance(x.get('tip'), str) and len(x['tip']) >= 60 for x in t), f'{p}.examTips: 2-4 of {{cert, tip>=60}}')
-        strs(it.get('pitfalls'), 2, 4, f'{p}.pitfalls', 30)
+        lo_tips, hi_tips = (3, 5) if block else (2, 4)
+        tip_certs = {block_cert(key)} if block else CERTS
+        need(isinstance(t, list) and lo_tips <= len(t) <= hi_tips and all(isinstance(x, dict) and x.get('cert') in tip_certs and isinstance(x.get('tip'), str) and len(x['tip']) >= 60 for x in t), f'{p}.examTips: {lo_tips}-{hi_tips} of {{cert, tip>=60}}' + (f', cert {block_cert(key)}' if block else ''))
+        strs(it.get('pitfalls'), *((3, 3) if block else (2, 4)), f'{p}.pitfalls', 30)
         c = it.get('check')
         need(isinstance(c, list) and len(c) == 3 and all(isinstance(x, dict) and isinstance(x.get('q'), str) and isinstance(x.get('a'), str) and len(x['a']) >= 60 for x in c), f'{p}.check: exactly 3 of {{q, a>=60}}')
     elif kind == 'docguides':
@@ -102,6 +123,8 @@ def check_item(kind, it, p):
         need(isinstance(it.get('term'), str) and it.get('cert') in CERTS | {'General'} and isinstance(it.get('definition'), str) and len(it['definition']) >= 40, f'{p}: {{term, cert, definition>=40}}')
     elif kind == 'flashcards':
         need(it.get('cert') in CERTS and isinstance(it.get('front'), str) and isinstance(it.get('back'), str), f'{p}: {{cert, front, back}}')
+        if 'lesson' in it:
+            need(it['lesson'] in BLOCK_LESSON_KEYS and block_cert(it['lesson']) == it.get('cert'), f'{p}.lesson must be a learn morning of the {it.get("cert")} block: {it["lesson"]}')
     elif kind == 'questions':
         need(isinstance(it.get('id'), str) and it['id'].startswith('q-'), f'{p}.id must start with q-')
         need(it.get('certification') in CERTS | {'Intersection'}, f'{p}.certification')
@@ -113,7 +136,16 @@ def check_item(kind, it, p):
         need(isinstance(it.get('explanation'), str) and len(it['explanation']) >= 60, f'{p}.explanation')
         inc = it.get('incorrect')
         need(isinstance(inc, dict) and set(inc) == {'A', 'B', 'C', 'D'} - {it.get('correct')}, f'{p}.incorrect must cover the three wrong letters')
-        need(it.get('artifactKey') in DELIVERABLE_KEYS, f'{p}.artifactKey invalid: {it.get("artifactKey")}')
+        # Version 8: block questions carry pool and lesson; artifactKey is optional for them.
+        pooled = 'pool' in it or 'lesson' in it
+        if pooled:
+            need(it.get('pool') in POOLS, f'{p}.pool must be one of {sorted(POOLS)}: {it.get("pool")}')
+            need(it.get('lesson') in BLOCK_LESSON_KEYS and block_cert(it.get('lesson')) == it.get('certification'), f'{p}.lesson must be a learn morning of the {it.get("certification")} block: {it.get("lesson")}')
+            areas = AREAS.get(it.get('certification'))
+            if areas and isinstance(it.get('domain'), str):
+                need(it['domain'].split(' · ')[0].strip() in areas, f'{p}.domain must start with a plan area: {it["domain"]}')
+        if not pooled or 'artifactKey' in it:
+            need(it.get('artifactKey') in DELIVERABLE_KEYS, f'{p}.artifactKey invalid: {it.get("artifactKey")}')
 
 for path in sys.argv[1:]:
     try:
