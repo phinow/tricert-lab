@@ -203,31 +203,31 @@
       "id": "q-itil-071",
       "certification": "ITIL",
       "domain": "Value and value co-creation · Digital experience",
-      "prompt": "How does PeopleCert describe digital experience in ITIL (Version 5)?",
+      "prompt": "A city's online permit service meets every target in its agreement, yet residents find the forms confusing and phone for help instead. Which focus, named by PeopleCert as core to ITIL (Version 5), is this service falling short on?",
       "options": [
         [
           "A",
-          "As a core focus of the framework"
+          "Digital experience"
         ],
         [
           "B",
-          "As an optional module taken after Foundation"
+          "Service level targets"
         ],
         [
           "C",
-          "As a topic for software developers only"
+          "Supplier contracts"
         ],
         [
           "D",
-          "As a replacement for service level management"
+          "Governance"
         ]
       ],
       "correct": "A",
-      "explanation": "PeopleCert states that digital experience is a core focus in Version 5, tied to how different stakeholders experience value.",
+      "explanation": "PeopleCert states that digital experience is a core focus in ITIL (Version 5). The targets are met, but residents' experience of the digital service is poor.",
       "incorrect": {
-        "B": "Digital experience is part of the core framework, not a separate module.",
-        "C": "It concerns everyone who designs, delivers and improves services.",
-        "D": "Service level management remains a practice; experience adds to it."
+        "B": "The targets are already met, so more targets would not show the problem.",
+        "C": "Nothing in the case involves a supplier.",
+        "D": "Nothing in the case is about how a governing body directs or controls the organization."
       },
       "pool": "mockA",
       "lesson": "itil-m2"
@@ -322,7 +322,7 @@
         ]
       ],
       "correct": "C",
-      "explanation": "Information and Technology covers information and knowledge, the technology that manages and protects it, and tools such as AI and automation.",
+      "explanation": "Information and Technology covers information and knowledge, the technology that manages and protects it, which can include AI.",
       "incorrect": {
         "A": "No contract or outside organization is the focus of the stem.",
         "B": "Staff skills and roles are not what the stem asks about.",
@@ -380,7 +380,7 @@
         ],
         [
           "C",
-          "It covers finance only, not how technology or AI is used"
+          "It covers finance only, not how technology is used"
         ],
         [
           "D",
@@ -391,7 +391,7 @@
       "explanation": "Governance is the means by which an organization is directed and controlled. The governing body sets direction and checks results; management plans and runs the work within that direction.",
       "incorrect": {
         "A": "Running services day to day is management, not governance.",
-        "C": "Governance applies to every part of the Value System, including AI use.",
+        "C": "Governance applies to every part of the Value System, not only finance.",
         "D": "Governance is a component of the ITIL Value System, not a dimension."
       },
       "pool": "mockA",
@@ -421,7 +421,7 @@
         ]
       ],
       "correct": "D",
-      "explanation": "Direct means assigning responsibility for, and setting the direction of, strategy and policies.",
+      "explanation": "In ITIL 4, which Version 5 builds on, direct means assigning responsibility for, and setting the direction of, strategy and policies.",
       "incorrect": {
         "A": "Evaluate looks at strategy, performance and risks before direction is set.",
         "B": "Monitor checks performance and compliance after direction is set.",
@@ -456,7 +456,7 @@
       "correct": "A",
       "explanation": "The ITIL Value System describes how all the parts of an organization work together to create value.",
       "incorrect": {
-        "B": "That is the product and service lifecycle, which the Value System contains.",
+        "B": "That describes the product and service lifecycle activities, not how the whole system works together.",
         "C": "That is one practice, incident management, not the whole system.",
         "D": "Those are the four dimensions, a separate model."
       },
@@ -467,7 +467,7 @@
       "id": "q-itil-079",
       "certification": "ITIL",
       "domain": "The ITIL Value System · Value System components",
-      "prompt": "Which component of the ITIL Value System is the work that turns demand into value, viewed in Version 5 through the product and service lifecycle?",
+      "prompt": "Which component of the ITIL Value System is the work that turns demand into value?",
       "options": [
         [
           "A",
@@ -487,7 +487,7 @@
         ]
       ],
       "correct": "D",
-      "explanation": "PeopleCert lists value chain activities as a component of the Value System. Version 5 views that work through the product and service lifecycle.",
+      "explanation": "PeopleCert lists value chain activities as a component of the Value System. They are the work itself.",
       "incorrect": {
         "A": "Governance directs and controls; it does not do the work itself.",
         "B": "Guiding principles guide decisions; they are not the work.",
@@ -566,31 +566,31 @@
       "id": "q-itil-082",
       "certification": "ITIL",
       "domain": "The seven guiding principles · Start where you are",
-      "prompt": "A bank's new operations manager reads reports saying the loan approval process is slow and plans to replace it. Which action best applies Start where you are?",
+      "prompt": "A bank's new operations manager wants to know how the loan approval process really works today. The written procedure for it is three years old. What does Start where you are recommend?",
       "options": [
         [
           "A",
-          "Replace the process at once, since the reports show it is slow"
+          "Follow the written procedure, since it is the approved version"
         ],
         [
           "B",
-          "Observe and measure the process, and keep the parts that work"
+          "Observe and measure the work as it is done today"
         ],
         [
           "C",
-          "Ask a supplier to design a new process from a blank page"
+          "Ask a consultant for a best-practice process to replace it"
         ],
         [
           "D",
-          "Automate the current process so that it runs faster"
+          "Automate the written procedure so it runs the same way every time"
         ]
       ],
       "correct": "B",
-      "explanation": "Start where you are asks you to look at what exists, observe it directly and measure it, and keep what works. Reports can mislead, so go and see the work.",
+      "explanation": "Start where you are asks you to observe the current state directly and measure it. Documents and reports can be out of date, so go and see the work before deciding what to keep.",
       "incorrect": {
-        "A": "Replacing without direct evidence discards what may already work.",
-        "C": "Starting from a blank page is the opposite of this principle.",
-        "D": "Automating before assessing makes a slow process run fast in the wrong way."
+        "A": "A three-year-old procedure may not match how the work is done now; observe it directly.",
+        "C": "Replacing the process before seeing it discards what may already work.",
+        "D": "Automating before assessing could make an out-of-date procedure run fast in the wrong way."
       },
       "pool": "mockA",
       "lesson": "itil-m4"
@@ -632,7 +632,7 @@
       "id": "q-itil-084",
       "certification": "ITIL",
       "domain": "The seven guiding principles · Optimize and automate",
-      "prompt": "A shop plans to automate its refund approval chain exactly as it is, including two sign-offs that repeat the same check. Which guiding principle does this plan go against most directly?",
+      "prompt": "A shop's staff copy the same order details by hand from emails into the stock system dozens of times a day. The steps are already simple and nobody disputes them. Which guiding principle points to the next step?",
       "options": [
         [
           "A",
@@ -652,10 +652,10 @@
         ]
       ],
       "correct": "C",
-      "explanation": "Optimize and automate says to make the work as useful and efficient as possible first, then automate. Automating a messy chain makes a fast messy chain.",
+      "explanation": "Optimize and automate hands frequent, repetitive work to technology once the work is as simple as it can be, and keeps people for work that needs judgment. Copying the same details by hand many times a day fits that.",
       "incorrect": {
-        "A": "Value matters, but the stem is about automating before optimizing.",
-        "B": "The plan does reuse what exists; the gap is that it is not optimized first.",
+        "A": "Value matters, but the stem points to repetitive work that suits technology.",
+        "B": "The current work is already known and simple; the next step is to let technology take it on.",
         "D": "Nothing is hidden from stakeholders in the stem."
       },
       "pool": "mockA",
@@ -665,7 +665,7 @@
       "id": "q-itil-085",
       "certification": "ITIL",
       "domain": "The seven guiding principles · Focus on value",
-      "prompt": "A school's IT team reports success as the number of tickets closed each month. Teachers still lose lesson time to broken projectors. Which principle should change how the team measures success?",
+      "prompt": "A council's IT team must choose between two upgrades for its library service. Before deciding, it asks library members which problems cost them the most time. Which guiding principle is it applying?",
       "options": [
         [
           "A",
@@ -685,11 +685,11 @@
         ]
       ],
       "correct": "D",
-      "explanation": "Focus on value links everything back to value for stakeholders. Success should be measured by outcomes for teachers, not by internal counts.",
+      "explanation": "Focus on value starts from what consumers value. Asking members which problems cost them most time ties the choice to their outcomes.",
       "incorrect": {
-        "A": "Nothing in the stem needs removing; the measure itself points the wrong way.",
-        "B": "Automation does not fix a measure of the wrong thing.",
-        "C": "The stem is about what counts as success, not the size of the steps."
+        "A": "Nothing in the stem is being removed or simplified.",
+        "B": "Nothing in the stem is about automation.",
+        "C": "The stem is about what to choose, not about splitting the work into smaller steps."
       },
       "pool": "mockA",
       "lesson": "itil-m4"
@@ -797,7 +797,7 @@
       "id": "q-itil-089",
       "certification": "ITIL",
       "domain": "The product and service lifecycle · Order of the activities",
-      "prompt": "In the product and service lifecycle, which activity comes directly after Build?",
+      "prompt": "In the order ITIL lists the product and service lifecycle activities, which activity comes directly after Build?",
       "options": [
         [
           "A",
@@ -817,11 +817,11 @@
         ]
       ],
       "correct": "C",
-      "explanation": "The order is Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition moves what was built into live use.",
+      "explanation": "ITIL lists them as Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. They do not have to run in a fixed sequence, but in this list Transition follows Build.",
       "incorrect": {
-        "A": "Acquire comes before Build: it obtains the resources Build uses.",
-        "B": "Operate follows Transition, once the service is live.",
-        "D": "Deliver comes after Transition and Operate."
+        "A": "Acquire is listed before Build.",
+        "B": "Operate is listed after Transition.",
+        "D": "Deliver is listed after Transition and Operate."
       },
       "pool": "mockA",
       "lesson": "itil-m5"
@@ -830,31 +830,31 @@
       "id": "q-itil-090",
       "certification": "ITIL",
       "domain": "The product and service lifecycle · Operate",
-      "prompt": "A bank's platform team applies security patches to its servers, watches their performance and checks that backups ran. Which lifecycle activity is this?",
+      "prompt": "For a city's new parking app, which piece of work belongs to the Operate lifecycle activity?",
       "options": [
         [
           "A",
-          "Transition"
+          "Training the parking staff and switching the app on for drivers"
         ],
         [
           "B",
-          "Support"
+          "Helping a driver who is locked out of the app"
         ],
         [
           "C",
-          "Build"
+          "Configuring and testing a new payment screen"
         ],
         [
           "D",
-          "Operate"
+          "Checking each night that the live servers are healthy"
         ]
       ],
       "correct": "D",
-      "explanation": "Operate keeps the live technology and components running as agreed: monitored, patched and backed up. Users rarely see it.",
+      "explanation": "In this course's plain-word reading, Operate keeps the live technology and components running as agreed: monitored, patched and backed up. Users rarely see it.",
       "incorrect": {
-        "A": "Transition moves new or changed services into live use; these servers are already live.",
-        "B": "Support helps users with a problem; no user is asking for help here.",
-        "C": "Build creates and tests new components before they go live."
+        "A": "Training and the first switch-on move the app into live use, which is Transition.",
+        "B": "Helping a user with a problem is Support.",
+        "C": "Configuring and testing a component before it goes live is Build."
       },
       "pool": "mockA",
       "lesson": "itil-m5"
@@ -862,32 +862,32 @@
     {
       "id": "q-itil-091",
       "certification": "ITIL",
-      "domain": "The product and service lifecycle · Acquire",
-      "prompt": "A school district signs a hosting contract with a cloud provider and hires a specialist with skills its staff lack. Which lifecycle activity is this?",
+      "domain": "The product and service lifecycle · Acquire and Build",
+      "prompt": "A school is setting up a new homework portal. Which piece of work belongs to Acquire rather than Build?",
       "options": [
         [
           "A",
-          "Acquire"
+          "Hiring a contractor with portal skills the staff lack"
         ],
         [
           "B",
-          "Build"
+          "Configuring the portal's class lists and testing them"
         ],
         [
           "C",
-          "Design"
+          "Setting up the portal's pages for each subject"
         ],
         [
           "D",
-          "Transition"
+          "Connecting the portal to the school's sign-in system and testing it"
         ]
       ],
       "correct": "A",
-      "explanation": "Acquire obtains the resources needed, from inside the organization or from partners and suppliers, including contracts, capacity and skills.",
+      "explanation": "Acquire obtains the resources needed, from inside the organization or from partners and suppliers, and that includes people with skills. Build then creates, configures and tests the components.",
       "incorrect": {
-        "B": "Build creates and tests components from resources already obtained.",
-        "C": "Design shapes the service; it does not obtain resources.",
-        "D": "Transition moves a built service into live use."
+        "B": "Configuring and testing is Build.",
+        "C": "Setting up pages creates part of the portal, which is Build.",
+        "D": "Connecting and testing components is Build."
       },
       "pool": "mockA",
       "lesson": "itil-m5"
@@ -895,20 +895,20 @@
     {
       "id": "q-itil-092",
       "certification": "ITIL",
-      "domain": "The product and service lifecycle · Discover",
-      "prompt": "A clothing shop studies why online customers leave before paying, and decides whether a new checkout is worth building. Which lifecycle activity is this?",
+      "domain": "The product and service lifecycle · Design",
+      "prompt": "A clothing shop has decided a new checkout is worth building. It now sets out the checkout's screens, payment options and how support will handle failed payments. Which lifecycle activity is this?",
       "options": [
         [
           "A",
-          "Design"
-        ],
-        [
-          "B",
           "Discover"
         ],
         [
+          "B",
+          "Design"
+        ],
+        [
           "C",
-          "Deliver"
+          "Build"
         ],
         [
           "D",
@@ -916,10 +916,10 @@
         ]
       ],
       "correct": "B",
-      "explanation": "Discover means understanding needs, demand and opportunities, and deciding what is worth doing.",
+      "explanation": "Design shapes the product or service, including how it will be used and supported. The decision that it is worth building was already made in Discover.",
       "incorrect": {
-        "A": "Design comes after the decision and shapes how the checkout will work.",
-        "C": "Deliver provides a live service to consumers.",
+        "A": "Discover decided the checkout was worth building; that is already done.",
+        "C": "Build creates and tests the components once the design is set.",
         "D": "Transition moves a finished change into live use."
       },
       "pool": "mockA",
@@ -1061,15 +1061,15 @@
       "id": "q-itil-097",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Continual improvement model",
-      "prompt": "A team has agreed its vision and measured its current state. Which question of the continual improvement model comes next?",
+      "prompt": "In the ITIL 4 continual improvement model, which Version 5 refines, a team has just set a measurable target for where it wants to be. Which question comes next?",
       "options": [
         [
           "A",
-          "How do we get there?"
+          "Where are we now?"
         ],
         [
           "B",
-          "Where do we want to be?"
+          "How do we get there?"
         ],
         [
           "C",
@@ -1081,10 +1081,10 @@
         ]
       ],
       "correct": "B",
-      "explanation": "The order is: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going?",
+      "explanation": "In the ITIL 4 model the questions run: What is the vision? Where are we now? Where do we want to be? How do we get there? Take action. Did we get there? How do we keep the momentum going? After the target comes planning the route.",
       "incorrect": {
-        "A": "Planning the route comes after setting a measurable target.",
-        "C": "Checking results comes after action has been taken.",
+        "A": "Where are we now? comes before the target is set.",
+        "C": "Did we get there? comes after action has been taken.",
         "D": "Keeping momentum is the last question in the model."
       },
       "pool": "mockA",
@@ -1094,31 +1094,31 @@
       "id": "q-itil-098",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Release management",
-      "prompt": "A city office installed new software for its tax portal last week with the new features switched off. Today it makes those features available to residents. Which practice covers making them available?",
+      "prompt": "A bank moves a new build of its app onto the live servers on Tuesday. On Thursday it turns the new budgeting feature on for 10% of customers, then for everyone a week later. Which statement is correct?",
       "options": [
         [
           "A",
-          "Deployment management"
+          "Tuesday's step is release; Thursday's step is deployment"
         ],
         [
           "B",
-          "Change enablement"
+          "Both steps are deployment, because both happen in the live environment"
         ],
         [
           "C",
-          "Release management"
+          "Tuesday's step is deployment; the staged switch-on is release"
         ],
         [
           "D",
-          "Service request management"
+          "Both steps are change enablement and involve no other practice"
         ]
       ],
       "correct": "C",
-      "explanation": "Release management makes new and changed services and features available for use. Installing the software last week was deployment.",
+      "explanation": "Deployment management moves components into an environment, here the live servers on Tuesday. Release management makes features available for use, which here happens in stages from Thursday.",
       "incorrect": {
-        "A": "Deployment moved the software into the live environment last week.",
-        "B": "Change enablement assesses and authorizes changes; it does not make features available.",
-        "D": "No user is asking for a pre-defined service action."
+        "A": "It is the other way round: moving the build is deployment, making the feature available is release.",
+        "B": "Turning the feature on for customers makes it available for use, which is release.",
+        "D": "Change enablement authorizes the change, but moving the build and making the feature available are deployment and release."
       },
       "pool": "mockA",
       "lesson": "itil-m7"
@@ -1147,7 +1147,7 @@
         ]
       ],
       "correct": "C",
-      "explanation": "An exception event means something has failed or broken a threshold. It may open an incident automatically.",
+      "explanation": "In ITIL, an exception event means something has failed or broken a threshold. It may open an incident automatically.",
       "incorrect": {
         "A": "An informational event says all is well, such as a backup finishing.",
         "B": "A warning means a threshold is near; here the server has already failed.",
@@ -1184,7 +1184,7 @@
       "incorrect": {
         "A": "The provider should not set targets alone or only measure what is easy.",
         "B": "One measure is never enough; combine targets with feedback on experience.",
-        "D": "Service levels are reviewed with the customer at set times."
+        "D": "Targets are reviewed regularly with the customer, not only at renewal."
       },
       "pool": "mockA",
       "lesson": "itil-m6"
@@ -1259,7 +1259,7 @@
       "id": "q-itil-103",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Continual improvement register",
-      "prompt": "Where should a team record improvement ideas so that they can be compared and prioritized by value?",
+      "prompt": "A team has many suggestions for making its services better and wants to compare them by expected value and pick the most useful first. Where should it record them?",
       "options": [
         [
           "A",
@@ -1312,7 +1312,7 @@
         ]
       ],
       "correct": "D",
-      "explanation": "Flow efficiency is total work time divided by lead time. A low figure shows that items spend most of their time waiting.",
+      "explanation": "In value stream mapping, flow efficiency is total work time divided by lead time. A low figure shows that items spend most of their time waiting.",
       "incorrect": {
         "A": "Flow efficiency compares work time with lead time, not wait with work.",
         "B": "That is a count of output, not flow efficiency.",
