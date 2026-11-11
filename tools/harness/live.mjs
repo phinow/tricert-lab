@@ -11,6 +11,8 @@ await mkdir(shots, { recursive: true });
 
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+// The study dates come from the browser; fix today so the run does not depend on the calendar.
+await context.addInitScript(() => { window.__tricertToday = '2026-11-18'; });
 const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
@@ -31,25 +33,21 @@ await check('Fresh database shows onboarding, with the self-hosted font applied'
   await page.screenshot({ path: path.join(shots, 'live-onboarding.png'), fullPage: true });
 });
 
-await check('Creating the profile writes to D1 and lands on Home, Week 1', async () => {
+await check('Setup writes the profile and the start date to D1 and lands on ITIL morning 1', async () => {
   await page.fill('#displayName', 'Moye');
   await page.fill('#motivation', 'Four certifications, one programme.');
   await page.click('button:has-text("Continue")');
   await page.fill('input[name="pmMonths"]', '22');
-  await page.fill('input[name="pmTrainingHours"]', '35');
+  await page.fill('input[name="cyberMonths"]', '30');
   await page.click('.tickbox');
   await page.click('button:has-text("Continue")');
-  await page.fill('input[name="cyberMonths"]', '30');
-  await page.click('.chip:has-text("Identity & access")');
-  await page.click('.chip:has-text("Security operations")');
-  await page.click('button:has-text("Continue")');
-  await page.selectOption('select[name="powerBiLevel"]', 'intermediate');
-  await page.click('button:has-text("Continue")');
-  await page.fill('#pl300Target', '2026-12-10');
+  await page.fill('#startDate', '2026-11-16');
   await page.click('button:has-text("Create my plan")');
   await page.waitForSelector('.hero-session');
-  assert.match(await page.textContent('.hero-when'), /Week 1, Day 1/);
-  const state = await (await fetch(`${base}/api/state`)).json();
+  assert.match(await page.textContent('.hero-when'), /ITIL, morning 1 of 12/);
+  let state = await (await fetch(`${base}/api/state`)).json();
+  for (let wait = 0; wait < 50 && state.records.plan.startDate !== '2026-11-16'; wait += 1) { await page.waitForTimeout(100); state = await (await fetch(`${base}/api/state`)).json(); }
+  assert.equal(state.records.plan.startDate, '2026-11-16');
   assert.equal(state.profile.pm_months, 22);
   assert.equal(state.profile.pm_training_complete, 1);
   assert.equal(state.profile.display_name, 'Moye');
@@ -82,18 +80,46 @@ await check('Make it yours saves name and why to D1; colour stays on the device'
   await page.waitForSelector('.hero-session');
 });
 
-await check('Completing five sessions moves the current week to 2 after a full reload', async () => {
-  for (let i = 0; i < 5; i += 1) {
-    await page.click('.hero-actions .ghost');
-    await page.waitForSelector('.celebrate');
-    await page.click('.celebrate .primary');
-    await page.waitForFunction((n) => document.querySelectorAll('.days .day-mark.is-done').length === n, i + 1);
+await check('A whole morning saves cards, answers, progress and the log to D1; Today moves to morning 2 after a reload', async () => {
+  await page.click('.hero-session .play');
+  await page.waitForSelector('.morning');
+  for (let step = 0; step < 60; step += 1) {
+    const label = (await page.textContent('.morning-foot .primary')).trim();
+    if (label === 'Show answer') { await page.click('.morning-foot .primary'); await page.waitForSelector('.m-card-back'); continue; }
+    if (label === 'Good') { await page.click('.morning-foot .primary'); await page.waitForSelector('.m-card-back', { state: 'detached' }); continue; }
+    break;
   }
+  await page.click('.morning-foot .primary'); // to Learn
+  await page.click('.morning-foot .primary'); // the lesson
+  await page.waitForSelector('.morning .lesson');
+  await page.click('.morning-foot .primary'); // the step
+  await page.fill('#build-answer', 'Outputs: the dashboard. Outcomes: decisions made at the 08:00 meeting.');
+  await page.click('.morning-foot .primary'); // recall
+  await page.click('.morning-foot .primary'); // questions
+  let answered = 0;
+  while (await page.locator('.q-head').count()) {
+    await page.click('.answer >> nth=0');
+    await page.click('.sure label:has-text("Sure")');
+    await page.click('.morning-foot .primary');
+    await page.waitForSelector('.sheet');
+    answered += 1;
+    const before = await page.textContent('#morning-title');
+    await page.click('.morning-foot .primary');
+    await page.waitForFunction((text) => document.querySelector('#morning-title')?.textContent !== text, before);
+  }
+  await page.click('.morning-foot .primary'); // Finish morning
+  await page.waitForSelector('.celebrate');
+  await page.click('.celebrate .primary');
   await page.reload();
   await page.waitForSelector('.hero-session');
-  assert.match(await page.textContent('.hero-when'), /Week 2, Day 1/);
+  assert.match(await page.textContent('.hero-when'), /ITIL, morning 2 of 12/);
   const state = await (await fetch(`${base}/api/state`)).json();
-  assert.equal(state.progress.filter((row) => row.status === 'complete').length, 5);
+  assert.ok(state.progress.some((row) => row.item_key === 'itil-m1' && row.status === 'complete'));
+  assert.equal(Object.keys(state.records.srs.cards).length, 8);
+  assert.equal(Object.keys(state.records.srs.questions).length, answered);
+  assert.equal(state.attempts.length, answered);
+  assert.equal(state.records.log.length, 1);
+  assert.equal(state.records.log[0].key, 'itil-m1');
   await page.screenshot({ path: path.join(shots, 'live-home.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: path.join(shots, 'live-home-phone.png') });
@@ -130,8 +156,9 @@ await check('Scenario attempt is recorded and shows in the review queue', async 
   await page.click('.quiz .close');
   await page.click('.tile-review');
   await page.waitForSelector('.review-list li');
+  // TODO(part 2): Scenarios across exams replaces this run.
   const state = await (await fetch(`${base}/api/state`)).json();
-  assert.equal(state.attempts.length, 1);
+  assert.ok(state.attempts.some((row) => row.certification === 'Intersection' || !/^q-itil-/.test(row.question_id)));
   await page.screenshot({ path: path.join(shots, 'live-review.png'), fullPage: true });
 });
 

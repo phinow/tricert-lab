@@ -95,12 +95,14 @@ const ok = (name) => { checks += 1; console.log(`ok - ${name}`); };
   await page.goto(base);
   await page.waitForSelector('#displayName');
   await page.fill('#displayName', 'Tester');
-  for (let step = 0; step < 4; step += 1) await page.click('button[type=submit]:has-text("Continue")');
+  // Setup has three steps; the last one saves the start date in the plan record.
+  for (let step = 0; step < 2; step += 1) await page.click('button[type=submit]:has-text("Continue")');
   await page.click('button[type=submit]:has-text("Create my plan")');
   await page.waitForSelector('.hero-session');
+  for (let wait = 0; wait < 50 && !store.has(`${prefix}rec-plan`); wait += 1) await page.waitForTimeout(100);
   assert.deepEqual(seen.badPaths, [], 'the store refused the document path');
-  assert.equal(store.size, 1, 'one document is saved');
-  assert.equal([...store.keys()][0], `${prefix}state`, 'the plan is saved in the state document');
+  assert.deepEqual([...store.keys()].sort(), [`${prefix}rec-plan`, `${prefix}state`], 'the profile is saved in the state document and the start date in the plan record');
+  assert.match(stored(store, 'rec-plan').value.startDate, /^\d{4}-\d{2}-\d{2}$/);
   await page.reload();
   await page.waitForSelector('.hero-session');
   assert.equal(await page.locator('#displayName').count(), 0, 'setup does not come back after a reload');
