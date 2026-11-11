@@ -46,6 +46,9 @@ test('practice, intersection, and portfolio content are substantial', () => {
   assert.ok(coverageRows.length >= 12);
   assert.ok(portfolioChecklist.length >= 12);
   scenarioBank.forEach((question) => {
+    assert.equal(question.certification, 'Intersection');
+    assert.ok(question.artifactKey, `${question.id} belongs to a document`);
+    assert.equal(question.pool, undefined);
     assert.equal(question.options.length, 4);
     assert.ok(question.options.some(([key]) => key === question.correct));
     assert.ok(question.explanation.length > 40);
