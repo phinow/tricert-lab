@@ -772,7 +772,7 @@
   {
    "id": "q-itil-01",
    "certification": "ITIL",
-   "domain": "Guiding principles · Focus on value",
+   "domain": "The seven guiding principles · Focus on value",
    "prompt": "Grace Liu drafts the measures for the patient-flow analytics service: report pages published and refreshes run each month. Janelle Cardinal says what matters to her team is having trusted numbers ready when the morning bed huddle starts. Which change best applies the guiding principle Focus on value?",
    "options": [
     [
@@ -799,12 +799,14 @@
     "C": "Ease of collection matters, but measures that ignore the consumer's outcome cannot show value.",
     "D": "Automating a measure that misses the outcome only produces the wrong measure faster."
    },
-   "artifactKey": "r1-service-value-proposition"
+   "artifactKey": "r1-service-value-proposition",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-02",
    "certification": "ITIL",
-   "domain": "Guiding principles · Start where you are",
+   "domain": "The seven guiding principles · Start where you are",
    "prompt": "In the first Release 2 workshop, a consultant proposes designing the clinician access process from a blank page because \"the current one is broken\". What best applies the guiding principle Start where you are?",
    "options": [
     [
@@ -831,12 +833,14 @@
     "B": "The principle calls for observing the work directly. Accounts from memory are often wrong about where time is lost.",
     "C": "Choosing a tool before understanding the current state risks automating the same problems."
    },
-   "artifactKey": "r2-current-state-clinician-access-process"
+   "artifactKey": "r2-current-state-clinician-access-process",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-03",
    "certification": "ITIL",
-   "domain": "Guiding principles · Progress iteratively with feedback",
+   "domain": "The seven guiding principles · Progress iteratively with feedback",
    "prompt": "Grace Liu plans to switch every site to the redesigned access-request process on the same day, to \"get it over with\". Which approach best applies the guiding principle Progress iteratively with feedback?",
    "options": [
     [
@@ -863,12 +867,14 @@
     "C": "Waiting for perfection delays value. Feedback from real use is what improves the design.",
     "D": "Two processes running side by side add confusion and cost, and they do not create structured feedback."
    },
-   "artifactKey": "r2-access-request-value-stream"
+   "artifactKey": "r2-access-request-value-stream",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-04",
    "certification": "ITIL",
-   "domain": "Guiding principles · Collaborate and promote visibility",
+   "domain": "The seven guiding principles · Collaborate and promote visibility",
    "prompt": "Unit managers complain they cannot tell where their access requests are. Requests sit in approvers' email inboxes, and the service desk only learns of a delay when a manager calls. Which action best applies the guiding principle Collaborate and promote visibility?",
    "options": [
     [
@@ -895,12 +901,14 @@
     "B": "A monthly summary for one executive does not help the people who must act on waiting requests now.",
     "D": "Reminders may help a little, but the work stays hidden in inboxes and nobody shares a view of the queue."
    },
-   "artifactKey": "r2-future-state-access-process"
+   "artifactKey": "r2-future-state-access-process",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-05",
    "certification": "ITIL",
-   "domain": "Guiding principles · Think and work holistically",
+   "domain": "The seven guiding principles · Think and work holistically",
    "prompt": "The Release 2 team plans to fix the joiner part of clinician access first and treat movers and leavers as separate future projects. The data shows a mover (E-028) still holding old Unit Clerk access and two missed leavers (E-014 and E-027) with enabled accounts. Which approach best applies the guiding principle Think and work holistically?",
    "options": [
     [
@@ -927,12 +935,14 @@
     "C": "A manual check treats symptoms in one team and ignores the HR feed and supplier end dates that cause them.",
     "D": "HR is one part of the system. The failure spans HR, ClearPath end dates, the directory and the desk."
    },
-   "artifactKey": "r2-joiner-mover-leaver-workflow"
+   "artifactKey": "r2-joiner-mover-leaver-workflow",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-06",
    "certification": "ITIL",
-   "domain": "Guiding principles · Keep it simple and practical",
+   "domain": "The seven guiding principles · Keep it simple and practical",
    "prompt": "In the access-request value-stream workshop, approvers explain that the second IT approval on every Clinical Information System access request only checks that the business owner has already approved it. Which action best applies the guiding principle Keep it simple and practical?",
    "options": [
     [
@@ -959,12 +969,14 @@
     "C": "A step that repeats a check adds waiting without reducing risk.",
     "D": "This adds work to a step that should not exist."
    },
-   "artifactKey": "r2-access-request-value-stream"
+   "artifactKey": "r2-access-request-value-stream",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-07",
    "certification": "ITIL",
-   "domain": "Guiding principles · Optimize and automate",
+   "domain": "The seven guiding principles · Optimize and automate",
    "prompt": "Nora Lindqvist, the human resources (HR) business partner, suggests that new accounts be created automatically from HR joiner events. The current process still has unclear role definitions and duplicate approvals. Which sequence best applies the guiding principle Optimize and automate?",
    "options": [
     [
@@ -991,12 +1003,14 @@
     "B": "Automation that follows clear, approved rules can be more consistent than manual work. The principle is to optimize first, not to avoid automation.",
     "C": "This automates around a symptom of the delay without improving the flow itself."
    },
-   "artifactKey": "r2-future-state-access-process"
+   "artifactKey": "r2-future-state-access-process",
+   "pool": "daily",
+   "lesson": "itil-m4"
   },
   {
    "id": "q-itil-08",
    "certification": "ITIL",
-   "domain": "Four dimensions · Partners and Suppliers",
+   "domain": "The four dimensions · Partners and Suppliers",
    "prompt": "Olivia Grant (E-014), an agency nurse supplied by ClearPath Staffing (V-03), finished her contract, but her account stayed enabled because nobody told Kestrel the end date. Which of the four dimensions most directly covers fixing how ClearPath tells Kestrel about start and end dates?",
    "options": [
     [
@@ -1023,12 +1037,14 @@
     "B": "A data feed may carry the dates, but agreeing what ClearPath must tell Kestrel, and when, is a supplier arrangement.",
     "D": "The leaver process is affected, but the fix described is the agreement with the supplier."
    },
-   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+   "artifactKey": "r2-procurement-and-vendor-risk-plan",
+   "pool": "daily",
+   "lesson": "itil-m3"
   },
   {
    "id": "q-itil-09",
    "certification": "ITIL",
-   "domain": "Four dimensions · Organizations and People",
+   "domain": "The four dimensions · Organizations and People",
    "prompt": "Lumen Analytics Partners presents its design for the analytics service: the semantic model, the gateway, the refresh schedule, the support workflow and Lumen's own support terms. Grace Liu asks who owns the service and whether her analysts have the skills to answer Power BI questions. Which dimension has the design left out?",
    "options": [
     [
@@ -1055,12 +1071,14 @@
     "C": "Lumen's support terms already cover the supplier relationship.",
     "D": "The support workflow already covers how the work flows."
    },
-   "artifactKey": "r1-go-live-readiness-and-support-handover"
+   "artifactKey": "r1-go-live-readiness-and-support-handover",
+   "pool": "daily",
+   "lesson": "itil-m3"
   },
   {
    "id": "q-itil-10",
    "certification": "ITIL",
-   "domain": "ITIL Value System · Governance",
+   "domain": "The ITIL Value System · Governance",
    "prompt": "Kestrel's board and executive team evaluate how its services perform, set direction through policies such as the rule to suppress counts under 5 in reports shared outside the care team, and monitor performance and conformance. Which component of the ITIL value system do these activities represent?",
    "options": [
     [
@@ -1087,12 +1105,14 @@
     "C": "Practices are sets of resources for doing types of work, such as incident management. Direction and control sit above them.",
     "D": "Continual improvement is the recurring work of improving at every level, not the direction and control of the organization."
    },
-   "artifactKey": "r1-change-control-process"
+   "artifactKey": "r1-change-control-process",
+   "pool": "daily",
+   "lesson": "itil-m3"
   },
   {
    "id": "q-itil-11",
    "certification": "ITIL",
-   "domain": "Product and service lifecycle · Discover",
+   "domain": "The product and service lifecycle · Discover",
    "prompt": "Before any design work on the clinician access service, Grace Liu interviews unit managers and ClearPath coordinators about who waits for access, how long they wait, and what the waiting costs patient care. In which stage of the product and service lifecycle is she working?",
    "options": [
     [
@@ -1119,12 +1139,14 @@
     "B": "Acquire obtains components and resources from partners, suppliers or internal sources.",
     "C": "Support restores normal service when something goes wrong in live service, through incident and problem work."
    },
-   "artifactKey": "r2-current-state-clinician-access-process"
+   "artifactKey": "r2-current-state-clinician-access-process",
+   "pool": "daily",
+   "lesson": "itil-m5"
   },
   {
    "id": "q-itil-12",
    "certification": "ITIL",
-   "domain": "Product and service lifecycle · Acquire",
+   "domain": "The product and service lifecycle · Acquire",
    "prompt": "For Release 2, Kestrel signs an agreement with ClearPath Staffing for a daily feed of agency nurse start and end dates, and obtains the licences for the identity tooling. In which stage of the product and service lifecycle is this work?",
    "options": [
     [
@@ -1151,12 +1173,14 @@
     "B": "Build creates, configures, integrates and tests the components once they have been obtained.",
     "D": "Transition moves new or changed products and services into live use."
    },
-   "artifactKey": "r2-procurement-and-vendor-risk-plan"
+   "artifactKey": "r2-procurement-and-vendor-risk-plan",
+   "pool": "daily",
+   "lesson": "itil-m5"
   },
   {
    "id": "q-itil-13",
    "certification": "ITIL",
-   "domain": "Product and service lifecycle · Transition",
+   "domain": "The product and service lifecycle · Transition",
    "prompt": "The Release 1 emergency department and bed pages are built and have passed the team's tests. Next come change authorization, training for patient-flow leaders and the cut-over from emailed Excel extracts to live use of the dashboards. Which stage of the product and service lifecycle is this?",
    "options": [
     [
@@ -1183,12 +1207,14 @@
     "C": "Deliver is providing the live service to consumers, which begins after the cut-over.",
     "D": "Operate runs and maintains the components once they are live."
    },
-   "artifactKey": "r1-go-live-readiness-and-support-handover"
+   "artifactKey": "r1-go-live-readiness-and-support-handover",
+   "pool": "daily",
+   "lesson": "itil-m5"
   },
   {
    "id": "q-itil-14",
    "certification": "ITIL",
-   "domain": "Product and service lifecycle · Operate",
+   "domain": "The product and service lifecycle · Operate",
    "prompt": "Each morning at 05:00 the on-premises data gateway runs the scheduled refresh of the Beacon semantic model. Tomás Rivera's team monitors the refresh, applies routine gateway maintenance and keeps the platform performing as designed. Which stage of the product and service lifecycle does this work belong to?",
    "options": [
     [
@@ -1215,12 +1241,14 @@
     "C": "Deliver is about providing the service to consumers so they can use it and reach their outcomes.",
     "D": "Support restores normal service after incidents and problems. Nothing has failed here; this is routine running of the technology."
    },
-   "artifactKey": "r1-workspace-refresh-and-deployment-plan"
+   "artifactKey": "r1-workspace-refresh-and-deployment-plan",
+   "pool": "daily",
+   "lesson": "itil-m5"
   },
   {
    "id": "q-itil-15",
    "certification": "ITIL",
-   "domain": "Value co-creation · Provider and consumer contributions",
+   "domain": "Value and value co-creation · Provider and consumer contributions",
    "prompt": "At a Release 1 review, Tomás Rivera says the analytics team will \"deliver value to Janelle on go-live day\". Janelle's team still has to agree the bed definitions, take part in testing and change how the morning huddle uses the numbers. Which statement best describes how value is created for this service?",
    "options": [
     [
@@ -1247,12 +1275,14 @@
     "B": "Meeting service levels shows warranty. On its own it does not mean the consumer gets value.",
     "D": "Cost is one factor, but value is the benefit, usefulness and importance stakeholders perceive, which here means better decisions."
    },
-   "artifactKey": "r1-service-value-proposition"
+   "artifactKey": "r1-service-value-proposition",
+   "pool": "daily",
+   "lesson": "itil-m2"
   },
   {
    "id": "q-itil-16",
    "certification": "ITIL",
-   "domain": "Product and service management concepts · Utility and warranty",
+   "domain": "Value and value co-creation · Utility and warranty",
    "prompt": "In user acceptance testing, the bed dashboard answered every question Janelle Cardinal asked. In the first weeks after go-live, some morning refreshes fail and the page still shows the previous refresh's numbers when the huddle starts. What does this show about the service?",
    "options": [
     [
@@ -1279,12 +1309,14 @@
     "B": "Acceptance testing checked the functions. It did not prove the service would be current every morning.",
     "C": "Accurate figures that arrive after the decision is made do not give the assurance warranty is about."
    },
-   "artifactKey": "r1-service-catalogue-entry-and-service-levels"
+   "artifactKey": "r1-service-catalogue-entry-and-service-levels",
+   "pool": "daily",
+   "lesson": "itil-m1"
   },
   {
    "id": "q-itil-17",
    "certification": "ITIL",
-   "domain": "Management practices · Incident versus service request",
+   "domain": "Practices, improvement and value streams · Incident versus service request",
    "prompt": "Three calls reach the Kestrel service desk one morning. Ben Kowalski asks for bed dashboard access for a new unit clerk. Aisha Mahmoud reports that the emergency department page will not load. Mei Tanaka asks how to export a report page to PDF. How should the desk classify the three calls, in that order?",
    "options": [
     [
@@ -1311,12 +1343,14 @@
     "C": "A page failing to load is an incident; a problem is the cause of one or more incidents. A how-to question is a request for information.",
     "D": "A how-to question is a request for information, which is a service request. Nothing is broken."
    },
-   "artifactKey": "r2-service-desk-knowledge-and-escalation-model"
+   "artifactKey": "r2-service-desk-knowledge-and-escalation-model",
+   "pool": "daily",
+   "lesson": "itil-m6"
   },
   {
    "id": "q-itil-18",
    "certification": "ITIL",
-   "domain": "Management practices · Incident versus problem",
+   "domain": "Practices, improvement and value streams · Incident versus problem",
    "prompt": "On several Monday mornings the bed dashboard has failed to refresh. Each time, the service desk restarts the gateway service and the dashboard works again. What should happen next?",
    "options": [
     [
@@ -1343,12 +1377,14 @@
     "C": "An incident is resolved when service is restored. Finding the cause belongs to problem management.",
     "D": "Acting before analysis may cost money and still leave the cause in place."
    },
-   "artifactKey": "r3-incident-and-problem-management-workflow"
+   "artifactKey": "r3-incident-and-problem-management-workflow",
+   "pool": "daily",
+   "lesson": "itil-m6"
   },
   {
    "id": "q-itil-19",
    "certification": "ITIL",
-   "domain": "Management practices · Known errors and workarounds",
+   "domain": "Practices, improvement and value streams · Known errors and workarounds",
    "prompt": "Problem analysis shows the Monday refresh failures come from a defect in the gateway version Kestrel runs. The vendor's fix will be installed through a change next month. Until then, re-running the refresh by hand restores the data. What should be done now?",
    "options": [
     [
@@ -1375,12 +1411,14 @@
     "B": "A workaround reduces impact. It does not remove the cause, and it costs manual effort every time.",
     "C": "With a documented workaround the desk can restore service itself. Escalating adds delay and loads a key person."
    },
-   "artifactKey": "r3-incident-and-problem-management-workflow"
+   "artifactKey": "r3-incident-and-problem-management-workflow",
+   "pool": "daily",
+   "lesson": "itil-m6"
   },
   {
    "id": "q-itil-20",
    "certification": "ITIL",
-   "domain": "Management practices · Standard change",
+   "domain": "Practices, improvement and value streams · Standard change",
    "prompt": "Applying the monthly update to the on-premises data gateway follows a documented, tested procedure. It is low risk, well understood and has been done many times without trouble. How should Kestrel handle this change?",
    "options": [
     [
@@ -1407,12 +1445,14 @@
     "B": "Emergency changes are for urgent needs, such as resolving a major incident or a security threat.",
     "D": "It modifies a live component, so it is a change. Standard changes are still recorded."
    },
-   "artifactKey": "r1-change-control-process"
+   "artifactKey": "r1-change-control-process",
+   "pool": "daily",
+   "lesson": "itil-m7"
   },
   {
    "id": "q-itil-21",
    "certification": "ITIL",
-   "domain": "Management practices · Emergency change",
+   "domain": "Practices, improvement and value streams · Emergency change",
    "prompt": "On 2026-08-11 a ransomware precursor (SEC-004) is detected on the Virtual Desktop Service (A-008) at 03:05. To contain it, the security team must isolate a group of virtual desktop hosts straight away. How should this change be handled?",
    "options": [
     [
@@ -1439,12 +1479,14 @@
     "C": "Standard changes are low-risk and pre-authorized. Isolating clinical hosts during an attack carries real risk.",
     "D": "Emergency changes still need authorization and records, so the organization knows what changed and can review it."
    },
-   "artifactKey": "r3-major-incident-service-restoration-review"
+   "artifactKey": "r3-major-incident-service-restoration-review",
+   "pool": "daily",
+   "lesson": "itil-m7"
   },
   {
    "id": "q-itil-22",
    "certification": "ITIL",
-   "domain": "Management practices · Service levels",
+   "domain": "Practices, improvement and value streams · Service levels",
    "prompt": "Grace Liu's monthly report tells unit managers that the service desk met its service levels on 64.6% of tickets with a known outcome. Managers still say new staff often cannot work their first shift. The same data shows access requests met their target only 15.2% of the time, with a median of 4.26 days. What should Grace change?",
    "options": [
     [
@@ -1471,12 +1513,14 @@
     "C": "A higher blended target neither shows nor fixes the access-request gap.",
     "D": "Hiding the measures removes the basis for improving the service and the relationship."
    },
-   "artifactKey": "r1-service-catalogue-entry-and-service-levels"
+   "artifactKey": "r1-service-catalogue-entry-and-service-levels",
+   "pool": "daily",
+   "lesson": "itil-m6"
   },
   {
    "id": "q-itil-23",
    "certification": "ITIL",
-   "domain": "Continual improvement · Improvement model",
+   "domain": "Practices, improvement and value streams · Improvement model",
    "prompt": "The redesigned access-request process went live a month ago and the team wants to start the next improvement straight away. Nobody has yet compared the current median days, or the share resolved within 72 hours, with the baseline of 4.26 days and 27.3%. Which question of the continual improvement model has the team skipped?",
    "options": [
     [
@@ -1503,12 +1547,14 @@
     "B": "The baseline answers this, and it was measured before the redesign.",
     "C": "This comes after checking the results, to embed and build on the improvement."
    },
-   "artifactKey": "r1-continual-improvement-register"
+   "artifactKey": "r1-continual-improvement-register",
+   "pool": "daily",
+   "lesson": "itil-m8"
   },
   {
    "id": "q-itil-24",
    "certification": "ITIL",
-   "domain": "Value stream mapping and management · Scope of a value stream",
+   "domain": "Practices, improvement and value streams · Scope of a value stream",
    "prompt": "Grace Liu is about to map the clinician access value stream for Release 2. Where should the map begin and end?",
    "options": [
     [
@@ -1535,7 +1581,9 @@
     "B": "This maps one team's part of the flow, not the whole stream from demand to value.",
     "D": "It leaves out the trigger and the early steps where requests wait, and stops before value is confirmed."
    },
-   "artifactKey": "r2-access-request-value-stream"
+   "artifactKey": "r2-access-request-value-stream",
+   "pool": "daily",
+   "lesson": "itil-m8"
   },
   {
    "id": "q-x-01",
