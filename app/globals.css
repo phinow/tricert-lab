@@ -1464,7 +1464,7 @@ button.plan-item:hover { background: var(--hover); }
 }
 
 /* Scrolled text fades out under the step line instead of being cut. */
-.morning-body { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px); mask-image: linear-gradient(to bottom, transparent 0, #000 16px); }
+.morning-body { -webkit-mask-image: linear-gradient(to bottom, transparent 4px, #000 20px); mask-image: linear-gradient(to bottom, transparent 4px, #000 20px); }
 
 /* Today: the tag stays at the top right; a long kicker wraps beside it. */
 .hero-top { flex-wrap: nowrap; align-items: baseline; }
@@ -1493,6 +1493,9 @@ button.plan-item:hover { background: var(--hover); }
 @media (max-width: 760px) {
   .onboard-intro h1 { font-size: var(--t-2xl); }
   .onboard-intro h1 span { display: inline; }
+  .onboard-blocks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .onboard-blocks li, .onboard-blocks li:first-child { padding: 0; box-shadow: none; }
+  .onboard-blocks li span { display: none; }
   .onboard.is-later .onboard-pitch { display: none; }
   .onboard.is-later .onboard-intro { padding-bottom: 12px; }
   .onboard-form .form-actions { position: sticky; z-index: 5; bottom: 0; margin: 16px calc(-1 * var(--gutter)) 0; padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--panel); box-shadow: 0 -1px 0 var(--line); }
