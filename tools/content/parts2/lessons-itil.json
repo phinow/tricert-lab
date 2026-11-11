@@ -1,0 +1,219 @@
+{
+ "type": "lessons",
+ "items": [
+  {
+   "key": "itil-m1",
+   "summary": "Learn the words every ITIL question builds on: value, products and services, outputs and outcomes, costs and risks, utility and warranty, the provider and consumer, the customer, user and sponsor roles, and service offerings and relationships.",
+   "read": [
+    {
+     "heading": "Value, products and services",
+     "body": "ITIL starts from one question: who gets value from this work, and how? Every later topic, from the guiding principles to the practices, comes back to it, so the words in this lesson appear in almost every exam question.\n\nThe core definitions below are the ones ITIL 4 used. Version 5 keeps the same ideas, so learn what each word means rather than memorising a sentence.\n\n- Value: the perceived benefits, usefulness and importance of something. Perceived matters. Value is judged by the stakeholder, not by the provider. A report the provider is proud of has no value to a manager who never opens it. Value is also more than money.\n- Organization: a person or a group of people with its own functions, responsibilities and authority to reach its objectives. A two-person team and a national company are both organizations.\n- Product: a configuration of an organization's resources designed to offer value for a consumer. The resources are people, information, technology, partners and money. The provider owns and builds the product: the configured software, the trained staff, the supplier contracts.\n- Service: a means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks.\n\nRead the service definition slowly. A service does not hand value over; it makes outcomes possible. And it takes some costs and risks off the customer.\n\nVersion 5 manages digital products and services together, across one lifecycle. The product is what the provider builds and runs; the services are how consumers get value from it. PeopleCert calls the whole subject digital product and service management."
+    },
+    {
+     "heading": "Outputs and outcomes, costs and risks",
+     "body": "An output is a tangible or intangible deliverable of an activity: a report page, a repaired laptop, a new account. An outcome is a result for a stakeholder, made possible by one or more outputs: a manager who decides earlier, a nurse who can start her shift. Outputs are what the provider makes. Outcomes are what people get. When an exam option talks about outputs and another talks about outcomes, the ITIL answer usually points to the outcome.\n\nTake Kestrel's patient-flow dashboards. The output is a set of report pages refreshed before 06:00. The outcome is that the Director of Patient Flow sees bed pressure before the morning huddle and acts on it.\n\nEvery service also changes the consumer's costs and risks, in both directions:\n\n| Effect | Dashboard example |\n|---|---|\n| Cost removed | Analysts no longer build Excel extracts each morning |\n| Cost imposed | Licences, training time, a support contract |\n| Risk removed | No more extracts with patient detail sent by email |\n| Risk imposed | Dependence on the provider: if the refresh fails, the huddle has no numbers |\n\nA consumer judges a service by weighing the outcomes it supports against the costs and risks it removes and adds. A service that removes one cost but imposes a larger risk may not be worth having. Lesson 2 adds two more things to weigh: experience and sustainability."
+    },
+    {
+     "heading": "Utility and warranty",
+     "body": "Utility is the functionality a product or service offers to meet a particular need. In short: what it does, or fit for purpose. Utility either supports a performance (helps the consumer do something better) or removes a constraint (takes a blocker away).\n\nWarranty is the assurance that a product or service will meet agreed requirements. In short: how well it does it, or fit for use. Warranty usually covers availability, capacity, security, continuity and performance against agreed service levels.\n\nA service needs both to create value. Utility without warranty is a good idea that fails when people need it. Warranty without utility is a reliable service that does not do what people need.\n\n| Situation | What is missing |\n|---|---|\n| The dashboard shows the right measures but is down two mornings a week | Warranty (availability) |\n| The dashboard is always up but does not show the waits leaders ask about | Utility |\n| The dashboard is fast, but staff without a need can see confidential pages | Warranty (security) |\n| The dashboard slows to a crawl when every site opens it at 07:00 | Warranty (capacity) |\n| No one can restore the dashboard after a server failure | Warranty (continuity) |\n\nExam stems often describe a complaint and ask which one is lacking. Ask yourself: does it do the right thing (utility), and does it do it reliably, safely and at the agreed level (warranty)?"
+    },
+    {
+     "heading": "Providers, consumers and three roles",
+     "body": "A service provider is the organization that provides services. A service consumer is the organization that receives them. Most organizations are both at once. Kestrel's IT team provides the dashboards to the patient-flow team, and at the same time consumes cloud hosting from a supplier.\n\nInside the consumer, ITIL separates three roles:\n\n- Customer: defines the requirements for a service and takes responsibility for the outcomes of using it.\n- User: uses the service.\n- Sponsor: authorizes the budget for using the service.\n\nThese are roles, not job titles, and one person can hold more than one. At home you are customer, user and sponsor of your phone plan. At work they are often different people. For the dashboards, the Director of Patient Flow is the customer, a charge nurse is a user, and the executive who signs the budget is the sponsor.\n\nExam questions test which role does what:\n\n- Who should agree the targets for a service? The customer.\n- Who reports that a screen is confusing? A user.\n- Who approves the spending? The sponsor.\n\nStakeholders go wider than these three roles. They include employees, partners and suppliers, funders or shareholders, and society. Value has to make sense for each of them, which is why ITIL speaks of value for stakeholders, not only for customers. A service that pleases customers but burns out the staff who run it is not creating value for every stakeholder."
+    },
+    {
+     "heading": "Service offerings and service relationships",
+     "body": "A service offering is a description of one or more services, designed to address the needs of a target consumer group. An offering can include three kinds of thing:\n\n- Goods: ownership passes to the consumer, who becomes responsible for them. A phone a new employee keeps.\n- Access to resources: the consumer may use them under agreed terms, but ownership stays with the provider. A licence to the dashboards, access to the network.\n- Service actions: work the provider does to meet the consumer's need. A support call, a training session, a password reset.\n\nOne service can be packaged into several offerings for different groups. A basic offering for occasional users and a fuller one with training and faster support for managers both draw on the same product.\n\nA service relationship is a cooperation between a service provider and a service consumer. It has three parts:\n\n1. Service provision: what the provider does to provide the service, including managing its resources and the actions it performs.\n2. Service consumption: what the consumer does, including managing its own resources and using the service.\n3. Service relationship management: the joint work that keeps value being co-created, such as agreeing needs, reviewing performance and acting on feedback.\n\nRelationships chain together. A consumer often turns what it receives into part of its own offering. The IT team consumes hosting from a supplier, and that hosting becomes one of the resources behind what it offers clinicians. Value comes from the whole relationship, not from a single handover."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Value",
+     "definition": "The perceived benefits, usefulness and importance of something. It is judged by the stakeholder, not by the provider, and it is more than money."
+    },
+    {
+     "term": "Product",
+     "definition": "A configuration of an organization's resources (people, information, technology, partners, money) designed to offer value for a consumer. The provider owns and builds it."
+    },
+    {
+     "term": "Service",
+     "definition": "A means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks."
+    },
+    {
+     "term": "Output and outcome",
+     "definition": "An output is a deliverable of an activity, such as a report. An outcome is a result for a stakeholder made possible by outputs, such as an earlier, better decision."
+    },
+    {
+     "term": "Utility",
+     "definition": "The functionality a product or service offers to meet a particular need: what it does, or fit for purpose. It supports a performance or removes a constraint."
+    },
+    {
+     "term": "Warranty",
+     "definition": "The assurance that a product or service will meet agreed requirements: how well it does it, or fit for use. Covers availability, capacity, security and continuity."
+    },
+    {
+     "term": "Customer, user and sponsor",
+     "definition": "Three consumer roles. The customer defines requirements and owns outcomes, the user uses the service, the sponsor authorizes the budget. One person can hold several."
+    },
+    {
+     "term": "Service relationship",
+     "definition": "A cooperation between a provider and a consumer, made up of service provision, service consumption and service relationship management."
+    }
+   ],
+   "build": {
+    "goal": "Classify ten statements about a home internet service as output, outcome, utility, warranty, cost or risk, or customer, user or sponsor, then explain in two sentences the value the service creates.",
+    "steps": [
+     "Read statements 1 to 4: (1) the router is delivered and set up; (2) you can work from home instead of commuting; (3) the connection stays up 99.9% of the month; (4) the plan streams video at full speed.",
+     "Read statements 5 to 7: (5) you no longer pay for extra mobile data; (6) you now depend on one company for every device in the house; (7) your teenager streams lessons on it every evening.",
+     "Read statements 8 to 10: (8) your partner chose the plan and its speed after listing what the house needs; (9) your employer pays the monthly bill; (10) the provider keeps your account details safe.",
+     "Label each statement with one word: output, outcome, utility, warranty, cost removed, risk imposed, user, customer or sponsor. Some could fit two labels; pick the best and note why.",
+     "Write two sentences on the value the service creates for your household: the main outcome it supports, one cost it removes and one risk it adds.",
+     "Compare with the model answer. For each label you got wrong, write the rule you missed in one line."
+    ],
+    "modelAnswer": "| Statement | Label | Why |\n|---|---|---|\n| 1 Router delivered and set up | Output | A deliverable of the provider's activity |\n| 2 Work from home instead of commuting | Outcome | The result you actually want |\n| 3 Up 99.9% of the month | Warranty | Availability: how well it works |\n| 4 Streams at full speed | Utility | What it does for your need |\n| 5 No extra mobile data to buy | Cost removed | The service takes a cost away |\n| 6 Depend on one company | Risk imposed | A new risk you now carry |\n| 7 Teenager streams lessons | User | Uses the service |\n| 8 Partner chose plan and speed | Customer | Defines requirements and owns outcomes |\n| 9 Employer pays the bill | Sponsor | Authorizes the budget |\n| 10 Account details kept safe | Warranty | Security is part of warranty |\n\nStatement 4 could tempt you towards warranty because speed sounds like performance. Here it describes what the plan offers to meet a need (streaming), so utility fits best. If the statement had said the plan reaches its promised speed at busy times, that would be warranty.\n\nValue in two sentences: The service lets the household work and study from home, which is the outcome that matters, and it removes the cost of extra mobile data. In return the household depends on one provider, so an outage stops work and lessons at the same time."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "A service enables outcomes and takes some costs and risks off the customer. An option saying the provider delivers value on its own is wrong: value is co-created with the consumer."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Utility is fit for purpose (what it does); warranty is fit for use (availability, capacity, security, continuity). A service that gives correct results but is often down or insecure has a warranty problem."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Customer defines requirements and owns outcomes, user uses, sponsor authorizes budget. When asked who should agree service targets or define requirements, choose the customer."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Outputs are deliverables; outcomes are results stakeholders want. When the options mix them, the ITIL answer usually points to the outcome."
+    }
+   ],
+   "pitfalls": [
+    "Treating value as whatever the provider delivers. Value is perceived by the stakeholder; a finished deliverable nobody uses has no value.",
+    "Calling availability or security a feature, and so utility. They are warranty, even when users are the ones asking for them.",
+    "Assuming customer, user and sponsor are always different people. They are roles, and one person can hold two or all three."
+   ],
+   "check": [
+    {
+     "q": "A reporting service delivers every report on time, yet managers keep deciding from their own spreadsheets. Using output, outcome and value, explain what is wrong.",
+     "a": "The provider is producing outputs (reports on time) but not the outcome the customer wants (decisions made from the reports). Value is perceived by the stakeholder, so reports nobody uses create no value however punctual they are."
+    },
+    {
+     "q": "A video call service has every feature users want but drops one call in five. Is this a utility or a warranty problem, and why does the service still fail to create value?",
+     "a": "It is a warranty problem: the service is fit for purpose but not fit for use, because its availability and reliability are poor. Value needs both utility and warranty, so a full feature set cannot make up for calls that drop."
+    },
+    {
+     "q": "Who should agree the targets in a service level agreement: the customer, a user or the sponsor? Explain using the definition of each role.",
+     "a": "The customer, because the customer defines the requirements for a service and takes responsibility for its outcomes. Users use the service and can give feedback; the sponsor authorizes the budget but does not set requirements."
+    }
+   ]
+  },
+  {
+   "key": "itil-m2",
+   "summary": "See how providers and consumers create value together, and what a consumer weighs: outcomes, costs, risks, experience and sustainability. Learn why digital experience is a core focus of Version 5 and how it treats AI as part of normal service work.",
+   "read": [
+    {
+     "heading": "Value is co-created",
+     "body": "Older thinking said a provider creates value and delivers it to a passive consumer. ITIL rejects that. Value is co-created: it comes from active collaboration between providers, consumers and other stakeholders.\n\nThe consumer contributes as much as the provider:\n\n- Time and attention: people learn the service and change how they work.\n- Information: they describe their needs, share data and report what goes wrong.\n- Resources: their own devices, staff and budgets.\n- Feedback: they say what works, which shapes the next change.\n\nTake Kestrel's plan to move password resets from the phone line to a self-service page. The service desk can build the page, but value appears only when staff register their recovery details, use the page instead of calling, and say where it confuses them. If staff never register, the page is an output with no outcome.\n\nThis is why exam questions on low use rarely want more features. When consumers are not getting value, the ITIL answer usually involves the consumers: ask them, watch them work, and act on what they say.\n\nCo-creation also means the provider cannot define value alone. A provider that decides what consumers need, without asking, is guessing. A provider and consumer that agree the outcomes together, and review them, are co-creating. The service relationship from lesson 1 is where that happens: provision, consumption and the joint work of managing the relationship."
+    },
+    {
+     "heading": "What a consumer weighs",
+     "body": "PeopleCert describes value co-creation as collaboration between service providers, consumers and stakeholders, while weighing outcomes, costs, risks, experience and sustainability. Learn those five words as a set.\n\n| Factor | Question the consumer asks | Self-service reset example |\n|---|---|---|\n| Outcomes | Does it get me the result I need? | Staff are back at work in minutes, any hour |\n| Costs | What does it take away, and what does it add? | Fewer calls to the desk; a licence and set-up time added |\n| Risks | What risk goes away, and what new risk appears? | Less waiting; new risk of someone resetting another person's account |\n| Experience | How does it feel to use, before, during and after? | Four clear screens, or a maze of security questions |\n| Sustainability | Can the value last, and at what wider cost? | Desk staff freed for harder work; no extra hardware |\n\nNo single factor decides. A service with the best outcome but an unacceptable risk is not good value. A cheap option that frustrates people every day costs more in lost time than it saves.\n\nIn exam questions, watch for options that judge a service on one factor only, usually cost or a single target. The stronger answer balances the factors and starts from the consumer's outcomes."
+    },
+    {
+     "heading": "Experience and digital experience",
+     "body": "Experience is how a stakeholder perceives every contact with a product or service: how easy it is, how long it takes, how clear the information is, and whether they trust it. Customers, users and the staff who run the service all have an experience, and each shapes the value they see.\n\nPeopleCert states that digital experience is a core focus in Version 5. It helps professionals design, deliver and improve digital products and services with greater visibility, better collaboration and a clear understanding of how different stakeholders experience value. Put simply: most contact with services is now through screens, apps and automated steps, so the quality of that digital contact is part of the value, not decoration.\n\nExperience can be poor while every target is met. The desk answers 95% of calls in 60 seconds, so the report is green, yet users hate calling because they repeat their story three times. This gap is sometimes called the watermelon effect: green outside, red inside. Service targets alone do not prove value.\n\nWays to see experience:\n\n- Ask users about a recent contact, soon after it.\n- Watch someone use the service and note where they hesitate.\n- Measure effort: how many steps, screens or handoffs it took.\n- Read complaints and compliments for patterns, not just counts.\n\nFor the self-service page, the experience measure might be the share of staff who finish a reset without calling the desk, plus a one-question rating at the end."
+    },
+    {
+     "heading": "Sustainability: value that lasts",
+     "body": "Sustainability asks two questions. Can the value last? And what does producing it cost over time, beyond this year's budget: in energy and hardware, in people's workload, in money in later years?\n\nA choice can look good today and fail this test:\n\n- A fix that needs one expert to repeat it by hand every week depends on a person who may leave or burn out.\n- A tool that needs new hardware every two years adds cost and waste that a simpler option avoids.\n- A quick change that skips documentation leaves rework for whoever comes next.\n\nPeopleCert's own wording links Version 5 to sustainable business results and lists sustainability among the things weighed in value co-creation. For the exam, treat it as one of the five factors: an option that creates value now while building up cost or harm for later is weaker than one whose value lasts.\n\nFor the self-service page, sustainability points to two checks. First, will the desk keep the page's help text current, or will it drift out of date within a year? Second, does the page reduce the load on a small team in a way they can keep up, or does it add a new manual task, such as reviewing every reset by hand?"
+    },
+    {
+     "heading": "Working together, and AI as normal work",
+     "body": "Co-creation needs steady habits, not a single meeting:\n\n1. Agree outcomes with the customer before choosing a solution.\n2. Involve users early, in design and testing, not only at launch.\n3. Share what you know: performance, problems and plans, including bad news.\n4. Collect feedback at the point of use and act on it visibly, so people see that speaking up changes things.\n5. Review value together at set times, using outcome and experience measures as well as targets.\n\nVersion 5 is described as AI-native. PeopleCert explains that the framework was designed with AI in mind from the outset: its practices, value streams, roles and ways of working are structured so AI can be built in to automate work, support decisions, predict outcomes and improve performance. For Foundation, treat AI as one more way of doing normal service work. An AI chat assistant on the reset page is judged by the same five factors: does it improve outcomes and experience, what does it cost, what risks does it add, and can the value last?\n\nPeopleCert also describes governing AI responsibly through oversight, accountability, risk management and trust. That topic has its own module, ITIL AI Governance, so at Foundation level you only need to know that AI use must be governed like any other part of a service."
+    }
+   ],
+   "keyTerms": [
+    {
+     "term": "Value co-creation",
+     "definition": "Creating value through active collaboration between providers, consumers and other stakeholders, rather than a provider delivering value to a passive consumer."
+    },
+    {
+     "term": "Stakeholder",
+     "definition": "A person or organization with an interest in a service: customers, users, sponsors, employees, partners and suppliers, funders and society."
+    },
+    {
+     "term": "Experience",
+     "definition": "How a stakeholder perceives every contact with a product or service: ease, speed, clarity and trust. It shapes the value they see, even when targets are met."
+    },
+    {
+     "term": "Digital experience",
+     "definition": "The quality of people's contact with digital products and services. PeopleCert names it a core focus of Version 5, tied to how different stakeholders experience value."
+    },
+    {
+     "term": "Sustainability (in value)",
+     "definition": "Whether value can last, and what producing it costs over time in energy, hardware, workload and future money. One of the five factors weighed in co-creation."
+    },
+    {
+     "term": "Watermelon effect",
+     "definition": "Service reports that are green on every target while users are unhappy. It shows that targets alone do not prove value; experience must be measured too."
+    },
+    {
+     "term": "AI-native",
+     "definition": "PeopleCert's description of Version 5: designed with AI in mind from the outset, so practices, value streams and roles can include AI to automate work and support decisions."
+    }
+   ],
+   "build": {
+    "goal": "Weigh two options for replacing phone password resets at a workplace across the five value factors, name what consumers must contribute, and recommend one option with one experience measure.",
+    "steps": [
+     "Option A: a self-service reset page open around the clock, with identity checked by a code sent to the person's registered phone. Option B: keep phone resets and extend desk hours to 22:00.",
+     "Draw a table with five rows (outcomes, costs, risks, experience, sustainability) and two columns (A and B). Write one short line in each cell.",
+     "List three things staff must do for option A to create value. These are their part in co-creation.",
+     "Recommend one option in two sentences, naming the factor that decided it and the factor you accept as a weakness.",
+     "Name one experience measure you would report next to the call-handling target, and say why the target alone is not enough.",
+     "Compare with the model answer and note any factor you judged on cost alone."
+    ],
+    "modelAnswer": "| Factor | Option A: self-service page | Option B: longer desk hours |\n|---|---|---|\n| Outcomes | Back to work in minutes, any hour, including night shifts | Faster than now, but nothing after 22:00 |\n| Costs | Licence and set-up; far fewer reset calls | Extra staff hours every week, with no end date |\n| Risks | Someone could reset another person's account if a phone is stolen; needs good identity checks | Callers can be impersonated too; fewer new risks overall |\n| Experience | Quick if registered; frustrating if not registered or the code does not arrive | Familiar, but users wait on hold and repeat details |\n| Sustainability | Frees desk staff for harder work; load stays low as staff numbers grow | Cost grows with staff numbers; tiring evening shifts |\n\nWhat staff must contribute for option A: register a recovery phone before they need it; use the page instead of calling; report steps that confuse them so the page can improve.\n\nRecommendation: Option A. Outcomes and sustainability decide it: night-shift staff get back to work at any hour and the desk's load stops growing. The weakness accepted is the new identity risk, which is reduced by requiring registration in person or through the manager, and by alerting the person by email after each reset.\n\nExperience measure: the share of resets finished on the page without a call to the desk, shown with a one-question rating at the end. The call target (for example answering 90% of calls within 60 seconds) can stay green while users are failing on the page and giving up, so it cannot show on its own whether the change created value."
+   },
+   "examTips": [
+    {
+     "cert": "ITIL",
+     "tip": "PeopleCert describes value co-creation as weighing outcomes, costs, risks, experience and sustainability. An option that judges a service on one of these alone, usually cost, is weaker than one that balances them."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Questions often contrast a provider deciding what consumers need with provider and consumer defining outcomes together. Pick the collaborative answer tied to the consumer's outcomes and feedback."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "Green targets do not prove value. If users are unhappy while every target is met, the answer usually involves measuring experience and talking to users, not adding more targets."
+    },
+    {
+     "cert": "ITIL",
+     "tip": "AI-native means Version 5 was designed with AI in mind. Judge an AI option like any other: does it improve outcomes and experience at an acceptable cost and risk, and is its use governed?"
+    }
+   ],
+   "pitfalls": [
+    "Treating consumers as passive receivers. Value appears only when they use the service and contribute their time, information and feedback.",
+    "Judging an option by cost alone. Outcomes, risks, experience and sustainability can outweigh a saving.",
+    "Reading a page of green service targets as proof of value. Experience can be poor while every target is met."
+   ],
+   "check": [
+    {
+     "q": "Why can a provider not create value on its own? Give one example of what the consumer must contribute.",
+     "a": "Value is co-created through active collaboration: it appears only when the consumer uses the service to reach an outcome. For example, staff must register their details and use a self-service page, and give feedback, before it saves them any time."
+    },
+    {
+     "q": "Name the five things PeopleCert says are weighed in value co-creation, and give one question to ask for each.",
+     "a": "Outcomes: does it get the result needed? Costs: what does it remove and add? Risks: which risks go away and which appear? Experience: how does it feel to use? Sustainability: can the value last, and at what wider cost over time?"
+    },
+    {
+     "q": "A service meets all its targets, yet users say it is slow and confusing. Which idea explains the gap, and what should the provider do first?",
+     "a": "Experience: targets measure what the provider controls, not how users perceive the service (the watermelon effect). The provider should first talk to and observe users to see where the experience fails, then add an experience measure."
+    }
+   ]
+  }
+ ]
+}
