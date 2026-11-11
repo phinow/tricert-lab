@@ -450,7 +450,7 @@ test('all four checks together', () => {
   });
   assert.deepEqual(checks.map((item) => item.key), ['mornings', 'exams', 'areas', 'reviews']);
   assert.ok(allChecksMet(checks));
-  checks.forEach((item) => assert.ok(item.title && item.detail && !/—/.test(item.detail)));
+  checks.forEach((item) => assert.ok(item.title && item.detail && !/\u2014/.test(item.detail)));
   assert.ok(!allChecksMet(readyToBook({ block, done: ['itil-m1', 'itil-m2'], results: [], today: '2027-01-20' })));
 });
 
