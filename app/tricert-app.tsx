@@ -283,7 +283,7 @@ export default function TriCertApp() {
   const [morningRestored, setMorningRestored] = useState(false);
   const [weekendOpen, setWeekendOpen] = useState<string | null>(null);
   const [finished, setFinished] = useState<Finished | null>(null);
-  const [today] = useState(todayIso);
+  const [today, setToday] = useState(todayIso);
   const [learnTab, setLearnTab] = useState<LearnTab>('lessons');
   const [lessonFrom, setLessonFrom] = useState<LessonFrom>('learn');
   const [learnItem, setLearnItem] = useState<string | null>(null);
@@ -321,7 +321,7 @@ export default function TriCertApp() {
 
     fetch('/api/state')
       .then(async (response) => {
-        const raw = await response.json();
+        const raw = (await response.json()) as { error?: string };
         if (!response.ok) throw new Error(raw.error || 'Unable to load your study plan.');
         const data = normalizeState(raw);
         if (route) { setView(route.view); if (route.tab) setProgressTab(route.tab); if (route.learnTab) setLearnTab(route.learnTab); }
@@ -384,13 +384,54 @@ export default function TriCertApp() {
     examRef.current = exam;
   });
 
-  /* The morning's place and writing are kept in this browser every two
-     seconds, and when the page is hidden or closed. */
+  /* Today's date is read again each minute and when the page comes back
+     into view, so a tab left open overnight moves to the new day. */
   useEffect(() => {
-    const flush = () => { const current = morningRef.current; if (current) writeMorning(withSpent(current, openedAt.current)); };
-    const handle = window.setInterval(flush, 2000);
+    const check = () => setToday((current) => { const next = todayIso(); return next === current ? current : next; });
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    const handle = window.setInterval(check, 60000);
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { window.clearInterval(handle); window.removeEventListener('focus', check); document.removeEventListener('visibilitychange', onVisible); };
+  }, []);
+
+  /* The morning's place and writing are kept in this browser every two
+     seconds while the page is in view, and when it is hidden or closed. A
+     morning another tab has finished or replaced is never written back. */
+  useEffect(() => {
+    const flush = () => { const current = morningRef.current; if (current && !runReplaced(morningKey, current.key)) writeMorning(withSpent(current, openedAt.current)); };
+    const tick = () => { if (document.visibilityState === 'visible') flush(); };
+    const handle = window.setInterval(tick, 2000);
     window.addEventListener('pagehide', flush);
     return () => { window.clearInterval(handle); window.removeEventListener('pagehide', flush); };
+  }, []);
+
+  /* Another tab on this browser changed the morning or the practice exam:
+     this tab follows it, so a finished one does not come back from here. */
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === morningKey) {
+        const current = morningRef.current;
+        const stored = readMorning();
+        // The same morning moved on in the other tab: a copy not on screen here follows it.
+        if (current && stored && stored.key === current.key) { if (!current.open) { morningRef.current = { ...stored, open: false }; setMorning({ ...stored, open: false }); } return; }
+        if (current) dropMorning();
+        if (stored) { morningRef.current = { ...stored, open: false }; setMorning({ ...stored, open: false }); }
+        if (!stored) void refreshState();
+      }
+      if (event.key === examKey) {
+        const current = examRef.current;
+        const stored = readExam();
+        if (current && stored && stored.id === current.id && !stored.finishedAt && !current.finishedAt) return;
+        if (current && !current.finishedAt) dropExam();
+        if (stored && !stored.finishedAt && !current) { examRef.current = stored; setExam(stored); }
+        if (!stored) void refreshState();
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+    // The handlers read the latest morning and exam through refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -531,7 +572,7 @@ export default function TriCertApp() {
     setNotice(null);
     try {
       const response = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      const data = await response.json();
+      const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error || 'Unable to save your work.');
       const next = normalizeState(data);
       setState(next);
@@ -542,6 +583,25 @@ export default function TriCertApp() {
     } finally {
       setSaving(false);
     }
+  }
+
+  /* The saved state again, after another tab has changed it. */
+  async function refreshState() {
+    try {
+      const response = await fetch('/api/state');
+      if (!response.ok) return;
+      const next = normalizeState(await response.json());
+      stateRef.current = next;
+      setState(next);
+    } catch { /* the next save brings it back */ }
+  }
+
+  /* Today's date at the moment of an action, which also moves the screen on
+     if the day has changed since it was last read. */
+  function freshToday() {
+    const next = todayIso();
+    if (next !== today) setToday(next);
+    return next;
   }
 
   /* Setup asks three short steps. Fields it no longer asks keep their defaults. */
@@ -593,12 +653,22 @@ export default function TriCertApp() {
     setMorning((current) => {
       if (!current) return current;
       const next = change(current);
-      if (keep) writeMorning(withSpent(next, openedAt.current));
+      if (keep && !runReplaced(morningKey, current.key)) writeMorning(withSpent(next, openedAt.current));
       return next;
     });
   }
 
+  /* Another tab finished or replaced this morning: close it here. */
+  function dropMorning() {
+    morningRef.current = null;
+    openedAt.current = null;
+    setMorning(null);
+    setMorningOpen(false);
+    setMorningRestored(false);
+  }
+
   function startMorning(item: Morning | null, mode: MorningMode) {
+    const today = freshToday();
     const owner = item ? examBlocks.find((candidate) => candidate.mornings.some((entry) => entry.key === item.key)) : studyBlock;
     if (!owner) return;
     const key = item ? item.key : `${mode === 'due' ? 'due' : 'short'}-${today}`;
@@ -643,6 +713,7 @@ export default function TriCertApp() {
     if (!morning) return;
     const head = morning.cards.queue[0];
     if (!head) return;
+    const today = freshToday();
     const result = answerCard(morning.cards.queue, srs.cards, grade, today);
     if (!head.repeat) {
       const saved = await update({ action: 'patch-record', key: 'srs', patch: { cards: { [head.id]: result.states[head.id] } } });
@@ -657,12 +728,17 @@ export default function TriCertApp() {
   async function answerMorningQuestion(question: ScenarioQuestion, choice: string, sure: boolean, seconds: number) {
     const correct = choice === question.correct;
     const result: QuestionResult = !correct ? 'wrong' : sure ? 'right' : 'guess';
+    const today = freshToday();
     const recorded = await update({ action: 'record-attempt', questionId: question.id, certification: question.certification, domain: question.domain, answer: choice, correct, confidence: sure ? 'high' : 'low' });
     if (!recorded) return false;
+    // Graded once a day: an answer given again today (another tab, or a
+    // retry) keeps the schedule it already has.
     const next = recordQuestionAnswer(recorded.records.srs, question, result, today);
-    const delayed = next.delayed?.[question.certification];
-    const saved = await update({ action: 'patch-record', key: 'srs', patch: { questions: { [question.id]: next.questions[question.id] }, ...(delayed ? { delayed: { [question.certification]: delayed } } : {}) } });
-    if (!saved) return false;
+    if (next !== recorded.records.srs) {
+      const delayed = next.delayed?.[question.certification];
+      const saved = await update({ action: 'patch-record', key: 'srs', patch: { questions: { [question.id]: next.questions[question.id] }, ...(delayed ? { delayed: { [question.certification]: delayed } } : {}) } });
+      if (!saved) return false;
+    }
     changeMorning((current) => ({ ...current, questions: { ...current.questions, answers: { ...current.questions.answers, [question.id]: { choice, sure, correct, result, seconds } } } }));
     return true;
   }
@@ -671,6 +747,7 @@ export default function TriCertApp() {
   async function saveMistakeCards(current: MorningRun): Promise<MorningRun | null> {
     const pending = Object.entries(current.mistakes).filter(([id, line]) => line.trim() && !current.savedCards.includes(id));
     if (!pending.length) return current;
+    const today = freshToday();
     const made: UserCard[] = [];
     for (const [id, line] of pending) {
       const question = questionById(id);
@@ -681,7 +758,7 @@ export default function TriCertApp() {
     }
     if (made.length && !(await update({ action: 'patch-record', key: 'srs', patch: { cards: Object.fromEntries(made.map((card) => [card.id, startCard(today)])) } }))) return null;
     const next = { ...current, savedCards: [...current.savedCards, ...pending.map(([id]) => id)] };
-    writeMorning(withSpent(next, openedAt.current));
+    if (!runReplaced(morningKey, current.key)) writeMorning(withSpent(next, openedAt.current));
     setMorning(next);
     return next;
   }
@@ -694,6 +771,9 @@ export default function TriCertApp() {
 
   async function finishMorning() {
     if (!morning) return;
+    // Finished in another tab already: close it here and add nothing.
+    if (runReplaced(morningKey, morning.key)) { dropMorning(); say('This morning was finished or set aside in another tab. Nothing was added twice.'); void refreshState(); return; }
+    const today = freshToday();
     const current = await saveMistakeCards(morning);
     if (!current) return;
     const owner = examBlocks.find((item) => item.key === current.block);
@@ -749,6 +829,7 @@ export default function TriCertApp() {
   }
 
   async function finishWeekend(item: WeekendBlock) {
+    const today = freshToday();
     const owner = examBlocks.find((candidate) => candidate.weekends.some((entry) => entry.key === item.key));
     if (!(await update({ action: 'set-progress', itemKey: item.key, status: 'complete' }))) return;
     const minutes = Math.max(1, Math.round((Date.now() - (weekendStarted.current || Date.now())) / 60000));
@@ -865,6 +946,9 @@ export default function TriCertApp() {
   /* --------------------------------------------------- practice exams */
 
   function changeExam(change: (current: ExamRun) => ExamRun) {
+    // Finished in another tab: close it here, never write it back.
+    const kept = examRef.current;
+    if (kept && !kept.finishedAt && examReplaced(kept)) { dropExam(); void refreshState(); return; }
     setExam((current) => {
       if (!current || current.finishedAt) return current;
       const next = change(current);
@@ -874,8 +958,18 @@ export default function TriCertApp() {
     });
   }
 
+  /* Another tab finished or replaced this practice exam: close it here. */
+  function dropExam() {
+    examRef.current = null;
+    setExam(null);
+    setExamOpen(false);
+    setExamRestored(false);
+    say('This practice exam was finished in another tab.');
+  }
+
   function beginExam() {
     if (!studyBlock) return;
+    const today = freshToday();
     if (exam && !exam.finishedAt) { setExamRestored(false); setExamOpen(true); return; }
     const gate = practiceExamGate(studyBlock, completed, records.mocks, today);
     if (!gate.open) return;
@@ -898,8 +992,9 @@ export default function TriCertApp() {
      saving follows and can be tried again if it fails. */
   async function finishExam(current: ExamRun) {
     if (examFinishing.current || current.finishedAt) return;
+    if (examReplaced(current)) { dropExam(); void refreshState(); return; }
     examFinishing.current = true;
-    const done: ExamRun = { ...current, finishedAt: Math.min(Date.now(), current.startedAt + current.minutes * 60000), date: today };
+    const done: ExamRun = { ...current, finishedAt: Math.min(Date.now(), current.startedAt + current.minutes * 60000), date: freshToday() };
     writeExam(done);
     examRef.current = done;
     setExam(done);
@@ -3126,7 +3221,9 @@ function morningGate(item: ExamBlock, morning: Morning, done: Set<string>) {
   return { open: true, reason: '' };
 }
 /* A weekend block opens once its morning is done, and practice exam B at
-   least seven days after practice exam A (the plan's minDaysAfter). */
+   least seven days after practice exam A (the plan's minDaysAfter). A
+   practice exam block also follows practiceExamGate, so Plan, Today and
+   Practice always agree. */
 function weekendState(item: ExamBlock, weekend: WeekendBlock, done: Set<string>, records: Records, today: string) {
   if (done.has(weekend.key)) return { open: false, reason: 'Done' };
   if (!done.has(weekend.after)) return { open: false, reason: `Opens after ${titleIn(item, weekend.after)}` };
@@ -3136,23 +3233,37 @@ function weekendState(item: ExamBlock, weekend: WeekendBlock, done: Set<string>,
     const on = [...records.log.filter((row) => row.key === key).map((row) => row.date), ...records.mocks.filter((row) => row.weekend === key).map((row) => row.date)].filter(isStudyDate).sort().pop();
     if (on && daysBetween(on, today) < days) return { open: false, reason: `Opens on ${formatDate(addDays(on, days))}` };
   }
+  if (weekend.kind === 'mock') {
+    const gate = practiceExamGate(item, done, records.mocks, today);
+    if (!gate.open && gate.form === weekend.form) return { open: false, reason: gate.reason };
+  }
   return { open: true, reason: '' };
 }
 
-/* Practice exam A opens when the block's learn mornings are done; B opens
-   7 days after A (the plan's minDaysAfter); after both, a new draw. */
+/* Practice exam A opens when the block's learn mornings and its weekend
+   block's morning are done (review 2); B opens after its morning (the
+   second repair morning) and 7 days after A (the plan's minDaysAfter);
+   after both, a new draw. */
 function practiceExamGate(item: ExamBlock, done: Set<string>, mocks: MockRow[], today: string): ExamGate {
   const taken = takenForms(mocks, item.cert);
   const learn = item.mornings.filter((entry) => entry.kind === 'learn');
   const learnDone = learn.filter((entry) => done.has(entry.key)).length;
+  const waitsFor = (form: 'A' | 'B') => {
+    const weekend = item.weekends.find((entry) => entry.kind === 'mock' && entry.form === form);
+    return weekend && !done.has(weekend.key) && !done.has(weekend.after) ? titleIn(item, weekend.after) : '';
+  };
   if (!taken.includes('A')) {
     if (!learn.length || learnDone < learn.length) return { open: false, form: 'A', reason: `Practice exam A opens when the ${learn.length} learn mornings are done. ${learnDone} of ${learn.length} are done.` };
+    const before = waitsFor('A');
+    if (before) return { open: false, form: 'A', reason: `Practice exam A opens after ${before}.` };
     return { open: true, form: 'A', reason: '' };
   }
   if (!taken.includes('B')) {
     const gap = item.weekends.find((entry) => entry.form === 'B')?.minDaysAfter?.days ?? 7;
     const onA = mocks.filter((row) => row.exam === item.cert && row.form === 'A').map((row) => row.date).filter(isStudyDate).sort().pop();
-    if (onA && daysBetween(onA, today) < gap) return { open: false, form: 'B', reason: `Practice exam B opens on ${formatDate(addDays(onA, gap))}, ${gap} days after exam A.` };
+    const before = waitsFor('B');
+    const early = onA && daysBetween(onA, today) < gap ? `on ${formatDate(addDays(onA, gap))}, ${gap} days after exam A` : '';
+    if (before || early) return { open: false, form: 'B', reason: `Practice exam B opens ${[before ? `after ${before}` : '', early].filter(Boolean).join(' and ')}.` };
     return { open: true, form: 'B', reason: '' };
   }
   return { open: true, form: 'draw', reason: '' };
@@ -3190,6 +3301,27 @@ function readExam(): ExamRun | null {
     const parsed = JSON.parse(window.localStorage.getItem(examKey) || 'null') as ExamRun | null;
     return parsed && parsed.v === 1 && typeof parsed.id === 'string' && Array.isArray(parsed.ids) && typeof parsed.startedAt === 'number' && Array.isArray(parsed.saved) ? parsed : null;
   } catch { return null; }
+}
+/* The key or id of the run kept in this browser: null when none is kept,
+   undefined when storage cannot be read. */
+function storedRun(name: string): { id: string; finished: boolean } | null | undefined {
+  try {
+    const raw = window.localStorage.getItem(name);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { key?: unknown; id?: unknown; finishedAt?: unknown } | null;
+    const id = typeof parsed?.key === 'string' ? parsed.key : typeof parsed?.id === 'string' ? parsed.id : '';
+    return { id, finished: Boolean(parsed?.finishedAt) };
+  } catch { return undefined; }
+}
+/* True when another tab has finished (cleared) or replaced the run with this
+   key. With storage unreadable nothing can be told, so the run carries on. */
+function runReplaced(name: string, id: string) {
+  const stored = storedRun(name);
+  return stored !== undefined && stored?.id !== id;
+}
+function examReplaced(run: ExamRun) {
+  const stored = storedRun(examKey);
+  return stored !== undefined && (stored?.id !== run.id || stored.finished);
 }
 function writeExam(value: ExamRun) {
   try { window.localStorage.setItem(examKey, JSON.stringify(value)); } catch { /* storage unavailable; the exam still runs */ }

@@ -726,7 +726,7 @@ await check('At 00:00 the exam finishes by itself; unanswered questions are wron
   assert.equal(await page.locator('.exam-unsaved').count(), 0);
 });
 
-await check('The result is saved: the mocks record with his answers, the review schedules, the weekend block and a log line; form B waits 7 days', async () => {
+await check('The result is saved: the mocks record with his answers, the review schedules, the weekend block and a log line; form B waits for the repair mornings and 7 days', async () => {
   const state = await getState();
   assert.equal(state.records.mocks.length, 1);
   const mock = state.records.mocks[0];
@@ -746,7 +746,8 @@ await check('The result is saved: the mocks record with his answers, the review 
   await page.click('.tile-exam');
   await page.waitForSelector('.exam-start');
   assert.match(await page.textContent('.exam-start h1'), /Practice exam B/);
-  assert.match(await page.textContent('.exam-locked'), /Practice exam B opens on Nov\.? 28, 2026, 7 days after exam A\./);
+  // B waits for the two repair mornings and 7 days after A, the same on Plan, Today and here.
+  assert.match(await page.textContent('.exam-locked'), /Practice exam B opens after Repair: your second weakest area and on Nov\.? 28, 2026, 7 days after exam A\./);
   assert.match(await page.textContent('.exam-last'), /Your last result: Practice exam A/);
   await nav('Progress');
   assert.match(await page.textContent('.history'), /Practice exam A.*5%.*2 of 40/s);
