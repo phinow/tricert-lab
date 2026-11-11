@@ -1,3 +1,64 @@
+# TriCert Lab, version 8.0: one exam at a time
+
+You study about 90 minutes each weekday morning before work and one 3 to 4 hour block at the weekend, about 11 hours a week. The 13-week plan asked for 14.5 hours a week, so it could not be kept. Version 8 replaces it with one exam at a time, in this order: ITIL Foundation (Version 5), PL-300, PMP, CISSP. Earlier exams stay alive through spaced review.
+
+## What you do each morning
+
+1. Open Today. One card shows the next item, for example "ITIL, morning 6 of 12", with one button: Start morning.
+2. The morning has four parts, each with one main button:
+   - Cards, 10 minutes. Flashcards that are due, one at a time. Show answer, then Again or Good. Again brings the card back once more today.
+   - Learn, 35 minutes. A short brief from a named Kestrel person, the lesson, one task you do yourself with a model answer you can reveal, then three recall prompts you answer from memory before you reveal them.
+   - Questions, 30 minutes. Up to 20 questions at the exam's real pace. Pick an answer, mark Sure or Guess, then read the explanation, including why each wrong option is wrong.
+   - Mistakes, 15 minutes. Every wrong or guessed question is listed. Write one line for each: the rule you missed. Each line becomes a flashcard.
+3. Press Finish morning. You can leave in the middle and come back to the same part.
+4. Short on time? Use the Short morning link on Today: cards (8 minutes), questions that are due (25) and mistakes (10). It does not count as a morning.
+5. On a review morning there is no new lesson. You get cards, a mixed quiz of 30 questions, mistakes and a weekly reflection.
+6. At the weekend, Today shows the weekend block: a lab in a real tool, or a full practice exam.
+
+## What is new
+
+- **Today, Plan, Learn, Practice, Progress and Setup were rebuilt around this.** The look is the same as 7.1.
+- **Plan** shows the four exam blocks in order with estimated dates from your start date: five mornings and one weekend block a week. The current block lists its mornings and weekend blocks.
+- **Learn** starts with the block's lessons, then the library as before: the 65 Kestrel lessons, the 66 documents, the exam guides and the glossary.
+- **Practice** starts with Today's review: the flashcards and questions that are due. Below it are Practice exam, Flashcards, Scenarios across exams and Labs. The old Timed set and the old Review are gone.
+- **Practice exam.** 40 questions, 60 minutes, no feedback until the end. Unanswered questions count as wrong. It ends when the clock reaches zero, and a reload puts you back in it with the clock still running. The result shows your score, your score by area, and every question with your answer, the right answer and the explanation. Forms A and B are fixed. After both, a new exam is drawn at random by area from questions you have not seen in the last 14 days.
+- **Spaced review.** A flashcard comes back after 1, 3, 7, 16 and 35 days, then retires. A question you get right and Sure on the first try comes back once, after 21 days. A miss or a guess comes back after 2, 7 and 21 days, and a miss starts again at 2.
+- **Ready to book?** on Progress replaces the old readiness score. All four must be true:
+  1. Every learning morning of the exam is done.
+  2. Two different practice exams are at or above 80%, at least 7 days apart.
+  3. Across those two exams, no area (with 5 or more questions) is more than 10 points under your overall score.
+  4. Of the review answers you give 7 or more days after your first try, at least 80% are right. This needs at least 20 such answers; until then it says "Not enough reviews yet".
+  When all four are met, the booking checklist appears.
+- **Setup** is three short steps: you (name and why), your background (education, months leading projects, months of security work, whether the 35 PMP training hours are done) and your rhythm (start date).
+- **Saving.** Your plan start date, review schedule, practice exam results, morning log and your own cards are now saved in both the local copy and the hosted copy. Text that is too long is refused with a clear message and nothing is saved. Before, it was cut short without telling you. Written documents are also kept in the browser every two seconds and come back after a reload. The hosted copy keeps one small document per part, so a phone and a laptop changing different things no longer overwrite each other. Progress saved in version 7.1.1 is split into the new layout on first load and nothing is lost.
+
+## What is ready and what is still being built
+
+- **Ready: ITIL Foundation (Version 5).**
+  - 8 learning mornings, each with a lesson of 1,000 to 1,400 words, a task and three recall prompts.
+  - 2 review mornings and 2 repair mornings, so 12 mornings in all.
+  - 3 weekend blocks: a lab (run a small service desk in Jira Service Management on the Free plan), practice exam A and practice exam B.
+  - 144 ITIL questions: 24 from before and 120 new (40 daily, 40 for exam A, 40 for exam B). Both exam forms have the same mix by area: value and value co-creation 7, the four dimensions 4, the ITIL Value System 5, the seven guiding principles 8, the product and service lifecycle 6, practices, improvement and value streams 10. That mix is our choice, because PeopleCert's weights were not available to us.
+  - 66 new ITIL flashcards tied to the lessons.
+- **Being built: PL-300, PMP and CISSP.** They show "Being built" on Plan and Progress. Each will get the same kind of block in a later stage.
+- **Unchanged:** the 65 Kestrel lessons, the 66 documents, the glossary, the exam guides and the datasets.
+
+## Things you should know
+
+- ITIL Version 5 wording: PeopleCert's page confirms the "lifecycle mindset" wording but does not say how the lifecycle activities relate to the value chain, and nothing about marking or going back in the exam. Where the lessons and questions explain these, they say "our plain-word reading" or "ITIL 4 background". The lessons no longer claim that the lifecycle is the Version 5 view of the value chain.
+- The exam pass mark is 65% (26 of 40). The app's target is 80% because practice should be harder than the real thing.
+- Repair mornings use the mixed quiz of 30 questions. They do not yet target your weakest area from practice exam A.
+- Every new question has been checked by the content checks, but a second reader answering the 120 new questions blind has not been recorded yet.
+- Not pushed and not yet published to the hosted copy. The hosted copy still runs version 7.1.1 until it is republished.
+
+## What I still need from you
+
+- Your education, for the PMP and CISSP notes.
+- How many months you have led projects.
+- Whether you will use Eagle Eye in real services, and how soon.
+- Whether you will have a Windows PC with a work account for the PL-300 labs.
+- A decision on five older Kestrel lessons that the fact check found out of date (w1-s2, w6-s3, w9-s4, w10-s1, w13-s4). They were left as they are.
+
 # TriCert Lab, version 7.1.1: the hosted copy now saves
 
 - The hosted copy kept progress only until the page was reloaded. The address it saved to broke the store's rules, and the error was hidden. It now saves to a valid address.

@@ -24,23 +24,23 @@ npm run build
 npm run test:e2e
 ```
 
-Run `test:e2e` while the development server is active. Set `TRICERT_BASE_URL` to test another deployment.
+Browser checks run from `tools/harness` (`npm run flows`, `npm run save`, `npm run live`); see `HANDOFF.md` section 5. Run `test:e2e` while the development server is active. Set `TRICERT_BASE_URL` to test another deployment.
 
 ## Demonstration walkthrough
 
-The app has five places: Today, Plan, Learn, Practice and Progress. On a laptop they sit in the left sidebar; on a phone they are the tabs at the bottom, with your initial at the top right for "Make it yours".
+The app studies one exam at a time, in this order: ITIL Foundation (Version 5), PL-300, PMP, CISSP. Only the ITIL block is built (version 8.0); the others show "Being built". There are five places: Today, Plan, Learn, Practice and Progress. On a laptop they sit in the left sidebar; on a phone they are the tabs at the bottom, with your initial at the top right for "Make it yours".
 
-1. Complete the five setup steps (your name and why, leadership, security, skills, exam dates). The PMP and CISSP eligibility notes are advisory.
-2. On Today, press Start session. Focus mode keeps the timer, the lesson and the session's documents in one place. Finish the session, or use Mark done.
-3. Open Plan to see the 13 weeks and the three exam gates. Open a week to read any of its five lessons (each one can start its session) or to write that week's reflection.
-4. Open Learn. Documents holds the 66 Beacon documents by release. Open a document to read how to write it and the finished example, then save your own draft with a teach-back explanation. Exams and Glossary hold the four exam guides and 242 terms.
-5. In a document, use Check yourself to answer five decisions about it, choosing how sure you are before you check.
-6. Open Practice for scenarios, a timed set for one exam, flashcards, labs with the Kestrel datasets, and Review for wrong or guessed answers.
-7. Open Progress. Readiness starts with the five checks for your next exam gate (completion alone cannot mark an exam ready), then each exam's evidence score. Portfolio tracks the handover package and holds the demonstration script, the disclosure and the logo.
+1. Complete the three setup steps: you (name and why), your background (education, months leading projects, months of security work, whether the 35 PMP training hours are done) and your rhythm (start date). The PMP and CISSP eligibility notes are advisory.
+2. On Today, press Start morning. A morning has four parts: Cards (due flashcards), Learn (a brief, the lesson, one task you do yourself and three recall prompts), Questions (up to 20, with Sure or Guess) and Mistakes (one line per miss, each becoming a flashcard). Finish morning saves it. The Short morning link does cards, due questions and mistakes only. On Saturday and Sunday, Today shows the weekend block: a lab, or a full practice exam.
+3. Open Plan to see the four exam blocks with estimated dates from your start date, and the mornings and weekend blocks of the current block.
+4. Open Learn. Lessons holds the block's lessons and the 65 Kestrel lessons. Documents holds the 66 Beacon documents by release; open one to read how to write it and the finished example, then save your own draft. Exams and Glossary hold the four exam guides and 242 terms.
+5. Open Practice. Start with Today's review (flashcards and questions that are due). Practice exam is 40 questions in 60 minutes with no feedback until the end; unanswered questions count as wrong. Flashcards, Scenarios across exams and Labs are below.
+6. Open Progress. "Ready to book?" shows four checks: all learning mornings done, two practice exams at or above 80% at least 7 days apart, no weak area, and 80% right on delayed reviews. Below are the practice exam history and the delayed-review score. Portfolio tracks the handover package and holds the demonstration script, the disclosure and the logo.
 
 ## Architecture
 
 - React and TypeScript interface built with the Sites scaffold
+- A pure study engine (`lib/tricert-study.ts`) for spaced review, daily sets, practice exams, Ready to book and estimated dates; it never reads the clock
 - D1/SQLite-compatible storage behind a server repository boundary
 - Parameterized queries and validated mutation actions
 - Static CSV, SQL, Markdown, and Microsoft Project-compatible lab exports

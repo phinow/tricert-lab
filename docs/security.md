@@ -13,9 +13,12 @@
 - React output encoding and parameterized D1 statements.
 - No secrets in source or browser storage.
 - A narrow action allowlist on the state endpoint; unsupported actions fail closed.
-- Append-only activity records for profile, progress, attempt, and artifact mutations.
+- Append-only activity records for profile, progress, attempt, and artifact mutations. Practice exam results and morning log lines are kept as records with their own ids.
 - Synthetic downloadable data with explicit classification and handling exercises.
-- Readiness does not unlock from completion alone; evidence, judgment, mocks, and teach-back are separate gates.
+- Ready to book does not unlock from completion alone: it also needs two timed practice exams at or above target at least 7 days apart, no weak area, and delayed-review accuracy. The engine computes it from saved results.
+- Values over a size limit are refused with status 400 and nothing is saved; nothing is cut short. Records are limited to 200,000 characters, work to 20,000 and explanations to 6,000, in both the local and the hosted copy. The hosted store also refuses documents over 256 KB.
+- `patch-record` and `append-record` accept only the named record keys (`plan` and `srs`; `mocks`, `log` and `usercards`) and merge to a fixed depth.
+- The hosted copy reads before it writes: a failed read shows an error and writes nothing, so a bad connection cannot wipe saved progress.
 - Secure errors return bounded application messages rather than SQL or stack details.
 
 ## Residual risks and next phase

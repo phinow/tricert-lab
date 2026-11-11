@@ -2,13 +2,13 @@
 
 ## Product outcome
 
-TriCert Lab is a single-learner, local-first study and portfolio workspace for a 13-week PMP, PL-300, CISSP, and ITIL Foundation (Version 5) program. Learning is organized around one fictional programme, Project Beacon at Kestrel Health Network (Alberta), so that exam objectives are practised through decisions and artifacts rather than isolated notes.
+TriCert Lab is a single-learner, local-first study and portfolio workspace for ITIL Foundation (Version 5), PL-300, PMP and CISSP, studied one exam at a time in that order (version 8). Learning is organized around one fictional programme, Project Beacon at Kestrel Health Network (Alberta), so that exam objectives are practised through decisions and artifacts rather than isolated notes.
 
-The first product slice includes eligibility onboarding, the Week 1 plan, the Secure BI project, a project-charter artifact, a deliberately imperfect project dataset, one scenario quiz, durable learner progress, and a readiness visualization.
+Version 8.0 builds the study engine and the ITIL block: 12 mornings, 3 weekend blocks, fixed practice exam forms A and B, spaced review and a Ready to book check. The PL-300, PMP and CISSP blocks are marked `building` in the plan and come in later stages. The 13-week plan of versions 4 to 7.1 is gone; its 65 Kestrel lessons and 66 documents remain in the Learn library.
 
 ## Assumptions and constraints
 
-- One learner, approximately 18-20 hours per week.
+- One learner, about 11 hours a week: 90 minutes on each weekday morning and one 3 to 4 hour weekend block.
 - Power BI Desktop and Microsoft Project remain external authoring tools.
 - The site supplies lab instructions, datasets, rubrics, questions, and progress tracking; it does not pretend to generate `.pbix` or `.mpp` files.
 - All Kestrel data is synthetic and safe to publish.
@@ -39,17 +39,18 @@ The curriculum is versioned with the source because it is authored content. Lear
 ## Main components
 
 1. **Eligibility and baseline gate** collects education, project leadership, training, cybersecurity experience, domain exposure, Power BI and ITIL skill baselines, study capacity, and target dates. It produces a checklist rather than a formal eligibility ruling.
-2. **Curriculum engine** connects weeks, activities, projects, artifacts, and certification objectives.
+2. **Plan** (`lib/tricert-plan.ts`, hand written) holds the four exam blocks: mornings (learn, review, repair), weekend blocks (lab or practice exam), exam settings and the booking checklist. Only the ITIL block has status `ready`. The curriculum in `lib/tricert-content.ts` (13 weeks, 65 sessions) feeds the Kestrel lesson library and the 66 documents.
 3. **Project workspace** presents Beacon's three releases and 66 documents, each with a writing guide, a finished example, a template and a completion rubric.
-4. **Study engine** records answers and confidence, explains outcomes, and directs weak concepts back to relevant artifacts.
-5. **Readiness engine** calculates separate PMP, PL-300, CISSP, and ITIL advisory scores from coverage, completed evidence, and question performance. It applies a domain floor so a high aggregate cannot hide a severe gap.
-6. **Portfolio export** will provide a case-study checklist and safe publishing guidance in the complete product.
+4. **Study engine** (`lib/tricert-study.ts`, pure functions, no React, never reads the clock; dates are passed in as `YYYY-MM-DD`). Flashcards: 1, 3, 7, 16 and 35 days, then retired; Again resets and shows the card once more the same day; at most 8 new cards a day from the lesson. Questions: right and Sure on first sight gets one check after 21 days; a miss or guess returns after 2, 7 and 21 days. The daily set is due reviews first, then 6 from the lesson, then other daily questions: 20 for a morning, 30 for a review morning, due only for a short morning. Practice exams: fixed forms, a seeded draw by area afterwards, scoring where unanswered is wrong. Estimated dates at 5 mornings and one weekend block a week.
+5. **Bank** (`lib/tricert-bank.ts`) connects the engine to the content: the question bank per exam, the 16 cross-exam scenarios kept apart, cards with engine ids, and helpers per lesson and practice exam form. It never imports the 1.6 MB reading file.
+6. **Ready to book** (`readyToBook` in the engine) replaces the old readiness score. Per exam, all four must hold: every learn morning done; two different practice exam forms at or above the target (80) at least 7 days apart; over those two exams pooled, no area of 5 or more questions more than 10 points under the overall score; and at least 80% right on review answers given 7 or more days after the first attempt, from at least 20 such answers.
+7. **Portfolio export** will provide a case-study checklist and safe publishing guidance in the complete product.
 
 ## Data model
 
 - `learner_profiles`: singleton learner settings and eligibility inputs, plus `display_name` and `motivation` (version 6).
 - `progress_items`: completion state for activities and deliverables, uniquely keyed by learner and curriculum item.
-- `quiz_attempts`: answer, correctness, confidence, certification, domain, and timestamp.
+- `quiz_attempts`: answer, correctness, confidence, certification, domain, and timestamp. The state endpoint returns the latest row per question.
 - `artifact_evidence`: artifact status, evidence note, reflection, and update time.
 - `study_records` (version 8, migration `drizzle/0003_study_records.sql`): one JSON value per learner and record key (`plan`, `srs`, `mocks`, `log`, `usercards`), with its update time. Created on start like the other tables.
 
