@@ -112,7 +112,7 @@
         ],
         [
           "B",
-          "Costs matter to the consumer, but risks are a concern for the provider alone"
+          "Costs matter mainly to the consumer, while risks are mainly the provider's concern"
         ],
         [
           "C",
@@ -207,7 +207,7 @@
       "options": [
         [
           "A",
-          "Warranty, because the checkout cannot cope with the number of customers"
+          "Risk, because the checkout holds customers' card details"
         ],
         [
           "B",
@@ -225,7 +225,7 @@
       "correct": "D",
       "explanation": "Experience is how consumers find using a product or service. The checkout does its job and is available, so utility and warranty are not the issue. The repeated questions make it frustrating, and customers leave, so value is lost through poor experience.",
       "incorrect": {
-        "A": "The stem says the checkout is always available, so warranty is not the problem.",
+        "A": "Customers are not giving up over risk; they give up because the checkout is frustrating to use.",
         "B": "Nothing in the stem says the price is the reason customers give up.",
         "C": "The complaint is about the customer's experience, not long-term use of resources."
       },
@@ -310,7 +310,7 @@
         ],
         [
           "B",
-          "AI is part of normal product and service work, used with oversight and accountability"
+          "AI is part of normal product and service work, and its use is governed"
         ],
         [
           "C",
@@ -322,9 +322,9 @@
         ]
       ],
       "correct": "B",
-      "explanation": "ITIL (Version 5) is described as AI-native: its practices, value streams and roles are designed so AI can be part of normal work. It stays technology-agnostic and asks organizations to govern AI with oversight, accountability, risk management and trust.",
+      "explanation": "PeopleCert describes ITIL (Version 5) as AI-native, so AI is treated as part of normal product and service work rather than a separate subject. Like any other part of a service, its use is governed.",
       "incorrect": {
-        "A": "ITIL (Version 5) is technology-agnostic and does not tell organizations which AI products to use.",
+        "A": "ITIL does not tell organizations which AI products to use.",
         "C": "The guiding principles remain part of the ITIL Value System.",
         "D": "Version 5 builds AI into normal work rather than keeping it apart."
       },
@@ -405,15 +405,15 @@
       "options": [
         [
           "A",
-          "All four should be considered for every product and service"
+          "All four should be considered for every product and service, and for the Value System as a whole"
         ],
         [
           "B",
-          "Each dimension is owned by one department, which manages it without the others"
+          "Each dimension is usually managed by a separate department, which looks after it for the organization"
         ],
         [
           "C",
-          "They are used only when a new service is designed, not once it is running"
+          "They matter mainly when a new service is designed, and much less once it is running"
         ],
         [
           "D",
@@ -483,15 +483,15 @@
         ],
         [
           "D",
-          "Engage"
+          "Authorize"
         ]
       ],
       "correct": "C",
-      "explanation": "Governance evaluates the organization and its options, directs it by setting strategy and policies, and monitors performance and conformance against them. Checking each quarter that teams follow the policy is monitoring.",
+      "explanation": "In ITIL 4, which Version 5 builds on, governance evaluates the organization and its options, directs it by setting strategy and policies, and monitors performance and conformance against them. Checking each quarter that teams follow the policy is monitoring.",
       "incorrect": {
         "A": "Evaluating is reviewing the organization and its needs before direction is set.",
         "B": "Directing is setting the policy itself, which the board had already done.",
-        "D": "Engage is not one of the governance activities of evaluate, direct and monitor."
+        "D": "Authorize is not one of the ITIL 4 governance activities of evaluate, direct and monitor."
       },
       "pool": "daily",
       "lesson": "itil-m3"
@@ -566,15 +566,15 @@
       "id": "q-itil-042",
       "certification": "ITIL",
       "domain": "The seven guiding principles · Collaborate and promote visibility",
-      "prompt": "A school IT team keeps its list of planned work to itself, so teachers find out about system changes only on the day they happen. Which guiding principle is the team ignoring?",
+      "prompt": "A school IT team chooses a new homework app without asking any teachers or pupils for their views. Teachers then find it does not fit how they set work. Which guiding principle did the team ignore?",
       "options": [
         [
           "A",
-          "Progress iteratively with feedback"
+          "Optimize and automate"
         ],
         [
           "B",
-          "Optimize and automate"
+          "Keep it simple and practical"
         ],
         [
           "C",
@@ -586,11 +586,11 @@
         ]
       ],
       "correct": "D",
-      "explanation": "Collaborate and promote visibility means working with the right stakeholders and making work and its progress visible to them. Hidden plans lead to surprises and poor decisions by the people affected.",
+      "explanation": "Collaborate and promote visibility means working with the right stakeholders in the right roles, and that includes users and customers, not only other IT teams. The teachers and pupils who use the app were never involved.",
       "incorrect": {
-        "A": "The problem is hidden plans, not the size of the steps or a lack of feedback loops.",
-        "B": "Nothing in the stem is about automation.",
-        "C": "The team is not ignoring the current state; it is keeping its work out of sight."
+        "A": "Nothing in the stem is about automating work.",
+        "B": "The problem is not extra steps; it is that the users were left out.",
+        "C": "Start where you are is about assessing what exists; the gap here is involving the people who will use the app."
       },
       "pool": "daily",
       "lesson": "itil-m4"
@@ -636,7 +636,7 @@
       "options": [
         [
           "A",
-          "They must be applied one at a time, in the order in which they are listed"
+          "They are best applied in the order in which they are listed"
         ],
         [
           "B",
@@ -644,7 +644,7 @@
         ],
         [
           "C",
-          "Only Focus on value is required, and the other six principles are optional"
+          "Focus on value decides every situation, and the other six serve as tie-breakers"
         ],
         [
           "D",
@@ -656,7 +656,7 @@
       "incorrect": {
         "A": "There is no fixed order for applying the principles.",
         "B": "The principles apply across all practices and all work, not to one practice each.",
-        "C": "All seven principles apply; none is optional."
+        "C": "All seven principles apply; none is only a tie-breaker."
       },
       "pool": "daily",
       "lesson": "itil-m4"
@@ -730,16 +730,16 @@
     {
       "id": "q-itil-047",
       "certification": "ITIL",
-      "domain": "The product and service lifecycle · Support",
-      "prompt": "A shop's card readers stop working in two stores. Staff restore payments with a temporary fix, and a team starts looking for the cause. Which lifecycle activity is this work part of?",
+      "domain": "The product and service lifecycle · Lifecycle activity names",
+      "prompt": "Which of these is one of the eight product and service lifecycle activities in ITIL (Version 5)?",
       "options": [
         [
           "A",
-          "Operate"
+          "Plan"
         ],
         [
           "B",
-          "Transition"
+          "Engage"
         ],
         [
           "C",
@@ -747,15 +747,15 @@
         ],
         [
           "D",
-          "Deliver"
+          "Improve"
         ]
       ],
       "correct": "C",
-      "explanation": "Support covers resolving incidents and problems for consumers, using workarounds and known errors where needed. Restoring payments and finding the cause of the failures is support work.",
+      "explanation": "The eight lifecycle activities are usually listed as Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. Support is one of them.",
       "incorrect": {
-        "A": "Operate is keeping components running as designed, such as monitoring and routine maintenance.",
-        "B": "Transition moves new or changed products into live use.",
-        "D": "Deliver covers consumers using the service and their requests, not fixing failures."
+        "A": "Plan is an ITIL 4 value chain activity name, not one of the eight lifecycle activities.",
+        "B": "Engage is an ITIL 4 value chain activity name, not one of the eight lifecycle activities.",
+        "D": "Improve is an ITIL 4 value chain activity name, not one of the eight lifecycle activities."
       },
       "pool": "daily",
       "lesson": "itil-m5"
@@ -763,32 +763,32 @@
     {
       "id": "q-itil-048",
       "certification": "ITIL",
-      "domain": "The product and service lifecycle · Deliver",
-      "prompt": "Residents use a city's online tax portal, ask for access to new features, and rate their visit in a short survey. Which lifecycle activity covers this contact with consumers using the service?",
+      "domain": "The product and service lifecycle · What the objective asks",
+      "prompt": "PeopleCert's learning objective for the product and service lifecycle asks you to understand what about each lifecycle management activity?",
       "options": [
         [
           "A",
-          "Operate"
+          "The job title that owns it"
         ],
         [
           "B",
-          "Deliver"
+          "Its purpose"
         ],
         [
           "C",
-          "Discover"
+          "Its fixed duration"
         ],
         [
           "D",
-          "Support"
+          "The tool that runs it"
         ]
       ],
       "correct": "B",
-      "explanation": "Deliver is where the service is provided to consumers as they use it: handling their requests and collecting their feedback. The portal being used, access requests and survey ratings are delivery work.",
+      "explanation": "PeopleCert's objective is to understand the purpose of each product and service lifecycle management activity, from discovery and design to operation, delivery and support, and how they work together to create value.",
       "incorrect": {
-        "A": "Operate keeps the portal's components running; it is not the contact with residents using it.",
-        "C": "Discover looks for new needs and opportunities before design starts.",
-        "D": "Support resolves incidents and problems; nothing has failed here."
+        "A": "The objective is about purpose, not job titles; roles vary between organizations.",
+        "C": "Activities have no fixed duration, and they do not have to run in a fixed sequence.",
+        "D": "ITIL does not tie an activity to a particular tool."
       },
       "pool": "daily",
       "lesson": "itil-m5"
@@ -796,20 +796,20 @@
     {
       "id": "q-itil-049",
       "certification": "ITIL",
-      "domain": "The product and service lifecycle · Lifecycle activities and value streams",
-      "prompt": "Which statement about product and service lifecycle activities and value streams is correct?",
+      "domain": "The product and service lifecycle · Value streams",
+      "prompt": "In ITIL, which statement about value streams in digital product and service management is correct?",
       "options": [
         [
           "A",
-          "A value stream can draw on several lifecycle activities and practices to turn a type of demand into value"
+          "A value stream can draw on several activities and practices to turn one type of demand into value"
         ],
         [
           "B",
-          "Each value stream uses exactly one lifecycle activity, and the practices are kept outside value streams"
+          "A value stream describes how one team organizes its own work, separate from other teams"
         ],
         [
           "C",
-          "The lifecycle activities must always run in the same fixed order, whatever the value stream and its demand"
+          "A value stream is the list of practices an organization uses, set out in the order they were adopted"
         ],
         [
           "D",
@@ -817,11 +817,11 @@
         ]
       ],
       "correct": "A",
-      "explanation": "A value stream is the series of steps an organization takes to turn a type of demand into value. It combines the lifecycle activities and practices it needs, in the order that suits that demand.",
+      "explanation": "A value stream is the series of steps an organization takes to turn a type of demand into value. It can combine several activities and practices.",
       "incorrect": {
-        "B": "A value stream usually involves several activities and practices.",
-        "C": "Different value streams combine the activities in different ways and orders.",
-        "D": "Value streams use practices; they do not replace them."
+        "B": "A value stream runs from demand to value and usually crosses several teams.",
+        "C": "A value stream is a series of steps from demand to value, not a list of practices.",
+        "D": "Practices are still used; a value stream draws on them."
       },
       "pool": "daily",
       "lesson": "itil-m5"
@@ -970,7 +970,7 @@
         ],
         [
           "B",
-          "Each one must be assessed and authorized by a change authority before anyone is allowed to fulfil it"
+          "They are usually assessed by a change authority, which decides whether each one may go ahead"
         ],
         [
           "C",
@@ -978,7 +978,7 @@
         ],
         [
           "D",
-          "They are a normal, agreed part of the service, so they can follow set steps"
+          "They are a normal, agreed part of the service, so most can follow set, often automated, steps"
         ]
       ],
       "correct": "D",
@@ -1127,7 +1127,7 @@
       "id": "q-itil-059",
       "certification": "ITIL",
       "domain": "Practices, improvement and value streams · Relationship management",
-      "prompt": "A city office's IT team meets each department head every quarter to understand their plans and agree which IT work matters most to them. Which practice is this?",
+      "prompt": "A bank's IT team keeps a list of its key stakeholders, what each one expects, and a plan for how to stay in touch with each. Which practice is this?",
       "options": [
         [
           "A",
@@ -1147,11 +1147,11 @@
         ]
       ],
       "correct": "C",
-      "explanation": "Relationship management builds and keeps the links between the organization and its stakeholders at a strategic and tactical level, such as understanding their plans and agreeing priorities.",
+      "explanation": "Relationship management establishes and nurtures the links between the organization and its stakeholders. It includes identifying, analysing, monitoring and improving those relationships.",
       "incorrect": {
-        "A": "Supplier management deals with outside suppliers, not internal department heads.",
+        "A": "Supplier management deals with outside suppliers and their contracts, not stakeholder relationships in general.",
         "B": "The service desk handles user contacts about incidents and requests.",
-        "D": "Service level management sets and reviews service targets, not wider plans and priorities."
+        "D": "Service level management sets and reviews service targets, not a plan for stakeholder relationships."
       },
       "pool": "daily",
       "lesson": "itil-m7"
@@ -1180,7 +1180,7 @@
         ]
       ],
       "correct": "D",
-      "explanation": "In the continual improvement model, after the vision comes \"Where are we now?\": an honest, measured view of the current state. It gives the baseline that later steps, including \"Did we get there?\", are compared with.",
+      "explanation": "In the ITIL 4 continual improvement model, which Version 5 refines, after the vision comes \"Where are we now?\": an honest, measured view of the current state. It gives the baseline that later steps, including \"Did we get there?\", are compared with.",
       "incorrect": {
         "A": "\"How do we get there?\" plans the improvement, after the target is set.",
         "B": "\"Did we get there?\" checks results after action is taken.",
@@ -1201,11 +1201,11 @@
         ],
         [
           "B",
-          "It starts only after a service has failed and the major incident that followed has been reviewed and closed"
+          "It is mostly triggered by failures, such as the review after a major incident"
         ],
         [
           "C",
-          "It belongs to one improvement team, which makes all the changes for everyone else"
+          "It is mainly led by an improvement team, with other staff taking part when asked"
         ],
         [
           "D",
@@ -1216,7 +1216,7 @@
       "explanation": "Continual improvement is one of the five components of the ITIL Value System. It takes place in all areas of the organization and at every level, from strategy to daily work.",
       "incorrect": {
         "B": "Improvement is ongoing; it does not wait for failures.",
-        "C": "An organization may have people who lead it, but everyone contributes to improvement.",
+        "C": "Improvement is everyone's responsibility, not mainly one team's with others joining when asked.",
         "D": "Continual means ongoing, not a single project at go-live."
       },
       "pool": "daily",
