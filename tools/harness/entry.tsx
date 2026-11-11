@@ -63,11 +63,27 @@ function midwayState() {
     confidence: index % 4 === 1 ? 'low' : 'medium',
     created_at: '2026-10-09T18:00:00Z',
   }));
-  return { profile, progress, attempts, artifacts };
+  return { profile, progress, attempts, artifacts, records: emptyRecords() };
 }
 
-let state: { profile: Row | null; progress: Row[]; attempts: Row[]; artifacts: Row[] } =
-  fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [] } : midwayState();
+type Records = { plan: Row; srs: Row; mocks: Row[]; log: Row[]; usercards: Row[] };
+function emptyRecords(): Records {
+  return { plan: {}, srs: { cards: {}, questions: {} }, mocks: [], log: [], usercards: [] };
+}
+const isObject = (value: unknown): value is Row => typeof value === 'object' && value !== null && !Array.isArray(value);
+// Same rules as the real copies: objects merge to three levels, null removes a key.
+function merge(target: Row, patch: Row, depth = 1): Row {
+  const out: Row = { ...target };
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === null) delete out[key];
+    else if (depth < 3 && isObject(value)) out[key] = merge(isObject(out[key]) ? out[key] : {}, value, depth + 1);
+    else out[key] = value;
+  }
+  return out;
+}
+
+let state: { profile: Row | null; progress: Row[]; attempts: Row[]; artifacts: Row[]; records: Records } =
+  fixture === 'fresh' ? { profile: null, progress: [], attempts: [], artifacts: [], records: emptyRecords() } : midwayState();
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -135,6 +151,21 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         ],
       };
       break;
+    case 'patch-record': {
+      const key = body.key as 'plan' | 'srs';
+      if (!['plan', 'srs'].includes(key) || !isObject(body.patch)) return json({ error: 'patch-record needs key plan or srs and an object patch.' }, 400);
+      state = { ...state, records: { ...state.records, [key]: merge(state.records[key], body.patch) } };
+      break;
+    }
+    case 'append-record': {
+      const key = body.key as 'mocks' | 'log' | 'usercards';
+      const item = body.item;
+      if (!['mocks', 'log', 'usercards'].includes(key) || !isObject(item) || typeof item.id !== 'string' || !item.id) return json({ error: 'append-record needs key mocks, log or usercards and an item with an id.' }, 400);
+      const at = state.records[key].findIndex((row) => row.id === item.id);
+      const next = at >= 0 ? state.records[key].map((row, index) => (index === at ? item : row)) : [...state.records[key], item];
+      state = { ...state, records: { ...state.records, [key]: next } };
+      break;
+    }
     default:
       return json({ error: 'Unsupported study action.' }, 400);
   }
