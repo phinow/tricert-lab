@@ -1491,6 +1491,8 @@ button.plan-item:hover { background: var(--hover); }
 /* Setup on a phone: the headline once, short; after step 1 only the mark;
    Continue stays in view at the bottom. */
 @media (max-width: 760px) {
+  .onboard { grid-template-rows: auto 1fr; }
+  .onboard-form { align-content: start; }
   .onboard-intro h1 { font-size: var(--t-2xl); }
   .onboard-intro h1 span { display: inline; }
   .onboard-blocks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
