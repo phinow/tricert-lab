@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  changeRecord,
   getStudyState,
   recordAttempt,
   saveArtifact,
@@ -37,6 +38,10 @@ export async function PUT(request: Request) {
         break;
       case 'save-artifact':
         await saveArtifact(body);
+        break;
+      case 'patch-record':
+      case 'append-record':
+        await changeRecord(body);
         break;
       default:
         return NextResponse.json({ error: 'Unsupported study action.' }, { status: 400 });

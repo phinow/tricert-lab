@@ -55,6 +55,7 @@ export const quizAttempts = sqliteTable(
   (table) => [
     index('idx_attempts_learner_cert').on(table.learnerId, table.certification),
     index('idx_attempts_learner_domain').on(table.learnerId, table.domain),
+    index('idx_attempts_learner_question').on(table.learnerId, table.questionId),
   ],
 );
 
@@ -85,4 +86,16 @@ export const activityLog = sqliteTable(
     createdAt: text('created_at').notNull(),
   },
   (table) => [index('idx_activity_learner_created').on(table.learnerId, table.createdAt)],
+);
+
+/* Version 8 records: one JSON value per learner and key (plan, srs, mocks, log, usercards). */
+export const studyRecords = sqliteTable(
+  'study_records',
+  {
+    learnerId: text('learner_id').notNull(),
+    recordKey: text('record_key').notNull(),
+    value: text('value').notNull().default('{}'),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [uniqueIndex('idx_records_learner_key').on(table.learnerId, table.recordKey)],
 );
