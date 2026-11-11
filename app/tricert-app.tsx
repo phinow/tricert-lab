@@ -1265,7 +1265,7 @@ export default function TriCertApp() {
               {block && showWeekend && nextWeekend && (
                 <section className="hero-session" aria-labelledby="session-title">
                   <div className="hero-top">
-                    <p className="hero-when-line"><span className="hero-label">{isWeekend ? 'This weekend' : 'Up next'}</span><span className="hero-when">{block.cert}, weekend block {block.weekends.indexOf(nextWeekend) + 1} of {block.weekends.length}</span></p>
+                    <p className="hero-when-line"><span className="hero-label">{isWeekend ? 'This weekend' : 'Up next'}</span><span className="hero-when">{block.cert}, {isWeekend ? 'block' : 'weekend block'} {block.weekends.indexOf(nextWeekend) + 1} of {block.weekends.length}</span></p>
                     <span className="hero-tags"><Tag>{nextWeekend.kind === 'lab' ? 'Lab' : 'Practice exam'}</Tag></span>
                   </div>
                   <h2 id="session-title">{keepTogether(nextWeekend.title)}</h2>
@@ -1556,7 +1556,7 @@ export default function TriCertApp() {
             <div className="progress">
               <header className="screen-head">
                 <h1>Progress</h1>
-                <p className="lede">{studyBlock ? (bookingReady ? `${studyBlock.cert}: all four checks are met. You are ready to book.` : `${studyBlock.cert}: ${checksMet} of 4 checks met. Book when all four are met.`) : 'No exam block is ready yet.'}</p>
+                <p className="lede">{studyBlock ? (bookingReady ? `${studyBlock.cert}: all four checks are met. You are ready to book.` : `${studyBlock.cert}: book the real exam when all four checks below are met.`) : 'No exam block is ready yet.'}</p>
               </header>
               <div className="segmented" role="tablist" aria-label="Progress sections">
                 <button role="tab" aria-selected={progressTab === 'readiness'} className={progressTab === 'readiness' ? 'active' : ''} onClick={() => { setProgressTab('readiness'); window.history.replaceState(null, '', '#progress'); }}>Readiness</button>
@@ -1590,8 +1590,10 @@ export default function TriCertApp() {
                     </section>
                   )}
 
-                  <h2 className="section-title">Practice exams</h2>
-                  {history.length ? (
+                  {/* The history and the delayed-review score show once they have
+                      data; until then the four checks already say where things are. */}
+                  {history.length > 0 && <h2 className="section-title">Practice exams</h2>}
+                  {history.length > 0 && (
                     <ul className="list history" aria-label="Practice exam history">
                       {history.map((row) => {
                         const percent = Math.round(((row.right || 0) * 1000) / Math.max(1, row.total || 0)) / 10;
@@ -1604,17 +1606,17 @@ export default function TriCertApp() {
                         return <li key={row.id}>{row.ids ? <button className="row" onClick={() => openResult(row.id)}>{body}<Chevron dir="right" /></button> : <div className="row">{body}</div>}</li>;
                       })}
                     </ul>
-                  ) : (
-                    <p className="hint empty-line">No practice exam yet. {examGate && !examGate.open ? examGate.reason : `${formName(examGate?.form || 'A')} is open on Practice.`}</p>
                   )}
 
-                  <h2 className="section-title">Delayed reviews</h2>
-                  <section className="card delayed" aria-label="Delayed-review score">
-                    {delayed && delayed.total >= 20
-                      ? <p className="delayed-score"><strong>{Math.round((delayed.right * 100) / delayed.total)}%</strong><span>{delayed.right} of {delayed.total} right</span></p>
-                      : <p className="delayed-score is-wait"><strong>{delayed?.total || 0}</strong><span>of 20 answers needed</span></p>}
-                    <p className="hint">Answers given 7 days or more after you first saw the question. This shows what you keep, not what you just read. The target is 80% over at least 20 answers.</p>
-                  </section>
+                  {delayed && delayed.total >= 20 && (
+                    <>
+                      <h2 className="section-title">Delayed reviews</h2>
+                      <section className="card delayed" aria-label="Delayed-review score">
+                        <p className="delayed-score"><strong>{Math.round((delayed.right * 100) / delayed.total)}%</strong><span>{delayed.right} of {delayed.total} right</span></p>
+                        <p className="hint">Answers given 7 days or more after you first saw the question. This shows what you keep, not what you just read. The target is 80% over at least 20 answers.</p>
+                      </section>
+                    </>
+                  )}
 
                   <h2 className="section-title">Other exams</h2>
                   <ul className="list other-exams">
@@ -2022,9 +2024,23 @@ function QuestionStep({ question, number, total, pace, saved, saving, restored, 
     if (!choice || !sure || saved || saving) return;
     await onAnswer(question, choice, sure === 'sure', seconds);
   }
+  /* Sure or Guess sits in the bottom bar next to Check, so on a phone both
+     stay in view however long the question is. */
   const foot = saved
     ? <button className="primary wide" onClick={onNext} autoFocus>{nextLabel}</button>
-    : <button className="primary wide" onClick={check} disabled={!choice || !sure || saving}>Check</button>;
+    : (
+      <>
+        <fieldset className="sure">
+          <legend className="sr-only">Sure or guess?</legend>
+          <div className="sure-options">
+            {([['sure', 'Sure'], ['guess', 'Guess']] as const).map(([key, label]) => (
+              <label key={key} className={sure === key ? 'active' : ''}><input type="radio" name={`s-${question.id}`} value={key} checked={sure === key} onChange={() => setSure(key)} />{label}</label>
+            ))}
+          </div>
+        </fieldset>
+        <button className="primary wide" onClick={check} disabled={!choice || !sure || saving}>Check</button>
+      </>
+    );
   return (
     <Pane step={question.id} restored={restored} foot={foot}>
       <div className="q-head">
@@ -2044,16 +2060,6 @@ function QuestionStep({ question, number, total, pace, saved, saving, restored, 
           );
         })}
       </div>
-      {!saved && (
-        <fieldset className="sure">
-          <legend>Sure or guess?</legend>
-          <div className="sure-options">
-            {([['sure', 'Sure'], ['guess', 'Guess']] as const).map(([key, label]) => (
-              <label key={key} className={sure === key ? 'active' : ''}><input type="radio" name={`s-${question.id}`} value={key} checked={sure === key} onChange={() => setSure(key)} />{label}</label>
-            ))}
-          </div>
-        </fieldset>
-      )}
       {saved && (
         <section id={`sheet-${question.id}`} className={saved.correct ? 'sheet is-right' : 'sheet is-wrong'} role="status">
           <strong className="sheet-title"><span className="sheet-icon" aria-hidden="true">{saved.correct ? <Check /> : '×'}</span>{saved.correct ? (saved.sure ? 'Right' : 'Right, but a guess. It comes back in two days.') : `The answer is ${question.correct}`}</strong>
@@ -2335,7 +2341,7 @@ function ExamResultView({ result, saving, onSave, onBack }: { result: ExamView; 
           <li key={area.area}>
             <div className="area-row">
               <span className="area-name">{area.area}</span>
-              <span className="area-score"><strong>{area.right} of {area.total}</strong><small>{area.percent}%</small></span>
+              <span className="area-score"><strong>{area.right} of {area.total}</strong><small>{Math.round(area.percent)}%</small></span>
               <Meter value={area.total ? area.right / area.total : 0} />
             </div>
           </li>
@@ -2743,10 +2749,12 @@ function RichText({ text }: { text: string }) {
       }
       const [head, ...body] = rows;
       blocks.push(
-        <div key={`t${blocks.length}`} className="table-scroll rich-table">
+        // Wide tables scroll sideways with a fade at the edge; on a phone each
+        // row stacks, every value under its column name (data-label).
+        <div key={`t${blocks.length}`} className="table-scroll rich-table" role="region" tabIndex={0} aria-label={head ? `Table: ${head.join(', ')}` : 'Table'}>
           <table>
             {head && <thead><tr>{head.map((cell, cellIndex) => <th key={cellIndex}>{cell}</th>)}</tr></thead>}
-            <tbody>{body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{cell}</td>)}</tr>)}</tbody>
+            <tbody>{body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex} data-label={head?.[cellIndex] || undefined}>{cell}</td>)}</tr>)}</tbody>
           </table>
         </div>,
       );
@@ -2964,13 +2972,12 @@ function Onboarding({ notice, saving, today, onSubmit }: { notice: Notice; savin
   const [step, setStep] = useState(0);
   const last = step === onboardingSteps.length - 1;
   return (
-    <main className="onboard">
+    <main className={step > 0 ? 'onboard is-later' : 'onboard'}>
       <section className="onboard-intro">
         <div className="brand"><BrandMark /><span className="brand-name">TriCert Lab</span></div>
         <div className="onboard-pitch">
           <h1><span>Four exams.</span> <span>One at a time.</span> <span>Ninety minutes a morning.</span></h1>
           <p className="onboard-note">Each weekday morning has four parts: cards, a short lesson, questions at the exam’s pace and your mistakes. One weekend block a week is a lab in a real tool or a full practice exam. Earlier exams stay fresh through spaced review.</p>
-          <p className="onboard-short">Four exams, one at a time, ninety minutes a morning.</p>
           <ol className="onboard-blocks">
             {examBlocks.map((item, index) => <li key={item.key}><strong>{index + 1}. {examLabel(item.cert)}</strong><span>{item.status === 'ready' ? item.title : `${item.title}, being built`}</span></li>)}
           </ol>

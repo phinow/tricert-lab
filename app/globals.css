@@ -186,7 +186,7 @@ input::placeholder, textarea::placeholder { color: var(--text-3); opacity: 1; }
    to text, number, date and search inputs as well as to textareas. Focus is
    a 2px ring in the accent ink, which meets 3:1 in both appearances. */
 input:not([type='checkbox']):not([type='radio']):hover, select:hover, textarea:hover { border-color: var(--text-3); }
-input:not([type='checkbox']):not([type='radio']):focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+input:not([type='checkbox']):not([type='radio']):focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
 label.field + .field-hint { margin: -2px 0 10px; }
 ul.field-hint { display: grid; gap: 4px; padding-left: 1.2em; list-style: disc; }
 ul.field-hint li::marker { color: var(--text-3); }
@@ -1048,7 +1048,7 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 /* ============================================================== refined */
 /* Fewer lines: planes instead of rims. Controls keep their edges. */
 .stage, .onboard-form { box-shadow: none; }
-.list, .fold, .folds, .reflect, .finished, .tips, .self-check, .review-list, .guide-sections, .exam-facts-grid, .model-doc, .rich-table, .plan-track, .empty, .card, .tally { background: var(--surface); box-shadow: var(--rim); }
+.list, .fold, .folds, .reflect, .finished, .tips, .self-check, .review-list, .guide-sections, .exam-facts-grid, .model-doc, .plan-track, .empty, .card, .tally { background: var(--surface); box-shadow: var(--rim); }
 .exam-card, .release, .reader-nav button, .guide div, .key-terms > div, .onboard-intro .track { background: var(--surface); box-shadow: var(--rim); }
 .exam-card:hover, .release:hover, .reader-nav button:hover { background: var(--surface-2); }
 .release.active { background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--fill); }
@@ -1076,7 +1076,7 @@ blockquote { margin: 0; padding: 14px 16px; border-radius: var(--r-sm); backgrou
 .screen-head h1, .doc-head h1, .hello h1 { font-size: var(--t-3xl); font-weight: 650; letter-spacing: -0.042em; line-height: 1.06; }
 .reader-head h1 { font-size: var(--t-4xl); font-weight: 650; letter-spacing: -0.048em; line-height: 1.02; }
 .lede { color: var(--text-2); font-size: var(--t-lg); line-height: 1.5; letter-spacing: -0.008em; }
-.eyebrow, .hero-when-line, .release-no, .flash-cert, .toc-title, .quiz-run, .exam-facts-grid dt { font-size: 11.5px; letter-spacing: 0.09em; }
+.eyebrow, .hero-when-line, .release-no, .flash-cert, .toc-title, .quiz-run, .exam-facts-grid dt { font-size: var(--t-xs); letter-spacing: 0.08em; }
 .section-title { margin: 0 2px 12px; color: var(--text-3); font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; }
 .row-text strong, .week-text strong, .doc-title strong { font-weight: 560; letter-spacing: -0.008em; }
 .phase { margin-top: 56px; gap: 14px; }
@@ -1436,4 +1436,64 @@ button.plan-item:hover { background: var(--hover); }
 }
 @media (prefers-reduced-motion: reduce) {
   .exam-cell, .flag-toggle { transition: none; }
+}
+
+/* ================================================== version 8, round 1 */
+
+/* Tables keep the surface of a card, with a fade and shadow at the edge
+   while there is more to scroll. On a phone each row stacks instead: every
+   value under its column name. */
+.rich-table { --edge: var(--surface); background-color: var(--surface); box-shadow: var(--rim); }
+@media (max-width: 500px) {
+  .rich-table { background: var(--surface); }
+  .rich-table table, .rich-table tbody, .rich-table tr, .rich-table td { display: block; width: auto; }
+  .rich-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .rich-table tr { padding: 12px 16px; }
+  .rich-table tr + tr { border-top: 1px solid var(--line); }
+  .rich-table td, .rich-table td:first-child { min-width: 0; padding: 3px 0; border-top: 0; }
+  .rich-table td[data-label]::before { content: attr(data-label); display: block; color: var(--text-3); font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.02em; }
+  .rich-table td + td[data-label]::before { margin-top: 4px; }
+}
+
+/* A morning question: Sure or Guess sits beside Check in the bottom bar. */
+.morning-actions > .sure { display: flex; flex: 0 1 38%; min-width: 0; min-height: 52px; margin: 0; padding: 0; border: 0; border-radius: 0; }
+.morning-actions > .sure .sure-options { flex: 1; width: 100%; }
+.morning-actions > .sure label { flex: 1; min-height: 46px; padding: 0 8px; }
+@media (max-width: 760px) {
+  .focus .quiz-q { font-size: var(--t-lg); }
+}
+
+/* Scrolled text fades out under the step line instead of being cut. */
+.morning-body { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px); mask-image: linear-gradient(to bottom, transparent 0, #000 16px); }
+
+/* Today: the tag stays at the top right; a long kicker wraps beside it. */
+.hero-top { flex-wrap: nowrap; align-items: baseline; }
+.hero-top > .hero-when-line { min-width: 0; }
+.hero-tags { flex: none; }
+
+/* Card titles in two sizes: the hero size for the one action card on Today
+   and Practice, and one size for every other card. */
+.hero-session.is-done h2, .exam-start .hero-session h2 { max-width: none; font-size: var(--t-xl); font-weight: 650; line-height: 1.2; letter-spacing: -0.03em; }
+.block-head h2, .book-checks h2 { font-size: var(--t-xl); font-weight: 650; letter-spacing: -0.03em; }
+
+/* 44px targets at every width, not only on touch screens. */
+.nav button, .back, .text-link, .brand, .segmented button, .pill, .sure label, .flag-toggle, .exam-tools .ghost, .focus-mini, .tile-controls select, .tile-controls .start, .self-check details summary, .ideas summary, .rubric label { min-height: 44px; }
+.close, .toast button, .arrow { width: 44px; height: 44px; }
+.brand { min-width: 44px; }
+.strip-head { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.quiz-bar { grid-template-columns: 44px minmax(0, 1fr) auto; }
+.hint.source a { display: inline-block; padding: 12px 0; margin: -12px 0; }
+
+/* The smallest text: 12px at 600, or 13px. */
+.me-text small, .week-text small, .wd-title small, .gate-text small, .pi-text small { font-size: 13px; }
+.nav-label, .nav-badge { font-weight: 600; }
+
+/* Setup on a phone: the headline once, short; after step 1 only the mark;
+   Continue stays in view at the bottom. */
+@media (max-width: 760px) {
+  .onboard-intro h1 { font-size: var(--t-2xl); }
+  .onboard-intro h1 span { display: inline; }
+  .onboard.is-later .onboard-pitch { display: none; }
+  .onboard.is-later .onboard-intro { padding-bottom: 12px; }
+  .onboard-form .form-actions { position: sticky; z-index: 5; bottom: 0; margin: 16px calc(-1 * var(--gutter)) 0; padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--panel); box-shadow: 0 -1px 0 var(--line); }
 }

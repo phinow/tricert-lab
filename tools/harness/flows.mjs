@@ -128,7 +128,7 @@ await check('Saturday shows the next weekend block with a link to do a morning i
   await page.goto(`${base}/?state=midway&today=2026-11-21`);
   await page.waitForSelector('.hero-session');
   assert.match(await page.textContent('.hero-label'), /This weekend/);
-  assert.match(await page.textContent('.hero-when'), /ITIL, weekend block 1 of 3/);
+  assert.match(await page.textContent('.hero-when'), /ITIL, block 1 of 3/);
   assert.match(await page.textContent('#session-title'), /Jira Service Management/);
   assert.equal((await page.textContent('.hero-session .play')).trim(), 'Start lab');
   assert.equal((await page.textContent('.hero-link')).trim(), 'Do a morning instead');
@@ -535,10 +535,11 @@ await check('Scenarios across exams: keyboard B + Enter shows the sheet; Enter c
   assert.equal(puts, 0);
 });
 
-await check('Progress: the four Ready to book checks with their details, an empty exam history, the delayed-review score and other exams; Portfolio and #portfolio work', async () => {
+await check('Progress: the four Ready to book checks with their details, no empty history or delayed-review card, and other exams; Portfolio and #portfolio work', async () => {
   await nav('Progress');
   await page.waitForSelector('.book-checks');
-  assert.match(await page.textContent('.progress .lede'), /^ITIL: 0 of 4 checks met\. Book when all four are met\.$/);
+  assert.match(await page.textContent('.progress .lede'), /^ITIL: book the real exam when all four checks below are met\.$/);
+  assert.match(await page.textContent('.gate-score'), /^0\/4$/);
   const checks = await page.locator('.book-checks .checklist li').allTextContents();
   assert.equal(checks.length, 4);
   assert.match(checks[0], /Every learn morning done.*Not yet\. 4 of 8 learn mornings done\./);
@@ -546,8 +547,8 @@ await check('Progress: the four Ready to book checks with their details, an empt
   assert.match(checks[2], /No weak area.*Checked once two practice exams pass\./);
   assert.match(checks[3], /Delayed reviews at 80% or more.*Not enough reviews yet: 6 of 20/);
   assert.equal(await page.locator('.booking-list').count(), 0);
-  assert.match(await page.textContent('.empty-line'), /No practice exam yet\. Practice exam A opens when/);
-  assert.match(await page.textContent('.delayed-score'), /6\s*of 20 answers needed/);
+  // No history and too few delayed reviews: only the four checks say so, once each.
+  assert.equal(await page.locator('.history, .empty-line, .delayed-score').count(), 0);
   assert.deepEqual((await page.locator('.other-exams .pi-state').allTextContents()), ['Being built', 'Being built', 'Being built']);
   assert.equal(await page.locator('.cert-scores, .gate-checks, .parts').count(), 0);
   assert.doesNotMatch(await page.textContent('main'), /gate|week \d+, day|Coverage|out of 100/i);
@@ -635,7 +636,7 @@ await page.waitForSelector('.hero-session');
 let examIds = [];
 
 await check('A practice exam weekend block opens the practice exam: its start screen says what it is, with one button', async () => {
-  assert.match(await page.textContent('.hero-when'), /ITIL, weekend block 2 of 3/);
+  assert.match(await page.textContent('.hero-when'), /ITIL, (weekend )?block 2 of 3/);
   assert.equal((await page.textContent('#session-title')).trim(), 'Practice exam A');
   assert.equal((await page.textContent('.hero-session .play')).trim(), 'Start practice exam');
   await page.click('.hero-session .play');
