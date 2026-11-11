@@ -166,6 +166,34 @@ await check('Practice and Progress: scenarios across exams save nothing; Ready t
   await page.screenshot({ path: path.join(shots, 'live-progress.png'), fullPage: true });
 });
 
+await check('A practice exam saves its result, the review schedules and its weekend block to D1', async () => {
+  for (const key of ['itil-m2', 'itil-m3', 'itil-m4', 'itil-m5', 'itil-m6', 'itil-m7', 'itil-m8']) {
+    const response = await fetch(`${base}/api/state`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-progress', itemKey: key, status: 'complete' }) });
+    assert.equal(response.status, 200);
+  }
+  await page.reload();
+  await page.waitForSelector('main.stage');
+  await page.click('.nav button:has(.nav-label:text-is("Practice"))');
+  await page.waitForSelector('.review-card');
+  await page.click('.tile-exam');
+  await page.click('.exam-start .play');
+  await page.waitForSelector('.exam .q-head');
+  await page.click('.exam .answer >> nth=0');
+  await page.click('.exam-tools .ghost:has-text("Finish exam")');
+  await page.click('.morning-foot .primary');
+  await page.waitForSelector('.exam-result');
+  await page.waitForFunction(() => !localStorage.getItem('tricert.exam.v1'));
+  const state = await (await fetch(`${base}/api/state`)).json();
+  assert.equal(state.records.mocks.length, 1);
+  assert.equal(state.records.mocks[0].form, 'A');
+  assert.equal(state.records.mocks[0].total, 40);
+  assert.equal(state.records.mocks[0].ids.length, 40);
+  assert.ok(Object.keys(state.records.srs.questions).length >= 40);
+  assert.ok(state.progress.some((row) => row.item_key === 'itil-w2' && row.status === 'complete'));
+  assert.ok(state.records.log.some((row) => row.key === 'itil-w2'));
+  await page.screenshot({ path: path.join(shots, 'live-exam-result.png') });
+});
+
 assert.deepEqual(errors, [], `console errors: ${errors.join(' | ')}`);
 console.log(`\n${passed} live checks passed against the real server, no console errors`);
 await browser.close();
