@@ -107,7 +107,7 @@ const itil: ExamBlock = {
         ask: 'Say which guiding principle each of the three ideas follows or breaks, and what should happen first.',
       },
     },
-    { key: 'itil-r1', kind: 'review', title: 'Review: mornings 1 to 4' },
+    { key: 'itil-r1', kind: 'review', title: 'Review: lessons 1 to 4' },
     {
       key: 'itil-m5',
       kind: 'learn',
@@ -160,7 +160,7 @@ const itil: ExamBlock = {
         ask: 'Map the access-request value stream with work and wait times, and plan one improvement with the continual improvement model.',
       },
     },
-    { key: 'itil-r2', kind: 'review', title: 'Review: mornings 5 to 8' },
+    { key: 'itil-r2', kind: 'review', title: 'Review: lessons 5 to 8' },
     { key: 'itil-p1', kind: 'repair', title: 'Repair: your weakest area in practice exam A' },
     { key: 'itil-p2', kind: 'repair', title: 'Repair: your second weakest area' },
   ],

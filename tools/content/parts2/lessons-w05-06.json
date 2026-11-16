@@ -763,7 +763,7 @@
    "read": [
     {
      "heading": "How the ITIL Foundation (Version 5) exam works",
-     "body": "- 40 multiple-choice questions in 60 minutes. Pass mark 65%, which is 26 of 40.\n- Closed book. Online proctored delivery is available, and no training course is required first.\n- The certificate renews every 3 years, through continuing professional development or a retake.\n\nThat is 90 seconds a question. Plan one pass through all 40 in about 45 minutes, then use the last 15 on the questions you marked.\n\nQuestions test definitions and how they apply:\n\n1. Read the stem twice and find the key word: value, outcome, output, utility, warranty, principle, dimension, stage.\n2. Watch for negatives. \"Which is NOT\" and \"which is LEAST likely\" reverse the task.\n3. Eliminate answers that are true but answer a different question.\n4. Prefer the answer about value for the consumer over the one about internal activity.\n5. Answer every question; a blank cannot score.\n\nThe learning objectives cover product and service management concepts, value co-creation, the four dimensions, the Value System, the guiding principles, the lifecycle, management practices, continual improvement, and value stream mapping and management. Version 5 builds artificial intelligence (AI) use and governance in throughout and is described as AI-native, so expect AI across topics."
+     "body": "- 40 multiple-choice questions in 60 minutes. Pass mark 65%, which is 26 of 40.\n- Closed book. Online proctored delivery is available, and no training course is required first.\n- The certificate renews every 3 years, through continuing professional development or a retake.\n\nThat is 90 seconds a question. Plan one pass through all 40 in about 45 minutes, then use the last 15 on the questions you marked.\n\nQuestions test definitions and how they apply:\n\n1. Read the stem twice and find the key word: value, outcome, output, utility, warranty, principle, dimension, activity.\n2. Watch for negatives. \"Which is NOT\" and \"which is LEAST likely\" reverse the task.\n3. Eliminate answers that are true but answer a different question.\n4. Prefer the answer about value for the consumer over the one about internal activity.\n5. Answer every question; a blank cannot score.\n\nThe learning objectives cover product and service management concepts, value co-creation, the four dimensions, the Value System, the guiding principles, the lifecycle, management practices, continual improvement, and value stream mapping and management. Version 5 builds artificial intelligence (AI) use and governance in throughout and is described as AI-native, so expect AI across topics."
     },
     {
      "heading": "High-yield ITIL: value, roles and the guiding principles",
@@ -771,7 +771,7 @@
     },
     {
      "heading": "High-yield ITIL: dimensions, lifecycle and practices",
-     "body": "The four dimensions of product and service management must all be considered for every service:\n\n- Organizations and People: roles, skills, culture (Tomás Rivera's key-person risk).\n- Information and Technology: data, tools and platforms (the semantic model, the gateway, the warehouse A-010).\n- Partners and Suppliers: other organizations involved (Lumen Analytics Partners; Microsoft as the Power BI provider).\n- Value Streams and Processes: how work flows to create value (a request for dashboard access, end to end).\n\nVersion 5 organizes work around an eight-stage product and service lifecycle, which replaces ITIL 4's service value chain as the organizing model:\n\n| Stage | For the analytics service |\n|---|---|\n| Discover | Leaders' pain with emailed extracts |\n| Design | Pages, measures, security, service levels |\n| Acquire | Lumen contract; Power BI capacity |\n| Build | Semantic model, reports, tests |\n| Transition | Go-live decision D-02 and handover |\n| Operate | Refresh, gateway and workspaces monitored and maintained |\n| Deliver | Access requests handled; reports used each morning; feedback collected |\n| Support | Incidents and problems resolved, using known errors and workarounds |\n\nManagement practices are sets of organizational resources for a type of work, such as incident, problem and service level management; Version 5 keeps them with adjustments and new groupings. A value stream is the series of steps that turns demand into value; mapping it shows where work waits."
+     "body": "The four dimensions of product and service management must all be considered for every service:\n\n- Organizations and People: roles, skills, culture (Tomás Rivera's key-person risk).\n- Information and Technology: data, tools and platforms (the semantic model, the gateway, the warehouse A-010).\n- Partners and Suppliers: other organizations involved (Lumen Analytics Partners; Microsoft as the Power BI provider).\n- Value Streams and Processes: how work flows to create value (a request for dashboard access, end to end).\n\nVersion 5 describes a product and service lifecycle of eight activities. It sits beside the value chain activities of the Value System; it does not replace them:\n\n| Activity | For the analytics service |\n|---|---|\n| Discover | Leaders' pain with emailed extracts |\n| Design | Pages, measures, security, service levels |\n| Acquire | Lumen contract; Power BI capacity |\n| Build | Semantic model, reports, tests |\n| Transition | Go-live decision D-02 and handover |\n| Operate | Refresh, gateway and workspaces monitored and maintained |\n| Deliver | Access requests handled; reports used each morning; feedback collected |\n| Support | Incidents and problems resolved, using known errors and workarounds |\n\nManagement practices are sets of organizational resources for a type of work, such as incident, problem and service level management; Version 5 keeps them with adjustments and new groupings. A value stream is the series of steps that turns demand into value; mapping it shows where work waits."
     },
     {
      "heading": "PL-300 topics Beacon did not exercise",
@@ -809,7 +809,7 @@
     },
     {
      "term": "Product and service lifecycle",
-     "definition": "ITIL Version 5's eight stages: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support, the organizing model in place of ITIL 4's value chain."
+     "definition": "ITIL Version 5's eight lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. Value chain activities remain a separate component of the ITIL Value System."
     }
    ],
    "build": {
@@ -835,7 +835,7 @@
     },
     {
      "cert": "ITIL",
-     "tip": "Know the eight lifecycle stages in order: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Do not answer with ITIL 4 value chain activity names."
+     "tip": "Know the eight lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Do not answer a lifecycle question with ITIL 4 value chain activity names."
     },
     {
      "cert": "PL-300",
@@ -845,7 +845,7 @@
    "pitfalls": [
     "Treating green service levels as proof of value without checking use and outcomes.",
     "Drawing conclusions from 9 satisfaction responses as if they were representative.",
-    "Studying ITIL with ITIL 4 value chain names; the Version 5 exam is organized around the eight-stage lifecycle.",
+    "Studying ITIL from ITIL 4 material alone; the Version 5 exam also covers the product and service lifecycle and its eight activities.",
     "Presenting the August and September figures as post-go-live performance. They are the baseline before the new service."
    ],
    "check": [
@@ -858,7 +858,7 @@
      "a": "Not on its own. It covers 12 incidents with a known outcome, before go-live. Service requests met target only 50.0%, satisfaction is 3.0 from just 9 responses, and use has not been measured. Green targets with low use would be the watermelon effect, so the review also tracks usage and outcomes."
     },
     {
-     "q": "In which lifecycle stage does go-live decision D-02 sit, and which stages follow it?",
+     "q": "In which lifecycle activity does go-live decision D-02 sit, and which activities follow it?",
      "a": "Transition. After it the analytics service runs in Operate (refresh, gateway and workspaces monitored and maintained), Deliver (access requests handled and reports used each morning) and Support (incidents and problems resolved by the service desk)."
     }
    ]

@@ -129,7 +129,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "heading": "ITIL Foundation (Version 5)",
-    "body": "Nine learning objectives: digital product and service management concepts; value co-creation; the four dimensions; the ITIL Value System; the guiding principles; the product and service lifecycle; management practices; continual improvement; value stream mapping and management. Version 5 is described as AI-native and unifies digital product and service management.\n\n- Four dimensions: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes.\n- Value System: guiding principles, governance, value chain activities, management practices, continual improvement.\n- Seven guiding principles: Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate.\n- Practices: Version 5 keeps ITIL 4's practices with adjustments and new groupings.\n- Continual improvement: Version 5 refines the ITIL 4 seven-question model (What is the vision? through How do we keep the momentum going?).\n\nThe eight-stage lifecycle replaces ITIL 4's service value chain as the organizing model. Beacon touches each stage: Discover (eliciting leaders' needs), Design (star schema, catalogue entry), Acquire (the Lumen Analytics Partners contract), Build (semantic model and reports), Transition (go-live and support handover), Operate (refresh and gateway), Deliver (leaders using the dashboards), Support (service desk knowledge and escalation)."
+    "body": "Nine learning objectives: digital product and service management concepts; value co-creation; the four dimensions; the ITIL Value System; the guiding principles; the product and service lifecycle; management practices; continual improvement; value stream mapping and management. Version 5 is described as AI-native and unifies digital product and service management.\n\n- Four dimensions: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes.\n- Value System: guiding principles, governance, value chain activities, management practices, continual improvement.\n- Seven guiding principles: Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate.\n- Practices: Version 5 keeps ITIL 4's practices with adjustments and new groupings.\n- Continual improvement: Version 5 refines the ITIL 4 seven-question model (What is the vision? through How do we keep the momentum going?).\n\nVersion 5 also describes a product and service lifecycle of eight activities. It sits beside the value chain activities; it does not replace them. Beacon touches each activity: Discover (eliciting leaders' needs), Design (star schema, catalogue entry), Acquire (the Lumen Analytics Partners contract), Build (semantic model and reports), Transition (go-live and support handover), Operate (refresh and gateway), Deliver (leaders using the dashboards), Support (service desk knowledge and escalation)."
    }
   ],
   "keyTerms": [
@@ -151,7 +151,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "term": "Product and service lifecycle",
-    "definition": "ITIL Version 5's eight-stage organizing model: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
+    "definition": "The eight product and service lifecycle activities in ITIL Version 5: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
    },
    {
     "term": "Coverage map",
@@ -185,13 +185,13 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "cert": "ITIL",
-    "tip": "Version 5 questions use the eight lifecycle stages. If an option uses ITIL 4 value chain words such as obtain/build or design and transition as if current, treat it with suspicion; the stages are Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
+    "tip": "For the lifecycle topic, learn the eight activity names: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Value chain activities are still a separate component of the ITIL Value System, so do not mix the two lists."
    }
   ],
   "pitfalls": [
    "Paraphrasing task names. Use the exact published wording, because exam questions and your coverage map both depend on recognizing the task.",
    "Mapping only to documents you like. Domains you avoid, such as CISSP Software Development Security, are exactly where the coverage score will fall short.",
-   "Mixing ITIL versions. The eight stages replace the ITIL 4 service value chain as the organizing model; do not list plan, engage or obtain/build as Version 5 stages.",
+   "Mixing ITIL versions. Do not list ITIL 4 value chain names such as plan, engage or obtain/build as Version 5 lifecycle activities, and do not say the lifecycle replaced the value chain.",
    "Treating weights as exact question counts. Weights guide study time. PL-300 has no published question count and CISSP's adaptive exam varies from 100 to 150 items, so any per-domain count is only an estimate."
   ],
   "check": [
@@ -204,7 +204,7 @@ export const lessons: Record<string, Lesson> = {
     "a": "Prepare the data 25–30%; Model the data 25–30%; Visualize and analyze the data 25–30%; Manage and secure Power BI 15–20%. The RLS test pack practises Manage and secure Power BI, in its secure and govern sub-skills (RLS roles and group membership)."
    },
    {
-    "q": "List the eight ITIL Version 5 lifecycle stages in order and give a Beacon example for Transition.",
+    "q": "List the eight ITIL Version 5 lifecycle activities and give a Beacon example for Transition.",
     "a": "Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition in Beacon is Release 1's go-live readiness and support handover, when the dashboards move into live use with the service desk ready to support them."
    }
   ]
@@ -2851,7 +2851,7 @@ export const lessons: Record<string, Lesson> = {
   "read": [
    {
     "heading": "How the ITIL Foundation (Version 5) exam works",
-    "body": "- 40 multiple-choice questions in 60 minutes. Pass mark 65%, which is 26 of 40.\n- Closed book. Online proctored delivery is available, and no training course is required first.\n- The certificate renews every 3 years, through continuing professional development or a retake.\n\nThat is 90 seconds a question. Plan one pass through all 40 in about 45 minutes, then use the last 15 on the questions you marked.\n\nQuestions test definitions and how they apply:\n\n1. Read the stem twice and find the key word: value, outcome, output, utility, warranty, principle, dimension, stage.\n2. Watch for negatives. \"Which is NOT\" and \"which is LEAST likely\" reverse the task.\n3. Eliminate answers that are true but answer a different question.\n4. Prefer the answer about value for the consumer over the one about internal activity.\n5. Answer every question; a blank cannot score.\n\nThe learning objectives cover product and service management concepts, value co-creation, the four dimensions, the Value System, the guiding principles, the lifecycle, management practices, continual improvement, and value stream mapping and management. Version 5 builds artificial intelligence (AI) use and governance in throughout and is described as AI-native, so expect AI across topics."
+    "body": "- 40 multiple-choice questions in 60 minutes. Pass mark 65%, which is 26 of 40.\n- Closed book. Online proctored delivery is available, and no training course is required first.\n- The certificate renews every 3 years, through continuing professional development or a retake.\n\nThat is 90 seconds a question. Plan one pass through all 40 in about 45 minutes, then use the last 15 on the questions you marked.\n\nQuestions test definitions and how they apply:\n\n1. Read the stem twice and find the key word: value, outcome, output, utility, warranty, principle, dimension, activity.\n2. Watch for negatives. \"Which is NOT\" and \"which is LEAST likely\" reverse the task.\n3. Eliminate answers that are true but answer a different question.\n4. Prefer the answer about value for the consumer over the one about internal activity.\n5. Answer every question; a blank cannot score.\n\nThe learning objectives cover product and service management concepts, value co-creation, the four dimensions, the Value System, the guiding principles, the lifecycle, management practices, continual improvement, and value stream mapping and management. Version 5 builds artificial intelligence (AI) use and governance in throughout and is described as AI-native, so expect AI across topics."
    },
    {
     "heading": "High-yield ITIL: value, roles and the guiding principles",
@@ -2859,7 +2859,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "heading": "High-yield ITIL: dimensions, lifecycle and practices",
-    "body": "The four dimensions of product and service management must all be considered for every service:\n\n- Organizations and People: roles, skills, culture (Tomás Rivera's key-person risk).\n- Information and Technology: data, tools and platforms (the semantic model, the gateway, the warehouse A-010).\n- Partners and Suppliers: other organizations involved (Lumen Analytics Partners; Microsoft as the Power BI provider).\n- Value Streams and Processes: how work flows to create value (a request for dashboard access, end to end).\n\nVersion 5 organizes work around an eight-stage product and service lifecycle, which replaces ITIL 4's service value chain as the organizing model:\n\n| Stage | For the analytics service |\n|---|---|\n| Discover | Leaders' pain with emailed extracts |\n| Design | Pages, measures, security, service levels |\n| Acquire | Lumen contract; Power BI capacity |\n| Build | Semantic model, reports, tests |\n| Transition | Go-live decision D-02 and handover |\n| Operate | Refresh, gateway and workspaces monitored and maintained |\n| Deliver | Access requests handled; reports used each morning; feedback collected |\n| Support | Incidents and problems resolved, using known errors and workarounds |\n\nManagement practices are sets of organizational resources for a type of work, such as incident, problem and service level management; Version 5 keeps them with adjustments and new groupings. A value stream is the series of steps that turns demand into value; mapping it shows where work waits."
+    "body": "The four dimensions of product and service management must all be considered for every service:\n\n- Organizations and People: roles, skills, culture (Tomás Rivera's key-person risk).\n- Information and Technology: data, tools and platforms (the semantic model, the gateway, the warehouse A-010).\n- Partners and Suppliers: other organizations involved (Lumen Analytics Partners; Microsoft as the Power BI provider).\n- Value Streams and Processes: how work flows to create value (a request for dashboard access, end to end).\n\nVersion 5 describes a product and service lifecycle of eight activities. It sits beside the value chain activities of the Value System; it does not replace them:\n\n| Activity | For the analytics service |\n|---|---|\n| Discover | Leaders' pain with emailed extracts |\n| Design | Pages, measures, security, service levels |\n| Acquire | Lumen contract; Power BI capacity |\n| Build | Semantic model, reports, tests |\n| Transition | Go-live decision D-02 and handover |\n| Operate | Refresh, gateway and workspaces monitored and maintained |\n| Deliver | Access requests handled; reports used each morning; feedback collected |\n| Support | Incidents and problems resolved, using known errors and workarounds |\n\nManagement practices are sets of organizational resources for a type of work, such as incident, problem and service level management; Version 5 keeps them with adjustments and new groupings. A value stream is the series of steps that turns demand into value; mapping it shows where work waits."
    },
    {
     "heading": "PL-300 topics Beacon did not exercise",
@@ -2897,7 +2897,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "term": "Product and service lifecycle",
-    "definition": "ITIL Version 5's eight stages: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support, the organizing model in place of ITIL 4's value chain."
+    "definition": "ITIL Version 5's eight lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver and Support. Value chain activities remain a separate component of the ITIL Value System."
    }
   ],
   "build": {
@@ -2923,7 +2923,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "cert": "ITIL",
-    "tip": "Know the eight lifecycle stages in order: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Do not answer with ITIL 4 value chain activity names."
+    "tip": "Know the eight lifecycle activities: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Do not answer a lifecycle question with ITIL 4 value chain activity names."
    },
    {
     "cert": "PL-300",
@@ -2933,7 +2933,7 @@ export const lessons: Record<string, Lesson> = {
   "pitfalls": [
    "Treating green service levels as proof of value without checking use and outcomes.",
    "Drawing conclusions from 9 satisfaction responses as if they were representative.",
-   "Studying ITIL with ITIL 4 value chain names; the Version 5 exam is organized around the eight-stage lifecycle.",
+   "Studying ITIL from ITIL 4 material alone; the Version 5 exam also covers the product and service lifecycle and its eight activities.",
    "Presenting the August and September figures as post-go-live performance. They are the baseline before the new service."
   ],
   "check": [
@@ -2946,7 +2946,7 @@ export const lessons: Record<string, Lesson> = {
     "a": "Not on its own. It covers 12 incidents with a known outcome, before go-live. Service requests met target only 50.0%, satisfaction is 3.0 from just 9 responses, and use has not been measured. Green targets with low use would be the watermelon effect, so the review also tracks usage and outcomes."
    },
    {
-    "q": "In which lifecycle stage does go-live decision D-02 sit, and which stages follow it?",
+    "q": "In which lifecycle activity does go-live decision D-02 sit, and which activities follow it?",
     "a": "Transition. After it the analytics service runs in Operate (refresh, gateway and workspaces monitored and maintained), Deliver (access requests handled and reports used each morning) and Support (incidents and problems resolved by the service desk)."
    }
   ]
@@ -4569,7 +4569,7 @@ export const lessons: Record<string, Lesson> = {
   "read": [
    {
     "heading": "The PMP exam you will sit",
-    "body": "The Project Management Professional (PMP) exam from the Project Management Institute (PMI) changed on July 9, 2026. The facts that matter:\n\n- 180 questions: 170 scored and 10 unscored pretest questions. You cannot tell which are which, so treat every question as scored.\n- 240 minutes, with two 10-minute breaks.\n- At a test centre (on computer or paper) or online with a remote proctor.\n- Three domains: People 33% (8 tasks), Process 41% (10 tasks), Business Environment 26% (8 tasks). Of 170 scored questions that is roughly 56 People, 70 Process and 44 Business Environment.\n\nQuestion types:\n\n- Case or scenario: a short story, then a question about it.\n- Graphic-based: a chart to read, such as an S-curve, a burndown chart or a network diagram.\n- Multiple choice, single response: pick one answer.\n- Multiple response: pick the number of answers the question asks for.\n- Computer-based only: enhanced matching, matching, point and click, and pull-down list.\n\nMost questions are situational: a project moment, then \"what should you do?\". Formulas help, but judgment wins this exam."
+    "body": "The Project Management Professional (PMP) exam from the Project Management Institute (PMI) changed on July 9, 2026. The facts that matter:\n\n- 180 questions: 170 scored and 10 unscored pretest questions. You cannot tell which are which, so treat every question as scored.\n- 240 minutes, with two 10-minute breaks.\n- At a test centre (on computer or paper) or online with a remote proctor.\n- Three domains: People 33% (8 tasks), Process 41% (10 tasks), Business Environment 26% (8 tasks). Of 170 scored questions that is roughly 56 People, 70 Process and 44 Business Environment.\n\nQuestion types:\n\n- Case or scenario: a detailed scenario, possibly with visuals, followed by a series of questions that use all of it.\n- Graphic-based: a chart to read, such as an S-curve, a burndown chart or a network diagram.\n- Multiple choice, single response: pick one answer.\n- Multiple response: pick the number of answers the question asks for.\n- Computer-based only: enhanced matching, matching, point and click, and pull-down list.\n\nMost questions are situational: a project moment, then \"what should you do?\". Formulas help, but judgment wins this exam."
    },
    {
     "heading": "How to read a situational question",
@@ -4809,7 +4809,7 @@ export const lessons: Record<string, Lesson> = {
    },
    {
     "heading": "The 35 hours and the 1 December 2026 rule",
-    "body": "From 1 December 2026, live instructor-led training counts toward the 35 hours only if it was delivered by:\n\n- a PMI Authorized Training Partner;\n- a China Registered Education Provider; or\n- an eligible accredited higher-education program.\n\nWhat to do:\n\n1. List every course you count: provider, title, format (live instructor-led or self-paced), dates, hours, and whether you hold a certificate.\n2. Mark each live instructor-led course whose provider is not one of the three types.\n3. If you need any marked hours to reach 35, the safe plan is to submit your application before 1 December 2026 with every certificate ready. The rule says \"from 1 December 2026\"; do not bet on how it will be read for training you took earlier.\n4. Take any further live training from one of the three provider types.\n5. If you are an active CAPM holder, the 35 hours do not apply.\n\nCount the contact hours shown on each certificate, not the number of days the course ran."
+    "body": "From 1 December 2026, live instructor-led training counts toward the 35 hours only if it was delivered by:\n\n- a PMI Authorized Training Partner;\n- a China Registered Education Provider; or\n- an eligible accredited higher-education program.\n\nWhat to do:\n\n1. List every course you count: provider, title, format (live instructor-led or self-paced), dates, hours, and whether you hold a certificate.\n2. Mark each live instructor-led course whose provider is not one of the three types.\n3. Courses finished before 1 December 2026 stay eligible under the old rule, even if you apply later. Keep each certificate with its completion date. Check this rule again before you apply, because PMI may reword it.\n4. Take any further live training from one of the three provider types.\n5. If you are an active CAPM holder, the 35 hours do not apply.\n\nCount the contact hours shown on each certificate, not the number of days the course ran."
    },
    {
     "heading": "Audit readiness",
@@ -4853,7 +4853,7 @@ export const lessons: Record<string, Lesson> = {
     "Separately, build your PMP self-audit: education row, calendar months of non-overlapping experience in the 10-year window, training list with the 1 December 2026 check, and evidence for each claim.",
     "Tick Done when, write Explain it in your own words and answer Check yourself."
    ],
-   "modelAnswer": "Self-audit extract (example). Education: bachelor's degree, program not GAC-accredited, so 36 months needed. Experience: four projects from March 2021 to September 2026, 49 calendar months counted once, all inside the 10-year window. Training: 36 hours; 20 self-paced and 16 live instructor-led from a provider that is not an Authorized Training Partner. Contacts: three of four agreed; one has left. Decision: replace the fourth contact, then submit before 1 December 2026 with every certificate in the folder."
+   "modelAnswer": "Self-audit extract (example). Education: bachelor's degree, program not GAC-accredited, so 36 months needed. Experience: four projects from March 2021 to September 2026, 49 calendar months counted once, all inside the 10-year window. Training: 36 hours; 20 self-paced and 16 live instructor-led from a provider that is not an Authorized Training Partner. Contacts: three of four agreed; one has left. Decision: replace the fourth contact, check that the live course finished before 1 December 2026 and its certificate shows the date, then submit with every certificate in the folder."
   },
   "examTips": [
    {
@@ -6656,7 +6656,7 @@ export const lessons: Record<string, Lesson> = {
   "read": [
    {
     "heading": "What the gate is for",
-    "body": "A gate is a decision point backed by evidence, the same idea as the Release 1 go-live gate on 2026-10-23 and the Release 2 acceptance gate on 2026-11-26. You did not let Release 1 go live on hope: Dr. Helen Marchetti approved it with a written condition (D-02). Treat yourself the same way. The question today is not whether you feel ready. It is whether the evidence says you are.\n\nThe rule in the app: sit the exam only when all five checks in Progress are met. If one fails, the decision is to defer, repair and recheck. Deferring is not failing. Sitting without the evidence and losing the attempt costs far more time than one more repair cycle.\n\nThe exam you are deciding on: the Certified Information Systems Security Professional (CISSP). English exams use Computerized Adaptive Testing (CAT): 100 to 150 items, 3 hours, passing score 700 out of 1000, and you cannot go back to earlier questions.\n\nToday's session is 180 minutes. Spend the first hour on the five checks and any quick repairs, the second on your experience route and the decision record, and the last on rehearsing the exam-day plan, or on the repair plan if the decision is to defer."
+    "body": "A gate is a decision point backed by evidence, the same idea as the Release 1 go-live gate on 2026-10-23 and the Release 2 acceptance gate on 2026-11-26. You did not let Release 1 go live on hope: Dr. Helen Marchetti approved it with a written condition (D-02). Treat yourself the same way. The question today is not whether you feel ready. It is whether the evidence says you are.\n\nThe rule in the app: sit the exam only when all five checks in Progress are met. If one fails, the decision is to defer, repair and recheck. Deferring is not failing. Sitting without the evidence and losing the attempt costs far more time than one more repair cycle.\n\nThe exam you are deciding on: the Certified Information Systems Security Professional (CISSP). All CISSP exams, in every language, use Computerized Adaptive Testing (CAT): 100 to 150 items, 3 hours, passing score 700 out of 1000, and you cannot go back to earlier questions.\n\nToday's session is 180 minutes. Spend the first hour on the five checks and any quick repairs, the second on your experience route and the decision record, and the last on rehearsing the exam-day plan, or on the repair plan if the decision is to defer."
    },
    {
     "heading": "The five gate checks",

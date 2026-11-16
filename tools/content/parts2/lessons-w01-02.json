@@ -130,7 +130,7 @@
     },
     {
      "heading": "ITIL Foundation (Version 5)",
-     "body": "Nine learning objectives: digital product and service management concepts; value co-creation; the four dimensions; the ITIL Value System; the guiding principles; the product and service lifecycle; management practices; continual improvement; value stream mapping and management. Version 5 is described as AI-native and unifies digital product and service management.\n\n- Four dimensions: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes.\n- Value System: guiding principles, governance, value chain activities, management practices, continual improvement.\n- Seven guiding principles: Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate.\n- Practices: Version 5 keeps ITIL 4's practices with adjustments and new groupings.\n- Continual improvement: Version 5 refines the ITIL 4 seven-question model (What is the vision? through How do we keep the momentum going?).\n\nThe eight-stage lifecycle replaces ITIL 4's service value chain as the organizing model. Beacon touches each stage: Discover (eliciting leaders' needs), Design (star schema, catalogue entry), Acquire (the Lumen Analytics Partners contract), Build (semantic model and reports), Transition (go-live and support handover), Operate (refresh and gateway), Deliver (leaders using the dashboards), Support (service desk knowledge and escalation)."
+     "body": "Nine learning objectives: digital product and service management concepts; value co-creation; the four dimensions; the ITIL Value System; the guiding principles; the product and service lifecycle; management practices; continual improvement; value stream mapping and management. Version 5 is described as AI-native and unifies digital product and service management.\n\n- Four dimensions: Organizations and People; Information and Technology; Partners and Suppliers; Value Streams and Processes.\n- Value System: guiding principles, governance, value chain activities, management practices, continual improvement.\n- Seven guiding principles: Focus on value; Start where you are; Progress iteratively with feedback; Collaborate and promote visibility; Think and work holistically; Keep it simple and practical; Optimize and automate.\n- Practices: Version 5 keeps ITIL 4's practices with adjustments and new groupings.\n- Continual improvement: Version 5 refines the ITIL 4 seven-question model (What is the vision? through How do we keep the momentum going?).\n\nVersion 5 also describes a product and service lifecycle of eight activities. It sits beside the value chain activities; it does not replace them. Beacon touches each activity: Discover (eliciting leaders' needs), Design (star schema, catalogue entry), Acquire (the Lumen Analytics Partners contract), Build (semantic model and reports), Transition (go-live and support handover), Operate (refresh and gateway), Deliver (leaders using the dashboards), Support (service desk knowledge and escalation)."
     }
    ],
    "keyTerms": [
@@ -152,7 +152,7 @@
     },
     {
      "term": "Product and service lifecycle",
-     "definition": "ITIL Version 5's eight-stage organizing model: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
+     "definition": "The eight product and service lifecycle activities in ITIL Version 5: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
     },
     {
      "term": "Coverage map",
@@ -186,13 +186,13 @@
     },
     {
      "cert": "ITIL",
-     "tip": "Version 5 questions use the eight lifecycle stages. If an option uses ITIL 4 value chain words such as obtain/build or design and transition as if current, treat it with suspicion; the stages are Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support."
+     "tip": "For the lifecycle topic, learn the eight activity names: Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Value chain activities are still a separate component of the ITIL Value System, so do not mix the two lists."
     }
    ],
    "pitfalls": [
     "Paraphrasing task names. Use the exact published wording, because exam questions and your coverage map both depend on recognizing the task.",
     "Mapping only to documents you like. Domains you avoid, such as CISSP Software Development Security, are exactly where the coverage score will fall short.",
-    "Mixing ITIL versions. The eight stages replace the ITIL 4 service value chain as the organizing model; do not list plan, engage or obtain/build as Version 5 stages.",
+    "Mixing ITIL versions. Do not list ITIL 4 value chain names such as plan, engage or obtain/build as Version 5 lifecycle activities, and do not say the lifecycle replaced the value chain.",
     "Treating weights as exact question counts. Weights guide study time. PL-300 has no published question count and CISSP's adaptive exam varies from 100 to 150 items, so any per-domain count is only an estimate."
    ],
    "check": [
@@ -205,7 +205,7 @@
      "a": "Prepare the data 25–30%; Model the data 25–30%; Visualize and analyze the data 25–30%; Manage and secure Power BI 15–20%. The RLS test pack practises Manage and secure Power BI, in its secure and govern sub-skills (RLS roles and group membership)."
     },
     {
-     "q": "List the eight ITIL Version 5 lifecycle stages in order and give a Beacon example for Transition.",
+     "q": "List the eight ITIL Version 5 lifecycle activities and give a Beacon example for Transition.",
      "a": "Discover, Design, Acquire, Build, Transition, Operate, Deliver, Support. Transition in Beacon is Release 1's go-live readiness and support handover, when the dashboards move into live use with the service desk ready to support them."
     }
    ]

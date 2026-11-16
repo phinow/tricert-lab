@@ -116,7 +116,8 @@ export function nextPracticeExam(input: {
     questions from the lesson, then other new daily questions of this exam.
     `mocks` is the mocks record, so form questions join once their form is
     taken. With `taught` (lesson keys of learn mornings done), new questions
-    from lessons not taught yet are left out; without it they can fill the set. */
+    from lessons not taught yet are left out; without it they can fill the set.
+    With `focus` (an area name) a repair morning starts with that area. */
 export function todaysQuestions(input: {
   exam: Certification;
   srs: SrsRecord;
@@ -125,6 +126,7 @@ export function todaysQuestions(input: {
   mode?: DailyMode;
   mocks?: Pick<ExamResult, 'exam' | 'form'>[];
   taught?: Iterable<string>;
+  focus?: string;
 }): ScenarioQuestion[] {
   const mocks = input.mocks ?? [];
   const taught = input.taught ? new Set(input.taught) : undefined;
@@ -143,6 +145,7 @@ export function todaysQuestions(input: {
     today: input.today,
     lesson: input.lesson,
     mode: input.mode,
+    focus: input.focus,
     // Forms are already filtered per exam above, so every form left is usable.
     takenForms: [...new Set(usable.map((question) => poolForm(question.pool)).filter((form): form is string => Boolean(form)))],
   });

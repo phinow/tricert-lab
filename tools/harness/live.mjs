@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
 
-const base = 'http://localhost:3000';
+const base = process.env.TRICERT_BASE_URL || 'http://localhost:3000';
 const here = path.dirname(new URL(import.meta.url).pathname);
 const shots = path.join(here, 'shots', 'live');
 await mkdir(shots, { recursive: true });
@@ -107,6 +107,11 @@ await check('A whole morning saves cards, answers, progress and the log to D1; T
     await page.click('.morning-foot .primary');
     await page.waitForFunction((text) => document.querySelector('#morning-title')?.textContent !== text, before);
   }
+  // Mistakes: Finish waits for one line per wrong answer.
+  const rules = page.locator('.mistakes input:not([disabled])');
+  if (await rules.count()) assert.equal(await page.isDisabled('.morning-foot .primary'), true);
+  const written = await rules.count();
+  for (let i = 0; i < written; i += 1) await rules.nth(i).fill('The rule I missed, in my own words.');
   await page.click('.morning-foot .primary'); // Finish morning
   await page.waitForSelector('.celebrate');
   await page.click('.celebrate .primary');
@@ -115,7 +120,9 @@ await check('A whole morning saves cards, answers, progress and the log to D1; T
   assert.match(await page.textContent('.hero-when'), /ITIL, morning 2 of 12/);
   const state = await (await fetch(`${base}/api/state`)).json();
   assert.ok(state.progress.some((row) => row.item_key === 'itil-m1' && row.status === 'complete'));
-  assert.equal(Object.keys(state.records.srs.cards).length, 8);
+  // Eight new cards from the lesson, plus one card for each line written in Mistakes.
+  assert.equal(Object.keys(state.records.srs.cards).length, 8 + written);
+  assert.equal(state.records.usercards.length, written);
   assert.equal(Object.keys(state.records.srs.questions).length, answered);
   assert.equal(state.attempts.length, answered);
   assert.equal(state.records.log.length, 1);
@@ -167,7 +174,8 @@ await check('Practice and Progress: scenarios across exams save nothing; Ready t
 });
 
 await check('A practice exam saves its result, the review schedules and its weekend block to D1', async () => {
-  for (const key of ['itil-m2', 'itil-m3', 'itil-m4', 'itil-m5', 'itil-m6', 'itil-m7', 'itil-m8']) {
+  /* Practice exam A opens after the eight lessons and both review mornings. */
+  for (const key of ['itil-m2', 'itil-m3', 'itil-m4', 'itil-r1', 'itil-m5', 'itil-m6', 'itil-m7', 'itil-m8', 'itil-r2']) {
     const response = await fetch(`${base}/api/state`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-progress', itemKey: key, status: 'complete' }) });
     assert.equal(response.status, 200);
   }

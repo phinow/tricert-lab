@@ -30,6 +30,7 @@ import {
   recordQuestionAnswer,
   scoreExam,
   startCard,
+  weakestAreas,
   weekday,
   type AreaScore,
   type BookingCheck,
@@ -182,14 +183,8 @@ const allDeliverables = projects.flatMap((project) => project.deliverables);
 const releaseNumber = (projectKey: string) => projects.findIndex((item) => item.key === projectKey) + 1;
 const docNumber = (projectKey: string, index: number) => `${releaseNumber(projectKey) ? `R${releaseNumber(projectKey)}` : 'NS'}-${String(index + 1).padStart(2, '0')}`;
 
-/* The four exams. They are named with plain text tags, never colours: the
+/* The four exams are named with plain text tags, never colours: the
    learner's one colour is kept for the next action and for progress. */
-const certs: Array<{ cert: Certification; label: string; field: keyof Profile; name: string }> = [
-  { cert: 'PMP', label: 'PMP', field: 'pmp_target', name: 'Project management' },
-  { cert: 'PL-300', label: 'PL-300', field: 'pl300_target', name: 'Power BI data analyst' },
-  { cert: 'CISSP', label: 'CISSP', field: 'cissp_target', name: 'Information security' },
-  { cert: 'ITIL', label: 'ITIL V5', field: 'itil_target', name: 'Service management' },
-];
 const examLabel = (cert: string) => (cert === 'ITIL' ? 'ITIL V5' : cert === 'Intersection' ? 'All four' : cert);
 function Tag({ children }: { children: ReactNode }) {
   return <span className="tag">{children}</span>;
@@ -679,7 +674,8 @@ export default function TriCertApp() {
     const lesson = mode === 'learn' ? item?.lesson : undefined;
     const engineMode: DailyMode = mode === 'short' || mode === 'due' ? 'short' : mode === 'learn' ? 'learn' : 'review';
     const picks = todaysCards({ srs, today, lesson, usercards: records.usercards }).slice(0, MAX_CARDS);
-    const questions = todaysQuestions({ exam: owner.cert, srs, today, lesson, mode: engineMode, mocks: records.mocks, taught });
+    const focus = item ? repairArea(owner, item, records.mocks)?.area : undefined;
+    const questions = todaysQuestions({ exam: owner.cert, srs, today, lesson, mode: engineMode, mocks: records.mocks, taught, focus });
     const next: MorningRun = {
       v: 1, key, morning: item ? item.key : null, mode, block: owner.key, exam: owner.cert, date: today, part: 0, open: true, spentMs: 0,
       cards: { queue: cardQueue(picks), shown: false, reviewed: 0, again: 0 },
@@ -778,7 +774,7 @@ export default function TriCertApp() {
     if (!current) return;
     const owner = examBlocks.find((item) => item.key === current.block);
     const item = owner?.mornings.find((entry) => entry.key === current.morning);
-    const title = item ? item.title : current.mode === 'due' ? 'Today’s review' : 'Short morning';
+    const title = item && owner ? morningTitle(owner, item, records.mocks) : current.mode === 'due' ? 'Today’s review' : 'Short morning';
     if (current.mode === 'review' && current.reflection.trim()) {
       const saved = await update({ action: 'save-artifact', artifactKey: `retrospective-${current.key}`, status: 'complete', evidenceText: current.reflection, reflection: `${title}: weekly reflection recorded.` });
       if (!saved) return;
@@ -1075,8 +1071,6 @@ export default function TriCertApp() {
   const pmpEligible = profile.pm_months >= pmpNeeded && (Boolean(profile.pm_training_complete) || profile.pm_training_hours >= 35);
   const cisspNeeded = profile.education === 'bachelor' || profile.education === 'gac' ? 48 : 60;
   const cisspEligible = profile.cyber_months >= cisspNeeded && profileDomains.length >= 2;
-  const exams = certs.map((item) => ({ ...item, date: String(profile[item.field] || ''), days: daysUntil(String(profile[item.field] || ''), today) }));
-  const nextExam = exams.filter((item) => item.days !== null && item.days >= 0).sort((a, b) => (a.days ?? 0) - (b.days ?? 0))[0];
   const ticked = new Set(rubricChecks[deliverable.key] || []);
   const workShort = Math.max(0, 120 - artifactText.trim().length);
   const explainShort = Math.max(0, 40 - artifactReflection.trim().length);
@@ -1099,6 +1093,8 @@ export default function TriCertApp() {
   const showWeekend = Boolean(block && nextWeekend && weekendGate?.open && (isWeekend || !nextMorning));
   const morningsDone = block ? block.mornings.filter((item) => completed.has(item.key)).length : 0;
   const examEstimate = block ? estimates.get(`${block.key}-exam`) : null;
+  /* The side rail counts down to the current block's estimated exam date. */
+  const railDays = block && examEstimate ? daysBetween(today, examEstimate) : null;
   const shortRun = morning?.mode === 'short' ? morning : null;
   const standing = block
     ? `${block.title}. ${examEstimate ? `Exam about ${formatDate(examEstimate)} at five mornings and one weekend block a week.` : 'Every morning and weekend block is done.'}`
@@ -1217,7 +1213,7 @@ export default function TriCertApp() {
             </button>
           )}
           <div className="rail-foot">
-            {nextExam && view !== 'today' && <p className="rail-exam"><strong>{nextExam.days}</strong> {nextExam.days === 1 ? 'day' : 'days'} to {nextExam.label}</p>}
+            {block && railDays !== null && railDays >= 0 && view !== 'today' && <p className="rail-exam">About <strong>{railDays}</strong> {railDays === 1 ? 'day' : 'days'} to {block.cert}</p>}
             <button className="me" title="Make it yours" onClick={() => setSettingsOpen(true)}>
               <span className="avatar" aria-hidden="true">{initials || <Flame size={16} />}</span>
               <span className="me-text"><strong>{firstName || 'You'}</strong><small>Make it yours</small></span>
@@ -1281,7 +1277,7 @@ export default function TriCertApp() {
                     <p className="hero-when-line"><span className="hero-label">{morning?.key === nextMorning.key ? 'In progress' : 'Up next'}</span><span className="hero-when">{block.cert}, morning {block.mornings.indexOf(nextMorning) + 1} of {block.mornings.length}</span></p>
                     <span className="hero-tags"><Tag>{kindLabel(nextMorning.kind)}</Tag></span>
                   </div>
-                  <h2 id="session-title">{keepTogether(nextMorning.title)}</h2>
+                  <h2 id="session-title">{keepTogether(morningTitle(block, nextMorning, records.mocks))}</h2>
                   <p className="hero-sub">
                     <span>{formatMinutes(morningParts[modeFor(nextMorning)].reduce((sum, [, , minutes]) => sum + minutes, 0))}</span>
                     <span>{morningParts[modeFor(nextMorning)].map(([, label]) => label).join(', ')}</span>
@@ -2078,23 +2074,37 @@ function QuestionStep({ question, number, total, pace, saved, saving, restored, 
 
 function MistakesPane({ run, restored, saving, step, finalLabel, onChange, onDone }: PaneProps & { finalLabel: string; onChange: MorningChange; onDone: () => void }) {
   const missed = run.questions.ids.filter((id) => run.questions.answers[id] && run.questions.answers[id].result !== 'right');
+  /* Wrong answers come first and each needs a line. A right answer marked
+     Guess is listed too, but its line is optional: marking a guess must
+     never cost him extra work. */
+  const wrong = missed.filter((id) => !run.questions.answers[id].correct);
+  const guessed = missed.filter((id) => run.questions.answers[id].correct);
+  const written = (id: string) => run.savedCards.includes(id) || (run.mistakes[id] || '').trim().length >= RULE_MIN;
+  const left = wrong.filter((id) => !written(id)).length;
+  const title = wrong.length ? (left ? `${left} to write up` : 'All written up') : guessed.length ? `${guessed.length} guessed, none wrong` : 'Nothing to write up';
+  const lede = wrong.length
+    ? `For each wrong answer, write the rule you missed in one line. Each line becomes one of your flashcards, due tomorrow.${guessed.length ? ' A line for a guess is optional.' : ''}`
+    : guessed.length
+      ? 'A line for a guess is optional. Each line you write becomes one of your flashcards, due tomorrow.'
+      : 'Every answer this morning was right and sure.';
   return (
-    <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onDone} disabled={saving}>{finalLabel}</button>}>
+    <Pane step={step} restored={restored} foot={<button className="primary wide" onClick={onDone} disabled={saving || left > 0}>{left ? `${left} ${left === 1 ? 'line' : 'lines'} left to write` : finalLabel}</button>}>
       <p className="eyebrow">Mistakes</p>
-      <h2 id="morning-title" className="m-title">{missed.length ? `${missed.length} to write up` : 'Nothing to write up'}</h2>
-      <p className="lede">{missed.length ? 'For each wrong or guessed question, write the rule you missed in one line. Each line becomes one of your flashcards, due tomorrow.' : 'Every answer this morning was right and sure.'}</p>
+      <h2 id="morning-title" className="m-title">{title}</h2>
+      <p className="lede">{lede}</p>
       {missed.length > 0 && (
         <ol className="mistakes">
-          {missed.map((id) => {
+          {[...wrong, ...guessed].map((id) => {
             const question = questionById(id);
             const given = run.questions.answers[id];
             if (!question) return null;
             const saved = run.savedCards.includes(id);
+            const answer = question.options.find(([key]) => key === question.correct)?.[1] || '';
             return (
               <li key={id}>
                 <p className="mistake-q">{keepTogether(question.prompt)}</p>
-                <p className="hint">{given.correct ? `Guessed. ${given.choice} was right.` : `You chose ${given.choice}. The answer is ${question.correct}.`}</p>
-                <label className="field" htmlFor={`rule-${id}`}>The rule you missed</label>
+                <p className="hint">{given.correct ? `Guessed. ${given.choice} was right: ${answer}` : `You chose ${given.choice}. The answer is ${question.correct}: ${answer}`}</p>
+                <label className="field" htmlFor={`rule-${id}`}>{given.correct ? 'The rule, in your words (optional)' : 'The rule you missed'}</label>
                 <input id={`rule-${id}`} value={run.mistakes[id] || ''} maxLength={300} disabled={saved} placeholder="One line, in your own words" onChange={(event) => { const text = event.target.value; onChange((current) => ({ ...current, mistakes: { ...current.mistakes, [id]: text } }), false); }} />
                 {saved && <p className="hint">Saved as a card.</p>}
               </li>
@@ -2415,7 +2425,7 @@ function PlanView({ completed, records, estimates, today, current, runKey, nextM
                       const now = runKey === entry.key;
                       const next = !now && entry.key === nextMorning;
                       const state = now ? 'In progress' : isDone ? 'Done' : next ? 'Next' : !gate.open ? gate.reason : date ? shortDate(date) : '';
-                      return <PlanRow key={entry.key} mark={isDone ? 'done' : now || next ? 'next' : 'none'} label={`Morning ${number + 1}, ${kindLabel(entry.kind).toLowerCase()}${(next || now) && date ? `, ${shortDate(date)}` : ''}`} title={entry.title} state={state} onOpen={gate.open || isDone ? () => onMorning(entry) : undefined} />;
+                      return <PlanRow key={entry.key} mark={isDone ? 'done' : now || next ? 'next' : 'none'} label={`Morning ${number + 1}, ${entry.kind === 'learn' ? `lesson ${lessonNumber(item, entry)}` : kindLabel(entry.kind).toLowerCase()}${(next || now) && date ? `, ${shortDate(date)}` : ''}`} title={morningTitle(item, entry, records.mocks)} state={state} onOpen={gate.open || isDone ? () => onMorning(entry) : undefined} />;
                     })}
                   </ul>
                   <h3 className="section-title">Weekend blocks</h3>
@@ -2425,7 +2435,7 @@ function PlanView({ completed, records, estimates, today, current, runKey, nextM
                       const gate = weekendState(item, entry, completed, records, today);
                       const date = estimates.get(entry.key);
                       const state = isDone ? 'Done' : !gate.open ? gate.reason : date ? shortDate(date) : 'Open';
-                      return <PlanRow key={entry.key} mark={isDone ? 'done' : gate.open ? 'next' : 'none'} label={`Weekend ${number + 1}, ${entry.kind === 'lab' ? 'lab' : 'practice exam'}, ${formatMinutes(entry.minutes)}`} title={entry.title} state={state} onOpen={gate.open ? () => onWeekend(entry) : undefined} />;
+                      return <PlanRow key={entry.key} mark={isDone ? 'done' : gate.open ? 'next' : 'none'} label={`Weekend ${number + 1}, ${entry.kind === 'lab' ? 'lab' : 'practice exam'}, ${formatMinutes(entry.minutes).replace(/ /g, '\u00a0')}`} title={entry.title} state={state} onOpen={gate.open ? () => onWeekend(entry) : undefined} />;
                     })}
                   </ul>
                 </div>
@@ -2562,8 +2572,8 @@ function LearnView({ tab: chosenTab, item, lessonFrom, block, onLeaveLesson, onT
                 {blockLessons.map((morning) => (
                   <li key={morning.key}>
                     <button className="row" onClick={() => onOpenLesson(morning.lesson || morning.key)}>
-                      <span className="lesson-no" aria-hidden="true">{block.mornings.indexOf(morning) + 1}</span>
-                      <span className="row-text"><strong>{keepTogether(morning.title)}</strong><small>Morning {block.mornings.indexOf(morning) + 1}{morning.brief ? `, brief from ${morning.brief.from}` : ''}</small></span>
+                      <span className="lesson-no" aria-hidden="true">{lessonNumber(block, morning)}</span>
+                      <span className="row-text"><strong>{keepTogether(morning.title)}</strong><small>Lesson {lessonNumber(block, morning)}, morning {block.mornings.indexOf(morning) + 1}{morning.brief ? `, brief from ${morning.brief.from}` : ''}</small></span>
                       <Status kind={completed.has(morning.key) ? 'done' : 'none'}>{completed.has(morning.key) ? 'Done' : 'Not yet'}</Status>
                       <Chevron dir="right" />
                     </button>
@@ -3210,6 +3220,8 @@ function currentBlock(done: Set<string>) {
 function blockFinished(item: ExamBlock, done: Set<string>) {
   return [...item.mornings, ...item.weekends].every((entry) => done.has(entry.key));
 }
+/* The fewest characters that count as a written rule in Mistakes. */
+const RULE_MIN = 8;
 function modeFor(item: Morning): MorningMode {
   return item.kind === 'learn' ? 'learn' : item.kind === 'review' ? 'review' : 'repair';
 }
@@ -3218,6 +3230,26 @@ function kindLabel(kind: string) {
 }
 function titleIn(item: ExamBlock, key: string) {
   return [...item.mornings, ...item.weekends].find((entry) => entry.key === key)?.title || key;
+}
+/* The area a repair morning works on: the weakest area of the block's first
+   practice exam for the first repair morning, the second weakest for the
+   second. Unknown until that exam is taken. */
+function repairArea(item: ExamBlock, morning: Morning, mocks: MockRow[]): AreaScore | undefined {
+  if (morning.kind !== 'repair') return undefined;
+  const which = item.mornings.filter((entry) => entry.kind === 'repair').findIndex((entry) => entry.key === morning.key);
+  const first = mocks
+    .filter((row) => row.exam === item.cert && Array.isArray(row.areas) && row.areas.length > 0 && isStudyDate(row.date))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))[0];
+  return first?.areas ? weakestAreas({ areas: first.areas })[which] : undefined;
+}
+/* A repair morning is named after its area once the practice exam is in. */
+function morningTitle(item: ExamBlock, morning: Morning, mocks: MockRow[]) {
+  const area = repairArea(item, morning, mocks);
+  return area ? `Repair: ${area.area}` : morning.title;
+}
+/* The lesson number of a learn morning within its block, from 1. */
+function lessonNumber(item: ExamBlock, morning: Morning) {
+  return item.mornings.filter((entry) => entry.kind === 'learn').findIndex((entry) => entry.key === morning.key) + 1;
 }
 /* A repair morning waits for the block's first practice exam. */
 function morningGate(item: ExamBlock, morning: Morning, done: Set<string>) {
@@ -3423,10 +3455,6 @@ function todayIso() {
   if (typeof forced === 'string' && isStudyDate(forced)) return forced;
   const date = new Date();
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-function daysUntil(target: string, today: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(target)) return null;
-  return Math.round((Date.parse(`${target}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000);
 }
 function formatDate(value: string) {
   const parsed = new Date(`${value}T12:00:00Z`);

@@ -9,7 +9,7 @@ You study about 90 minutes each weekday morning before work and one 3 to 4 hour 
    - Cards, 10 minutes. Flashcards that are due, one at a time. Show answer, then Again or Good. Again brings the card back once more today.
    - Learn, 35 minutes. A short brief from a named Kestrel person, the lesson, one task you do yourself with a model answer you can reveal, then three recall prompts you answer from memory before you reveal them.
    - Questions, 30 minutes. Up to 20 questions at the exam's real pace. Pick an answer, mark Sure or Guess, then read the explanation, including why each wrong option is wrong.
-   - Mistakes, 15 minutes. Every wrong or guessed question is listed. Write one line for each: the rule you missed. Each line becomes a flashcard.
+   - Mistakes, 15 minutes. Every wrong or guessed question is listed with its right answer. Write one line for each wrong answer: the rule you missed. Finish waits until each wrong answer has a line; a line for a guess is optional. Each line becomes a flashcard.
 3. Press Finish morning. You can leave in the middle and come back to the same part.
 4. Short on time? Use the Short morning link on Today: cards (8 minutes), questions that are due (25) and mistakes (10). It does not count as a morning.
 5. On a review morning there is no new lesson. You get cards, a mixed quiz of 30 questions, mistakes and a weekly reflection.
@@ -47,9 +47,10 @@ You study about 90 minutes each weekday morning before work and one 3 to 4 hour 
 
 - ITIL Version 5 wording: PeopleCert's page confirms the "lifecycle mindset" wording but does not say how the lifecycle activities relate to the value chain, and nothing about marking or going back in the exam. Where the lessons and questions explain these, they say "our plain-word reading" or "ITIL 4 background". The lessons no longer claim that the lifecycle is the Version 5 view of the value chain.
 - The exam pass mark is 65% (26 of 40). The app's target is 80% because practice should be harder than the real thing.
-- Repair mornings use the mixed quiz of 30 questions. They do not yet target your weakest area from practice exam A.
-- Every new question has been checked by the content checks, but a second reader answering the 120 new questions blind has not been recorded yet.
-- Not pushed and not yet published to the hosted copy. The hosted copy still runs version 7.1.1 until it is republished.
+- Repair mornings target your weak areas. Once practice exam A is in, repair morning 1 is named after your weakest area and repair morning 2 after the second weakest. Half of each repair quiz comes from that area (your misses first), the rest is the usual mixed review.
+- Every new question was answered blind by a second reader. 119 of 120 matched the key at first; the one disagreement (q-itil-130) was rewritten, and the 32 questions changed by the content fixes were answered blind again: 32 of 32 matched.
+- Pushed as branch `release/v8.0.0`. The preview link runs 8.0; your official hosted copy still runs 7.1.1 until you say to replace it.
+- Also fixed before release: review mornings are named by lesson ("Review: lessons 1 to 4") so the numbers match Learn; the side countdown now counts to the current exam's estimated date, not an old date from setup; five older Kestrel lessons were corrected to the checked facts (ITIL lifecycle wording, PMP case items, the 1 December training rule, CISSP adaptive testing in all languages).
 
 ## What I still need from you
 
@@ -57,7 +58,6 @@ You study about 90 minutes each weekday morning before work and one 3 to 4 hour 
 - How many months you have led projects.
 - Whether you will use Eagle Eye in real services, and how soon.
 - Whether you will have a Windows PC with a work account for the PL-300 labs.
-- A decision on five older Kestrel lessons that the fact check found out of date (w1-s2, w6-s3, w9-s4, w10-s1, w13-s4). They were left as they are.
 
 # TriCert Lab, version 7.1.1: the hosted copy now saves
 

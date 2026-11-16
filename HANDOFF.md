@@ -19,18 +19,16 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 - Study engine `lib/tricert-study.ts` (pure, tested), bank `lib/tricert-bank.ts`, plan `lib/tricert-plan.ts`. Rules are in `docs/system-design.md` and `docs/v8-rebuild-spec.md`.
 - Saving: local copy has a `study_records` table (migration `drizzle/0003_study_records.sql`) and the actions `patch-record` and `append-record`; the hosted copy keeps one document per part (`state`, `attempts`, `rec-<key>`, `doc-<key>`). Text over a limit is refused (400), not cut. See `docs/system-design.md` (Records, Size limits, Hosted copy).
 - Content counts: 65 Kestrel lessons plus 8 ITIL block lessons, 66 document guides with finished examples, 216 questions (144 in a pool: ITIL has 144 in total, 24 of the older ones plus 120 new, split as daily 64, mockA 40, mockB 40; PL-300, PMP and CISSP have 24 each; 16 cross-exam scenarios are kept apart), 164 flashcards (18 original plus 146 from the library, 66 of them ITIL cards tied to a lesson), 242 glossary terms, 4 exam guides, 22 dataset files. ITIL facts were checked against PeopleCert's Foundation (Version 5) page on 11 November 2026; other exam facts on 18 October 2026.
-- Checks run on 2026-11-11: `npm test` 50 of 50, lint 0 errors and 1 warning, build completes, `check2.py` OK, `build-library.py` leaves the `lib/` files unchanged, harness typecheck clean, 43 flow checks, 7 save checks, artifact builds. Details in section 5.
+- Checks run on 2026-11-16: `npm test` 52 of 52, lint 0 errors and 1 warning, build completes, `check2.py` OK, harness typecheck clean, 43 flow checks, 7 save checks, artifact builds, and on a fresh database 7 live checks, live-reading and 7 of 7 `test:e2e`.
 - A hosted copy runs as a private claude.ai artifact (see section 6). It still runs the version 6 or 7.1.1 build until republished.
 
 ### What is half done
 
 - PL-300, PMP and CISSP blocks are not built. Each needs: mornings and weekend blocks in `lib/tricert-plan.ts` (set `status: 'ready'`), lessons for each learn morning in `tools/content/parts2/lessons-<exam>.json`, about 120 questions in a `daily`, `mockA` and `mockB` pool, flashcards with lesson tags, and the exam facts and booking list. `check2.py` and `build-library.py` already accept the keys. The PL-300 block needs a Windows PC with a work account for Power BI (open question, section 8).
-- The 120 new ITIL questions have passed `check2.py` and the content fixes of 11 November, but no second reader has answered them blind (the spec requires this). `tools/content/` has no record of it.
-- Repair mornings (`itil-p1`, `itil-p2`) use the review mix of 30 questions. They do not yet target the weakest area of practice exam A, because the engine has no area-targeted daily set.
+- The 120 new ITIL questions were answered blind by a second reader: 119 of 120 matched at first, q-itil-130 was rewritten, and the 32 questions changed by the content fixes were answered again (32 of 32).
+- Repair mornings target practice exam A: `weakestAreas` in `lib/tricert-study.ts` ranks its areas, `repairArea` in the app gives repair 1 the weakest and repair 2 the second, and `dailySet({ focus })` fills half the 30 questions from that area (misses first).
 - `tools/harness/export-logo.mjs` still draws the old 13-week track for the share image `public/og.png`. Redraw it for the block plan.
 - `npm run live` and `npm run live-reading` were not run in the final pass: they need `npm run dev` on a fresh database, and the shared `.wrangler` database was not fresh. `live.mjs` has 7 checks and passes `node --check`. `npm run test:e2e` (7 tests) also needs the dev server and was not run in the final pass. Run both before release.
-- Five older Kestrel lessons were found out of date by the ITIL fact check and left unchanged, because the 65 Kestrel lessons stay as they are: w1-s2 and w6-s3 (the eight-stage lifecycle replaces the value chain), w9-s4 (case item wording), w10-s1 (1 December advice) and w13-s4 (adaptive testing applies to all languages). Fixing them needs a decision from Moye and a change to the unchanged-content check in `tests/library.test.ts`.
-- `tools/content/verified-facts.md` needs three additions from the ITIL content fixes. (1) PeopleCert's Foundation (Version 5) page, opened 11 November 2026, says "how products and services are managed across their lifecycle" and "Embrace a 'lifecycle mindset' to make smarter decisions, anticipate changes, reduce technical debt, improve service continuity, and keep teams aligned while leaving silo mentality behind"; it says nothing about marking or reviewing questions during the exam. (2) The ITIL 4 carry-over terms used in the questions, labelled "ITIL 4 term, assumed unchanged in Version 5": evaluate, direct and monitor; impact and urgency; event types; known error; confidentiality, integrity and availability; service offering parts; user, customer and sponsor; service relationship parts; standard change and change authority; percent complete and accurate, flow efficiency and lead time; PESTLE. (3) Version 5's own definitions of the lifecycle activities are unconfirmed (itil.com refused connections), so lessons and questions call them "our plain-word reading".
 - Version 7.1 and 7 history: Moye said "i love it" about version 7. 7.1 added soft surfaces, big numerals and phone pill buttons; version 8 keeps that look.
 - Design review screenshots: `tools/harness/shoot.mjs` (not committed).
 - `docs/implementation-backlog.md` is still out of date.
@@ -245,7 +243,7 @@ Results below were recorded on 2026-11-11 on branch `v8-rebuild`, except where m
 
 | Command (where) | Expected result |
 |---|---|
-| `npm test` (root) | `# tests 50`, `# pass 50`, `# fail 0` (content 4, library 10, study 25, plan 6, bank 5) |
+| `npm test` (root) | `# tests 52`, `# pass 52`, `# fail 0` (content 4, library 10, study 27, plan 6, bank 5) |
 | `npm run lint` (root) | `1 problem (0 errors, 1 warning)`; the warning is the logo `<img>` |
 | `npm run build` (root) | `Build complete.` |
 | `npm run test:e2e` (root, with `npm run dev` running) | `# pass 7`, `# fail 0` (not run in the final pass) |
@@ -303,11 +301,11 @@ In priority order.
 
 1. Run `npm run test:e2e` and `npm run live` (with `npm run live-reading`) on a fresh dev server before release. They were not run in the final pass of 2026-11-11.
 2. Push `v8-rebuild` as `release/v8.0.0` (the lead does this) and show Moye version 8. Change what he asks for. Serves: the approved rebuild (decision 15).
-3. Get a second reader to answer the 120 new ITIL questions blind with `tools/content/` helpers or the scratchpad `blind.py`, and resolve every disagreement. Serves: the spec's "Every new question answered blind by a second agent".
+3. Done: blind answers for all 120 new ITIL questions.
 4. Build the PL-300 block, then PMP, then CISSP, each like the ITIL block: mornings and weekend blocks in `lib/tricert-plan.ts`, lessons, 120 questions in three pools, flashcards, exam facts, booking list. The PL-300 block needs an answer on a Windows PC with a work account (Power BI Desktop). The PMP block needs the 35 training hours and his background answers.
-5. Add an area-targeted daily set to the engine so repair mornings use the weakest area of practice exam A.
+5. Done: repair mornings use the weak areas of practice exam A.
 6. Redraw `tools/harness/export-logo.mjs` for the block plan, then regenerate `public/og.png`.
-7. Add the three notes in Status to `tools/content/verified-facts.md`, and decide with Moye what to do about the five out-of-date Kestrel lessons.
+7. Done 16 November 2026: the three ITIL notes are in `verified-facts.md`, and lessons w1-s2, w6-s3, w9-s4, w10-s1 and w13-s4 were corrected to it.
 8. After any change, rebuild the hosted copy (`cd tools/harness && npm run artifact`) and republish `tools/harness/out/artifact/index.html` to https://claude.ai/artifact/GPeDwtK5stmbqQHyzHTTGE, if the tools allow it. The hosted copy still runs an older build.
 9. Before Moye books each exam, recheck the exam facts in `lib/tricert-exams.ts` and `tools/content/verified-facts.md` against PMI, Microsoft Learn, ISC2 and PeopleCert (ITIL last checked 11 November 2026, the others 18 October 2026).
 10. Bring `docs/implementation-backlog.md` and the "readiness rings" line in `tools/content/BRIEF2.md` up to date.

@@ -10,6 +10,7 @@ import {
   cardQueue,
   cardsForToday,
   dailySet,
+  weakestAreas,
   daysBetween,
   drawExam,
   emptySrs,
@@ -563,4 +564,27 @@ test('estimated dates start from today when the start date has passed, and skip 
     today: '2026-11-28',
   });
   assert.deepEqual(asMap(weekendNow), { 'b-m1': null, 'b-w1': '2026-11-28', 'b-exam': '2026-11-30' });
+});
+
+test('weakestAreas orders by share right, then by size', () => {
+  const order = weakestAreas({ areas: [
+    { area: 'A', total: 10, right: 8, percent: 80 },
+    { area: 'B', total: 4, right: 1, percent: 25 },
+    { area: 'C', total: 8, right: 2, percent: 25 },
+    { area: 'D', total: 0, right: 0, percent: 0 },
+  ] }).map((item) => item.area);
+  assert.deepEqual(order, ['C', 'B', 'A']);
+});
+
+test('a repair morning starts with its area: misses first, then new questions', () => {
+  const q = (id: string, area: string) => ({ id, certification: 'ITIL' as const, domain: `${area} · x`, correct: 'A' as const, pool: 'daily' });
+  const questions = [q('o1', 'Other'), q('o2', 'Other'), q('f1', 'Focus'), q('f2', 'Focus'), q('f3', 'Focus'), q('o3', 'Other')];
+  const states = {
+    f2: { stage: 1, due: '2026-12-30', last: '2026-11-01', first: '2026-11-01' },
+    f3: { stage: 3, due: '2026-12-30', last: '2026-11-01', first: '2026-11-01' },
+  };
+  const set = dailySet({ questions, states, exam: 'ITIL', today: '2026-11-16', mode: 'review', size: 4, focus: 'Focus' });
+  assert.deepEqual(set.slice(0, 2).map((item) => item.id), ['f2', 'f1']);
+  assert.equal(set.length, 4);
+  assert.equal(new Set(set.map((item) => item.id)).size, 4);
 });

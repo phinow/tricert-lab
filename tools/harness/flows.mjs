@@ -161,7 +161,7 @@ await check('The lab lists its steps with a tick for each; ticks survive a reloa
   assert.ok(state.records.log.some((row) => row.key === 'itil-w1' && row.kind === 'lab'));
   // Practice exam A waits for review 2, so Saturday now offers the morning.
   await page.waitForFunction(() => /ITIL, morning 6 of 12/.test(document.querySelector('.hero-when')?.textContent || ''));
-  assert.match(await page.textContent('.hero-note'), /No weekend block is open yet\. The next one opens after Review: mornings 5 to 8\./);
+  assert.match(await page.textContent('.hero-note'), /No weekend block is open yet\. The next one opens after Review: lessons 5 to 8\./);
 });
 await context.close();
 
@@ -268,7 +268,13 @@ await check('Questions: one at a time with a clock at the exam pace; Sure or Gue
 
 await check('Mistakes lists the wrong and guessed questions; Finish morning saves the cards, progress and log, then shows what he did', async () => {
   assert.equal(await page.locator('.mistakes li').count(), 2);
+  // The wrong answer needs a line before Finish; the guess does not.
+  assert.equal(await mainLabel(), '1 line left to write');
+  assert.equal(await page.isDisabled('.morning-foot .primary'), true);
+  assert.match(await page.textContent('#morning-title'), /1 to write up/);
   await page.fill(`#rule-${wrongId}`, 'Lifecycle activities describe the work, not the order it happens in.');
+  assert.equal(await mainLabel(), 'Finish morning');
+  assert.match(await page.textContent('#morning-title'), /All written up/);
   await page.fill(`#rule-${guessId}`, 'Support is a lifecycle activity on its own.');
   assert.equal(await mainLabel(), 'Finish morning');
   await page.click('.morning-foot .primary');
@@ -322,14 +328,14 @@ await check('Plan: four blocks in order, the current one open with its mornings 
   assert.equal(await mornings.nth(10).locator('button').count(), 0);
   const weekends = await page.locator('.block.is-current .plan-items >> nth=1').locator('li').allTextContents();
   assert.equal(weekends.length, 3);
-  assert.match(weekends[1], /Practice exam A.*Opens after Review: mornings 5 to 8/);
+  assert.match(weekends[1], /Practice exam A.*Opens after Review: lessons 5 to 8/);
   const others = await page.locator('.block:not(.is-current) .block-line').allTextContents();
   assert.equal(others.length, 3);
   assert.ok(others.every((line) => /^Being built\./.test(line)), others.join(' | '));
 });
 
 await check('A morning opens from Plan; a review morning has a quiz of up to 30 and ends with the weekly reflection', async () => {
-  await page.click('.plan-item:has-text("Review: mornings 1 to 4")');
+  await page.click('.plan-item:has-text("Review: lessons 1 to 4")');
   await page.waitForSelector('.morning');
   const steps = await page.locator('.step-line li').allTextContents();
   assert.deepEqual(steps.map((text) => text.replace(/\s+/g, ' ').trim()), ['Cards10 min', 'Quiz40 min', 'Mistakes20 min', 'Reflection20 min']);

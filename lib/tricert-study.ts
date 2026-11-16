@@ -309,13 +309,17 @@ function isDailyPool(question: Pick<StudyQuestionLike, 'pool'>): boolean {
 export type DailyMode = 'learn' | 'review' | 'short';
 export const DAILY_SIZE: Record<DailyMode, number> = { learn: 20, review: 30, short: 20 };
 export const NEW_FROM_LESSON = 6;
+/** The share of a repair morning's questions that come from its one area. */
+export const FOCUS_SHARE = 0.5;
 
 /** Today's questions: due reviews of any exam (oldest due first), then up to 6
     new questions from the lesson, then other new daily questions of this
     exam, up to the size (20 for a morning, 30 for a review morning). A review
     morning tops up with questions already seen. A short morning takes due
     reviews only. Questions in a practice exam form that has
-    not been taken are never used. */
+    not been taken are never used. With `focus` (an area name, for a repair
+    morning) up to half the set comes from that area first: its missed
+    questions, then new ones, then the ones answered longest ago. */
 export function dailySet<Q extends StudyQuestionLike>(input: {
   questions: Q[];
   states: Record<string, QuestionState>;
@@ -325,6 +329,7 @@ export function dailySet<Q extends StudyQuestionLike>(input: {
   mode?: DailyMode;
   size?: number;
   takenForms?: string[];
+  focus?: string;
 }): Q[] {
   const { questions, states, exam, today, lesson } = input;
   const mode = input.mode ?? 'learn';
@@ -344,8 +349,31 @@ export function dailySet<Q extends StudyQuestionLike>(input: {
       return da < db ? -1 : da > db ? 1 : a.index - b.index;
     })
     .map(({ question }) => question);
-  const picked = due.slice(0, size);
-  if (mode === 'short') return picked;
+  if (mode === 'short') return due.slice(0, size);
+  const picked: Q[] = [];
+  if (input.focus) {
+    // 0 missed or guessed last time, 1 never seen, 2 known, 3 retired.
+    const rank = (question: Q) => {
+      const state = states[question.id];
+      if (!state) return 1;
+      if (isQuestionRetired(state)) return 3;
+      return state.stage <= 1 ? 0 : 2;
+    };
+    const area = usable
+      .filter(({ question }) => {
+        const state = states[question.id];
+        return question.certification === exam && areaOf(question.domain) === input.focus && (!state || state.last < today);
+      })
+      .sort((a, b) => {
+        const la = states[a.question.id]?.last ?? '';
+        const lb = states[b.question.id]?.last ?? '';
+        return rank(a.question) - rank(b.question) || (la < lb ? -1 : la > lb ? 1 : a.index - b.index);
+      })
+      .map(({ question }) => question);
+    picked.push(...area.slice(0, Math.ceil(size * FOCUS_SHARE)));
+  }
+  const focused = new Set(picked.map((question) => question.id));
+  picked.push(...due.filter((question) => !focused.has(question.id)).slice(0, size - picked.length));
   const fresh = usable
     .map(({ question }) => question)
     .filter((question) => question.certification === exam && !states[question.id]);
@@ -509,6 +537,15 @@ export function afterExam(srs: SrsRecord, questions: StudyQuestionLike[], answer
     };
   });
   return next;
+}
+
+/** The areas of a practice exam result, weakest first: the lowest share
+    right, then the area with more questions. Areas with no questions are
+    left out. A repair morning takes its area from this list. */
+export function weakestAreas(result: { areas: AreaScore[] }): AreaScore[] {
+  return result.areas
+    .filter((area) => area.total > 0)
+    .sort((a, b) => a.right / a.total - b.right / b.total || b.total - a.total || (a.area < b.area ? -1 : a.area > b.area ? 1 : 0));
 }
 
 /* ---------- Ready to book ---------- */
