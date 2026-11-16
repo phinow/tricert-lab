@@ -20,7 +20,7 @@ TriCert Lab is a private study and portfolio web app for one learner, Moye, who 
 - Saving: local copy has a `study_records` table (migration `drizzle/0003_study_records.sql`) and the actions `patch-record` and `append-record`; the hosted copy keeps one document per part (`state`, `attempts`, `rec-<key>`, `doc-<key>`). Text over a limit is refused (400), not cut. See `docs/system-design.md` (Records, Size limits, Hosted copy).
 - Content counts: 65 Kestrel lessons plus 8 ITIL block lessons, 66 document guides with finished examples, 216 questions (144 in a pool: ITIL has 144 in total, 24 of the older ones plus 120 new, split as daily 64, mockA 40, mockB 40; PL-300, PMP and CISSP have 24 each; 16 cross-exam scenarios are kept apart), 164 flashcards (18 original plus 146 from the library, 66 of them ITIL cards tied to a lesson), 242 glossary terms, 4 exam guides, 22 dataset files. ITIL facts were checked against PeopleCert's Foundation (Version 5) page on 11 November 2026; other exam facts on 18 October 2026.
 - Checks run on 2026-11-16: `npm test` 52 of 52, lint 0 errors and 1 warning, build completes, `check2.py` OK, harness typecheck clean, 43 flow checks, 7 save checks, artifact builds, and on a fresh database 7 live checks, live-reading and 7 of 7 `test:e2e`.
-- A hosted copy runs as a private claude.ai artifact (see section 6). It still runs the version 6 or 7.1.1 build until republished.
+- The hosted copy (private claude.ai artifact, section 6) runs 8.0 since 16 November 2026. A 7.1.1 save is split into the new documents on first load.
 
 ### What is half done
 

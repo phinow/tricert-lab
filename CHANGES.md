@@ -49,7 +49,7 @@ You study about 90 minutes each weekday morning before work and one 3 to 4 hour 
 - The exam pass mark is 65% (26 of 40). The app's target is 80% because practice should be harder than the real thing.
 - Repair mornings target your weak areas. Once practice exam A is in, repair morning 1 is named after your weakest area and repair morning 2 after the second weakest. Half of each repair quiz comes from that area (your misses first), the rest is the usual mixed review.
 - Every new question was answered blind by a second reader. 119 of 120 matched the key at first; the one disagreement (q-itil-130) was rewritten, and the 32 questions changed by the content fixes were answered blind again: 32 of 32 matched.
-- Pushed as branch `release/v8.0.0`. The preview link runs 8.0; your official hosted copy still runs 7.1.1 until you say to replace it.
+- Pushed as branch `release/v8.0.0`. The official hosted copy and the preview link both run 8.0 (published 16 November 2026).
 - Also fixed before release: review mornings are named by lesson ("Review: lessons 1 to 4") so the numbers match Learn; the side countdown now counts to the current exam's estimated date, not an old date from setup; five older Kestrel lessons were corrected to the checked facts (ITIL lifecycle wording, PMP case items, the 1 December training rule, CISSP adaptive testing in all languages).
 
 ## What I still need from you
